@@ -1,0 +1,213 @@
+import React from 'react';
+import { Task, TaskStatus } from '../types/Task';
+import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon } from '../utils/taskUtils';
+import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+
+interface TaskItemProps {
+  task: Task;
+  isExpanded: boolean;
+  onToggleExpand: (id: string) => void;
+  onStatusChange: (id: string, status: TaskStatus) => void;
+  onEdit: (task: Task) => void;
+  onDelete: (id: string) => void;
+  onAddChild: (parentId: string) => void;
+  hasChildren: boolean;
+  canComplete: boolean;
+}
+
+export const TaskItem: React.FC<TaskItemProps> = ({
+  task,
+  isExpanded,
+  onToggleExpand,
+  onStatusChange,
+  onEdit,
+  onDelete,
+  onAddChild,
+  hasChildren,
+  canComplete
+}) => {
+  const StatusIcon = LucideIcons[getStatusIcon(task.status) as keyof typeof LucideIcons] as React.ComponentType<{className?: string}>;
+  const isOverdue = isTaskOverdue(task);
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = e.target.value as TaskStatus;
+    if (newStatus === 'Done' && !canComplete) {
+      alert('Cannot complete a task that has incomplete subtasks');
+      return;
+    }
+    onStatusChange(task.id, newStatus);
+  };
+
+  const renderTitle = () => {
+    const maxLength = 60;
+    const isLong = task.title.length > maxLength;
+    
+    if (isLong) {
+      const truncated = task.title.substring(0, maxLength);
+      return (
+        <h3 className="font-medium text-gray-900">
+          {truncated}
+          <button
+            onClick={() => onEdit(task)}
+            className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
+          >
+            ...
+          </button>
+        </h3>
+      );
+    }
+    
+    return (
+      <h3 className="font-medium text-gray-900 truncate">
+        {task.title}
+      </h3>
+    );
+  };
+
+  const renderDescription = () => {
+    if (!task.description) return null;
+    
+    const maxLength = 80;
+    const isLong = task.description.length > maxLength;
+    
+    if (isLong) {
+      const truncated = task.description.substring(0, maxLength);
+      return (
+        <p className="mt-1 text-sm text-gray-600">
+          {truncated}
+          <button
+            onClick={() => onEdit(task)}
+            className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
+          >
+            ...Ver más
+          </button>
+        </p>
+      );
+    }
+    
+    return (
+      <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+        {task.description}
+      </p>
+    );
+  };
+
+  return (
+    <div className="group">
+      <div 
+        className={`
+          flex items-center gap-3 p-3 rounded-lg border transition-all duration-200
+          hover:shadow-md hover:border-indigo-200 bg-white
+          ${isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-200'}
+        `}
+        style={{ marginLeft: `${task.depth * 24}px` }}
+      >
+        {/* Expand/Collapse Button */}
+        <button
+          onClick={() => onToggleExpand(task.id)}
+          className={`
+            flex-shrink-0 p-1 rounded transition-colors duration-200
+            ${hasChildren 
+              ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' 
+              : 'text-transparent cursor-default'
+            }
+          `}
+          disabled={!hasChildren}
+        >
+          {hasChildren && (isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+        </button>
+
+        {/* Status Icon */}
+        <div className="flex-shrink-0">
+          <StatusIcon className={`w-5 h-5 ${getStatusColor(task.status).split(' ')[0]}`} />
+        </div>
+
+        {/* Task Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              {renderTitle()}
+              {renderDescription()}
+              
+              {/* Task Meta */}
+              <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <Calendar size={12} />
+                  <span>Created {formatDate(task.createdAt)}</span>
+                </div>
+                {task.dueDate && (
+                  <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
+                    <Calendar size={12} />
+                    <span>Due {formatDate(task.dueDate)}</span>
+                    {isOverdue && <span className="text-red-600">• Overdue</span>}
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <User size={12} />
+                  <span>Depth {task.depth}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 ml-4">
+              {/* Status Selector */}
+              <select
+                value={task.status}
+                onChange={handleStatusChange}
+                className={`
+                  px-2 py-1 text-xs font-medium border rounded-md transition-colors duration-200
+                  ${getStatusColor(task.status)}
+                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1
+                `}
+              >
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Done" disabled={!canComplete}>
+                  Done {!canComplete ? '(Has subtasks)' : ''}
+                </option>
+              </select>
+
+              {/* Menu Button */}
+              <div className="relative">
+                <button
+                  className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all duration-200"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Toggle dropdown menu
+                    const menu = e.currentTarget.nextElementSibling as HTMLElement;
+                    menu?.classList.toggle('hidden');
+                  }}
+                >
+                  <MoreHorizontal size={16} />
+                </button>
+                
+                <div className="hidden absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <button
+                    className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => onEdit(task)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => onAddChild(task.id)}
+                  >
+                    Add Subtask
+                  </button>
+                  <button
+                    className="block w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                    onClick={() => onDelete(task.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
