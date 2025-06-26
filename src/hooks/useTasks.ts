@@ -1,54 +1,86 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Task, TaskStatus, TaskNode, TaskFilter } from '../types/Task';
 import { generateId, buildTaskTree, canCompleteTask } from '../utils/taskUtils';
 
+// Tareas iniciales para nuevos usuarios
+const defaultTasks: Task[] = [
+  {
+    id: '1',
+    title: 'Frontend Development',
+    description: 'Complete the user interface components',
+    status: 'In Progress',
+    createdAt: new Date('2024-01-15'),
+    dueDate: new Date('2024-02-15'),
+    parentId: undefined,
+    childIds: ['2', '3'],
+    depth: 0
+  },
+  {
+    id: '2',
+    title: 'Design System',
+    description: 'Create reusable UI components',
+    status: 'Done',
+    createdAt: new Date('2024-01-16'),
+    parentId: '1',
+    childIds: ['4'],
+    depth: 1
+  },
+  {
+    id: '3',
+    title: 'API Integration',
+    description: 'Connect frontend with backend services',
+    status: 'Open',
+    createdAt: new Date('2024-01-17'),
+    parentId: '1',
+    childIds: [],
+    depth: 1
+  },
+  {
+    id: '4',
+    title: 'Button Components',
+    description: 'Create various button styles and states',
+    status: 'Done',
+    createdAt: new Date('2024-01-18'),
+    parentId: '2',
+    childIds: [],
+    depth: 2
+  }
+];
+
+// Clave para el almacenamiento en localStorage
+const TASKS_STORAGE_KEY = 'taskflow_tasks';
+const EXPANDED_NODES_STORAGE_KEY = 'taskflow_expanded_nodes';
+
+// Función para parsear fechas en localStorage
+const parseTasksFromStorage = (storedTasks: string): Task[] => {
+  try {
+    const parsedTasks = JSON.parse(storedTasks);
+    return parsedTasks.map((task: any) => ({
+      ...task,
+      createdAt: new Date(task.createdAt),
+      dueDate: task.dueDate ? new Date(task.dueDate) : undefined
+    }));
+  } catch (error) {
+    console.error('Error parsing tasks from localStorage:', error);
+    return defaultTasks;
+  }
+};
+
 export const useTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: '1',
-      title: 'Frontend Development',
-      description: 'Complete the user interface components',
-      status: 'In Progress',
-      createdAt: new Date('2024-01-15'),
-      dueDate: new Date('2024-02-15'),
-      parentId: undefined,
-      childIds: ['2', '3'],
-      depth: 0
-    },
-    {
-      id: '2',
-      title: 'Design System',
-      description: 'Create reusable UI components',
-      status: 'Done',
-      createdAt: new Date('2024-01-16'),
-      parentId: '1',
-      childIds: ['4'],
-      depth: 1
-    },
-    {
-      id: '3',
-      title: 'API Integration',
-      description: 'Connect frontend with backend services',
-      status: 'Open',
-      createdAt: new Date('2024-01-17'),
-      parentId: '1',
-      childIds: [],
-      depth: 1
-    },
-    {
-      id: '4',
-      title: 'Button Components',
-      description: 'Create various button styles and states',
-      status: 'Done',
-      createdAt: new Date('2024-01-18'),
-      parentId: '2',
-      childIds: [],
-      depth: 2
-    }
-  ]);
+  // Carga las tareas desde localStorage o usa las predeterminadas
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+    return storedTasks ? parseTasksFromStorage(storedTasks) : defaultTasks;
+  });
 
   const [filter, setFilter] = useState<TaskFilter>({});
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['1', '2']));
+  // Carga los nodos expandidos desde localStorage
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => {
+    const storedExpandedNodes = localStorage.getItem(EXPANDED_NODES_STORAGE_KEY);
+    return storedExpandedNodes 
+      ? new Set(JSON.parse(storedExpandedNodes)) 
+      : new Set(['1', '2']);
+  });
 
   const taskTree = useMemo(() => buildTaskTree(tasks), [tasks]);
 
@@ -200,6 +232,27 @@ export const useTasks = () => {
   const getTasksByStatus = useCallback((status: TaskStatus): Task[] => {
     return tasks.filter(task => task.status === status);
   }, [tasks]);
+
+  // Guarda las tareas en localStorage cada vez que cambian
+  useEffect(() => {
+    try {
+      localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+    } catch (error) {
+      console.error('Error saving tasks to localStorage:', error);
+    }
+  }, [tasks]);
+
+  // Guarda los nodos expandidos en localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        EXPANDED_NODES_STORAGE_KEY, 
+        JSON.stringify(Array.from(expandedNodes))
+      );
+    } catch (error) {
+      console.error('Error saving expanded nodes to localStorage:', error);
+    }
+  }, [expandedNodes]);
 
   return {
     tasks,
