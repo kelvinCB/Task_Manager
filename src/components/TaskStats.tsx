@@ -15,7 +15,7 @@ export const TaskStats: React.FC<TaskStatsProps> = ({ tasks }) => {
     overdue: tasks.filter(t => t.dueDate && new Date() > t.dueDate && t.status !== 'Done').length
   };
 
-  const completionRate = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0;
+  
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

@@ -1,8 +1,8 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Task, TaskStatus, TaskNode, TaskFilter } from '../types/Task';
+import { Task, TaskStatus, TaskFilter } from '../types/Task';
 import { generateId, buildTaskTree, canCompleteTask } from '../utils/taskUtils';
 
-// Tareas iniciales para nuevos usuarios
+// Initial tasks for new users
 const defaultTasks: Task[] = [
   {
     id: '1',
@@ -47,15 +47,15 @@ const defaultTasks: Task[] = [
   }
 ];
 
-// Clave para el almacenamiento en localStorage
+// Key for localStorage
 const TASKS_STORAGE_KEY = 'taskflow_tasks';
 const EXPANDED_NODES_STORAGE_KEY = 'taskflow_expanded_nodes';
 
-// Función para parsear fechas en localStorage
+// Function to parse dates from localStorage
 const parseTasksFromStorage = (storedTasks: string): Task[] => {
   try {
     const parsedTasks = JSON.parse(storedTasks);
-    return parsedTasks.map((task: any) => ({
+    return parsedTasks.map((task: Task) => ({
       ...task,
       createdAt: new Date(task.createdAt),
       dueDate: task.dueDate ? new Date(task.dueDate) : undefined
@@ -67,14 +67,14 @@ const parseTasksFromStorage = (storedTasks: string): Task[] => {
 };
 
 export const useTasks = () => {
-  // Carga las tareas desde localStorage o usa las predeterminadas
+  // Load tasks from localStorage or use defaults
   const [tasks, setTasks] = useState<Task[]>(() => {
     const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
     return storedTasks ? parseTasksFromStorage(storedTasks) : defaultTasks;
   });
 
   const [filter, setFilter] = useState<TaskFilter>({});
-  // Carga los nodos expandidos desde localStorage
+  // Load expanded nodes from localStorage
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => {
     const storedExpandedNodes = localStorage.getItem(EXPANDED_NODES_STORAGE_KEY);
     return storedExpandedNodes 
@@ -86,10 +86,10 @@ export const useTasks = () => {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
-      // Filtro por estado
+      // Filter by status
       if (filter.status && task.status !== filter.status) return false;
       
-      // Filtro por término de búsqueda
+      // Filter by search term
       if (filter.searchTerm && filter.searchTerm.trim() !== '') {
         const searchLower = filter.searchTerm.toLowerCase().trim();
         const titleMatch = task.title.toLowerCase().includes(searchLower);
@@ -103,17 +103,17 @@ export const useTasks = () => {
     });
   }, [tasks, filter]);
 
-  // Crear un árbol filtrado basado en las tareas filtradas
+  // Create a filtered tree based on the filtered tasks
   const filteredTaskTree = useMemo(() => {
-    // Si no hay filtros activos, devolver el árbol completo
+    // If there are no active filters, return the full tree
     if (!filter.status && (!filter.searchTerm || filter.searchTerm.trim() === '')) {
       return taskTree;
     }
 
-    // Obtener IDs de tareas filtradas
+    // Get IDs of filtered tasks
     const filteredTaskIds = new Set(filteredTasks.map(task => task.id));
     
-    // Función para incluir ancestros de tareas que coinciden con el filtro
+    // Function to include ancestors of tasks that match the filter
     const includeAncestors = (taskId: string, includedIds: Set<string>) => {
       const task = tasks.find(t => t.id === taskId);
       if (task && task.parentId && !includedIds.has(task.parentId)) {
@@ -122,13 +122,13 @@ export const useTasks = () => {
       }
     };
 
-    // Incluir ancestros de todas las tareas filtradas
+    // Include ancestors of all filtered tasks
     const tasksToInclude = new Set(filteredTaskIds);
     filteredTaskIds.forEach(taskId => {
       includeAncestors(taskId, tasksToInclude);
     });
 
-    // Crear lista de tareas que incluye las filtradas y sus ancestros
+    // Create a list of tasks that includes the filtered ones and their ancestors
     const tasksForTree = tasks.filter(task => tasksToInclude.has(task.id));
     
     return buildTaskTree(tasksForTree);
@@ -204,7 +204,7 @@ export const useTasks = () => {
     const task = tasks.find(t => t.id === id);
     if (!task) return false;
 
-    // Verificar si puede completarse (todas las hijas deben estar completadas)
+    // Check if it can be completed (all subtasks must be completed)
     if (newStatus === 'Done' && !canCompleteTask(task, tasks)) {
       return false;
     }
@@ -233,7 +233,7 @@ export const useTasks = () => {
     return tasks.filter(task => task.status === status);
   }, [tasks]);
 
-  // Guarda las tareas en localStorage cada vez que cambian
+  // Save tasks to localStorage whenever they change
   useEffect(() => {
     try {
       localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
@@ -242,7 +242,7 @@ export const useTasks = () => {
     }
   }, [tasks]);
 
-  // Guarda los nodos expandidos en localStorage
+  // Save expanded nodes to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(

@@ -36,10 +36,10 @@ export const buildTaskTree = (tasks: Task[]): TaskNode[] => {
 };
 
 export const canCompleteTask = (task: Task, allTasks: Task[]): boolean => {
-  // Si no tiene hijas, puede completarse
+  // If it has no children, it can be completed
   if (task.childIds.length === 0) return true;
   
-  // Si tiene hijas, todas deben estar completadas
+  // If it has children, all must be completed
   return task.childIds.every(childId => {
     const childTask = allTasks.find(t => t.id === childId);
     return childTask?.status === 'Done';

@@ -80,7 +80,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             onClick={() => onEdit(task)}
             className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
           >
-            ...Ver más
+            ...See more
           </button>
         </p>
       );

@@ -3,22 +3,17 @@ import { useTasks } from './hooks/useTasks';
 import { TaskTree } from './components/TaskTree';
 import { TaskBoard } from './components/TaskBoard';
 import { TaskForm } from './components/TaskForm';
-import { Task, TaskFilter } from './types/Task';
+import { Task } from './types/Task';
 import { 
   TreePine, 
   LayoutGrid, 
   Plus, 
   Search, 
-  Filter,
-  Menu,
-  X,
-  Settings
+  Filter
 } from 'lucide-react';
 
 function App() {
   const {
-    tasks,
-    taskTree,
     filteredTasks,
     filteredTaskTree,
     filter,
@@ -59,7 +54,7 @@ function App() {
     // Verificar si la tarea padre está completada
     const parentTask = getTaskById(parentTaskId);
     if (parentTask && parentTask.status === 'Done') {
-      alert('No se puede agregar una subtarea porque la tarea padre ya fue completada y marcada como "Done"');
+      alert('Cannot add a subtask because the parent task is already completed and marked as "Done"');
       return;
     }
     
