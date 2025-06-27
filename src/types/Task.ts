@@ -21,3 +21,14 @@ export interface TaskFilter {
   status?: TaskStatus;
   searchTerm?: string;
 }
+
+export interface ImportedTaskRow {
+  id?: string;
+  title: string;
+  description?: string;
+  status: string;
+  createdAt: string;
+  dueDate?: string;
+  parentId?: string;
+  childIds?: string;
+}

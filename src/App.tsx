@@ -9,8 +9,11 @@ import {
   LayoutGrid, 
   Plus, 
   Search, 
-  Filter
+  Filter,
+  Download,
+  Upload
 } from 'lucide-react';
+import Papa from 'papaparse';
 
 function App() {
   const {
@@ -81,6 +84,66 @@ function App() {
     setIsFormOpen(true);
   };
 
+  const handleImportTasks = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const importedTasks: Omit<Task, 'id' | 'childIds' | 'depth'>[] = results.data.map((row: ImportedTaskRow) => ({
+          title: row.title || 'Untitled Task',
+          description: row.description || '',
+          status: row.status as Task['status'] || 'Open',
+          createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
+          dueDate: row.dueDate ? new Date(row.dueDate) : undefined,
+          parentId: row.parentId || undefined,
+        }));
+
+        importedTasks.forEach(taskData => {
+          createTask(taskData);
+        });
+        alert('Tasks imported successfully!');
+      },
+      error: (error) => {
+        console.error('Error parsing CSV:', error);
+        alert('Error importing tasks. Please check the CSV file format.');
+      }
+    });
+  };
+
+  const handleExportTasks = () => {
+    const tasksToExport = filteredTasks;
+
+    const csv = Papa.unparse(tasksToExport.map(task => ({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      createdAt: task.createdAt.toISOString(),
+      dueDate: task.dueDate ? task.dueDate.toISOString() : '',
+      parentId: task.parentId || '',
+      childIds: task.childIds.join(';')
+    })));
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestamp = `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+    link.setAttribute('download', `tasks-${timestamp}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
@@ -148,6 +211,28 @@ function App() {
                 <Plus size={16} />
                 <span className="hidden sm:inline">Add Task</span>
               </button>
+
+              {/* Export Button */}
+              <button
+                onClick={handleExportTasks}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200"
+              >
+                <Download size={16} />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+
+              {/* Import Button */}
+              <label htmlFor="import-csv" className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200 cursor-pointer">
+                <Upload size={16} />
+                <span className="hidden sm:inline">Import</span>
+                <input
+                  type="file"
+                  id="import-csv"
+                  accept=".csv"
+                  onChange={handleImportTasks}
+                  className="hidden"
+                />
+              </label>
             </div>
           </div>
         </div>
