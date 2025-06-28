@@ -55,7 +55,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       description: formData.description.trim(),
       status: formData.status,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-      parentId: formData.parentId || undefined
+      parentId: formData.parentId || undefined,
+      timeTracking: {
+        totalTimeSpent: 0,
+        isActive: false,
+        timeEntries: []
+      }
     });
 
     onClose();
@@ -83,11 +88,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Title */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="task-title" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <FileText size={16} />
               Title
             </label>
             <input
+              id="task-title"
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -99,26 +105,27 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
           {/* Description */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="task-description" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <FileText size={16} />
               Description
             </label>
             <textarea
+              id="task-description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 resize-none"
-              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 min-h-[100px]"
               placeholder="Enter task description..."
-            />
+            ></textarea>
           </div>
 
           {/* Status */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="task-status" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <Tag size={16} />
               Status
             </label>
             <select
+              id="task-status"
               value={formData.status}
               onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as TaskStatus }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200"
@@ -131,11 +138,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
           {/* Due Date */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="task-due-date" className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <Calendar size={16} />
               Due Date (Optional)
             </label>
             <input
+              id="task-due-date"
               type="date"
               value={formData.dueDate}
               onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
@@ -165,7 +173,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               type="submit"
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200"
             >
-              {task ? 'Update Task' : 'Create Task'}
+              Save
             </button>
           </div>
         </form>

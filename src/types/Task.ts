@@ -46,3 +46,12 @@ export interface ImportedTaskRow {
   parentId?: string;
   childIds?: string;
 }
+
+export interface TaskTimeStats {
+  id: string;
+  title: string;
+  timeSpent: number;  // tiempo en milisegundos
+  status: TaskStatus;
+  startDate: number;  // timestamp
+  endDate: number;    // timestamp
+}

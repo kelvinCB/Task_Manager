@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Guía de Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+        h3 {
+            font-size: 1.2em;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            font-family: monospace;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        ol {
+            list-style-type: decimal;
+            margin-left: 20px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<h1>Task Manager - Guía de Testing</h1>
+<p>Esta guía documenta el enfoque de testing para la aplicación Task Manager, incluyendo las pruebas unitarias implementadas, cómo ejecutarlas y las mejores prácticas a seguir.</p>
+<h2>Índice</h2>
+<ol>
+<li><a href="#introduccion">Introducción</a></li>
+<li><a href="#estructura">Estructura de pruebas</a></li>
+<li><a href="#casos">Casos de prueba</a></li>
+<li><a href="#ejecucion">Cómo ejecutar las pruebas</a></li>
+<li><a href="#cobertura">Cobertura de código</a></li>
+<li><a href="#mocks">Mocks y fixtures</a></li>
+<li><a href="#contribucion">Contribución</a></li>
+</ol>
+<h2 id="introduccion">Introducción</h2>
+<p>La aplicación Task Manager cuenta con un conjunto completo de pruebas unitarias que cubren los componentes, hooks y utilidades principales. Las pruebas están implementadas utilizando:</p>
+<ul>
+<li><strong>Vitest</strong>: Framework de pruebas rápido compatible con el ecosistema Vite</li>
+<li><strong>React Testing Library</strong>: Para probar componentes de React</li>
+<li><strong>jsdom</strong>: Para simular el DOM durante las pruebas</li>
+</ul>
+<h2 id="estructura">Estructura de pruebas</h2>
+<p>El código de prueba está organizado en la carpeta <code>src/test</code> con la siguiente estructura:</p>
+<pre><code>src/
+└── test/
+    ├── setup.ts              # Configuración global de pruebas
+    ├── components/           # Pruebas de componentes React
+    │   ├── App.test.tsx
+    │   ├── TaskBoard.test.tsx
+    │   ├── TaskItem.test.tsx
+    │   ├── TaskTimer.test.tsx
+    │   ├── TaskTree.test.tsx
+    │   └── TimeStatsView.test.tsx
+    ├── hooks/               # Pruebas de hooks personalizados
+    │   └── useTasks.test.tsx
+    └── utils/               # Pruebas de funciones de utilidad
+        └── taskUtils.test.ts
+</code></pre>
+<h2 id="casos">Casos de prueba</h2>
+<h3>Componente App (<code>App.test.tsx</code>)</h3>
+<ol>
+<li>Renderiza la aplicación con botones de navegación</li>
+<li>Muestra la vista Board por defecto</li>
+<li>Cambia a vista Tree cuando se hace clic en el botón Tree</li>
+<li>Cambia a vista Time Stats cuando se hace clic en el botón Stats</li>
+<li>Crea una nueva tarea usando TaskForm</li>
+<li>Importa/exporta tareas usando funcionalidad CSV</li>
+<li>Mantiene el estado del temporizador al cambiar entre vistas</li>
+</ol>
+<h3>Componente TaskTimer (<code>TaskTimer.test.tsx</code>)</h3>
+<ol>
+<li>Renderiza correctamente con tiempo transcurrido inicial</li>
+<li>Muestra botón de pausa cuando el temporizador está activo</li>
+<li>Llama al callback onStart cuando se hace clic en el botón de inicio</li>
+<li>Llama al callback onPause cuando se hace clic en el botón de pausa</li>
+<li>Actualiza la visualización del tiempo cada segundo cuando está activo</li>
+<li>Reproduce un sonido de notificación después de 10 minutos</li>
+</ol>
+<h3>Hook useTasks (<code>useTasks.test.tsx</code>)</h3>
+<ol>
+<li>Inicializa con tareas vacías</li>
+<li>Crea una nueva tarea con valores por defecto correctos</li>
+<li>Crea una subtarea con relación correcta con el padre</li>
+<li>Elimina una tarea y todas sus subtareas</li>
+<li>Actualiza las propiedades de la tarea</li>
+<li>Inicia el temporizador de la tarea y actualiza su estado</li>
+<li>Pausa el temporizador de la tarea y actualiza el tiempo transcurrido</li>
+<li>Obtiene tiempo transcurrido para un temporizador activo</li>
+<li>Pausa el temporizador cuando la tarea se marca como completada</li>
+<li>Obtiene estadísticas de tiempo para un período específico</li>
+</ol>
+<h3>Utilidades de tareas (<code>taskUtils.test.ts</code>)</h3>
+<ol>
+<li>Verifica si una tarea puede completarse (sin hijos)</li>
+<li>Verifica si una tarea puede completarse (todos los hijos completados)</li>
+<li>Verifica si una tarea no puede completarse (algunos hijos no completados)</li>
+<li>Construye un árbol a partir de una lista plana de tareas</li>
+<li>Formatea fechas correctamente</li>
+<li>Identifica tareas vencidas</li>
+<li>Obtiene colores de estado correctos</li>
+<li>Obtiene iconos de estado correctos</li>
+</ol>
+<h3>Componente TaskItem (<code>TaskItem.test.tsx</code>)</h3>
+<ol>
+<li>Renderiza el título y estado de la tarea</li>
+<li>Renderiza la descripción de la tarea cuando está expandida</li>
+<li>Abre el menú al hacer clic en el botón de menú</li>
+<li>Llama a onUpdateTask al cambiar el estado de la tarea</li>
+<li>Muestra el componente TaskTimer con tiempo transcurrido</li>
+<li>Llama a onStartTimer cuando se hace clic en el botón de inicio</li>
+<li>Llama a onDeleteTask cuando se hace clic en la opción de eliminar</li>
+</ol>
+<h3>Componente TaskBoard (<code>TaskBoard.test.tsx</code>)</h3>
+<ol>
+<li>Renderiza el tablero con columnas y tareas correctas</li>
+<li>Renderiza el botón "Add Task" en cada columna</li>
+<li>Llama a onCreateTask cuando se hace clic en el botón "Add Task"</li>
+<li>Renderiza el componente TaskTimer para las tareas</li>
+<li>Muestra detalles de la tarea cuando se hace clic en una tarea</li>
+</ol>
+<h3>Componente TaskTree (<code>TaskTree.test.tsx</code>)</h3>
+<ol>
+<li>Renderiza el árbol de tareas con tareas padre e hijas</li>
+<li>Aplica la indentación correcta para tareas anidadas</li>
+<li>Renderiza componentes TaskTimer para cada tarea</li>
+<li>Propaga eventos del temporizador al componente padre</li>
+<li>Pasa el tiempo transcurrido a los componentes hijos correctamente</li>
+</ol>
+<h3>Componente TimeStatsView (<code>TimeStatsView.test.tsx</code>)</h3>
+<ol>
+<li>Renderiza la vista de estadísticas de tiempo con selector de período</li>
+<li>Muestra estadísticas de tiempo para tareas</li>
+<li>Llama a getTimeStatistics con el período seleccionado</li>
+<li>Muestra entradas de fecha personalizadas cuando se selecciona período "custom"</li>
+<li>Actualiza el rango de fechas personalizado y obtiene nuevas estadísticas</li>
+<li>Muestra tiempo total acumulado de todas las tareas</li>
+<li>Maneja estadísticas vacías de forma elegante</li>
+</ol>
+<h2 id="ejecucion">Cómo ejecutar las pruebas</h2>
+<h3>Requisitos previos</h3>
+<p>Asegúrate de tener todas las dependencias instaladas:</p>
+<pre><code>npm install
+</code></pre>
+<h3>Ejecutar todas las pruebas</h3>
+<p>Para ejecutar todas las pruebas en modo watch:</p>
+<pre><code>npm test
+</code></pre>
+<h3>Ejecutar pruebas específicas</h3>
+<p>Para ejecutar un conjunto específico de pruebas:</p>
+<pre><code>npm test -- components/TaskTimer
+</code></pre>
+<h3>Ejecutar con cobertura</h3>
+<p>Para ejecutar las pruebas con informe de cobertura:</p>
+<pre><code>npm run test:coverage
+</code></pre>
+<p>Esto generará un informe de cobertura HTML en la carpeta <code>coverage/</code>.</p>
+<h3>Interfaz de usuario para pruebas (opcional)</h3>
+<p>Para ejecutar pruebas con una interfaz visual:</p>
+<pre><code>npm run test:ui
+</code></pre>
+<h2 id="cobertura">Cobertura de código</h2>
+<p>Nuestro objetivo es mantener una cobertura de código superior al 80% en los módulos críticos:</p>
+<ul>
+<li><code>src/components/TaskTimer.tsx</code>: Enfoque principal en la funcionalidad de notificación de sonido</li>
+<li><code>src/hooks/useTasks.ts</code>: Lógica central de manejo de tareas y temporizadores</li>
+<li><code>src/utils/</code>: Funciones utilitarias que son ampliamente utilizadas</li>
+</ul>
+<h2 id="mocks">Mocks y fixtures</h2>
+<p>En <code>src/test/setup.ts</code> se han configurado los siguientes mocks:</p>
+<ul>
+<li><strong>localStorage</strong>: Mock completo para simular persistencia</li>
+<li><strong>AudioContext</strong>: Mock para probar la funcionalidad de sonido</li>
+<li><strong>Temporizadores</strong>: Mock para controlar el tiempo en pruebas con <code>vi.useFakeTimers()</code></li>
+</ul>
+<h2 id="contribucion">Contribución</h2>
+<ol>
+<li>Escribe primero las pruebas antes de implementar la funcionalidad (TDD)</li>
+<li>Asegúrate de que cada componente nuevo tenga un archivo de prueba correspondiente</li>
+<li>Para nuevos hooks o utilidades, crea pruebas dedicadas</li>
+<li>Utiliza los mocks existentes para localStorage y AudioContext</li>
+<li>Ejecuta el conjunto completo de pruebas antes de enviar un PR</li>
+</ol>
+<hr>
+<p>Con esta guía, cualquier desarrollador puede entender la estrategia de pruebas, ejecutar las pruebas existentes y contribuir con nuevas pruebas para mantener la calidad del código.</p>
+</body>
+</html>
+
