@@ -13,10 +13,13 @@ import {
   Filter,
   Download,
   Upload,
-  Clock
+  Clock,
+  Sun,
+  Moon
 } from 'lucide-react';
 // @ts-ignore
 import Papa from 'papaparse';
+import { useTheme } from './contexts/ThemeContext';
 
 function App() {
   const {
@@ -37,6 +40,8 @@ function App() {
     getElapsedTime,
     getTimeStatistics
   } = useTasks();
+
+  const { theme, toggleTheme } = useTheme();
 
   const [view, setView] = useState<'tree' | 'board' | 'stats'>('board');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -153,31 +158,31 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className={`bg-white border-b border-gray-200 shadow-sm ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-white dark:border-gray-700' : ''}`}>
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <TreePine className="w-6 h-6 text-indigo-600" />
+              <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg`}>
+                <TreePine className={`w-6 h-6 ${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">TaskFlow</h1>
-                <p className="text-sm text-gray-600">Hierarchical Task Management</p>
+                <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>TaskFlow</h1>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Hierarchical Task Management</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               {/* Search */}
               <div className="relative hidden sm:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-400'} w-4 h-4`} />
                 <input
                   type="text"
                   placeholder="Search tasks..."
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200"
+                  className={`pl-10 pr-4 py-2 w-64 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
                 />
               </div>
 
@@ -188,7 +193,7 @@ function App() {
                   title="Tree View"
                   className={`
                     flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
-                    ${view === 'tree' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}
+                    ${view === 'tree' ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100')}
                   `}
                 >
                   <TreePine size={18} />
@@ -199,7 +204,7 @@ function App() {
                   title="Board View"
                   className={`
                     flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
-                    ${view === 'board' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}
+                    ${view === 'board' ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100')}
                   `}
                 >
                   <LayoutGrid size={18} />
@@ -210,7 +215,7 @@ function App() {
                   title="Time Stats"
                   className={`
                     flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
-                    ${view === 'stats' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-gray-100'}
+                    ${view === 'stats' ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100')}
                   `}
                 >
                   <Clock size={18} />
@@ -218,10 +223,20 @@ function App() {
                 </button>
               </div>
 
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-2 px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                title="Toggle Dark Mode"
+              >
+                {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+                <span className="hidden sm:inline">{theme === 'light' ? 'Dark' : 'Light'}</span>
+              </button>
+
               {/* Add Task Button */}
               <button
                 onClick={openCreateForm}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200"
+                className={`flex items-center gap-2 px-4 py-2 ${theme === 'dark' ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg transition-colors duration-200`}
               >
                 <Plus size={16} />
                 <span className="hidden sm:inline">Add Task</span>
@@ -231,14 +246,14 @@ function App() {
               <button
                 onClick={handleExportTasks}
                 title="Export"
-                className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200"
+                className={`flex items-center gap-2 px-4 py-2 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} rounded-lg transition-colors duration-200`}
               >
                 <Download size={16} />
                 <span className="hidden sm:inline">Export</span>
               </button>
 
               {/* Import Button */}
-              <label htmlFor="import-csv" title="Import" className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200 cursor-pointer">
+              <label htmlFor="import-csv" title="Import" className={`flex items-center gap-2 px-4 py-2 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} rounded-lg transition-colors duration-200 cursor-pointer`}>
                 <Upload size={16} />
                 <span className="hidden sm:inline">Import</span>
                 <input
@@ -257,13 +272,13 @@ function App() {
       {/* Main Content */}
       <main className="flex-1">
         {/* Filters Section */}
-        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
+        <div className={`bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700' : ''}`}>
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <h3 className="font-medium text-gray-900">Filters</h3>
+              <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Filters</h3>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors duration-200"
+                className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} hover:bg-gray-100 rounded transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
               >
                 <Filter size={16} />
               </button>
@@ -272,13 +287,13 @@ function App() {
             {showFilters && (
               <>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
                     Status:
                   </label>
                   <select
                     value={filter.status || ''}
                     onChange={(e) => setFilter({ ...filter, status: e.target.value as Task['status'] || undefined })}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200"
+                    className={`px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
                   >
                     <option value="">All Status</option>
                     <option value="Open">Open</option>
@@ -294,7 +309,7 @@ function App() {
                       setFilter({});
                       setSearchTerm('');
                     }}
-                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                    className={`px-3 py-2 text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-gray-100' : 'text-gray-600 hover:text-gray-800'} hover:bg-gray-100 rounded-lg transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
                   >
                     Clear Filters
                   </button>
@@ -372,8 +387,5 @@ function App() {
     </div>
   );
 }
-
-export { App };
-
 
 export default App;
