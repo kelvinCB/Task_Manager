@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TaskItem } from '../../components/TaskItem';
 import { Task, TaskStatus } from '../../types/Task';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mocks para las pruebas
 const mockOnStatusChange = vi.fn();
@@ -43,20 +44,22 @@ describe('TaskItem Component', () => {
   it('should render the task title and status', () => {
     // Act
     render(
-      <TaskItem
-        task={mockTask}
-        isExpanded={false}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        hasChildren={false}
-        canComplete={true}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskItem
+          task={mockTask}
+          isExpanded={false}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert
@@ -67,20 +70,22 @@ describe('TaskItem Component', () => {
   it('should render the task description when expanded', () => {
     // Act
     render(
-      <TaskItem
-        task={mockTask}
-        isExpanded={true} // Renderizar directamente como expandido
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        hasChildren={false}
-        canComplete={true}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskItem
+          task={mockTask}
+          isExpanded={true} // Renderizar directamente como expandido
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert
@@ -90,20 +95,22 @@ describe('TaskItem Component', () => {
   it('should open menu when clicking menu button', () => {
     // Act
     render(
-      <TaskItem
-        task={mockTask}
-        isExpanded={false}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        hasChildren={false}
-        canComplete={true}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskItem
+          task={mockTask}
+          isExpanded={false}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Clic en el botón de menú con el ícono MoreHorizontal
@@ -126,20 +133,22 @@ describe('TaskItem Component', () => {
   it('should call onStatusChange when changing task status', () => {
     // Act
     render(
-      <TaskItem
-        task={mockTask}
-        isExpanded={false}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        hasChildren={false}
-        canComplete={true}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskItem
+          task={mockTask}
+          isExpanded={false}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Cambiar el estado directamente en el selector
@@ -163,20 +172,22 @@ describe('TaskItem Component', () => {
     
     // Act
     render(
-      <TaskItem
-        task={taskWithActiveTimer}
-        isExpanded={false}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        hasChildren={false}
-        canComplete={true}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskItem
+          task={taskWithActiveTimer}
+          isExpanded={false}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert - Verificar que se muestra el tiempo formateado (01:00:00 para 3600000ms)
@@ -190,20 +201,22 @@ describe('TaskItem Component', () => {
   it('should call onStartTimer when play button is clicked', () => {
     // Act
     render(
-      <TaskItem
-        task={mockTask}
-        isExpanded={false}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        hasChildren={false}
-        canComplete={true}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskItem
+          task={mockTask}
+          isExpanded={false}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Clic en el botón de iniciar temporizador
@@ -217,20 +230,22 @@ describe('TaskItem Component', () => {
   it('should call onDelete when delete option is clicked', () => {
     // Act
     render(
-      <TaskItem
-        task={mockTask}
-        isExpanded={false}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        hasChildren={false}
-        canComplete={true}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskItem
+          task={mockTask}
+          isExpanded={false}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Abrir menú - usar el mismo enfoque que en la prueba anterior

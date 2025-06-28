@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TaskTree } from '../../components/TaskTree';
 import { TaskNode, TaskStatus } from '../../types/Task';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mocks para las pruebas
 const mockOnToggleExpand = vi.fn();
@@ -102,19 +103,21 @@ describe('TaskTree Component', () => {
     const expandedNodeSet = new Set(['parent-1', 'child-2']);
     
     render(
-      <TaskTree 
-        nodes={mockTaskTree} 
-        expandedNodes={expandedNodeSet} 
-        allTasks={mockTaskTree}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskTree 
+          nodes={mockTaskTree} 
+          expandedNodes={expandedNodeSet} 
+          allTasks={mockTaskTree}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert - verificar que se muestran las tareas
@@ -129,19 +132,21 @@ describe('TaskTree Component', () => {
     const expandedNodeSet = new Set(['parent-1', 'child-2']);
     
     render(
-      <TaskTree 
-        nodes={mockTaskTree} 
-        expandedNodes={expandedNodeSet} 
-        allTasks={mockTaskTree}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskTree 
+          nodes={mockTaskTree} 
+          expandedNodes={expandedNodeSet} 
+          allTasks={mockTaskTree}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Nota: La indentación específica depende de la implementación
@@ -158,19 +163,21 @@ describe('TaskTree Component', () => {
     mockTaskTree[0].children[1].timeTracking.isActive = true; // Child Task 2 activa
     
     render(
-      <TaskTree 
-        nodes={mockTaskTree} 
-        expandedNodes={expandedNodeSet} 
-        allTasks={mockTaskTree}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskTree 
+          nodes={mockTaskTree} 
+          expandedNodes={expandedNodeSet} 
+          allTasks={mockTaskTree}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert - verificamos que hay botones de inicio para todas las tareas
@@ -185,19 +192,21 @@ describe('TaskTree Component', () => {
   it('should propagate timer events to parent component', () => {
     // Act
     render(
-      <TaskTree 
-        nodes={mockTaskTree} 
-        expandedNodes={new Set()} 
-        allTasks={mockTaskTree}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskTree 
+          nodes={mockTaskTree} 
+          expandedNodes={new Set()} 
+          allTasks={mockTaskTree}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Encontrar un botón de inicio de temporizador y hacer clic en él
@@ -220,19 +229,21 @@ describe('TaskTree Component', () => {
     const expandedNodeSet = new Set(['parent-1', 'child-2']);
     
     render(
-      <TaskTree 
-        nodes={mockTaskTree} 
-        expandedNodes={expandedNodeSet} 
-        allTasks={mockTaskTree}
-        onToggleExpand={mockOnToggleExpand}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onAddChild={mockOnAddChild}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskTree 
+          nodes={mockTaskTree} 
+          expandedNodes={expandedNodeSet} 
+          allTasks={mockTaskTree}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert

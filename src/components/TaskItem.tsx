@@ -4,6 +4,7 @@ import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon } from '../uti
 import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface TaskItemProps {
   task: Task;
@@ -34,6 +35,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onPauseTimer,
   getElapsedTime
 }) => {
+  const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const StatusIcon = LucideIcons[getStatusIcon(task.status) as keyof typeof LucideIcons] as React.ComponentType<{className?: string}>;
@@ -71,11 +73,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     if (isLong) {
       const truncated = task.title.substring(0, maxLength);
       return (
-        <h3 className="font-medium text-gray-900">
+        <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
           {truncated}
           <button
             onClick={() => onEdit(task)}
-            className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
+            className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
           >
             ...
           </button>
@@ -84,7 +86,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
     
     return (
-      <h3 className="font-medium text-gray-900 truncate">
+      <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} truncate`}>
         {task.title}
       </h3>
     );
@@ -99,11 +101,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     if (isLong) {
       const truncated = task.description.substring(0, maxLength);
       return (
-        <p className="mt-1 text-sm text-gray-600">
+        <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
           {truncated}
           <button
             onClick={() => onEdit(task)}
-            className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
+            className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
           >
             ...See more
           </button>
@@ -112,7 +114,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
     
     return (
-      <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+      <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
         {task.description}
       </p>
     );
@@ -123,8 +125,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       <div 
         className={`
           flex items-center gap-3 p-3 rounded-lg border transition-all duration-200
-          hover:shadow-md hover:border-indigo-200 bg-white
-          ${isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-200'}
+          hover:shadow-md ${theme === 'dark' ? 'hover:border-indigo-700' : 'hover:border-indigo-200'} 
+          ${theme === 'dark' 
+            ? isOverdue ? 'border-red-700 bg-red-900/30' : 'border-gray-700 bg-gray-700' 
+            : isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'}
         `}
         style={{ marginLeft: `${task.depth * 24}px` }}
       >
@@ -134,7 +138,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           className={`
             flex-shrink-0 p-1 rounded transition-colors duration-200
             ${hasChildren 
-              ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' 
+              ? theme === 'dark' ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100' 
               : 'text-transparent cursor-default'
             }
           `}
@@ -156,7 +160,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               {renderDescription()}
               
               {/* Task Meta */}
-              <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+              <div className={`flex items-center gap-4 mt-2 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 <div className="flex items-center gap-1">
                   <Calendar size={12} />
                   <span>Created {formatDate(task.createdAt)}</span>
@@ -207,7 +211,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               {/* Menu Button */}
               <div className="relative" ref={menuRef}>
                 <button
-                  className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all duration-200"
+                  className={`opacity-0 group-hover:opacity-100 p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded transition-all duration-200`}
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsMenuOpen(prev => !prev);
@@ -217,21 +221,21 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                 </button>
                 
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <div className={`absolute right-0 mt-1 w-32 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-md shadow-lg z-10`}>
                     <button
-                      className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                      className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
                       onClick={() => { onEdit(task); setIsMenuOpen(false); }}
                     >
                       Edit
                     </button>
                     <button
-                      className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                      className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
                       onClick={() => { onAddChild(task.id); setIsMenuOpen(false); }}
                     >
                       Add Subtask
                     </button>
                     <button
-                      className="block w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                      className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-red-400 hover:bg-red-900' : 'text-red-600 hover:bg-red-50'}`}
                       onClick={() => { onDelete(task.id); setIsMenuOpen(false); }}
                     >
                       Delete
