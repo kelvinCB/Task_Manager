@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Task, TaskStatus } from '../types/Task';
 import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon } from '../utils/taskUtils';
 import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User } from 'lucide-react';
@@ -27,8 +27,26 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   hasChildren,
   canComplete
 }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const StatusIcon = LucideIcons[getStatusIcon(task.status) as keyof typeof LucideIcons] as React.ComponentType<{className?: string}>;
   const isOverdue = isTaskOverdue(task);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value as TaskStatus;
@@ -170,39 +188,39 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               </select>
 
               {/* Menu Button */}
-              <div className="relative">
+              <div className="relative" ref={menuRef}>
                 <button
                   className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-all duration-200"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Toggle dropdown menu
-                    const menu = e.currentTarget.nextElementSibling as HTMLElement;
-                    menu?.classList.toggle('hidden');
+                    setIsMenuOpen(prev => !prev);
                   }}
                 >
                   <MoreHorizontal size={16} />
                 </button>
                 
-                <div className="hidden absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                  <button
-                    className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => onEdit(task)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => onAddChild(task.id)}
-                  >
-                    Add Subtask
-                  </button>
-                  <button
-                    className="block w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                    onClick={() => onDelete(task.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
+                {isMenuOpen && (
+                  <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                    <button
+                      className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { onEdit(task); setIsMenuOpen(false); }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => { onAddChild(task.id); setIsMenuOpen(false); }}
+                    >
+                      Add Subtask
+                    </button>
+                    <button
+                      className="block w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                      onClick={() => { onDelete(task.id); setIsMenuOpen(false); }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
