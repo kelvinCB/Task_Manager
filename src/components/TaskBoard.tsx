@@ -110,14 +110,14 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   };
 
   return (
-    <div className={`h-full overflow-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
+    <div className={`h-full overflow-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
       <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
         {statusColumns.map(column => {
           const columnTasks = getTasksByStatus(column.status);
           const StatusIcon = LucideIcons[getStatusIcon(column.status) as keyof typeof LucideIcons] as React.ComponentType<{className?: string}>;
           
           return (
-            <div key={column.status} className={`flex flex-col h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <div key={column.status} className={`flex flex-col h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
               {/* Column Header */}
               <div className="mb-4">
                 <div className="flex items-center gap-2">
@@ -125,7 +125,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{column.title}</h2>
-                      <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-medium ${theme === 'dark' ? 'bg-gray-700 text-gray-300 border border-gray-600' : 'bg-gray-100 text-gray-700'} rounded`}>
+                      <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-medium ${theme === 'dark' ? 'bg-gray-700 text-gray-300 border border-gray-600' : 'bg-gray-200 text-gray-700'} rounded`}>
                         {columnTasks.length}
                       </span>
                     </div>
@@ -146,7 +146,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                       key={task.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, task.id)}
-                      className={`mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move`}
+                      className={`mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
