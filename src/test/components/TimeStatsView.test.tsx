@@ -41,9 +41,13 @@ describe('TimeStatsView Component', () => {
     // Act
     render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
     
-    // Assert - verificar que se muestra el selector de periodo
-    expect(screen.getByText(/Time Statistics/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Period/i)).toBeInTheDocument();
+    // Assert - verificar que se muestra el título y los botones de periodo
+    expect(screen.getByText(/Time Tracking Statistics/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Today/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /This Week/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /This Month/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /This Year/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Custom/i })).toBeInTheDocument();
   });
   
   it('should show time stats for tasks', () => {
@@ -54,18 +58,21 @@ describe('TimeStatsView Component', () => {
     expect(screen.getByText('Task 1')).toBeInTheDocument();
     expect(screen.getByText('Task 2')).toBeInTheDocument();
     
-    // Verificar que se muestran las duraciones formateadas
-    expect(screen.getByText('01:00:00')).toBeInTheDocument(); // 1h
-    expect(screen.getByText('02:00:00')).toBeInTheDocument(); // 2h
+    // Verificar que se muestran las duraciones formateadas (formato h m s)
+    expect(screen.getByText('1h 0m 0s')).toBeInTheDocument(); // 1h
+    expect(screen.getByText('2h 0m 0s')).toBeInTheDocument(); // 2h
   });
   
   it('should call getTimeStatistics with the selected period', () => {
     // Act
     render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
     
+    // Limpiar las llamadas iniciales (mount + useEffect)
+    mockGetTimeStatistics.mockClear();
+    
     // Seleccionar un periodo diferente (semana)
-    const periodSelect = screen.getByLabelText(/Period/i);
-    fireEvent.change(periodSelect, { target: { value: 'week' } });
+    const weekButton = screen.getByRole('button', { name: /This Week/i });
+    fireEvent.click(weekButton);
     
     // Assert - verificar que se llamó a getTimeStatistics con 'week'
     expect(mockGetTimeStatistics).toHaveBeenCalledWith('week');
@@ -76,38 +83,43 @@ describe('TimeStatsView Component', () => {
     render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
     
     // Inicialmente no deberían mostrarse los campos de fecha personalizados
-    expect(screen.queryByLabelText(/Start Date/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Start Date/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/End Date/i)).not.toBeInTheDocument();
     
-    // Seleccionar periodo personalizado
-    const periodSelect = screen.getByLabelText(/Period/i);
-    fireEvent.change(periodSelect, { target: { value: 'custom' } });
+    // Seleccionar periodo personalizado haciendo clic en el botón Custom
+    const customButton = screen.getByRole('button', { name: /Custom/i });
+    fireEvent.click(customButton);
     
     // Assert - verificar que ahora se muestran los campos de fecha
-    expect(screen.getByLabelText(/Start Date/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/End Date/i)).toBeInTheDocument();
+    expect(screen.getByText(/Start Date/i)).toBeInTheDocument();
+    expect(screen.getByText(/End Date/i)).toBeInTheDocument();
+    // Verificar que hay 2 inputs de tipo date
+    const dateInputs = screen.getAllByDisplayValue('');
+    expect(dateInputs).toHaveLength(2);
   });
   
   it('should update custom date range and fetch new statistics', () => {
     // Act
     render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
     
-    // Seleccionar periodo personalizado
-    const periodSelect = screen.getByLabelText(/Period/i);
-    fireEvent.change(periodSelect, { target: { value: 'custom' } });
+    // Limpiar las llamadas iniciales
+    mockGetTimeStatistics.mockClear();
     
-    // Esperar a que aparezcan los inputs de fecha
-    const startDateInput = screen.getByLabelText(/Start Date/i);
-    const endDateInput = screen.getByLabelText(/End Date/i);
+    // Seleccionar periodo personalizado haciendo clic en el botón Custom
+    const customButton = screen.getByRole('button', { name: /Custom/i });
+    fireEvent.click(customButton);
     
-    // Cambiar las fechas
+    // Esperar a que aparezcan los inputs de fecha por tipo date
+    const dateInputs = screen.getAllByDisplayValue('');
+    const startDateInput = dateInputs[0]; // Primer input (Start Date)
+    const endDateInput = dateInputs[1];   // Segundo input (End Date)
+    
+    // Cambiar las fechas (esto automáticamente dispara el useEffect)
     fireEvent.change(startDateInput, { target: { value: '2021-07-01' } });
     fireEvent.change(endDateInput, { target: { value: '2021-07-05' } });
     
-    // Aplicar el filtro personalizado
-    const applyButton = screen.getByRole('button', { name: /Apply/i });
-    fireEvent.click(applyButton);
-    
     // Assert - verificar que se llamó a getTimeStatistics con fechas personalizadas
+    // (el useEffect se dispara automáticamente cuando cambian las fechas)
     expect(mockGetTimeStatistics).toHaveBeenCalledWith(
       'custom',
       expect.any(Date), // Fecha de inicio
@@ -123,7 +135,7 @@ describe('TimeStatsView Component', () => {
     
     // Assert - verificar que se muestra el tiempo total
     expect(screen.getByText(/Total Time/i)).toBeInTheDocument();
-    expect(screen.getByText('03:00:00')).toBeInTheDocument(); // 3h total
+    expect(screen.getByText('3h 0m 0s')).toBeInTheDocument(); // 3h total
   });
   
   it('should handle empty statistics gracefully', () => {
@@ -136,7 +148,7 @@ describe('TimeStatsView Component', () => {
     // Assert - verificar que se muestra un mensaje de no datos
     expect(screen.getByText(/No time tracking data/i)).toBeInTheDocument();
     
-    // El tiempo total debería ser 0
-    expect(screen.getByText('00:00:00')).toBeInTheDocument();
+    // El tiempo total debería ser 0 en formato h m s
+    expect(screen.getByText('0h 0m 0s')).toBeInTheDocument();
   });
 });

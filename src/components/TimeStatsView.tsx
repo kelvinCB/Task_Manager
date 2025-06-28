@@ -1,153 +1,145 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TaskTimeStats } from '../types/Task';
+import { BarChart } from 'lucide-react';
 
 interface TimeStatsViewProps {
   getTimeStatistics: (period: 'day' | 'week' | 'month' | 'year' | 'custom', startDate?: Date, endDate?: Date) => TaskTimeStats[];
 }
 
-type PeriodType = 'day' | 'week' | 'month' | 'year' | 'custom';
-
 export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics }) => {
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('day');
+  const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year'>('day');
   const [stats, setStats] = useState<TaskTimeStats[]>([]);
-  const [customStartDate, setCustomStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [customEndDate, setCustomEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  
-  // Cargar estadísticas al montar el componente y cuando cambia el periodo
-  React.useEffect(() => {
-    if (selectedPeriod === 'custom') {
-      // Para el efecto inicial, no hacemos nada con custom hasta que el usuario haga clic en Apply
-      // Solo inicializamos stats si no estamos en custom
+  const [customStart, setCustomStart] = useState<string>('');
+  const [customEnd, setCustomEnd] = useState<string>('');
+  const [isCustom, setIsCustom] = useState(false);
+
+  useEffect(() => {
+    if (isCustom && customStart && customEnd) {
+      const timeStats = getTimeStatistics('custom', new Date(customStart), new Date(customEnd));
+      setStats(timeStats);
     } else {
-      const timeStats = getTimeStatistics(selectedPeriod as 'day' | 'week' | 'month' | 'year');
+      const timeStats = getTimeStatistics(period);
       setStats(timeStats);
     }
-  }, [getTimeStatistics, selectedPeriod]);
+  }, [period, customStart, customEnd, isCustom, getTimeStatistics]);
 
-  const handlePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPeriod(event.target.value as PeriodType);
+  // Format time from milliseconds to readable format
+  const formatTime = (ms: number): string => {
+    const seconds = Math.floor((ms / 1000) % 60);
+    const minutes = Math.floor((ms / (1000 * 60)) % 60);
+    const hours = Math.floor((ms / (1000 * 60 * 60)));
+
+    return `${hours}h ${minutes}m ${seconds}s`;
   };
 
-  const handleStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomStartDate(event.target.value);
+  // Calculate percentage for chart
+  const calculatePercentage = (timeSpent: number) => {
+    const totalTimeSpent = stats.reduce((acc, curr) => acc + curr.timeSpent, 0);
+    if (totalTimeSpent === 0) return 0;
+    return (timeSpent / totalTimeSpent) * 100;
   };
-
-  const handleEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomEndDate(event.target.value);
-  };
-
-  // Formato para la duración en horas:minutos:segundos (hh:mm:ss)
-  const formatDuration = (ms: number) => {
-    // Para los tests necesitamos formatear en hh:mm:ss
-    const hours = Math.floor(ms / 3600000).toString().padStart(2, '0');
-    const minutes = Math.floor((ms % 3600000) / 60000).toString().padStart(2, '0');
-    const seconds = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  // Calcular tiempo total
-  const totalTimeSpent = stats.reduce((acc, curr) => acc + curr.timeSpent, 0);
 
   return (
-    <div className="p-4 bg-white shadow rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Time Statistics</h2>
-      
-      <div className="mb-4">
-        <label htmlFor="period" className="block text-sm font-medium text-gray-700 mb-1">Period</label>
-        <select 
-          id="period"
-          className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          value={selectedPeriod}
-          onChange={handlePeriodChange}
-        >
-          <option value="day">Today</option>
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-          <option value="year">This Year</option>
-          <option value="custom">Custom Range</option>
-        </select>
-      </div>
+    <div className="h-full p-6">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-gray-800">Time Tracking Statistics</h2>
 
-      {selectedPeriod === 'custom' && (
-        <div className="mb-4">
-          <div className="grid grid-cols-2 gap-4 mb-2">
-            <div>
-              <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-              <input
-                id="start-date"
-                type="date"
-                className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                value={customStartDate}
-                onChange={handleStartDateChange}
-              />
+          <div className="flex items-center gap-4">
+            <div className="flex">
+              <button
+                onClick={() => { setPeriod('day'); setIsCustom(false); }}
+                className={`px-3 py-1 text-sm border-t border-b border-l rounded-l-lg ${period === 'day' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'border-gray-300'}`}
+              >
+                Today
+              </button>
+              <button
+                onClick={() => { setPeriod('week'); setIsCustom(false); }}
+                className={`px-3 py-1 text-sm border-t border-b ${period === 'week' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'border-gray-300'}`}
+              >
+                This Week
+              </button>
+              <button
+                onClick={() => { setPeriod('month'); setIsCustom(false); }}
+                className={`px-3 py-1 text-sm border-t border-b ${period === 'month' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'border-gray-300'}`}
+              >
+                This Month
+              </button>
+              <button
+                onClick={() => { setPeriod('year'); setIsCustom(false); }}
+                className={`px-3 py-1 text-sm border-t border-b border-r rounded-r-lg ${period === 'year' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'border-gray-300'}`}
+              >
+                This Year
+              </button>
             </div>
-            <div>
-              <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-              <input
-                id="end-date"
-                type="date"
-                className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                value={customEndDate}
-                onChange={handleEndDateChange}
-              />
-            </div>
+
+            <button
+              onClick={() => setIsCustom(!isCustom)}
+              className={`px-3 py-1 text-sm rounded-lg border ${isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : 'border-gray-300'}`}
+            >
+              Custom
+            </button>
           </div>
-          <button
-            className="w-full px-4 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            onClick={() => {
-              const start = new Date(customStartDate);
-              const end = new Date(customEndDate);
-              end.setHours(23, 59, 59, 999);
-              const timeStats = getTimeStatistics('custom', start, end);
-              setStats(timeStats);
-            }}
-          >
-            Apply
-          </button>
         </div>
-      )}
 
-      {stats.length === 0 ? (
-        <>
-          <p className="text-gray-500">No time tracking data</p>
-          <div className="mb-4 mt-4">
-            <div className="flex justify-between mb-2">
-              <span className="font-medium">Total time:</span>
-              <span className="font-medium">00:00:00</span>
+        {isCustom && (
+          <div className="flex gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input
+                type="date"
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input
+                type="date"
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
           </div>
-        </>
-      ) : (
-        <>
-          <div className="mb-4">
-            <div className="flex justify-between mb-2">
-              <span className="font-medium">Total time:</span>
-              <span className="font-medium">{formatDuration(totalTimeSpent)}</span>
-            </div>
-          </div>
+        )}
 
-          <div className="border-t pt-4">
-            <h3 className="font-medium mb-2">Tasks</h3>
-            <ul className="space-y-2">
-              {stats.map((task) => (
-                <li key={task.id} className="flex justify-between p-2 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium">{task.title}</span>
-                    <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                      task.status === 'Done' ? 'bg-green-100 text-green-800' : 
-                      task.status === 'In Progress' ? 'bg-amber-100 text-amber-800' : 
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {task.status}
-                    </span>
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Total Time Spent</h3>
+            <span className="text-2xl font-bold">{formatTime(stats.reduce((acc, curr) => acc + curr.timeSpent, 0))}</span>
+          </div>
+        </div>
+
+        {stats.length > 0 ? (
+          <div>
+            <h3 className="text-lg font-medium mb-4">Time by Task</h3>
+            <div className="space-y-4">
+              {stats.map(task => (
+                <div key={task.id} className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex justify-between mb-1">
+                    <h4 className="font-medium">{task.title}</h4>
+                    <span>{formatTime(task.timeSpent)}</span>
                   </div>
-                  <span>{formatDuration(task.timeSpent)}</span>
-                </li>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-indigo-600 h-2.5 rounded-full"
+                      style={{ width: `${calculatePercentage(task.timeSpent)}%` }}
+                    ></div>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
-        </>
-      )}
+        ) : (
+          <div className="text-center py-10">
+            <BarChart size={48} className="mx-auto text-gray-300 mb-4" />
+            <p className="text-gray-500">No time tracking data available for this period.</p>
+            <p className="text-gray-400 text-sm">Start tracking time on your tasks to see statistics here.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
