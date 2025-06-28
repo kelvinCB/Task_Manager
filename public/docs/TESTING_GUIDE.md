@@ -189,6 +189,8 @@ En `src/test/setup.ts` se han configurado los siguientes mocks:
 - **localStorage**: Mock completo para simular persistencia
 - **AudioContext**: Mock para probar la funcionalidad de sonido
 - **Temporizadores**: Mock para controlar el tiempo en pruebas con `vi.useFakeTimers()`
+- **Iconos de Lucide React**: Los iconos de `lucide-react` se mockean para evitar errores de renderizado y asegurar que los tests no dependan de la implementación real de los iconos. Esto se hace en `src/test/components/App.test.tsx`.
+- **Componentes de Vista**: Componentes como `TaskBoard`, `TaskTree` y `TimeStatsView` se mockean para aislar los tests de `App.test.tsx` y evitar dependencias complejas. Se utilizan `data-testid` únicos para asegurar consultas de test robustas.
 
 ## Buenas Prácticas de Accesibilidad
 

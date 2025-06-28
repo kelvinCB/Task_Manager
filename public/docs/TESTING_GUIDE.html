@@ -201,6 +201,8 @@
 <li><strong>localStorage</strong>: Mock completo para simular persistencia</li>
 <li><strong>AudioContext</strong>: Mock para probar la funcionalidad de sonido</li>
 <li><strong>Temporizadores</strong>: Mock para controlar el tiempo en pruebas con <code>vi.useFakeTimers()</code></li>
+<li><strong>Iconos de Lucide React</strong>: Los iconos de <code>lucide-react</code> se mockean para evitar errores de renderizado y asegurar que los tests no dependan de la implementación real de los iconos. Esto se hace en <code>src/test/components/App.test.tsx</code>.</li>
+<li><strong>Componentes de Vista</strong>: Componentes como <code>TaskBoard</code>, <code>TaskTree</code> y <code>TimeStatsView</code> se mockean para aislar los tests de <code>App.test.tsx</code> y evitar dependencias complejas. Se utilizan <code>data-testid</code> únicos para asegurar consultas de test robustas.</li>
 </ul>
 <h2 id="contribucion">Contribución</h2>
 <ol>

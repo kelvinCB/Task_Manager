@@ -81,6 +81,10 @@ vi.mock('lucide-react', () => ({
   Download: () => <div data-testid="download-icon">Download</div>,
   Upload: () => <div data-testid="upload-icon">Upload</div>,
   Filter: () => <div data-testid="filter-icon">Filter</div>,
+  X: ({ size }: { size?: number }) => <div data-testid="close-icon" style={{ width: size, height: size }}>X</div>,
+  FileText: ({ size }: { size?: number }) => <div data-testid="file-text-icon" style={{ width: size, height: size }}>FileText</div>,
+  Tag: ({ size }: { size?: number }) => <div data-testid="tag-icon" style={{ width: size, height: size }}>Tag</div>,
+  Calendar: ({ size }: { size?: number }) => <div data-testid="calendar-icon" style={{ width: size, height: size }}>Calendar</div>,
 }));
 
 // Mock view components
@@ -89,11 +93,11 @@ vi.mock('../../components/TaskBoard', () => ({
 }));
 
 vi.mock('../../components/TaskTree', () => ({
-  TaskTree: () => <div data-testid="tree-view-container">Mock Tree View</div>
+  TaskTree: () => <div data-testid="tree-view-mock">Mock Tree View</div>
 }));
 
 vi.mock('../../components/TimeStatsView', () => ({
-  TimeStatsView: () => <div data-testid="time-stats-view">Mock Time Stats View</div>
+  TimeStatsView: () => <div data-testid="time-stats-view">Mock Time Stats View <span>time statistics</span></div>
 }));
 
 // Mock useTasks hook
@@ -161,8 +165,8 @@ describe('App Component', () => {
     // Verify Tree button is active
     expect(treeButton.className).toContain('bg-indigo-100');
     
-    // Verify Tree container is displayed
-    const treeContainer = screen.getByTestId('tree-view-container');
+    // Verify Tree mock is displayed
+    const treeContainer = screen.getByTestId('tree-view-mock');
     expect(treeContainer).toBeInTheDocument();
   });
   
