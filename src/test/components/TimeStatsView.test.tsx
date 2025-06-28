@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TimeStatsView } from '../../components/TimeStatsView';
 import { TaskTimeStats } from '../../types/Task';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mocks para las pruebas
 const mockGetTimeStatistics = vi.fn();
@@ -39,7 +40,11 @@ describe('TimeStatsView Component', () => {
   
   it('should render the time statistics view with period selector', () => {
     // Act
-    render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
     
     // Assert - verificar que se muestra el título y los botones de periodo
     expect(screen.getByText(/Time Tracking Statistics/i)).toBeInTheDocument();
@@ -52,7 +57,11 @@ describe('TimeStatsView Component', () => {
   
   it('should show time stats for tasks', () => {
     // Act
-    render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
     
     // Assert - verificar que se muestran los datos de las tareas
     expect(screen.getByText('Task 1')).toBeInTheDocument();
@@ -65,7 +74,11 @@ describe('TimeStatsView Component', () => {
   
   it('should call getTimeStatistics with the selected period', () => {
     // Act
-    render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
     
     // Limpiar las llamadas iniciales (mount + useEffect)
     mockGetTimeStatistics.mockClear();
@@ -80,7 +93,11 @@ describe('TimeStatsView Component', () => {
   
   it('should show custom date inputs when "custom" period is selected', () => {
     // Act
-    render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
     
     // Inicialmente no deberían mostrarse los campos de fecha personalizados
     expect(screen.queryByText(/Start Date/i)).not.toBeInTheDocument();
@@ -100,7 +117,11 @@ describe('TimeStatsView Component', () => {
   
   it('should update custom date range and fetch new statistics', () => {
     // Act
-    render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
     
     // Limpiar las llamadas iniciales
     mockGetTimeStatistics.mockClear();
@@ -129,7 +150,11 @@ describe('TimeStatsView Component', () => {
   
   it('should show total time spent across all tasks', () => {
     // Act
-    render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
     
     // El tiempo total debería ser 3h (1h + 2h = 3h = 10800000ms)
     
@@ -143,7 +168,11 @@ describe('TimeStatsView Component', () => {
     mockGetTimeStatistics.mockReturnValue([]);
     
     // Act
-    render(<TimeStatsView getTimeStatistics={mockGetTimeStatistics} />);
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
     
     // Assert - verificar que se muestra un mensaje de no datos
     expect(screen.getByText(/No time tracking data/i)).toBeInTheDocument();
