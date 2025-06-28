@@ -110,25 +110,27 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className={`h-full overflow-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
       <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
         {statusColumns.map(column => {
           const columnTasks = getTasksByStatus(column.status);
           const StatusIcon = LucideIcons[getStatusIcon(column.status) as keyof typeof LucideIcons] as React.ComponentType<{className?: string}>;
           
           return (
-            <div key={column.status} className="flex flex-col h-full">
+            <div key={column.status} className={`flex flex-col h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
               {/* Column Header */}
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <div className="flex items-center gap-2">
                   <StatusIcon className={`w-5 h-5 ${getStatusColor(column.status).split(' ')[0]}`} />
-                  <div>
-                    <h3 className={`font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{column.title}</h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>{column.description}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h2 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{column.title}</h2>
+                      <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-medium ${theme === 'dark' ? 'bg-gray-700 text-gray-300 border border-gray-600' : 'bg-gray-100 text-gray-700'} rounded`}>
+                        {columnTasks.length}
+                      </span>
+                    </div>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{column.description}</p>
                   </div>
-                </div>
-                <div className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(column.status)}`}>
-                  {columnTasks.length}
                 </div>
               </div>
 
@@ -144,7 +146,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                       key={task.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, task.id)}
-                      className={`${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'} p-4 rounded-lg border shadow-sm hover:shadow-md transition-all duration-200 cursor-move group`}
+                      className={`mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
