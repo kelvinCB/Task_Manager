@@ -1,0 +1,5 @@
+# Ejecutar tests
+npm run test
+
+# Verificar que el build funciona
+npm run build
