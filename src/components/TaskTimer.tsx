@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Clock } from 'lucide-react';
 
 interface TaskTimerProps {
@@ -22,6 +22,36 @@ const formatTime = (ms: number): string => {
   ].join(':');
 };
 
+// Utilidad para reproducir un sonido corto de notificación
+const playNotificationSound = () => {
+  try {
+    // Crear un contexto de audio
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    // Crear un oscilador para generar un tono
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    // Configurar el oscilador
+    oscillator.type = 'sine'; // Tipo de onda sinusoidal (suave)
+    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime); // Frecuencia en Hz
+    
+    // Configurar el volumen y la duración
+    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime); // Volumen más alto (0.4 en lugar de 0.1)
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 2.0); // Fade out durante 2 segundos
+    
+    // Conectar los nodos
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Reproducir el sonido
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 2.0); // Duración de 2 segundos
+  } catch (error) {
+    console.error('Error al reproducir el sonido:', error);
+  }
+};
+
 export const TaskTimer: React.FC<TaskTimerProps> = ({ 
   taskId, 
   isActive, 
@@ -30,6 +60,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   onPause 
 }) => {
   const [currentTime, setCurrentTime] = useState(elapsedTime);
+  const lastNotificationTimeRef = useRef(0);
 
   // Actualizar el tiempo transcurrido si el temporizador está activo
   useEffect(() => {
@@ -37,7 +68,26 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     
     if (isActive) {
       interval = window.setInterval(() => {
-        setCurrentTime(prevTime => prevTime + 1000); // Actualizar cada segundo
+        setCurrentTime(prevTime => {
+          const newTime = prevTime + 1000; // Actualizar cada segundo
+          
+          // Verificar si debemos reproducir un sonido (cada 10 minutos)
+          const tenMinutesInMs = 10 * 60 * 1000;
+          const previousMinutes = Math.floor(prevTime / tenMinutesInMs);
+          const currentMinutes = Math.floor(newTime / tenMinutesInMs);
+          
+          if (currentMinutes > previousMinutes) {
+            // Solo reproducir si ha pasado al menos 9 minutos desde la última notificación
+            // Esto previene notificaciones múltiples si hay varios temporizadores activos
+            const now = Date.now();
+            if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
+              playNotificationSound();
+              lastNotificationTimeRef.current = now;
+            }
+          }
+          
+          return newTime;
+        });
       }, 1000);
     } else {
       setCurrentTime(elapsedTime); // Sincronizar con el tiempo externo cuando se pausa
@@ -71,6 +121,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
           <Play className="w-4 h-4" />
         </button>
       )}
+
     </div>
   );
 };
