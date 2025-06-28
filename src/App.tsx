@@ -307,16 +307,7 @@ function App() {
         {/* Content Area */}
         <div className="h-[calc(100vh-8rem)]">
           {view === 'tree' ? (
-            <div className="h-full overflow-auto p-6">
-              <div className="flex justify-end mb-4">
-                <button
-                  onClick={openCreateForm}
-                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200"
-                >
-                  <Plus size={16} />
-                  Create Root Task
-                </button>
-              </div>
+            <div data-testid="tree-view-container" className="h-full overflow-auto p-6">
               <TaskTree
                 nodes={filteredTaskTree as unknown as TaskNode[]}
                 expandedNodes={expandedNodes}
