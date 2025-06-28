@@ -1,5 +1,5 @@
 import React from 'react';
-import { TaskNode, TaskStatus } from '../types/Task';
+import { TaskNode, TaskStatus, Task } from '../types/Task';
 import { TaskItem } from './TaskItem';
 import { canCompleteTask } from '../utils/taskUtils';
 
@@ -12,6 +12,9 @@ interface TaskTreeProps {
   onEdit: (task: TaskNode) => void;
   onDelete: (id: string) => void;
   onAddChild: (parentId: string) => void;
+  onStartTimer?: (taskId: string) => void;
+  onPauseTimer?: (taskId: string) => void;
+  getElapsedTime?: (taskId: string) => number;
 }
 
 export const TaskTree: React.FC<TaskTreeProps> = ({
@@ -22,7 +25,10 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
   onStatusChange,
   onEdit,
   onDelete,
-  onAddChild
+  onAddChild,
+  onStartTimer,
+  onPauseTimer,
+  getElapsedTime
 }) => {
   const flattenTasks = (nodes: TaskNode[]): TaskNode[] => {
     const result: TaskNode[] = [];
@@ -67,11 +73,14 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
           isExpanded={expandedNodes.has(task.id)}
           onToggleExpand={onToggleExpand}
           onStatusChange={onStatusChange}
-          onEdit={onEdit}
+          onEdit={(t: Task) => onEdit(t as unknown as TaskNode)}
           onDelete={onDelete}
           onAddChild={onAddChild}
           hasChildren={task.children.length > 0}
           canComplete={canCompleteTask(task, allTasks)}
+          onStartTimer={onStartTimer}
+          onPauseTimer={onPauseTimer}
+          getElapsedTime={getElapsedTime}
         />
       ))}
     </div>

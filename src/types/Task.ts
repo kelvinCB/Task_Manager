@@ -8,6 +8,20 @@ export interface Task {
   parentId?: string;
   childIds: string[];
   depth: number;
+  
+  // Time tracking properties
+  timeTracking: {
+    totalTimeSpent: number; // Total time spent in milliseconds
+    isActive: boolean;     // Whether the timer is currently running
+    lastStarted?: number;  // Timestamp when the timer was last started
+    timeEntries: TimeEntry[];
+  };
+}
+
+export interface TimeEntry {
+  startTime: number;     // Timestamp when tracking started
+  endTime?: number;      // Timestamp when tracking ended (undefined if still active)
+  duration?: number;     // Duration in milliseconds (calculated when ended)
 }
 
 export type TaskStatus = 'Open' | 'In Progress' | 'Done';

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Task, TaskStatus, TaskFilter } from '../types/Task';
+import { Task, TaskStatus, TaskFilter, TimeEntry } from '../types/Task';
 import { generateId, buildTaskTree, canCompleteTask } from '../utils/taskUtils';
 
 // Initial tasks for new users
@@ -13,7 +13,12 @@ const defaultTasks: Task[] = [
     dueDate: new Date('2024-02-15'),
     parentId: undefined,
     childIds: ['2', '3'],
-    depth: 0
+    depth: 0,
+    timeTracking: {
+      totalTimeSpent: 0,
+      isActive: false,
+      timeEntries: []
+    }
   },
   {
     id: '2',
@@ -23,7 +28,12 @@ const defaultTasks: Task[] = [
     createdAt: new Date('2024-01-16'),
     parentId: '1',
     childIds: ['4'],
-    depth: 1
+    depth: 1,
+    timeTracking: {
+      totalTimeSpent: 0,
+      isActive: false,
+      timeEntries: []
+    }
   },
   {
     id: '3',
@@ -33,7 +43,12 @@ const defaultTasks: Task[] = [
     createdAt: new Date('2024-01-17'),
     parentId: '1',
     childIds: [],
-    depth: 1
+    depth: 1,
+    timeTracking: {
+      totalTimeSpent: 0,
+      isActive: false,
+      timeEntries: []
+    }
   },
   {
     id: '4',
@@ -43,7 +58,12 @@ const defaultTasks: Task[] = [
     createdAt: new Date('2024-01-18'),
     parentId: '2',
     childIds: [],
-    depth: 2
+    depth: 2,
+    timeTracking: {
+      totalTimeSpent: 0,
+      isActive: false,
+      timeEntries: []
+    }
   }
 ];
 
@@ -55,11 +75,22 @@ const EXPANDED_NODES_STORAGE_KEY = 'taskflow_expanded_nodes';
 const parseTasksFromStorage = (storedTasks: string): Task[] => {
   try {
     const parsedTasks = JSON.parse(storedTasks);
-    return parsedTasks.map((task: Task) => ({
-      ...task,
-      createdAt: new Date(task.createdAt),
-      dueDate: task.dueDate ? new Date(task.dueDate) : undefined
-    }));
+    return parsedTasks.map((task: any) => {
+      // Ensure timeTracking exists for backward compatibility with older stored tasks
+      if (!task.timeTracking) {
+        task.timeTracking = {
+          totalTimeSpent: 0,
+          isActive: false,
+          timeEntries: []
+        };
+      }
+      
+      return {
+        ...task,
+        createdAt: new Date(task.createdAt),
+        dueDate: task.dueDate ? new Date(task.dueDate) : undefined
+      };
+    });
   } catch (error) {
     console.error('Error parsing tasks from localStorage:', error);
     return defaultTasks;
@@ -134,13 +165,18 @@ export const useTasks = () => {
     return buildTaskTree(tasksForTree);
   }, [tasks, taskTree, filteredTasks, filter]);
 
-  const createTask = useCallback((taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>) => {
+  const createTask = useCallback((taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth' | 'timeTracking'>) => {
     const newTask: Task = {
       ...taskData,
       id: generateId(),
       createdAt: new Date(),
       childIds: [],
-      depth: taskData.parentId ? (tasks.find(t => t.id === taskData.parentId)?.depth ?? 0) + 1 : 0
+      depth: taskData.parentId ? (tasks.find(t => t.id === taskData.parentId)?.depth ?? 0) + 1 : 0,
+      timeTracking: {
+        totalTimeSpent: 0,
+        isActive: false,
+        timeEntries: []
+      }
     };
 
     setTasks(prev => {
@@ -254,6 +290,142 @@ export const useTasks = () => {
     }
   }, [expandedNodes]);
 
+  // Time tracking functions
+  const startTaskTimer = useCallback((taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    // If task is not in progress, change its status
+    if (task.status !== 'In Progress') {
+      moveTask(taskId, 'In Progress');
+    }
+
+    // Start the timer if it's not already running
+    if (!task.timeTracking.isActive) {
+      const now = Date.now();
+      const newEntry: TimeEntry = {
+        startTime: now
+      };
+      
+      updateTask(taskId, {
+        timeTracking: {
+          ...task.timeTracking,
+          isActive: true,
+          lastStarted: now,
+          timeEntries: [...task.timeTracking.timeEntries, newEntry]
+        }
+      });
+    }
+  }, [tasks, updateTask, moveTask]);
+
+  const pauseTaskTimer = useCallback((taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task || !task.timeTracking.isActive) return;
+
+    const now = Date.now();
+    const lastEntryIndex = task.timeTracking.timeEntries.length - 1;
+    const lastEntry = task.timeTracking.timeEntries[lastEntryIndex];
+    
+    if (lastEntry && !lastEntry.endTime) {
+      // Calculate duration for this entry
+      const duration = now - lastEntry.startTime;
+      const updatedEntry: TimeEntry = {
+        ...lastEntry,
+        endTime: now,
+        duration
+      };
+
+      // Update the time entries array with the completed entry
+      const newTimeEntries = [...task.timeTracking.timeEntries];
+      newTimeEntries[lastEntryIndex] = updatedEntry;
+
+      // Update task with new total time and the completed entry
+      updateTask(taskId, {
+        timeTracking: {
+          ...task.timeTracking,
+          isActive: false,
+          totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
+          timeEntries: newTimeEntries
+        }
+      });
+    }
+  }, [tasks, updateTask]);
+
+  const getElapsedTime = useCallback((taskId: string): number => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return 0;
+    
+    let totalTime = task.timeTracking.totalTimeSpent;
+    
+    // If the timer is active, add the current session time
+    if (task.timeTracking.isActive && task.timeTracking.lastStarted) {
+      const currentSession = Date.now() - task.timeTracking.lastStarted;
+      totalTime += currentSession;
+    }
+    
+    return totalTime;
+  }, [tasks]);
+
+  // Get time statistics for specific time periods
+  const getTimeStatistics = useCallback((period: 'day' | 'week' | 'month' | 'year' | {start: Date, end: Date}) => {
+    const now = new Date();
+    let startDate: Date;
+    let endDate = now;
+
+    if (period === 'day') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    } else if (period === 'week') {
+      const dayOfWeek = now.getDay();
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - dayOfWeek);
+      startDate.setHours(0, 0, 0, 0);
+    } else if (period === 'month') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else if (period === 'year') {
+      startDate = new Date(now.getFullYear(), 0, 1);
+    } else if (typeof period === 'object') {
+      startDate = period.start;
+      endDate = period.end;
+    } else {
+      startDate = new Date(0); // Default to epoch start
+    }
+
+    const stats = {
+      totalTime: 0,
+      taskStats: [] as {taskId: string, title: string, timeSpent: number}[]
+    };
+
+    // Process each task's time entries
+    tasks.forEach(task => {
+      let taskTime = 0;
+
+      task.timeTracking.timeEntries.forEach(entry => {
+        const entryStart = new Date(entry.startTime);
+        const entryEnd = entry.endTime ? new Date(entry.endTime) : now;
+        
+        // Check if this entry falls within our time period
+        if (entryStart >= startDate && entryStart <= endDate) {
+          const duration = entry.duration || (entryEnd.getTime() - entryStart.getTime());
+          taskTime += duration;
+        }
+      });
+
+      if (taskTime > 0) {
+        stats.totalTime += taskTime;
+        stats.taskStats.push({
+          taskId: task.id,
+          title: task.title,
+          timeSpent: taskTime
+        });
+      }
+    });
+
+    // Sort tasks by time spent (descending)
+    stats.taskStats.sort((a, b) => b.timeSpent - a.timeSpent);
+
+    return stats;
+  }, [tasks]);
+
   return {
     tasks,
     taskTree,
@@ -268,6 +440,11 @@ export const useTasks = () => {
     setFilter,
     toggleNodeExpansion,
     getTaskById,
-    getTasksByStatus
+    getTasksByStatus,
+    // Time tracking functions
+    startTaskTimer,
+    pauseTaskTimer,
+    getElapsedTime,
+    getTimeStatistics
   };
 };

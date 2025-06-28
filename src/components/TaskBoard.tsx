@@ -3,6 +3,7 @@ import { Task, TaskStatus } from '../types/Task';
 import { getStatusColor, getStatusIcon } from '../utils/taskUtils';
 import { Plus } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { TaskTimer } from './TaskTimer';
 
 interface TaskBoardProps {
   tasks: Task[];
@@ -10,6 +11,9 @@ interface TaskBoardProps {
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
   onCreateTask: () => void;
+  onStartTimer?: (taskId: string) => void;
+  onPauseTimer?: (taskId: string) => void;
+  getElapsedTime?: (taskId: string) => number;
 }
 
 const statusColumns: { status: TaskStatus; title: string; description: string }[] = [
@@ -23,7 +27,10 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onStatusChange,
   onEdit,
   onDelete,
-  onCreateTask
+  onCreateTask,
+  onStartTimer,
+  onPauseTimer,
+  getElapsedTime
 }) => {
   const getTasksByStatus = (status: TaskStatus) => {
     return tasks.filter(task => task.status === status);
@@ -148,6 +155,16 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             <span>Depth: {task.depth}</span>
                             {task.childIds.length > 0 && (
                               <span>• {task.childIds.length} subtask{task.childIds.length !== 1 ? 's' : ''}</span>
+                            )}
+                            {/* Task Timer */}
+                            {onStartTimer && onPauseTimer && getElapsedTime && (
+                              <TaskTimer
+                                taskId={task.id}
+                                isActive={task.timeTracking.isActive}
+                                elapsedTime={getElapsedTime(task.id)}
+                                onStart={onStartTimer}
+                                onPause={onPauseTimer}
+                              />
                             )}
                           </div>
                         </div>

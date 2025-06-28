@@ -3,6 +3,7 @@ import { Task, TaskStatus } from '../types/Task';
 import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon } from '../utils/taskUtils';
 import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { TaskTimer } from './TaskTimer';
 
 interface TaskItemProps {
   task: Task;
@@ -14,6 +15,9 @@ interface TaskItemProps {
   onAddChild: (parentId: string) => void;
   hasChildren: boolean;
   canComplete: boolean;
+  onStartTimer?: (taskId: string) => void;
+  onPauseTimer?: (taskId: string) => void;
+  getElapsedTime?: (taskId: string) => number;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -25,7 +29,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onDelete,
   onAddChild,
   hasChildren,
-  canComplete
+  canComplete,
+  onStartTimer,
+  onPauseTimer,
+  getElapsedTime
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -165,6 +172,16 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                   <User size={12} />
                   <span>Depth {task.depth}</span>
                 </div>
+                {/* Task Timer */}
+                {onStartTimer && onPauseTimer && getElapsedTime && (
+                  <TaskTimer
+                    taskId={task.id}
+                    isActive={task.timeTracking.isActive}
+                    elapsedTime={getElapsedTime(task.id)}
+                    onStart={onStartTimer}
+                    onPause={onPauseTimer}
+                  />
+                )}
               </div>
             </div>
 
