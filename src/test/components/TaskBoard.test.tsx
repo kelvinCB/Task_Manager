@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TaskBoard } from '../../components/TaskBoard';
 import { Task, TaskStatus } from '../../types/Task';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mocks para las pruebas
 const mockOnStatusChange = vi.fn();
@@ -82,16 +83,18 @@ describe('TaskBoard Component', () => {
   it('should render the board with correct columns and tasks', () => {
     // Act
     render(
-      <TaskBoard 
-        tasks={mockTasks}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onCreateTask={mockOnCreateTask}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskBoard 
+          tasks={mockTasks}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onCreateTask={mockOnCreateTask}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert - verificar que se muestran las columnas
@@ -108,16 +111,18 @@ describe('TaskBoard Component', () => {
   it('should render "Add New Task" button in Open column', () => {
     // Act
     render(
-      <TaskBoard 
-        tasks={mockTasks}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onCreateTask={mockOnCreateTask}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskBoard 
+          tasks={mockTasks}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onCreateTask={mockOnCreateTask}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert - verificar que hay un botón para añadir tareas en la columna Open
@@ -128,16 +133,18 @@ describe('TaskBoard Component', () => {
   it('should call onCreateTask when "Add New Task" button is clicked', () => {
     // Act
     render(
-      <TaskBoard 
-        tasks={mockTasks}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onCreateTask={mockOnCreateTask}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskBoard 
+          tasks={mockTasks}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onCreateTask={mockOnCreateTask}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Clic en el botón de añadir tarea (columna Open)
@@ -151,16 +158,18 @@ describe('TaskBoard Component', () => {
   it('should render task timer component for tasks', () => {
     // Act
     render(
-      <TaskBoard 
-        tasks={mockTasks}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onCreateTask={mockOnCreateTask}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskBoard 
+          tasks={mockTasks}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onCreateTask={mockOnCreateTask}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Assert - verificar que se muestra el componente TaskTimer
@@ -174,16 +183,18 @@ describe('TaskBoard Component', () => {
   it('should show task details when a task is clicked', () => {
     // Act
     render(
-      <TaskBoard 
-        tasks={mockTasks}
-        onStatusChange={mockOnStatusChange}
-        onEdit={mockOnEdit}
-        onDelete={mockOnDelete}
-        onCreateTask={mockOnCreateTask}
-        onStartTimer={mockOnStartTimer}
-        onPauseTimer={mockOnPauseTimer}
-        getElapsedTime={mockGetElapsedTime}
-      />
+      <ThemeProvider>
+        <TaskBoard 
+          tasks={mockTasks}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onCreateTask={mockOnCreateTask}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+        />
+      </ThemeProvider>
     );
     
     // Clic en la primera tarea

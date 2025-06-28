@@ -223,16 +223,6 @@ function App() {
                 </button>
               </div>
 
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
-                title="Toggle Dark Mode"
-              >
-                {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-                <span className="hidden sm:inline">{theme === 'light' ? 'Dark' : 'Light'}</span>
-              </button>
-
               {/* Add Task Button */}
               <button
                 onClick={openCreateForm}
@@ -273,49 +263,60 @@ function App() {
       <main className="flex-1">
         {/* Filters Section */}
         <div className={`bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700' : ''}`}>
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex items-center gap-3">
-              <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Filters</h3>
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} hover:bg-gray-100 rounded transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
-              >
-                <Filter size={16} />
-              </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Filters</h3>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} hover:bg-gray-100 rounded transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
+                >
+                  <Filter size={16} />
+                </button>
+              </div>
+
+              {showFilters && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                      Status:
+                    </label>
+                    <select
+                      value={filter.status || ''}
+                      onChange={(e) => setFilter({ ...filter, status: e.target.value as Task['status'] || undefined })}
+                      className={`px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
+                    >
+                      <option value="">All Status</option>
+                      <option value="Open">Open</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Done">Done</option>
+                    </select>
+                  </div>
+
+                  {/* Clear Filters */}
+                  {(filter.status || filter.searchTerm) && (
+                    <button
+                      onClick={() => {
+                        setFilter({});
+                        setSearchTerm('');
+                      }}
+                      className={`px-3 py-2 text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-gray-100' : 'text-gray-600 hover:text-gray-800'} hover:bg-gray-100 rounded-lg transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </>
+              )}
             </div>
-
-            {showFilters && (
-              <>
-                <div className="flex items-center gap-2">
-                  <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
-                    Status:
-                  </label>
-                  <select
-                    value={filter.status || ''}
-                    onChange={(e) => setFilter({ ...filter, status: e.target.value as Task['status'] || undefined })}
-                    className={`px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
-                  >
-                    <option value="">All Status</option>
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Done">Done</option>
-                  </select>
-                </div>
-
-                {/* Clear Filters */}
-                {(filter.status || filter.searchTerm) && (
-                  <button
-                    onClick={() => {
-                      setFilter({});
-                      setSearchTerm('');
-                    }}
-                    className={`px-3 py-2 text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-gray-100' : 'text-gray-600 hover:text-gray-800'} hover:bg-gray-100 rounded-lg transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </>
-            )}
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`flex items-center gap-2 px-3 py-2 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} rounded-lg transition-colors duration-200`}
+              title="Toggle Dark Mode"
+            >
+              {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+              <span className="hidden sm:inline">{theme === 'light' ? 'Dark' : 'Light'}</span>
+            </button>
           </div>
         </div>
 
