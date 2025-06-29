@@ -18,7 +18,6 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
-// @ts-ignore
 import Papa from 'papaparse';
 import { useTheme } from './contexts/ThemeContext';
 
