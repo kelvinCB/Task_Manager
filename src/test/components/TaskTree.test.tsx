@@ -210,7 +210,7 @@ describe('TaskTree Component', () => {
     );
     
     // Encontrar un botón de inicio de temporizador y hacer clic en él
-    const playButtons = screen.getAllByTitle('Iniciar cronómetro');
+    const playButtons = screen.getAllByTitle('Start timer');
     fireEvent.click(playButtons[0]);
     
     // Assert - verificar que se llamó a la función onStartTimer

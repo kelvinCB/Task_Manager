@@ -174,10 +174,10 @@ describe('TaskBoard Component', () => {
     
     // Assert - verificar que se muestra el componente TaskTimer
     // La tarea en progreso debería mostrar un botón de pausa
-    expect(screen.getAllByTitle('Pausar cronómetro').length).toBeGreaterThan(0);
+    expect(screen.getAllByTitle('Pause timer').length).toBeGreaterThan(0);
     
     // La tarea abierta debería mostrar un botón de inicio
-    expect(screen.getAllByTitle('Iniciar cronómetro').length).toBeGreaterThan(0);
+    expect(screen.getAllByTitle('Start timer').length).toBeGreaterThan(0);
   });
   
   it('should show task details when a task is clicked', () => {

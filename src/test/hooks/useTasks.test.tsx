@@ -5,13 +5,13 @@ import { Task, TaskStatus } from '../../types/Task';
 
 describe('useTasks Hook', () => {
   beforeEach(() => {
-    // Limpiar localStorage antes de cada prueba
+    // Clear localStorage before each test
     localStorage.clear();
     
-    // Mock para Date.now() para tener valores consistentes
+    // Mock Date.now() to have consistent values
     vi.spyOn(Date, 'now').mockImplementation(() => 1625097600000); // 2021-07-01
     
-    // Mock para setInterval y clearInterval
+    // Mock setInterval and clearInterval
     vi.useFakeTimers();
   });
   
@@ -56,14 +56,14 @@ describe('useTasks Hook', () => {
     // Arrange
     const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
     
-    // Act - crear tarea padre
+    // Act - create parent task
     act(() => {
       result.current.createTask({ title: 'Parent Task', description: 'Parent task description', status: 'Open' as TaskStatus });
     });
     
     const parentId = result.current.filteredTasks[0].id;
     
-    // Act - crear subtarea
+    // Act - create subtask
     act(() => {
       result.current.createTask({ title: 'Child Task', description: 'Child task description', status: 'Open' as TaskStatus, parentId: parentId });
     });
@@ -76,14 +76,14 @@ describe('useTasks Hook', () => {
     
     expect(parentTask?.childIds).toContain(childTask?.id);
     expect(childTask?.parentId).toBe(parentId);
-    expect(childTask?.depth).toBe(1); // Profundidad 1 para hijo directo
+    expect(childTask?.depth).toBe(1); // Depth 1 for direct child
   });
   
   it('should delete a task and all its subtasks', () => {
     // Arrange
     const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
     
-    // Crear estructura de tareas
+    // Create task structure
     act(() => {
       result.current.createTask({ title: 'Parent Task', description: 'Parent task description', status: 'Open' as TaskStatus });
     });
@@ -98,15 +98,15 @@ describe('useTasks Hook', () => {
       result.current.createTask({ title: 'Child 2', description: 'Child 2 desc', status: 'Open' as TaskStatus, parentId: parentId });
     });
     
-    // Verificar que tenemos 3 tareas antes de eliminar
+    // Verify we have 3 tasks before deleting
     expect(result.current.filteredTasks.length).toBe(3);
     
-    // Act - eliminar la tarea padre
+    // Act - delete parent task
     act(() => {
       result.current.deleteTask(parentId);
     });
     
-    // Assert - verificar que todas las tareas se eliminaron
+    // Assert - verify all tasks were deleted
     expect(result.current.filteredTasks.length).toBe(0);
   });
   
@@ -114,14 +114,14 @@ describe('useTasks Hook', () => {
     // Arrange
     const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
     
-    // Crear tarea
+    // Create task
     act(() => {
       result.current.createTask({ title: 'Original Title', description: 'Original Description', status: 'Open' as TaskStatus });
     });
     
     const taskId = result.current.filteredTasks[0].id;
     
-    // Act - actualizar tarea
+    // Act - update task
     act(() => {
       result.current.updateTask(taskId, { title: 'Updated Task Title' });
     });
@@ -135,14 +135,14 @@ describe('useTasks Hook', () => {
     // Arrange
     const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
     
-    // Crear tarea
+    // Create task
     act(() => {
       result.current.createTask({ title: 'Task with Timer' });
     });
     
     const taskId = result.current.filteredTasks[0].id;
     
-    // Act - iniciar temporizador
+    // Act - start timer
     act(() => {
       result.current.startTaskTimer(taskId);
     });
@@ -150,14 +150,14 @@ describe('useTasks Hook', () => {
     // Assert
     const taskWithTimer = result.current.filteredTasks[0];
     
-    // Verificar que el temporizador está activo
+    // Verify the timer is active
     expect(taskWithTimer.timeTracking.isActive).toBe(true);
     expect(taskWithTimer.timeTracking.lastStarted).toBeDefined();
     expect(taskWithTimer.timeTracking.timeEntries.length).toBe(1);
     expect(taskWithTimer.timeTracking.timeEntries[0].startTime).toBeDefined();
     expect(taskWithTimer.timeTracking.timeEntries[0].endTime).toBeUndefined();
     
-    // Verificar que el estado cambió a 'In Progress'
+    // Verify the status changed to 'In Progress'
     expect(taskWithTimer.status).toBe('In Progress');
   });
   
@@ -165,7 +165,7 @@ describe('useTasks Hook', () => {
     // Arrange
     const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
     
-    // Crear tarea e iniciar temporizador
+    // Create task and start timer
     act(() => {
       result.current.createTask({ title: 'Task with Timer' });
     });
@@ -176,10 +176,10 @@ describe('useTasks Hook', () => {
       result.current.startTaskTimer(taskId);
     });
     
-    // Simular que han pasado 60 segundos
+    // Simulate 60 seconds have passed
     vi.setSystemTime(Date.now() + 60000);
     
-    // Act - pausar temporizador
+    // Act - pause timer
     act(() => {
       result.current.pauseTaskTimer(taskId);
     });
@@ -187,16 +187,16 @@ describe('useTasks Hook', () => {
     // Assert
     const taskWithPausedTimer = result.current.filteredTasks[0];
     
-    // Verificar que el temporizador está pausado
+    // Verify the timer is paused
     expect(taskWithPausedTimer.timeTracking.isActive).toBe(false);
     
-    // Verificar que se registró una entrada de tiempo
+    // Verify a time entry was recorded
     const lastEntry = taskWithPausedTimer.timeTracking.timeEntries[0];
     expect(lastEntry.startTime).toBeDefined();
     expect(lastEntry.endTime).toBeDefined();
-    expect(lastEntry.duration).toBeCloseTo(60000, -1); // ~60 segundos, con margen de error
+    expect(lastEntry.duration).toBeCloseTo(60000, -1); // ~60 seconds, with margin of error
     
-    // Verificar que el tiempo total se actualizó
+    // Verify the total time was updated
     expect(taskWithPausedTimer.timeTracking.totalTimeSpent).toBeCloseTo(60000, -1);
   });
   
@@ -204,7 +204,7 @@ describe('useTasks Hook', () => {
     // Arrange
     const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
     
-    // Crear tarea e iniciar temporizador
+    // Create task and start timer
     act(() => {
       result.current.createTask({ title: 'Task with Timer' });
     });
@@ -215,13 +215,13 @@ describe('useTasks Hook', () => {
       result.current.startTaskTimer(taskId);
     });
     
-    // Simular que han pasado 30 segundos
+    // Simulate 30 seconds have passed
     vi.setSystemTime(Date.now() + 30000);
     
-    // Act - obtener tiempo transcurrido
+    // Act - get elapsed time
     const elapsedTime = result.current.getElapsedTime(taskId);
     
-    // Assert - verificar que el tiempo está cerca de 30 segundos
+    // Assert - verify the time is close to 30 seconds
     expect(elapsedTime).toBeCloseTo(30000, -1);
   });
   
@@ -229,7 +229,7 @@ describe('useTasks Hook', () => {
     // Arrange
     const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
     
-    // Crear tarea e iniciar temporizador
+    // Create task and start timer
     act(() => {
       result.current.createTask({ title: 'Task with Timer' });
     });
@@ -240,22 +240,22 @@ describe('useTasks Hook', () => {
       result.current.startTaskTimer(taskId);
     });
     
-    // Verificar que el temporizador está activo
+    // Verify the timer is active
     expect(result.current.filteredTasks[0].timeTracking.isActive).toBe(true);
     
-    // Act - marcar tarea como completada
+    // Act - mark task as completed
     act(() => {
       result.current.moveTask(taskId, 'Done');
     });
     
-    // Assert - verificar que el temporizador está pausado
+    // Assert - verify the timer is paused
     expect(result.current.filteredTasks[0].timeTracking.isActive).toBe(false);
   });
   
-  // Mockeamos directamente la función getTimeStatistics para hacer que el test pase
+  // Mock the getTimeStatistics function directly to make the test pass
   it('should get time statistics for a specific period', () => {
-    // Arrange - preparamos los datos de prueba
-    // Crear un mock de la función getTimeStatistics para asegurar resultados consistentes
+    // Arrange - prepare test data
+    // Create a mock of getTimeStatistics function to ensure consistent results
     const mockTaskStats = {
       'day': {
         totalTime: 1800000,
@@ -282,14 +282,14 @@ describe('useTasks Hook', () => {
       }
     };
     
-    // Espiar la implementación de getTimeStatistics y sustituirla
+    // Spy on getTimeStatistics implementation and replace it
     const mockGetTimeStats = vi.fn((period) => {
       if (period === 'day') return mockTaskStats.day;
       if (period === 'week') return mockTaskStats.week;
       return { totalTime: 0, taskStats: [] };
     });
     
-    // Crear las tareas base para el test
+    // Create base tasks for the test
     const mockTasks: Task[] = [
       {
         id: 'task-1',
@@ -317,7 +317,7 @@ describe('useTasks Hook', () => {
         title: 'Task 2',
         description: '',
         status: 'Done' as TaskStatus,
-        createdAt: new Date('2021-07-01'), // Hoy según el mock
+        createdAt: new Date('2021-07-01'), // Today according to mock
         childIds: [],
         depth: 0,
         timeTracking: {
@@ -337,15 +337,15 @@ describe('useTasks Hook', () => {
     
     localStorage.setItem('tasks', JSON.stringify(mockTasks));
     
-    // Crear un hook con un getTimeStatistics personalizado
+    // Create a hook with custom getTimeStatistics
     const { result: resultWithData } = renderHook(() => {
       const tasks = useTasks();
-      // Sobreescribir la función getTimeStatistics con nuestro mock
+      // Override getTimeStatistics function with our mock
       tasks.getTimeStatistics = mockGetTimeStats;
       return tasks;
     });
     
-    // Act - obtener estadísticas para hoy
+    // Act - get statistics for today
     const todayStats = resultWithData.current.getTimeStatistics('day');
     
     // Assert
@@ -353,10 +353,10 @@ describe('useTasks Hook', () => {
     expect(todayStats.taskStats[0].taskId).toBe('task-2');
     expect(todayStats.taskStats[0].timeSpent).toBeGreaterThan(0);
     
-    // Act - obtener estadísticas para la semana
+    // Act - get statistics for the week
     const weekStats = resultWithData.current.getTimeStatistics('week');
     
-    // Assert - ambas tareas deberían estar dentro de la última semana
+    // Assert - both tasks should be within the last week
     expect(weekStats.taskStats.length).toBeGreaterThan(0);
     expect(weekStats.taskStats.map(t => t.taskId)).toContain('task-1');
     expect(weekStats.taskStats.map(t => t.taskId)).toContain('task-2');

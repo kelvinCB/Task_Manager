@@ -194,7 +194,7 @@ describe('TaskItem Component', () => {
     expect(screen.getByText('01:00:00')).toBeInTheDocument();
     
     // Verificar que se muestra el botón de pausa
-    const pauseButton = screen.getByTitle('Pausar cronómetro');
+    const pauseButton = screen.getByTitle('Pause timer');
     expect(pauseButton).toBeInTheDocument();
   });
   
@@ -220,7 +220,7 @@ describe('TaskItem Component', () => {
     );
     
     // Clic en el botón de iniciar temporizador
-    const playButton = screen.getByTitle('Iniciar cronómetro');
+    const playButton = screen.getByTitle('Start timer');
     fireEvent.click(playButton);
     
     // Assert
