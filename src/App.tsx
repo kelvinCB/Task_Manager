@@ -4,6 +4,7 @@ import { TaskTree } from './components/TaskTree';
 import { TaskBoard } from './components/TaskBoard';
 import { TaskForm } from './components/TaskForm';
 import { TimeStatsView } from './components/TimeStatsView';
+import { ProgressIcon } from './components/ProgressIcon';
 import { Task, ImportedTaskRow, TaskNode } from './types/Task';
 import { 
   TreePine, 
@@ -165,10 +166,14 @@ function App() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg`}>
-                <TreePine className={`w-6 h-6 ${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} />
+                <ProgressIcon 
+                  size={24} 
+                  className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} 
+                  progress={75}
+                />
               </div>
               <div>
-                <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>TaskFlow</h1>
+                <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>TasksFun</h1>
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Hierarchical Task Management</p>
               </div>
             </div>
