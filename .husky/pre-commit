@@ -1,5 +1,5 @@
 # Ejecutar tests
-npm run test
+npx vitest run
 
 # Verificar que el build funciona
 npm run build

@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Clock } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface TaskTimerProps {
   taskId: string;
   isActive: boolean;
-  elapsedTime: number; // en milisegundos
+  elapsedTime: number; // in milliseconds
   onStart: (taskId: string) => void;
   onPause: (taskId: string) => void;
 }
 
-// Utilidad para formatear el tiempo en formato hh:mm:ss
+// Utility to format time in hh:mm:ss format
 const formatTime = (ms: number): string => {
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
@@ -22,33 +23,33 @@ const formatTime = (ms: number): string => {
   ].join(':');
 };
 
-// Utilidad para reproducir un sonido corto de notificación
+// Utility to play a short notification sound
 const playNotificationSound = () => {
   try {
-    // Crear un contexto de audio
+    // Create an audio context
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     
-    // Crear un oscilador para generar un tono
+    // Create an oscillator to generate a tone
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
-    // Configurar el oscilador
-    oscillator.type = 'sine'; // Tipo de onda sinusoidal (suave)
-    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime); // Frecuencia en Hz
+    // Configure the oscillator
+    oscillator.type = 'sine'; // Sine wave type (smooth)
+    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime); // Frequency in Hz
     
-    // Configurar el volumen y la duración
-    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime); // Volumen más alto (0.4 en lugar de 0.1)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 2.0); // Fade out durante 2 segundos
+    // Configure volume and duration
+    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime); // Higher volume (0.4 instead of 0.1)
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 2.0); // Fade out for 2 seconds
     
-    // Conectar los nodos
+    // Connect the nodes
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    // Reproducir el sonido
+    // Play the sound
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 2.0); // Duración de 2 segundos
+    oscillator.stop(audioContext.currentTime + 2.0); // 2 seconds duration
   } catch (error) {
-    console.error('Error al reproducir el sonido:', error);
+    console.error('Error playing sound:', error);
   }
 };
 
@@ -59,26 +60,27 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   onStart, 
   onPause 
 }) => {
+  const { theme } = useTheme();
   const [currentTime, setCurrentTime] = useState(elapsedTime);
   const lastNotificationTimeRef = useRef(0);
 
-  // Actualizar el tiempo transcurrido si el temporizador está activo
+  // Update elapsed time if timer is active
   useEffect(() => {
     let interval: number | null = null;
     
     if (isActive) {
       interval = window.setInterval(() => {
         setCurrentTime(prevTime => {
-          const newTime = prevTime + 1000; // Actualizar cada segundo
+          const newTime = prevTime + 1000; // Update every second
           
-          // Verificar si debemos reproducir un sonido (cada 10 minutos)
+          // Check if we should play a sound (every 10 minutes)
           const tenMinutesInMs = 10 * 60 * 1000;
           const previousMinutes = Math.floor(prevTime / tenMinutesInMs);
           const currentMinutes = Math.floor(newTime / tenMinutesInMs);
           
           if (currentMinutes > previousMinutes) {
-            // Solo reproducir si ha pasado al menos 9 minutos desde la última notificación
-            // Esto previene notificaciones múltiples si hay varios temporizadores activos
+            // Only play if at least 9 minutes have passed since last notification
+            // This prevents multiple notifications if there are several active timers
             const now = Date.now();
             if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
               playNotificationSound();
@@ -90,7 +92,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
         });
       }, 1000);
     } else {
-      setCurrentTime(elapsedTime); // Sincronizar con el tiempo externo cuando se pausa
+      setCurrentTime(elapsedTime); // Sync with external time when paused
     }
     
     return () => {
@@ -100,28 +102,33 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
 
   return (
     <div className="flex items-center space-x-2 text-sm">
-      <Clock className="w-4 h-4 text-gray-500" />
-      <span className={`font-mono ${isActive ? 'text-green-600 font-bold' : 'text-gray-600'}`}>
+      <Clock className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
+      <span className={`font-mono ${isActive 
+        ? (theme === 'dark' ? 'text-green-400 font-bold' : 'text-green-600 font-bold')
+        : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')}`}>
         {formatTime(currentTime)}
       </span>
       {isActive ? (
         <button 
           onClick={() => onPause(taskId)}
-          className="p-1 text-orange-500 hover:text-orange-700 hover:bg-orange-50 rounded transition-all"
-          title="Pausar cronómetro"
+          className={`p-1 ${theme === 'dark' 
+            ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700' 
+            : 'text-orange-500 hover:text-orange-700 hover:bg-orange-50'} rounded transition-all`}
+          title="Pause timer"
         >
           <Pause className="w-4 h-4" />
         </button>
       ) : (
         <button 
           onClick={() => onStart(taskId)}
-          className="p-1 text-green-500 hover:text-green-700 hover:bg-green-50 rounded transition-all"
-          title="Iniciar cronómetro"
+          className={`p-1 ${theme === 'dark' 
+            ? 'text-green-400 hover:text-green-300 hover:bg-gray-700' 
+            : 'text-green-500 hover:text-green-700 hover:bg-green-50'} rounded transition-all`}
+          title="Start timer"
         >
           <Play className="w-4 h-4" />
         </button>
       )}
-
     </div>
   );
 };

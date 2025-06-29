@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { App } from '../../App';
+import App from '../../App';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mock sample task data
 const mockTasks = [
@@ -81,6 +82,8 @@ vi.mock('lucide-react', () => ({
   Download: () => <div data-testid="download-icon">Download</div>,
   Upload: () => <div data-testid="upload-icon">Upload</div>,
   Filter: () => <div data-testid="filter-icon">Filter</div>,
+  Moon: ({ size }: { size?: number }) => <div data-testid="moon-icon" style={{ width: size, height: size }}>Moon</div>,
+  Sun: ({ size }: { size?: number }) => <div data-testid="sun-icon" style={{ width: size, height: size }}>Sun</div>,
   X: ({ size }: { size?: number }) => <div data-testid="close-icon" style={{ width: size, height: size }}>X</div>,
   FileText: ({ size }: { size?: number }) => <div data-testid="file-text-icon" style={{ width: size, height: size }}>FileText</div>,
   Tag: ({ size }: { size?: number }) => <div data-testid="tag-icon" style={{ width: size, height: size }}>Tag</div>,
@@ -132,7 +135,11 @@ describe('App Component', () => {
   
   it('should render the app with navigation buttons', () => {
     // Act
-    render(<App />);
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
     
     // Assert - verify navigation buttons are displayed
     expect(screen.getByTitle('Board View')).toBeInTheDocument();
@@ -142,7 +149,11 @@ describe('App Component', () => {
   
   it('should show Board view by default', () => {
     // Act
-    render(<App />);
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
     
     // Assert - verify Board view is shown by default
     // Check for characteristic Board view elements
@@ -155,7 +166,11 @@ describe('App Component', () => {
   
   it('should switch to Tree view when Tree button is clicked', () => {
     // Act
-    render(<App />);
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
     
     // Click Tree view button
     const treeButton = screen.getByTitle('Tree View');
@@ -172,7 +187,11 @@ describe('App Component', () => {
   
   it('should switch to Time Stats view when Stats button is clicked', () => {
     // Act
-    render(<App />);
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
     
     // Click Time Stats button
     const statsButton = screen.getByTitle('Time Stats');
@@ -185,7 +204,11 @@ describe('App Component', () => {
   
   it('should create a new task when using the TaskForm', () => {
     // Act
-    render(<App />);
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
     
     // Open form
     const addTaskButton = screen.getAllByText(/add task/i)[0];
@@ -204,7 +227,11 @@ describe('App Component', () => {
   });
   
   it('should import/export tasks using CSV functionality', () => {
-    render(<App />);
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
     
     // Verify import/export buttons exist
     expect(screen.getByTitle(/export/i)).toBeInTheDocument();
@@ -212,7 +239,11 @@ describe('App Component', () => {
   });
   
   it('should handle task timer controls across views', () => {
-    render(<App />);
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
     
     // For this test we just verify task items are present
     // Actual timer functionality would be tested in TaskTimer component tests

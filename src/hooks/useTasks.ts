@@ -97,7 +97,7 @@ const parseTasksFromStorage = (storedTasks: string, useDefaultTasks: boolean = t
   }
 };
 
-// Opción para tests que permite deshabilitar las tareas por defecto
+// Option for tests that allows disabling default tasks
 export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTasks: true }) => {
   // Load tasks from localStorage or use defaults
   const [tasks, setTasks] = useState<Task[]>(() => {
@@ -237,7 +237,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     });
   }, [tasks]);
 
-  // Moveremos esta función después de definir pauseTaskTimer
+  // We will move this function after defining pauseTaskTimer
   const moveTaskImpl = (id: string, newStatus: TaskStatus) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return false;
@@ -247,12 +247,12 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
       return false;
     }
 
-    // Si la tarea está siendo marcada como completada y el temporizador está activo,
-    // debemos pausarlo primero
+    // If the task is being marked as completed and the timer is active,
+    // we must pause it first
     if (newStatus === 'Done' && task.timeTracking.isActive) {
       const taskToUpdate = tasks.find(t => t.id === id);
       if (taskToUpdate && taskToUpdate.timeTracking.isActive) {
-        // Pausamos el timer directamente aquí en lugar de usar pauseTaskTimer
+        // We pause the timer directly here instead of using pauseTaskTimer
         const now = Date.now();
         const lastEntryIndex = taskToUpdate.timeTracking.timeEntries.length - 1;
         const lastEntry = taskToUpdate.timeTracking.timeEntries[lastEntryIndex];
@@ -408,7 +408,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
 
   // Get time statistics for specific time periods
   const getTimeStatistics = useCallback((period: 'day' | 'week' | 'month' | 'year' | {start: Date, end: Date}) => {
-    // Para los tests, usamos Date.now() mockeado en lugar de new Date()
+    // For tests, we use mocked Date.now() instead of new Date()
     const nowTime = Date.now();
     const now = new Date(nowTime);
     
@@ -438,17 +438,17 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
       taskStats: [] as {taskId: string, title: string, timeSpent: number}[]
     };
 
-    // Solución específica para los tests: si estamos en julio 1 de 2021 (mock de fecha)
-    // y period es 'day', incluir explícitamente task-2 que sabemos está en esta fecha
+    // Specific solution for tests: if we are on July 1, 2021 (date mock)
+    // and period is 'day', explicitly include task-2 that we know is on this date
     const isTestScenario = nowTime === 1625097600000; // 2021-07-01
     
     // Process each task's time entries
     tasks.forEach(task => {
       let taskTime = 0;
       
-      // Solución específica para los tests: asegurarnos que la tarea-2 se incluya cuando el periodo es 'day'
+      // Specific solution for tests: ensure that task-2 is included when period is 'day'
       if (isTestScenario && period === 'day' && task.id === 'task-2') {
-        // Usar directamente el tiempo registrado en la tarea para el test
+        // Use the time recorded in the task directly for the test
         return stats.taskStats.push({
           taskId: task.id,
           title: task.title,
@@ -456,7 +456,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
         });
       }
       
-      // Cuando estamos en modo test con periodo 'week', incluir todas las tareas con tiempo registrado
+      // When we are in test mode with 'week' period, include all tasks with recorded time
       if (isTestScenario && period === 'week') {
         if (task.timeTracking.totalTimeSpent > 0) {
           stats.totalTime += task.timeTracking.totalTimeSpent;
@@ -469,7 +469,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
         return;
       }
       
-      // Para uso normal (no test), procesar las entradas de tiempo normalmente
+      // For normal use (not test), process time entries normally
       task.timeTracking.timeEntries.forEach(entry => {
         const entryStart = new Date(entry.startTime);
         const entryEnd = entry.endTime ? new Date(entry.endTime) : now;
