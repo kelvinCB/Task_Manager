@@ -4,19 +4,19 @@ import { act } from 'react-dom/test-utils';
 import { TaskTimer } from '../../components/TaskTimer';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 
-// Mocks para las pruebas
+// Mocks for tests
 const mockOnStart = vi.fn();
 const mockOnPause = vi.fn();
 
 describe('TaskTimer Component', () => {
   beforeEach(() => {
-    // Limpiar mocks antes de cada prueba
+    // Clear mocks before each test
     vi.clearAllMocks();
     
-    // Mock para Date.now() para tener un valor consistente
+    // Mock Date.now() to have a consistent value
     vi.spyOn(Date, 'now').mockImplementation(() => 1625097600000); // 2021-07-01
     
-    // Mock para window.setInterval y clearInterval
+    // Mock window.setInterval and clearInterval
     vi.useFakeTimers();
   });
   
@@ -42,11 +42,11 @@ describe('TaskTimer Component', () => {
       </ThemeProvider>
     );
     
-    // Assert - comprobar que se muestra el tiempo formateado correctamente
+    // Assert - check formatted time is displayed correctly
     expect(screen.getByText('01:01:01')).toBeInTheDocument();
     
-    // Comprobar que se muestra el botón de reproducción cuando no está activo
-    const playButton = screen.getByTitle('Iniciar cronómetro');
+    // Check that play button is displayed when inactive
+    const playButton = screen.getByTitle('Start timer');
     expect(playButton).toBeInTheDocument();
   });
   
@@ -67,8 +67,8 @@ describe('TaskTimer Component', () => {
       </ThemeProvider>
     );
     
-    // Assert - comprobar que se muestra el botón de pausa cuando está activo
-    const pauseButton = screen.getByTitle('Pausar cronómetro');
+    // Assert - check that pause button is displayed when active
+    const pauseButton = screen.getByTitle('Pause timer');
     expect(pauseButton).toBeInTheDocument();
   });
   
@@ -88,7 +88,7 @@ describe('TaskTimer Component', () => {
         <TaskTimer {...props} />
       </ThemeProvider>
     );
-    const playButton = screen.getByTitle('Iniciar cronómetro');
+    const playButton = screen.getByTitle('Start timer');
     fireEvent.click(playButton);
     
     // Assert
@@ -112,7 +112,7 @@ describe('TaskTimer Component', () => {
         <TaskTimer {...props} />
       </ThemeProvider>
     );
-    const pauseButton = screen.getByTitle('Pausar cronómetro');
+    const pauseButton = screen.getByTitle('Pause timer');
     fireEvent.click(pauseButton);
     
     // Assert
@@ -137,28 +137,28 @@ describe('TaskTimer Component', () => {
       </ThemeProvider>
     );
     
-    // Verificar el tiempo inicial
+    // Verify initial time
     expect(screen.getByText('00:00:00')).toBeInTheDocument();
     
-    // Avanzar 1 segundo
+    // Advance 1 second
     act(() => {
       vi.advanceTimersByTime(1000);
     });
     
-    // Verificar que el tiempo se actualizó
+    // Verify the time updated
     expect(screen.getByText('00:00:01')).toBeInTheDocument();
     
-    // Avanzar 59 segundos más (1 minuto total)
+    // Advance 59 seconds more (1 minute total)
     act(() => {
       vi.advanceTimersByTime(59000);
     });
     
-    // Verificar que el tiempo muestra 1 minuto
+    // Verify the time shows 1 minute
     expect(screen.getByText('00:01:00')).toBeInTheDocument();
   });
   
   it('should try to play a notification sound after 10 minutes', () => {
-    // Arrange - mock para playNotificationSound (como es privada, espiaremos el AudioContext)
+    // Arrange - mock playNotificationSound (since it's private, we'll spy on AudioContext)
     const audioContextSpy = vi.spyOn(window, 'AudioContext');
     
     const props = {
@@ -176,12 +176,12 @@ describe('TaskTimer Component', () => {
       </ThemeProvider>
     );
     
-    // Avanzar 10 minutos
+    // Advance 10 minutes
     act(() => {
       vi.advanceTimersByTime(10 * 60 * 1000);
     });
     
-    // Assert - comprobar que se llamó al AudioContext para reproducir el sonido
+    // Assert - check that AudioContext was called to play sound
     expect(audioContextSpy).toHaveBeenCalled();
   });
 });

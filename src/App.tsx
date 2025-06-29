@@ -67,7 +67,7 @@ function App() {
   };
 
   const handleAddChild = (parentTaskId: string) => {
-    // Verificar si la tarea padre está completada
+    // Check if the parent task is completed
     const parentTask = getTaskById(parentTaskId);
     if (parentTask && parentTask.status === 'Done') {
       alert('Cannot add a subtask because the parent task is already completed and marked as "Done"');
@@ -359,12 +359,12 @@ function App() {
                 stats = getTimeStatistics(period as 'day' | 'week' | 'month' | 'year');
               }
               
-              // Convertir del formato devuelto por useTasks al formato esperado por TimeStatsView
+              // Convert from format returned by useTasks to format expected by TimeStatsView
               return stats.taskStats.map(item => ({
                 id: item.taskId,
                 title: item.title,
                 timeSpent: item.timeSpent,
-                status: 'Open', // Campo requerido pero no usado para estadísticas
+                status: 'Open', // Required field but not used for statistics
                 startDate: Date.now(),
                 endDate: Date.now()
               }));

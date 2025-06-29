@@ -50,7 +50,7 @@ export interface ImportedTaskRow {
 export interface TaskTimeStats {
   id: string;
   title: string;
-  timeSpent: number;  // tiempo en milisegundos
+  timeSpent: number;  // time in milliseconds
   status: TaskStatus;
   startDate: number;  // timestamp
   endDate: number;    // timestamp
