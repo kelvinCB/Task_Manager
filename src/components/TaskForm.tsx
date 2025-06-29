@@ -3,6 +3,7 @@ import { Task, TaskStatus } from '../types/Task';
 import { X, Calendar, FileText, Tag } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { AIIcon } from './AIIcon';
+import { openaiService } from '../services/openaiService';
 
 interface TaskFormProps {
   task?: Task;
@@ -160,17 +161,22 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       setIsGeneratingAI(true);
-                      // TODO: Implement OpenAI API call
-                      setTimeout(() => {
+                      try {
+                        const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+                        const generatedDescription = await openaiService.generateTaskDescription(formData.title, model);
                         setFormData(prev => ({ 
                           ...prev, 
-                          description: `AI Generated: This is a placeholder description for "${formData.title}". The actual implementation will connect to OpenAI API.` 
+                          description: generatedDescription
                         }));
-                        setIsGeneratingAI(false);
                         setShowAIOptions(false);
-                      }, 2000);
+                      } catch (error) {
+                        console.error('Error generating AI description:', error);
+                        alert(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                      } finally {
+                        setIsGeneratingAI(false);
+                      }
                     }}
                     disabled={isGeneratingAI}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg font-medium transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:opacity-70 ${
