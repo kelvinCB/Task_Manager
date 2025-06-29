@@ -259,6 +259,90 @@ describe('TaskForm', () => {
         })
       );
     });
+
+    it('should preserve timeTracking data when editing existing task', () => {
+      const taskWithTimer = {
+        ...mockTask,
+        timeTracking: {
+          totalTimeSpent: 3000, // 50 minutes
+          isActive: true,
+          timeEntries: [
+            {
+              id: 'entry-1',
+              startTime: new Date('2024-01-01T10:00:00'),
+              endTime: new Date('2024-01-01T10:50:00'),
+              duration: 3000
+            }
+          ]
+        }
+      };
+
+      render(
+        <TestWrapper>
+          <TaskForm
+            task={taskWithTimer}
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const titleInput = screen.getByRole('textbox', { name: /title/i });
+      const descriptionInput = screen.getByRole('textbox', { name: /description/i });
+
+      // Modify the task
+      fireEvent.change(titleInput, { target: { value: 'Updated Task Title' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Updated Description' } });
+
+      fireEvent.click(screen.getByText('Save'));
+
+      expect(mockOnSubmit).toHaveBeenCalledWith({
+        title: 'Updated Task Title',
+        description: 'Updated Description',
+        status: 'Open',
+        dueDate: new Date('2024-12-31'),
+        parentId: undefined,
+        timeTracking: {
+          totalTimeSpent: 3000,
+          isActive: true,
+          timeEntries: [
+            {
+              id: 'entry-1',
+              startTime: new Date('2024-01-01T10:00:00'),
+              endTime: new Date('2024-01-01T10:50:00'),
+              duration: 3000
+            }
+          ]
+        }
+      });
+    });
+
+    it('should use default timeTracking for new tasks', () => {
+      render(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const titleInput = screen.getByRole('textbox', { name: /title/i });
+      fireEvent.change(titleInput, { target: { value: 'New Task' } });
+      fireEvent.click(screen.getByText('Save'));
+
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          timeTracking: {
+            totalTimeSpent: 0,
+            isActive: false,
+            timeEntries: []
+          }
+        })
+      );
+    });
   });
 
   describe('AI Functionality', () => {

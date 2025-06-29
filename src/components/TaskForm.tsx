@@ -62,7 +62,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       status: formData.status,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       parentId: formData.parentId || undefined,
-      timeTracking: {
+      timeTracking: task?.timeTracking || {
         totalTimeSpent: 0,
         isActive: false,
         timeEntries: []
