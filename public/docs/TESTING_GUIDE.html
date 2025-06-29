@@ -54,22 +54,29 @@
 <p>Esta guía documenta el enfoque de testing para la aplicación Task Manager, incluyendo las pruebas unitarias implementadas, cómo ejecutarlas y las mejores prácticas a seguir.</p>
 <h2>Índice</h2>
 <ol>
-<li><a href="#introduccion">Introducción</a></li>
-<li><a href="#estructura">Estructura de pruebas</a></li>
-<li><a href="#casos">Casos de prueba</a></li>
-<li><a href="#ejecucion">Cómo ejecutar las pruebas</a></li>
-<li><a href="#cobertura">Cobertura de código</a></li>
-<li><a href="#mocks">Mocks y fixtures</a></li>
-<li><a href="#contribucion">Contribución</a></li>
+<li><a href="#introducción">Introducción</a></li>
+<li><a href="#estructura-de-pruebas">Estructura de pruebas</a></li>
+<li><a href="#casos-de-prueba">Casos de prueba</a></li>
+<li><a href="#cómo-ejecutar-las-pruebas">Cómo ejecutar las pruebas</a></li>
+<li><a href="#cobertura-de-código">Cobertura de código</a></li>
+<li><a href="#mocks-y-fixtures">Mocks y fixtures</a></li>
+<li><a href="#contribución">Contribución</a></li>
 </ol>
-<h2 id="introduccion">Introducción</h2>
+<h2 id="introducción">Introducción</h2>
 <p>La aplicación Task Manager cuenta con un conjunto completo de pruebas unitarias que cubren los componentes, hooks y utilidades principales. Las pruebas están implementadas utilizando:</p>
 <ul>
 <li><strong>Vitest</strong>: Framework de pruebas rápido compatible con el ecosistema Vite</li>
-<li><strong>React Testing Library</strong>: Para probar componentes de React</li>
+<li><strong>React Testing Library</strong>: Para probar componentes de React desde la perspectiva del usuario</li>
 <li><strong>jsdom</strong>: Para simular el DOM durante las pruebas</li>
 </ul>
-<h2 id="estructura">Estructura de pruebas</h2>
+<h3>Enfoque de Testing</h3>
+<p>Seguimos las mejores prácticas de testing, priorizando:</p>
+<ul>
+<li><strong>Testing centrado en el usuario</strong>: Probamos la aplicación como lo haría un usuario real</li>
+<li><strong>Accesibilidad</strong>: Verificamos que los componentes sean accesibles (etiquetas, títulos, roles ARIA)</li>
+<li><strong>Robustez</strong>: Las pruebas deben ser resistentes a cambios en la implementación</li>
+</ul>
+<h2 id="estructura-de-pruebas">Estructura de pruebas</h2>
 <p>El código de prueba está organizado en la carpeta <code>src/test</code> con la siguiente estructura:</p>
 <pre><code>src/
 └── test/
@@ -86,11 +93,11 @@
     └── utils/               # Pruebas de funciones de utilidad
         └── taskUtils.test.ts
 </code></pre>
-<h2 id="casos">Casos de prueba</h2>
+<h2 id="casos-de-prueba">Casos de prueba</h2>
 <h3>Componente App (<code>App.test.tsx</code>)</h3>
 <ol>
 <li>Renderiza la aplicación con botones de navegación</li>
-<li>Muestra la vista Board por defecto</li>
+<li>Muestra la vista Board por defecto (verificado usando atributos y clases)</li>
 <li>Cambia a vista Tree cuando se hace clic en el botón Tree</li>
 <li>Cambia a vista Time Stats cuando se hace clic en el botón Stats</li>
 <li>Crea una nueva tarea usando TaskForm</li>
@@ -166,8 +173,184 @@
 <li>Muestra tiempo total acumulado de todas las tareas</li>
 <li>Maneja estadísticas vacías de forma elegante</li>
 </ol>
-<h2 id="ejecucion">Cómo ejecutar las pruebas</h2>
+<h3>Contexto de tema y modo oscuro
+
+<p>Los componentes que utilizan el hook `useTheme` del contexto de tema deben estar envueltos en el componente `ThemeProvider` durante las pruebas:</p>
+<pre><code>import { ThemeProvider } from '../../contexts/ThemeContext';
+
+// En el test
+render(
+  <ThemeProvider>
+    <ComponenteQueUsaTheme />
+  </ThemeProvider>
+);
+</code></pre>
+<p>Esto incluye los siguientes componentes:
+<ul>
+<li>TaskItem</li>
+<li>TaskTree</li>
+<li>TaskTimer</li>
+<li>TaskBoard</li>
+<li>TimeStatsView</li>
+</ul>
+<p>No proporcionar el `ThemeProvider` resultará en un error: "useTheme must be used within a ThemeProvider".
+
+<h2>Buenas Prácticas de Accesibilidad</h2>
+
+<p>Para asegurar que la aplicación sea accesible y las pruebas sean robustas, seguimos estas prácticas:</p>
+<ol>
+<li>**Atributos `title` en botones**: Todos los botones deben tener un atributo `title` descriptivo para facilitar su identificación tanto por lectores de pantalla como por los tests.
+<li>**Contraste adecuado**: Los componentes tienen estilos diferentes para modo claro y oscuro para mantener un contraste adecuado y asegurar la visibilidad en ambos temas.
+<li>**Asociación de etiquetas e inputs**: Siempre asociar las etiquetas (`label`) con sus campos de entrada (`input`) mediante los atributos `htmlFor` e `id`.
+<li>**Textos descriptivos**: Usar textos descriptivos que indiquen claramente la función de cada elemento UI.
+<li>**Roles ARIA**: Utilizar roles ARIA apropiados cuando sea necesario para mejorar la accesibilidad.
+<li>**Consultas de testing robustas**: Al escribir pruebas:
+   <ul>
+   <li>Preferir `getByRole` sobre `getByText` cuando sea posible
+   <li>Usar `getAllByText` o `getAllByTitle` cuando un elemento puede aparecer múltiples veces
+   <li>Implementar selectores específicos para evitar ambigüedades
+
+<h2>Cómo ejecutar las pruebas</h2>
+
 <h3>Requisitos previos</h3>
+
+<p>Asegúrate de tener todas las dependencias instaladas:</p>
+<pre><code>npm install
+</code></pre>
+<h3>Ejecutar todas las pruebas</h3>
+
+<p>Para ejecutar todas las pruebas en modo watch:</p>
+<pre><code>npm test
+</code></pre>
+<h3>Ejecutar pruebas específicas</h3>
+
+<p>Para ejecutar un conjunto específico de pruebas:</p>
+<pre><code>npm test -- components/TaskTimer
+</code></pre>
+<h3>Ejecutar con cobertura</h3>
+
+<p>Para ejecutar las pruebas con informe de cobertura:</p>
+<pre><code>npm run test:coverage
+</code></pre>
+<p>Esto generará un informe de cobertura HTML en la carpeta <code>coverage/</code>.
+
+<h3>Interfaz de usuario para pruebas (opcional)</h3>
+
+<p>Para ejecutar pruebas con una interfaz visual:</p>
+<pre><code>npm run test:ui
+</code></pre>
+<h2 id="cobertura-de-código">Cobertura de código</h2>
+<p>Nuestro objetivo es mantener una cobertura de código superior al 80% en los módulos críticos:
+<ul>
+<li><code>src/components/TaskTimer.tsx</code>: Enfoque principal en la funcionalidad de notificación de sonido
+<li><code>src/hooks/useTasks.ts</code>: Lógica central de manejo de tareas y temporizadores
+<li><code>src/utils/</code>: Funciones utilitarias que son ampliamente utilizadas
+</ul>
+<h2>Mocks y fixtures</h2>
+
+<p>En <code>src/test/setup.ts</code> se han configurado los siguientes mocks:
+<ul>
+<li><strong>localStorage</strong>: Mock completo para simular persistencia
+<li><strong>AudioContext</strong>: Mock para probar la funcionalidad de sonido
+<li><strong>Temporizadores</strong>: Mock para controlar el tiempo en pruebas con <code>vi.useFakeTimers()</code>
+<li><strong>Iconos de Lucide React</strong>: Los iconos de <code>lucide-react</code> se mockean para evitar errores de renderizado y asegurar que los tests no dependan de la implementación real de los iconos. Esto se hace en <code>src/test/components/App.test.tsx</code>.
+<li><strong>Componentes de Vista</strong>: Componentes como <code>TaskBoard</code>, <code>TaskTree</code> y <code>TimeStatsView</code> se mockean para aislar los tests de <code>App.test.tsx</code> y evitar dependencias complejas. Se utilizan <code>data-testid</code> únicos para asegurar consultas de test robustas.
+<li>## Contexto de tema y modo oscuro
+   
+<p>Los componentes que utilizan el hook `useTheme` del contexto de tema deben estar envueltos en el componente `ThemeProvider` durante las pruebas:</p>
+<pre><code>import { ThemeProvider } from '../../contexts/ThemeContext';
+
+// En el test
+render(
+   <ThemeProvider>
+    <ComponenteQueUsaTheme />
+   </ThemeProvider>
+);
+</code></pre>
+<p>Esto incluye los siguientes componentes:
+<ul>
+<li>TaskItem</li>
+<li>TaskTree</li>
+<li>TaskTimer</li>
+<li>TaskBoard</li>
+<li>TimeStatsView</li>
+</ul>
+<p>No proporcionar el `ThemeProvider` resultará en un error: "useTheme must be used within a ThemeProvider".
+
+<h2>Buenas Prácticas de Accesibilidad</h2>
+
+<p>Para asegurar que la aplicación sea accesible y las pruebas sean robustas, seguimos estas prácticas:
+<ol>
+<li>**Atributos `title` en botones**: Todos los botones deben tener un atributo `title` descriptivo para facilitar su identificación tanto por lectores de pantalla como por los tests.
+<li>**Contraste adecuado**: Los componentes tienen estilos diferentes para modo claro y oscuro para mantener un contraste adecuado y asegurar la visibilidad en ambos temas.
+<li>**Asociación de etiquetas e inputs**: Siempre asociar las etiquetas (`label`) con sus campos de entrada (`input`) mediante los atributos `htmlFor` e `id`.
+<li>**Textos descriptivos**: Usar textos descriptivos que indiquen claramente la función de cada elemento UI.
+<li>**Roles ARIA**: Utilizar roles ARIA apropiados cuando sea necesario para mejorar la accesibilidad.
+<li>**Consultas de testing robustas**: Al escribir pruebas:
+   <ul>
+   <li>Preferir `getByRole` sobre `getByText` cuando sea posible
+   <li>Usar `getAllByText` o `getAllByTitle` cuando un elemento puede aparecer múltiples veces
+   <li>Implementar selectores específicos para evitar ambigüedades
+
+<h2>Cómo ejecutar las pruebas</h2>
+
+<h3>Requisitos previos</h3>
+
+<p>Asegúrate de tener todas las dependencias instaladas:</p>
+<pre><code>npm install
+</code></pre>
+<h3>Ejecutar todas las pruebas</h3>
+
+<p>Para ejecutar todas las pruebas en modo watch:</p>
+<pre><code>npm test
+</code></pre>
+<h3>Ejecutar pruebas específicas</h3>
+
+<p>Para ejecutar un conjunto específico de pruebas:</p>
+<pre><code>npm test -- components/TaskTimer
+</code></pre>
+<h3>Ejecutar con cobertura</h3>
+
+<p>Para ejecutar las pruebas con informe de cobertura:</p>
+<pre><code>npm run test:coverage
+</code></pre>
+<p>Esto generará un informe de cobertura HTML en la carpeta <code>coverage/</code>.
+
+<h3>Interfaz de usuario para pruebas (opcional)</h3>
+
+<p>Para ejecutar pruebas con una interfaz visual:</p>
+<pre><code>npm run test:ui
+</code></pre>
+<h2 id="cobertura-de-código">Cobertura de código</h2>
+<p>Nuestro objetivo es mantener una cobertura de código superior al 80% en los módulos críticos:
+<ul>
+<li><code>src/components/TaskTimer.tsx</code>: Enfoque principal en la funcionalidad de notificación de sonido
+<li><code>src/hooks/useTasks.ts</code>: Lógica central de manejo de tareas y temporizadores
+<li><code>src/utils/</code>: Funciones utilitarias que son ampliamente utilizadas
+</ul>
+<h2>Mocks y fixtures</h2>
+
+<p>En <code>src/test/setup.ts</code> se han configurado los siguientes mocks:
+<ul>
+<li><strong>localStorage</strong>: Mock completo para simular persistencia
+<li><strong>AudioContext</strong>: Mock para probar la funcionalidad de sonido
+<li><strong>Temporizadores</strong>: Mock para controlar el tiempo en pruebas con <code>vi.useFakeTimers()</code>
+<li><strong>Iconos de Lucide React</strong>: Los iconos de <code>lucide-react</code> se mockean para evitar errores de renderizado y asegurar que los tests no dependan de la implementación real de los iconos. Esto se hace en <code>src/test/components/App.test.tsx</code>.
+<li><strong>Componentes de Vista</strong>: Componentes como <code>TaskBoard</code>, <code>TaskTree</code> y <code>TimeStatsView</code> se mockean para aislar los tests de <code>App.test.tsx</code> y evitar dependencias complejas. Se utilizan <code>data-testid</code> únicos para asegurar consultas de test robustas.
+
+<h2>Contribución</h2>
+<ol>
+<li>Escribe primero las pruebas antes de implementar la funcionalidad (TDD)
+<li>Asegúrate de que cada componente nuevo tenga un archivo de prueba correspondiente
+<li>Para nuevos hooks o utilidades, crea pruebas dedicadas
+<li>Utiliza los mocks existentes para localStorage y AudioContext
+<li>Ejecuta el conjunto completo de pruebas antes de enviar un PR
+
+<hr>
+<p>Con esta guía, cualquier desarrollador puede entender la estrategia de pruebas, ejecutar las pruebas existentes y contribuir con nuevas pruebas para mantener la calidad del código.
+</body>
+</html>
+```
 <p>Asegúrate de tener todas las dependencias instaladas:</p>
 <pre><code>npm install
 </code></pre>
