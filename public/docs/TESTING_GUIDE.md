@@ -39,10 +39,13 @@ src/
     ├── components/           # Pruebas de componentes React
     │   ├── App.test.tsx
     │   ├── TaskBoard.test.tsx
+    │   ├── TaskForm.test.tsx
     │   ├── TaskItem.test.tsx
     │   ├── TaskTimer.test.tsx
     │   ├── TaskTree.test.tsx
     │   └── TimeStatsView.test.tsx
+    ├── services/            # Pruebas de servicios
+    │   └── openaiService.test.ts
     ├── hooks/               # Pruebas de hooks personalizados
     │   └── useTasks.test.tsx
     └── utils/               # Pruebas de funciones de utilidad
@@ -130,6 +133,65 @@ src/
 6. Muestra tiempo total acumulado de todas las tareas
 7. Maneja estadísticas vacías de forma elegante
 
+### Componente TaskForm (`TaskForm.test.tsx`)
+
+#### Renderizado
+1. Renderiza el formulario de creación cuando no se proporciona tarea
+2. Renderiza el formulario de edición cuando se proporciona una tarea
+3. No renderiza cuando `isOpen` es falso
+4. Muestra información de subtarea cuando se proporciona `parentId`
+
+#### Interacciones del Formulario
+5. Actualiza los campos del formulario correctamente
+6. Llama a `onClose` cuando se hace clic en el botón cancelar
+7. Llama a `onClose` cuando se hace clic en el botón X
+8. Envía el formulario con datos correctos
+9. No envía el formulario sin título
+10. Recorta espacios en blanco del título y descripción
+11. **Preserva datos de timeTracking al editar tareas existentes**
+12. **Usa timeTracking por defecto para tareas nuevas**
+
+#### Funcionalidad AI
+13. Muestra el icono AI en el campo de descripción
+14. Muestra alerta cuando se hace clic en AI sin título
+15. Muestra opciones AI cuando se proporciona título y se hace clic en el botón AI
+16. Oculta opciones AI cuando se hace clic en cancelar
+17. Genera descripción usando el servicio AI
+18. Maneja errores de generación AI
+19. Deshabilita el botón generar mientras se está generando
+
+#### Restablecimiento del Formulario
+20. Restablece el formulario cuando cambia la prop task
+21. Restablece el formulario cuando cambia parentId
+
+### Servicio OpenAI (`openaiService.test.ts`)
+
+#### Constructor
+1. Se inicializa con variables de entorno
+2. *Nota: Tests de validación de API key omitidos debido a limitaciones de mocking en vitest*
+
+#### Generación de Descripción de Tareas
+3. Genera descripción de tarea exitosamente
+4. Maneja parámetros de modelo O4 (sin temperature, con max_completion_tokens)
+5. Maneja parámetros de modelo GPT estándar (con temperature, max_tokens)
+6. Lanza error para título de tarea vacío
+7. Lanza error para título de tarea con solo espacios en blanco
+8. Maneja respuestas de error de la API
+9. Maneja errores de red
+10. Maneja opciones vacías en la respuesta
+11. Maneja estructuras de respuesta alternativas (campo `text`)
+12. Maneja campo de contenido directo
+13. Maneja contenido vacío con razón de finalización `length`
+14. Maneja contenido de respuesta vacío
+15. Maneja estructura de respuesta inválida
+
+#### Configuración
+16. Retorna verdadero cuando está correctamente configurado
+17. *Nota: Test de API key placeholder omitido por limitaciones de mocking*
+
+#### Instancia Singleton
+18. Exporta una instancia singleton
+
 ## Cómo ejecutar las pruebas
 
 ### Requisitos previos
@@ -191,6 +253,9 @@ En `src/test/setup.ts` se han configurado los siguientes mocks:
 - **Temporizadores**: Mock para controlar el tiempo en pruebas con `vi.useFakeTimers()`
 - **Iconos de Lucide React**: Los iconos de `lucide-react` se mockean para evitar errores de renderizado y asegurar que los tests no dependan de la implementación real de los iconos. Esto se hace en `src/test/components/App.test.tsx`.
 - **Componentes de Vista**: Componentes como `TaskBoard`, `TaskTree` y `TimeStatsView` se mockean para aislar los tests de `App.test.tsx` y evitar dependencias complejas. Se utilizan `data-testid` únicos para asegurar consultas de test robustas.
+- **Servicio OpenAI**: En `TaskForm.test.tsx` se mockea el servicio OpenAI para probar la funcionalidad AI sin hacer llamadas reales a la API. Se incluyen mocks para `generateTaskDescription` e `isConfigured`.
+- **Variables de Entorno**: Se mockean las variables de entorno necesarias para el servicio OpenAI (`VITE_OPENAI_MODEL`, `VITE_OPENAI_API_KEY`) usando `vi.stubGlobal`.
+- **Fetch API**: En `openaiService.test.ts` se mockea `global.fetch` para simular respuestas de la API de OpenAI sin hacer llamadas HTTP reales.
 
 ## Contexto de tema y modo oscuro
 
@@ -213,6 +278,7 @@ Esto incluye los siguientes componentes:
 - `TaskTree`
 - `TaskTimer`
 - `TaskBoard`
+- `TaskForm`
 - `TimeStatsView`
 
 No proporcionar el `ThemeProvider` resultará en un error: "useTheme must be used within a ThemeProvider".
