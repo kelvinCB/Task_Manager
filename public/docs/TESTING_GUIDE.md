@@ -192,11 +192,37 @@ En `src/test/setup.ts` se han configurado los siguientes mocks:
 - **Iconos de Lucide React**: Los iconos de `lucide-react` se mockean para evitar errores de renderizado y asegurar que los tests no dependan de la implementación real de los iconos. Esto se hace en `src/test/components/App.test.tsx`.
 - **Componentes de Vista**: Componentes como `TaskBoard`, `TaskTree` y `TimeStatsView` se mockean para aislar los tests de `App.test.tsx` y evitar dependencias complejas. Se utilizan `data-testid` únicos para asegurar consultas de test robustas.
 
+## Contexto de tema y modo oscuro
+
+Los componentes que utilizan el hook `useTheme` del contexto de tema deben estar envueltos en el componente `ThemeProvider` durante las pruebas:
+
+```jsx
+import { ThemeProvider } from '../../contexts/ThemeContext';
+
+// En el test
+render(
+  <ThemeProvider>
+    <ComponenteQueUsaTheme />
+  </ThemeProvider>
+);
+```
+
+Esto incluye los siguientes componentes:
+
+- `TaskItem`
+- `TaskTree`
+- `TaskTimer`
+- `TaskBoard`
+- `TimeStatsView`
+
+No proporcionar el `ThemeProvider` resultará en un error: "useTheme must be used within a ThemeProvider".
+
 ## Buenas Prácticas de Accesibilidad
 
 Para asegurar que la aplicación sea accesible y las pruebas sean robustas, seguimos estas prácticas:
 
 1. **Atributos `title` en botones**: Todos los botones deben tener un atributo `title` descriptivo para facilitar su identificación tanto por lectores de pantalla como por los tests.
+2. **Contraste adecuado**: Los componentes tienen estilos diferentes para modo claro y oscuro para mantener un contraste adecuado y asegurar la visibilidad en ambos temas.
 
 2. **Asociación de etiquetas e inputs**: Siempre asociar las etiquetas (`label`) con sus campos de entrada (`input`) mediante los atributos `htmlFor` e `id`.
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Clock } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface TaskTimerProps {
   taskId: string;
@@ -59,6 +60,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   onStart, 
   onPause 
 }) => {
+  const { theme } = useTheme();
   const [currentTime, setCurrentTime] = useState(elapsedTime);
   const lastNotificationTimeRef = useRef(0);
 
@@ -100,14 +102,18 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
 
   return (
     <div className="flex items-center space-x-2 text-sm">
-      <Clock className="w-4 h-4 text-gray-500" />
-      <span className={`font-mono ${isActive ? 'text-green-600 font-bold' : 'text-gray-600'}`}>
+      <Clock className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
+      <span className={`font-mono ${isActive 
+        ? (theme === 'dark' ? 'text-green-400 font-bold' : 'text-green-600 font-bold')
+        : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')}`}>
         {formatTime(currentTime)}
       </span>
       {isActive ? (
         <button 
           onClick={() => onPause(taskId)}
-          className="p-1 text-orange-500 hover:text-orange-700 hover:bg-orange-50 rounded transition-all"
+          className={`p-1 ${theme === 'dark' 
+            ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700' 
+            : 'text-orange-500 hover:text-orange-700 hover:bg-orange-50'} rounded transition-all`}
           title="Pausar cronómetro"
         >
           <Pause className="w-4 h-4" />
@@ -115,13 +121,14 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
       ) : (
         <button 
           onClick={() => onStart(taskId)}
-          className="p-1 text-green-500 hover:text-green-700 hover:bg-green-50 rounded transition-all"
+          className={`p-1 ${theme === 'dark' 
+            ? 'text-green-400 hover:text-green-300 hover:bg-gray-700' 
+            : 'text-green-500 hover:text-green-700 hover:bg-green-50'} rounded transition-all`}
           title="Iniciar cronómetro"
         >
           <Play className="w-4 h-4" />
         </button>
       )}
-
     </div>
   );
 };

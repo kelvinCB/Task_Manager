@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { TaskTimer } from '../../components/TaskTimer';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 // Mocks para las pruebas
 const mockOnStart = vi.fn();
@@ -35,7 +36,11 @@ describe('TaskTimer Component', () => {
     };
     
     // Act
-    render(<TaskTimer {...props} />);
+    render(
+      <ThemeProvider>
+        <TaskTimer {...props} />
+      </ThemeProvider>
+    );
     
     // Assert - comprobar que se muestra el tiempo formateado correctamente
     expect(screen.getByText('01:01:01')).toBeInTheDocument();
@@ -56,7 +61,11 @@ describe('TaskTimer Component', () => {
     };
     
     // Act
-    render(<TaskTimer {...props} />);
+    render(
+      <ThemeProvider>
+        <TaskTimer {...props} />
+      </ThemeProvider>
+    );
     
     // Assert - comprobar que se muestra el botón de pausa cuando está activo
     const pauseButton = screen.getByTitle('Pausar cronómetro');
@@ -74,7 +83,11 @@ describe('TaskTimer Component', () => {
     };
     
     // Act
-    render(<TaskTimer {...props} />);
+    render(
+      <ThemeProvider>
+        <TaskTimer {...props} />
+      </ThemeProvider>
+    );
     const playButton = screen.getByTitle('Iniciar cronómetro');
     fireEvent.click(playButton);
     
@@ -94,7 +107,11 @@ describe('TaskTimer Component', () => {
     };
     
     // Act
-    render(<TaskTimer {...props} />);
+    render(
+      <ThemeProvider>
+        <TaskTimer {...props} />
+      </ThemeProvider>
+    );
     const pauseButton = screen.getByTitle('Pausar cronómetro');
     fireEvent.click(pauseButton);
     
@@ -114,7 +131,11 @@ describe('TaskTimer Component', () => {
     };
     
     // Act
-    render(<TaskTimer {...props} />);
+    render(
+      <ThemeProvider>
+        <TaskTimer {...props} />
+      </ThemeProvider>
+    );
     
     // Verificar el tiempo inicial
     expect(screen.getByText('00:00:00')).toBeInTheDocument();
@@ -149,7 +170,11 @@ describe('TaskTimer Component', () => {
     };
     
     // Act
-    render(<TaskTimer {...props} />);
+    render(
+      <ThemeProvider>
+        <TaskTimer {...props} />
+      </ThemeProvider>
+    );
     
     // Avanzar 10 minutos
     act(() => {
