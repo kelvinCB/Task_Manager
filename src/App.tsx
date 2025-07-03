@@ -28,6 +28,7 @@ function App() {
     filter,
     expandedNodes,
     createTask,
+    createTaskWithTimeTracking,
     updateTask,
     deleteTask,
     moveTask,
@@ -38,7 +39,6 @@ function App() {
     startTaskTimer,
     pauseTaskTimer,
     getElapsedTime,
-    clearAllTasks,
     getTimeStatistics
   } = useTasks();
 
@@ -106,17 +106,69 @@ function App() {
       header: true,
       skipEmptyLines: true,
       complete: (results: Papa.ParseResult<any>) => {
-        const importedTasks: Omit<Task, 'id' | 'childIds' | 'depth'>[] = results.data.map((row: ImportedTaskRow) => ({
-          title: row.title || 'Untitled Task',
-          description: row.description || '',
-          status: row.status as Task['status'] || 'Open',
-          createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
-          dueDate: row.dueDate ? new Date(row.dueDate) : undefined,
-          parentId: row.parentId || undefined,
-        }));
+        const importedTasks: Omit<Task, 'id' | 'childIds' | 'depth'>[] = results.data.map((row: any) => {
+          // Parse time tracking data if available
+          let timeEntries = [];
+          let totalTimeSpent = 0;
+          
+          if (row.timeEntries) {
+            try {
+              // Handle escaped quotes from CSV export
+              const cleanedTimeEntries = row.timeEntries.replace(/""/g, '"');
+              timeEntries = JSON.parse(cleanedTimeEntries);
+              
+              // Ensure timeEntries is an array and has valid structure
+              if (Array.isArray(timeEntries)) {
+                timeEntries = timeEntries.map(entry => {
+                  // If an entry doesn't have endTime (was active), close it
+                  if (entry.startTime && !entry.endTime) {
+                    // For active entries, we'll assume they were stopped when exported
+                    // Use a reasonable duration or calculate from startTime to now
+                    const estimatedDuration = entry.duration || 0;
+                    return {
+                      ...entry,
+                      endTime: entry.startTime + estimatedDuration,
+                      duration: estimatedDuration
+                    };
+                  }
+                  // Ensure all entries have proper numeric values
+                  return {
+                    ...entry,
+                    startTime: Number(entry.startTime),
+                    endTime: entry.endTime ? Number(entry.endTime) : undefined,
+                    duration: entry.duration ? Number(entry.duration) : undefined
+                  };
+                });
+              } else {
+                timeEntries = [];
+              }
+            } catch (e) {
+              console.warn('Could not parse time entries for task:', row.title, 'Error:', e);
+              timeEntries = [];
+            }
+          }
+          
+          if (row.totalTimeSpent && !isNaN(Number(row.totalTimeSpent))) {
+            totalTimeSpent = Number(row.totalTimeSpent);
+          }
+          
+          return {
+            title: row.title || 'Untitled Task',
+            description: row.description || '',
+            status: row.status as Task['status'] || 'Open',
+            createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
+            dueDate: row.dueDate ? new Date(row.dueDate) : undefined,
+            parentId: row.parentId || undefined,
+            timeTracking: {
+              totalTimeSpent,
+              isActive: false,
+              timeEntries
+            }
+          };
+        });
 
         importedTasks.forEach(taskData => {
-          createTask(taskData);
+          createTaskWithTimeTracking(taskData);
         });
         alert('Tasks imported successfully!');
       },
@@ -130,16 +182,41 @@ function App() {
   const handleExportTasks = () => {
     const tasksToExport = filteredTasks;
 
-    const csv = Papa.unparse(tasksToExport.map(task => ({
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      createdAt: task.createdAt.toISOString(),
-      dueDate: task.dueDate ? task.dueDate.toISOString() : '',
-      parentId: task.parentId || '',
-      childIds: task.childIds.join(';')
-    })));
+    const csv = Papa.unparse(tasksToExport.map(task => {
+      // Calculate total time including active sessions
+      let totalTimeForExport = task.timeTracking.totalTimeSpent;
+      let timeEntriesForExport = [...task.timeTracking.timeEntries];
+      
+      // If task is currently active, calculate the current session time
+      if (task.timeTracking.isActive && task.timeTracking.lastStarted) {
+        const currentSessionTime = Date.now() - task.timeTracking.lastStarted;
+        totalTimeForExport += currentSessionTime;
+        
+        // Update the last entry to include the endTime and duration
+        const lastEntryIndex = timeEntriesForExport.length - 1;
+        if (lastEntryIndex >= 0 && !timeEntriesForExport[lastEntryIndex].endTime) {
+          timeEntriesForExport[lastEntryIndex] = {
+            ...timeEntriesForExport[lastEntryIndex],
+            endTime: Date.now(),
+            duration: currentSessionTime
+          };
+        }
+      }
+      
+      return {
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        createdAt: task.createdAt.toISOString(),
+        dueDate: task.dueDate ? task.dueDate.toISOString() : '',
+        parentId: task.parentId || '',
+        childIds: task.childIds.join(';'),
+        // Time tracking data with current session included
+        totalTimeSpent: totalTimeForExport,
+        timeEntries: JSON.stringify(timeEntriesForExport)
+      };
+    }));
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -272,18 +349,6 @@ function App() {
             <div className="flex items-center flex-wrap gap-4">
               <div className="flex items-center gap-3">
                 <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Filters</h3>
-                {/* TEMP DELETE TASKS BUTTON */}
-                <button
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to delete ALL tasks?')) {
-                      clearAllTasks();
-                    }
-                  }}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-colors duration-200 ${theme === 'dark' ? 'border-red-500 text-red-400 hover:bg-red-600 hover:text-white' : 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white'}`}
-                  title="TEMP: Delete ALL tasks"
-                >
-                  TEMP-Delete-Tasks
-                </button>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} hover:bg-gray-100 rounded transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
