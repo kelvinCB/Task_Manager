@@ -30,6 +30,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   });
   const [showAIOptions, setShowAIOptions] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
     if (task) {
@@ -54,7 +55,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title.trim()) return;
+    if (!formData.title.trim()) {
+      setValidationError('Title is required');
+      return;
+    }
+    
+    setValidationError('');
 
     onSubmit({
       title: formData.title.trim(),
@@ -102,11 +108,17 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               id="task-title"
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white'}`}
+              onChange={(e) => {
+                setFormData(prev => ({ ...prev, title: e.target.value }));
+                if (validationError) setValidationError(''); // Clear error when user types
+              }}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${validationError ? 'border-red-500' : theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} ${theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-white'}`}
               placeholder="Enter task title..."
               required
             />
+            {validationError && (
+              <p className="mt-1 text-sm text-red-500" role="alert">{validationError}</p>
+            )}
           </div>
 
           {/* Description */}

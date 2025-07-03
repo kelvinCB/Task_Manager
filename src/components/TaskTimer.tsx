@@ -101,11 +101,11 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   }, [isActive, elapsedTime]);
 
   return (
-    <div className="flex items-center space-x-2 text-sm">
+    <div className="timer-component flex items-center space-x-2 text-sm" data-testid="task-timer">
       <Clock className={`w-4 h-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
       <span className={`font-mono ${isActive 
         ? (theme === 'dark' ? 'text-green-400 font-bold' : 'text-green-600 font-bold')
-        : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')}`}>
+        : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')}`} data-testid="elapsed-time">
         {formatTime(currentTime)}
       </span>
       {isActive ? (

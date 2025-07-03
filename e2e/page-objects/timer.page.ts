@@ -10,22 +10,23 @@ export class TimerPage {
   // Get timer for a specific task by task title or index
   getTaskTimer(taskIdentifier: string | number) {
     if (typeof taskIdentifier === 'string') {
-      // Find timer by task title
-      return this.page.locator(`[data-testid="task-item"]:has-text("${taskIdentifier}") [data-testid="task-timer"]`);
+      // Find the task by text content, then find the timer within the same container
+      // Use a more robust selector that works across different views (board, tree)
+      return this.page.getByText(taskIdentifier).locator('..').locator('..').locator('[data-testid="task-timer"]').first();
     } else {
       // Find timer by index
-      return this.page.locator(`[data-testid="task-timer"]`).nth(taskIdentifier);
+      return this.page.locator('[data-testid="task-timer"]').nth(taskIdentifier);
     }
   }
 
   getStartButton(taskIdentifier: string | number) {
     const timer = this.getTaskTimer(taskIdentifier);
-    return timer.getByRole('button', { name: /start|play/i });
+    return timer.getByTitle('Start timer');
   }
 
   getPauseButton(taskIdentifier: string | number) {
     const timer = this.getTaskTimer(taskIdentifier);
-    return timer.getByRole('button', { name: /pause|stop/i });
+    return timer.getByTitle('Pause timer');
   }
 
   getElapsedTime(taskIdentifier: string | number) {

@@ -17,18 +17,21 @@ export class TaskPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.taskModal = page.locator('[role="dialog"]');
-    this.titleInput = page.getByLabel(/task title/i);
-    this.descriptionInput = page.getByLabel(/description/i);
-    this.dueDateInput = page.getByLabel(/due date/i);
-    this.statusSelect = page.getByLabel(/status/i);
-    this.createButton = page.getByRole('button', { name: /create task/i });
-    this.updateButton = page.getByRole('button', { name: /update task/i });
-    this.cancelButton = page.getByRole('button', { name: /cancel/i });
-    this.closeButton = page.getByRole('button', { name: /close/i });
-    this.aiButton = page.getByRole('button', { name: /ai/i });
-    this.aiGenerateButton = page.getByRole('button', { name: /generate/i });
-    this.aiCancelButton = page.getByRole('button', { name: /cancel/i });
+    // Look for modal dialog content (the actual modal div)
+    this.taskModal = page.locator('div').filter({ hasText: 'Create New Task' }).or(page.locator('div').filter({ hasText: 'Edit Task' })).first();
+    // Use specific IDs from the actual implementation
+    this.titleInput = page.locator('#task-title');
+    this.descriptionInput = page.locator('#task-description');
+    this.dueDateInput = page.locator('#task-due-date');
+    this.statusSelect = page.locator('#task-status');
+    // The actual buttons are "Save" and "Cancel"
+    this.createButton = page.getByRole('button', { name: 'Save' });
+    this.updateButton = page.getByRole('button', { name: 'Save' });
+    this.cancelButton = page.getByRole('button', { name: 'Cancel' });
+    this.closeButton = page.getByRole('button').filter({ hasText: '' }); // X button has no text
+    this.aiButton = page.getByTitle('AI Assistant - Generate description');
+    this.aiGenerateButton = page.getByText('Add Description');
+    this.aiCancelButton = page.locator('button').filter({ hasText: 'Cancel' }).last(); // AI panel cancel button
   }
 
   async verifyModalOpen() {
@@ -141,8 +144,8 @@ export class TaskPage {
   }
 
   async verifyValidationErrors() {
-    // Check for validation error messages
-    const errorMessages = this.page.locator('.error, [role="alert"], .text-red-500');
+    // Check for validation error messages - specifically look for the role="alert" with red text
+    const errorMessages = this.page.locator('[role="alert"]');
     await expect(errorMessages).toBeVisible();
   }
 }

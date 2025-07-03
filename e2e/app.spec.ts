@@ -86,7 +86,7 @@ test.describe('Task Manager App', () => {
 
   test('should display search functionality', async () => {
     await expect(appPage.searchInput).toBeVisible();
-    await expect(appPage.searchInput).toHaveAttribute('placeholder', /search tasks/i);
+    await expect(appPage.searchInput).toHaveAttribute('placeholder', 'Search tasks...');
   });
 
   test('should show export and import buttons', async () => {

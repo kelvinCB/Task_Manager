@@ -39,6 +39,13 @@ test.describe('Time Tracking', () => {
       description: 'Task for testing timer functionality'
     });
 
+    // Verify the task was created and is visible
+    await expect(appPage.page.getByText('Timer Test Task')).toBeVisible();
+    
+    // Verify that a timer component exists for this task
+    const timer = timerPage.getTaskTimer('Timer Test Task');
+    await expect(timer).toBeVisible();
+    
     // Start the timer
     await timerPage.startTimer('Timer Test Task');
     await timerPage.verifyTimerRunning('Timer Test Task');

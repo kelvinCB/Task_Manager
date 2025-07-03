@@ -14,12 +14,16 @@ export class AppPage {
 
   constructor(page: Page) {
     this.page = page;
+    // Navigation buttons use specific titles
     this.boardViewButton = page.getByTitle('Board View');
     this.treeViewButton = page.getByTitle('Tree View');
     this.timeStatsButton = page.getByTitle('Time Stats');
     this.themeToggle = page.getByTitle('Toggle Dark Mode');
-    this.searchInput = page.getByPlaceholder(/search tasks/i);
-    this.addTaskButton = page.getByRole('button', { name: /add task/i });
+    // Search input has specific placeholder
+    this.searchInput = page.getByPlaceholder('Search tasks...');
+    // Add task button - look for the button with Add Task text or Plus icon
+    this.addTaskButton = page.getByRole('button', { name: /Add Task/i }).or(page.getByText('Add Task')).first();
+    // Export/Import buttons
     this.exportButton = page.getByTitle('Export');
     this.importButton = page.getByTitle('Import');
     this.importInput = page.locator('input[type="file"]');
@@ -88,7 +92,7 @@ export class AppPage {
         break;
       case 'stats':
         // Verify stats view by looking for characteristic elements
-        await expect(this.page.getByText(/time statistics/i)).toBeVisible();
+        await expect(this.page.getByText(/Time Tracking Statistics/i)).toBeVisible();
         break;
     }
   }
