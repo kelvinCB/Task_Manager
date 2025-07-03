@@ -38,6 +38,7 @@ function App() {
     startTaskTimer,
     pauseTaskTimer,
     getElapsedTime,
+    clearAllTasks,
     getTimeStatistics
   } = useTasks();
 
@@ -271,6 +272,18 @@ function App() {
             <div className="flex items-center flex-wrap gap-4">
               <div className="flex items-center gap-3">
                 <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>Filters</h3>
+                {/* TEMP DELETE TASKS BUTTON */}
+                <button
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete ALL tasks?')) {
+                      clearAllTasks();
+                    }
+                  }}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-colors duration-200 ${theme === 'dark' ? 'border-red-500 text-red-400 hover:bg-red-600 hover:text-white' : 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white'}`}
+                  title="TEMP: Delete ALL tasks"
+                >
+                  TEMP-Delete-Tasks
+                </button>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'} hover:bg-gray-100 rounded transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}

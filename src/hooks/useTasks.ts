@@ -289,6 +289,12 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
 
   const moveTask = useCallback(moveTaskImpl, [tasks, updateTask]);
 
+  // Delete all tasks at once (temporary helper)
+  const clearAllTasks = useCallback(() => {
+    setTasks([]);
+    setExpandedNodes(new Set());
+  }, []);
+
   const toggleNodeExpansion = useCallback((nodeId: string) => {
     setExpandedNodes(prev => {
       const newSet = new Set(prev);
@@ -512,6 +518,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     toggleNodeExpansion,
     getTaskById,
     getTasksByStatus,
+    clearAllTasks,
     // Time tracking functions
     startTaskTimer,
     pauseTaskTimer,
