@@ -45,6 +45,9 @@ export interface ImportedTaskRow {
   dueDate?: string;
   parentId?: string;
   childIds?: string;
+  // Time tracking fields
+  totalTimeSpent?: string;
+  timeEntries?: string;
 }
 
 export interface TaskTimeStats {

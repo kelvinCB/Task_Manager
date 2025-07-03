@@ -199,6 +199,40 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     return newTask.id;
   }, [tasks]);
 
+  // Special createTask function for imports that preserves timeTracking data
+  const createTaskWithTimeTracking = useCallback((taskData: Omit<Task, 'id' | 'childIds' | 'depth'>) => {
+    const newTask: Task = {
+      ...taskData,
+      id: generateId(),
+      childIds: [],
+      depth: taskData.parentId ? (tasks.find(t => t.id === taskData.parentId)?.depth ?? 0) + 1 : 0,
+      // Use provided timeTracking or default
+      timeTracking: taskData.timeTracking || {
+        totalTimeSpent: 0,
+        isActive: false,
+        timeEntries: []
+      }
+    };
+
+    setTasks(prev => {
+      const updated = [...prev, newTask];
+      
+      if (taskData.parentId) {
+        const parentIndex = updated.findIndex(t => t.id === taskData.parentId);
+        if (parentIndex !== -1) {
+          updated[parentIndex] = {
+            ...updated[parentIndex],
+            childIds: [...updated[parentIndex].childIds, newTask.id]
+          };
+        }
+      }
+      
+      return updated;
+    });
+
+    return newTask.id;
+  }, [tasks]);
+
   const updateTask = useCallback((id: string, updates: Partial<Task>) => {
     setTasks(prev => prev.map(task => 
       task.id === id ? { ...task, ...updates } : task
@@ -288,6 +322,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
   };
 
   const moveTask = useCallback(moveTaskImpl, [tasks, updateTask]);
+
 
   const toggleNodeExpansion = useCallback((nodeId: string) => {
     setExpandedNodes(prev => {
@@ -505,6 +540,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     filter,
     expandedNodes,
     createTask,
+    createTaskWithTimeTracking,
     updateTask,
     deleteTask,
     moveTask,

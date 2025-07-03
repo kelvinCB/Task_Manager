@@ -13,6 +13,7 @@
 -   **Intuitive User Interface**: A clean and modern design that makes task management easy and enjoyable.
 -   **Task Status Tracking**: Easily track the status of each task (e.g., *Open*, *In Progress*, *Done*).
 -   **Time Tracking**: Track time spent on tasks with built-in timer functionality.
+-   **Import/Export with Time Data**: Export and import tasks while preserving all time tracking information.
 -   **Filters and Search**: Quickly find the tasks you need with powerful filtering and search options.
 -   **Dark/Light Theme**: Switch between dark and light themes for comfortable viewing.
 -   **Responsive Design**: Fully functional on both desktop and mobile devices.
