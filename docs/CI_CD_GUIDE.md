@@ -26,7 +26,11 @@ This document outlines the Continuous Integration and Continuous Deployment (CI/
 ### 2. Testing
 - Unit tests with Vitest
 - Component tests with React Testing Library
-- E2E tests with Playwright (when implemented)
+- E2E tests with Playwright (implemented)
+  - Headed mode for development
+  - Headless mode for CI/CD
+  - Screenshot capture on failures
+  - Sequential execution for stability
 
 ### 3. Build
 - Frontend build with Vite

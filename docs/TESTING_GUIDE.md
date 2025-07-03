@@ -311,6 +311,102 @@ Al agregar nuevas características, sigue estas pautas para mantener la calidad 
 4. Utiliza los mocks existentes para localStorage y AudioContext
 5. Ejecuta el conjunto completo de pruebas antes de enviar un PR
 
+## Pruebas End-to-End (E2E)
+
+### Configuración de Playwright
+
+La aplicación cuenta con pruebas E2E implementadas usando Playwright, que proporciona testing confiable y multiplataforma.
+
+#### Características de la configuración:
+- **Solo Chromium**: Configurado para ejecutar únicamente en Chromium para velocidad y consistencia
+- **Ejecución secuencial**: Tests ejecutados uno por uno (workers: 1) para evitar conflictos
+- **Screenshots automáticos**: Captura de pantalla al final de cada test
+- **Headed y Headless**: Soporte para ambos modos de ejecución
+- **Wait de 1 segundo**: Pausa antes de terminar cada test para estabilidad
+
+### Scripts disponibles
+
+```bash
+# Ejecutar todos los tests E2E (headless)
+npm run test:e2e
+
+# Ejecutar con interfaz visual (headed)
+npm run test:e2e:headed
+
+# Ejecutar solo en Chromium (headless)
+npm run test:e2e:headless
+
+# Ejecutar tests básicos simplificados
+npm run test:e2e:simple
+
+# Modo debug interactivo
+npm run test:e2e:debug
+
+# Ver reporte HTML de resultados
+npm run test:e2e:report
+```
+
+### Tests implementados
+
+#### Tests básicos (app-simple.spec.ts)
+1. **Carga de aplicación**: Verifica que la aplicación carga correctamente con título y elementos principales
+2. **Botones de navegación**: Confirma que los botones de vista (Board, Tree, Stats) están visibles
+3. **Toggle de tema**: Verifica que el botón de cambio de tema está disponible
+4. **Input de búsqueda**: Confirma que el campo de búsqueda está presente
+5. **Cambio de vistas**: Prueba la navegación entre diferentes vistas
+
+#### Page Objects
+
+Los tests utilizan el patrón Page Object Model para mejor mantenimiento:
+
+- **AppPage**: Interacciones principales de la aplicación
+- **TaskPage**: Operaciones relacionadas con tareas
+- **TimerPage**: Funcionalidad de seguimiento de tiempo
+
+### Estructura de archivos E2E
+
+```
+e2e/
+├── page-objects/           # Page Object Models
+│   ├── app.page.ts         # Página principal
+│   ├── task.page.ts        # Operaciones de tareas
+│   └── timer.page.ts       # Funcionalidad de timer
+├── app-simple.spec.ts      # Tests básicos funcionando
+├── app.spec.ts             # Tests completos de app
+├── task-management.spec.ts # Tests de gestión de tareas
+├── time-tracking.spec.ts   # Tests de seguimiento de tiempo
+├── global-setup.ts         # Configuración global
+└── global-teardown.ts      # Limpieza global
+```
+
+### Screenshots y reportes
+
+- **Screenshots**: Se guardan automáticamente en `test-results/screenshots/`
+- **Videos**: Se graban en caso de fallos en `test-results/`
+- **Reporte HTML**: Disponible ejecutando `npm run test:e2e:report`
+
+### Estado actual
+
+✅ **Completado**:
+- Configuración de Playwright
+- Page Objects básicos
+- Tests de carga y navegación
+- Screenshots automáticos
+- Soporte headed/headless
+
+🔄 **En progreso**:
+- Tests de gestión de tareas
+- Tests de seguimiento de tiempo
+- Tests de importación/exportación
+
+### Mejores prácticas para E2E
+
+1. **Selectores robustos**: Usar `getByRole`, `getByTitle`, `getByText` en lugar de selectores CSS
+2. **Waits apropiados**: Usar `waitForTimeout` solo cuando sea necesario
+3. **Page Objects**: Mantener la lógica de interacción separada de los tests
+4. **Screenshots**: Aprovechar las capturas automáticas para debugging
+5. **Tests independientes**: Cada test debe ser independiente y limpiar su estado
+
 ---
 
 Con esta guía, cualquier desarrollador puede entender la estrategia de pruebas, ejecutar las pruebas existentes y contribuir con nuevas pruebas para mantener la calidad del código.

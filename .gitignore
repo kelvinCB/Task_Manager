@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Playwright test results
+test-results/
+playwright-report/
+playwright/.cache/
+
 # Environment variables (contains API keys)
 .env
 .env.local
