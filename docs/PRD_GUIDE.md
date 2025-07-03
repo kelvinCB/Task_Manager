@@ -125,9 +125,9 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
 | **Frontend Unit Tests** | ✅ Complete | 100% | 96 tests passing with Vitest |
+| **E2E Tests** | ✅ Complete | 90% | Playwright end-to-end tests implemented |
 | **Backend Unit Tests** | ❌ Pending | 0% | Backend component testing |
 | **Integration Tests** | ❌ Pending | 0% | API integration testing |
-| **E2E Tests** | ❌ Pending | 0% | Playwright end-to-end tests |
 | **Performance Tests** | ❌ Pending | 0% | Load and performance testing |
 
 ---
