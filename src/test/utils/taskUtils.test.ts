@@ -234,17 +234,85 @@ describe('Task Utility Functions', () => {
   });
   
   describe('formatDate', () => {
-    it('should format date correctly', () => {
+    it('should format date correctly with complete validation', () => {
       // Arrange
-      // Usar una fecha explícita con zona UTC para evitar problemas de zona horaria
-      const date = new Date(Date.UTC(2021, 6, 15));
+      // Usar una fecha específica en la zona horaria local para evitar problemas de UTC
+      const date = new Date(2021, 6, 15, 12, 0, 0); // July 15, 2021 at noon
       
       // Act
       const formattedDate = formatDate(date);
       
-      // Assert - verificamos solo el formato general, no la fecha específica
-      // ya que depende de la implementación y zona horaria
+      // Assert - verificamos el formato completo incluyendo mes y día
       expect(formattedDate).toMatch(/[A-Z][a-z]{2} \d{1,2}, 2021/);
+      
+      // Validar componentes específicos de la fecha
+      expect(formattedDate).toContain('2021'); // Year
+      expect(formattedDate).toContain('15'); // Day
+      // July puede aparecer como 'Jul' o 'July' dependiendo de la implementación
+      expect(formattedDate).toMatch(/Jul|July/);
+    });
+    
+    it('should format different months correctly', () => {
+      // Test cases for different months usando fechas locales
+      const testCases = [
+        { date: new Date(2025, 0, 1, 12, 0, 0), expectedMonth: /Jan|January/, expectedDay: '1', expectedYear: '2025' },
+        { date: new Date(2025, 5, 30, 12, 0, 0), expectedMonth: /Jun|June/, expectedDay: '30', expectedYear: '2025' },
+        { date: new Date(2025, 11, 25, 12, 0, 0), expectedMonth: /Dec|December/, expectedDay: '25', expectedYear: '2025' }
+      ];
+      
+      testCases.forEach(testCase => {
+        const formattedDate = formatDate(testCase.date);
+        
+        // Verify year
+        expect(formattedDate).toContain(testCase.expectedYear);
+        
+        // Verify month
+        expect(formattedDate).toMatch(testCase.expectedMonth);
+        
+        // Verify day
+        expect(formattedDate).toContain(testCase.expectedDay);
+      });
+    });
+    
+    it('should handle edge cases for dates', () => {
+      // Test first day of year
+      const firstDay = new Date(2025, 0, 1, 12, 0, 0);
+      const formattedFirstDay = formatDate(firstDay);
+      expect(formattedFirstDay).toContain('2025');
+      expect(formattedFirstDay).toContain('1');
+      expect(formattedFirstDay).toMatch(/Jan|January/);
+      
+      // Test last day of year
+      const lastDay = new Date(2025, 11, 31, 12, 0, 0);
+      const formattedLastDay = formatDate(lastDay);
+      expect(formattedLastDay).toContain('2025');
+      expect(formattedLastDay).toContain('31');
+      expect(formattedLastDay).toMatch(/Dec|December/);
+      
+      // Test leap year Feb 29
+      const leapDay = new Date(2024, 1, 29, 12, 0, 0);
+      const formattedLeapDay = formatDate(leapDay);
+      expect(formattedLeapDay).toContain('2024');
+      expect(formattedLeapDay).toContain('29');
+      expect(formattedLeapDay).toMatch(/Feb|February/);
+    });
+    
+    it('should validate specific date components comprehensively', () => {
+      // Test case específico para validar que todos los componentes de fecha son correctos
+      const testDate = new Date(2025, 11, 30, 12, 0, 0); // Dec 30, 2025
+      const formattedDate = formatDate(testDate);
+      
+      // Verificar que contiene todos los componentes esperados
+      expect(formattedDate).toContain('2025'); // Year
+      expect(formattedDate).toContain('30'); // Day
+      expect(formattedDate).toMatch(/Dec|December/); // Month
+      
+      // Verificar el formato general
+      expect(formattedDate).toMatch(/[A-Z][a-z]{2,8} \d{1,2}, \d{4}/);
+      
+      // Verificar que no contiene caracteres extraños
+      expect(formattedDate).not.toContain('undefined');
+      expect(formattedDate).not.toContain('null');
     });
   });
   
