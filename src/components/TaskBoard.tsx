@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Task, TaskStatus } from '../types/Task';
-import { getStatusColor, getStatusIcon } from '../utils/taskUtils';
-import { Plus } from 'lucide-react';
+import { getStatusColor, getStatusIcon, formatDate, isTaskOverdue } from '../utils/taskUtils';
+import { Plus, Calendar } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 
@@ -159,6 +159,13 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             <span>Depth: {task.depth}</span>
                             {task.childIds.length > 0 && (
                               <span>• {task.childIds.length} subtask{task.childIds.length !== 1 ? 's' : ''}</span>
+                            )}
+                            {task.dueDate && (
+                              <div className={`flex items-center gap-1 ${isTaskOverdue(task) ? 'text-red-600 font-medium' : ''}`}>
+                                <Calendar size={12} />
+                                <span>Due {formatDate(task.dueDate)}</span>
+                                {isTaskOverdue(task) && <span className="text-red-600">• Overdue</span>}
+                              </div>
                             )}
                             {/* Task Timer */}
                             {onStartTimer && onPauseTimer && getElapsedTime && (

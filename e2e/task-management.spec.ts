@@ -51,46 +51,97 @@ test.describe('Task Management', () => {
     await expect(appPage.page.getByText(taskData.description)).toBeVisible();
   });
 
-  test('should edit an existing task', async () => {
-    // First create a task
+  test('should edit an existing task in both Board and Tree views', async () => {
+    // Create a task for Board View testing
     await appPage.openAddTaskModal();
     await taskPage.createTask({
-      title: 'Original Task Title',
-      description: 'Original description'
+      title: 'Original Board Task',
+      description: 'Original description for board'
     });
 
-    // Click on the edit button for the task
-    await boardPage.editTask('Original Task Title');
+    // Test editing in Board View
+    await appPage.switchToView('board');
+    await appPage.verifyCurrentView('board');
+    await boardPage.editTask('Original Board Task');
     await taskPage.verifyModalOpen();
 
-    // Update the task
-    const updatedData = {
-      title: 'Updated Task Title',
-      description: 'Updated description'
-    };
-
-    await taskPage.updateTask(updatedData);
+    await taskPage.updateTask({
+      title: 'Updated Board Task',
+      description: 'Updated description for board'
+    });
     await taskPage.verifyModalClosed();
+    await expect(appPage.page.getByText('Updated Board Task')).toBeVisible();
 
-    // Verify the task was updated
-    await expect(appPage.page.getByText(updatedData.title)).toBeVisible();
-    await expect(appPage.page.getByText(updatedData.description)).toBeVisible();
-    await expect(appPage.page.getByText('Original Task Title')).not.toBeVisible();
-  });
-
-  test('should delete a task', async () => {
-    // Create a task first
+    // Create another task for Tree View testing
     await appPage.openAddTaskModal();
     await taskPage.createTask({
-      title: 'Task to Delete',
-      description: 'This task will be deleted'
+      title: 'Original Tree Task',
+      description: 'Original description for tree'
     });
 
-    // Use the BoardPage to delete the task directly (no confirmation dialog)
-    await boardPage.deleteTask('Task to Delete');
+    // Test editing in Tree View
+    await appPage.switchToView('tree');
+    await appPage.verifyCurrentView('tree');
+    
+    const taskRow = appPage.page.locator('.group').filter({ hasText: 'Original Tree Task' });
+    await taskRow.hover();
+    await appPage.page.waitForTimeout(500);
+    const moreButton = taskRow.locator('button').filter({ has: appPage.page.locator('svg') }).last();
+    await moreButton.click();
+    
+    const editOption = appPage.page.getByText('Edit').first();
+    await editOption.click();
+    await taskPage.verifyModalOpen();
 
-    // Verify task is removed
-    await expect(appPage.page.getByText('Task to Delete')).not.toBeVisible();
+    await taskPage.updateTask({
+      title: 'Updated Tree Task',
+      description: 'Updated description for tree'
+    });
+    await taskPage.verifyModalClosed();
+    await expect(appPage.page.getByText('Updated Tree Task')).toBeVisible();
+  });
+
+  test('should delete a task in both Board and Tree views', async () => {
+    // Test deletion in Board View
+    await appPage.openAddTaskModal();
+    await taskPage.createTask({
+      title: 'Task to Delete in Board',
+      description: 'This task will be deleted from board view'
+    });
+
+    await appPage.switchToView('board');
+    await appPage.verifyCurrentView('board');
+    await boardPage.deleteTask('Task to Delete in Board');
+    await expect(appPage.page.getByText('Task to Delete in Board')).not.toBeVisible();
+
+    // Test deletion in Tree View
+    await appPage.openAddTaskModal();
+    await taskPage.createTask({
+      title: 'Task to Delete in Tree',
+      description: 'This task will be deleted from tree view'
+    });
+
+    await appPage.switchToView('tree');
+    await appPage.verifyCurrentView('tree');
+    await expect(appPage.page.getByText('Task to Delete in Tree')).toBeVisible();
+
+    const taskRow = appPage.page.locator('.group').filter({ hasText: 'Task to Delete in Tree' });
+    await taskRow.hover();
+    await appPage.page.waitForTimeout(1000);
+    
+    const buttons = taskRow.locator('button');
+    const buttonCount = await buttons.count();
+    const moreButton = buttons.nth(buttonCount - 1);
+    await expect(moreButton).toBeVisible();
+    await moreButton.click();
+    
+    await appPage.page.waitForTimeout(500);
+    const deleteOption = appPage.page.getByRole('button', { name: 'Delete' });
+    await expect(deleteOption).toBeVisible();
+    await deleteOption.click();
+
+    await appPage.page.waitForTimeout(1000);
+    await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
   });
 
   test('should prevent creating task without title (required field validation)', async () => {

@@ -30,44 +30,39 @@ test.describe('Task Manager App', () => {
     await appPage.verifyCurrentView('board');
   });
 
-  test('should switch between different views', async () => {
-    // Test switching to tree view
+  test('should display navigation buttons and switch between views', async () => {
+    // Verify navigation buttons are visible (covers display requirement)
+    await expect(appPage.boardViewButton).toBeVisible();
+    await expect(appPage.treeViewButton).toBeVisible();
+    await expect(appPage.timeStatsButton).toBeVisible();
+    
+    // Test switching functionality
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
 
-    // Test switching to stats view
     await appPage.switchToView('stats');
     await appPage.verifyCurrentView('stats');
 
-    // Test switching back to board view
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
   });
 
-  test('should toggle between light and dark themes', async () => {
-    // Verify initial theme (likely light)
+  test('should handle theme toggle and persistence', async () => {
+    // Verify initial theme
     await appPage.verifyTheme('light');
 
     // Toggle to dark theme
     await appPage.toggleTheme();
+    await appPage.verifyTheme('dark');
+
+    // Test persistence: reload page
+    await appPage.page.reload();
+    await appPage.verifyPageLoaded();
     await appPage.verifyTheme('dark');
 
     // Toggle back to light theme
     await appPage.toggleTheme();
     await appPage.verifyTheme('light');
-  });
-
-  test('should persist theme preference after page reload', async () => {
-    // Toggle to dark theme
-    await appPage.toggleTheme();
-    await appPage.verifyTheme('dark');
-
-    // Reload the page
-    await appPage.page.reload();
-    await appPage.verifyPageLoaded();
-
-    // Verify theme is still dark
-    await appPage.verifyTheme('dark');
   });
 
   test('should have responsive design on mobile viewport', async ({ page }) => {

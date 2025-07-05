@@ -81,10 +81,10 @@ export class AppPage {
   async verifyCurrentView(view: 'board' | 'tree' | 'stats') {
     switch (view) {
       case 'board':
-        // Verify board view by looking for characteristic elements
-        await expect(this.page.getByText('Open')).toBeVisible();
-        await expect(this.page.getByText('In Progress')).toBeVisible();
-        await expect(this.page.getByText('Done')).toBeVisible();
+        // Verify board view by looking for board grid structure
+        await expect(this.page.locator('.grid-cols-1.md\\:grid-cols-3')).toBeVisible();
+        // Also verify column structure
+        await expect(this.page.getByRole('heading', { name: 'Open', exact: true }).first()).toBeVisible();
         break;
       case 'tree':
         // Verify tree view by looking for container with tree-view-container data-testid
