@@ -43,8 +43,9 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
 
   return (
     <div className={`h-full overflow-auto ${theme === 'dark' ? 'bg-gray-800' : ''}`}>
-      <div className={`rounded-lg shadow-sm p-6 m-6 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
-        <div className="flex justify-between items-center mb-6">
+      <div className={`rounded-lg shadow-sm p-4 md:p-6 m-4 md:m-6 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
+        {/* Header - Desktop */}
+        <div className="hidden md:flex justify-between items-center mb-6">
           <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
 
           <div className="flex items-center gap-4">
@@ -84,32 +85,107 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
           </div>
         </div>
 
-        {isCustom && (
-          <div className="flex gap-4 mb-6">
-            <div>
-              <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>Start Date</label>
-              <input
-                type="date"
-                value={customStart}
-                onChange={(e) => setCustomStart(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${theme === 'dark' ? 'bg-gray-600 text-gray-100 border-gray-500' : 'bg-white text-gray-900 border-gray-300'}`}
-              />
+        {/* Header - Mobile */}
+        <div className="md:hidden mb-6">
+          <h2 className={`text-lg font-bold mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
+          
+          {/* Mobile Period Buttons - Two rows */}
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => { setPeriod('day'); setIsCustom(false); }}
+                className={`px-3 py-2 text-sm rounded-lg border ${period === 'day' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+              >
+                Today
+              </button>
+              <button
+                onClick={() => { setPeriod('week'); setIsCustom(false); }}
+                className={`px-3 py-2 text-sm rounded-lg border ${period === 'week' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+              >
+                This Week
+              </button>
             </div>
-            <div>
-              <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>End Date</label>
-              <input
-                type="date"
-                value={customEnd}
-                onChange={(e) => setCustomEnd(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${theme === 'dark' ? 'bg-gray-600 text-gray-100 border-gray-500' : 'bg-white text-gray-900 border-gray-300'}`}
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => { setPeriod('month'); setIsCustom(false); }}
+                className={`px-3 py-2 text-sm rounded-lg border ${period === 'month' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+              >
+                This Month
+              </button>
+              <button
+                onClick={() => { setPeriod('year'); setIsCustom(false); }}
+                className={`px-3 py-2 text-sm rounded-lg border ${period === 'year' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+              >
+                This Year
+              </button>
+            </div>
+            <button
+              onClick={() => setIsCustom(!isCustom)}
+              className={`w-full px-3 py-2 text-sm rounded-lg border ${isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+            >
+              Custom Range
+            </button>
+          </div>
+        </div>
+
+        {isCustom && (
+          <div className="mb-6">
+            {/* Desktop - Side by side */}
+            <div className="hidden md:flex gap-4">
+              <div>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>Start Date</label>
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className={`px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${theme === 'dark' ? 'bg-gray-600 text-gray-100 border-gray-500' : 'bg-white text-gray-900 border-gray-300'}`}
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>End Date</label>
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className={`px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${theme === 'dark' ? 'bg-gray-600 text-gray-100 border-gray-500' : 'bg-white text-gray-900 border-gray-300'}`}
+                />
+              </div>
+            </div>
+            
+            {/* Mobile - Stacked */}
+            <div className="md:hidden space-y-4">
+              <div>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>Start Date</label>
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${theme === 'dark' ? 'bg-gray-600 text-gray-100 border-gray-500' : 'bg-white text-gray-900 border-gray-300'}`}
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>End Date</label>
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${theme === 'dark' ? 'bg-gray-600 text-gray-100 border-gray-500' : 'bg-white text-gray-900 border-gray-300'}`}
+                />
+              </div>
             </div>
           </div>
         )}
 
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          {/* Desktop - Side by side */}
+          <div className="hidden md:flex items-center justify-between">
             <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Total Time Spent</h3>
+            <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{formatTime(stats.reduce((acc, curr) => acc + curr.timeSpent, 0))}</span>
+          </div>
+          
+          {/* Mobile - Stacked */}
+          <div className="md:hidden text-center">
+            <h3 className={`text-lg font-medium mb-2 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Total Time Spent</h3>
             <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{formatTime(stats.reduce((acc, curr) => acc + curr.timeSpent, 0))}</span>
           </div>
         </div>
@@ -117,13 +193,21 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
         {stats.length > 0 ? (
           <div>
             <h3 className={`text-lg font-medium mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time by Task</h3>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {stats.map(task => (
-                <div key={task.id} className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-50'}`}>
-                  <div className="flex justify-between mb-1">
+                <div key={task.id} className={`p-3 md:p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-50'}`}>
+                  {/* Desktop - Side by side */}
+                  <div className="hidden md:flex justify-between mb-1">
                     <h4 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{task.title}</h4>
                     <span className={theme === 'dark' ? 'text-gray-200' : ''}>{formatTime(task.timeSpent)}</span>
                   </div>
+                  
+                  {/* Mobile - Stacked */}
+                  <div className="md:hidden mb-2">
+                    <h4 className={`font-medium mb-1 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{task.title}</h4>
+                    <span className={`text-sm ${theme === 'dark' ? 'text-gray-200' : 'text-gray-600'}`}>{formatTime(task.timeSpent)}</span>
+                  </div>
+                  
                   <div className={`w-full rounded-full h-2.5 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                     <div
                       className="bg-indigo-600 h-2.5 rounded-full"
