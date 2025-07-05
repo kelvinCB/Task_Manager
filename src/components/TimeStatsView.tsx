@@ -45,49 +45,51 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
     <div className={`h-full overflow-auto ${theme === 'dark' ? 'bg-gray-800' : ''}`}>
       <div className={`rounded-lg shadow-sm p-4 md:p-6 m-4 md:m-6 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
         {/* Header - Desktop */}
-        <div className="hidden md:flex justify-between items-center mb-6">
-          <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
+        <div className="hidden md:block mb-6">
+          <h2 className={`text-xl font-bold text-center mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
+          
+          <div className="flex justify-center items-center">
+            <div className="flex items-center gap-4">
+              <div className="flex">
+                <button
+                  onClick={() => { setPeriod('day'); setIsCustom(false); }}
+                  className={`px-3 py-1 text-sm border-t border-b border-l rounded-l-lg ${period === 'day' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => { setPeriod('week'); setIsCustom(false); }}
+                  className={`px-3 py-1 text-sm border-t border-b ${period === 'week' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+                >
+                  This Week
+                </button>
+                <button
+                  onClick={() => { setPeriod('month'); setIsCustom(false); }}
+                  className={`px-3 py-1 text-sm border-t border-b ${period === 'month' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+                >
+                  This Month
+                </button>
+                <button
+                  onClick={() => { setPeriod('year'); setIsCustom(false); }}
+                  className={`px-3 py-1 text-sm border-t border-b border-r rounded-r-lg ${period === 'year' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+                >
+                  This Year
+                </button>
+              </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex">
               <button
-                onClick={() => { setPeriod('day'); setIsCustom(false); }}
-                className={`px-3 py-1 text-sm border-t border-b border-l rounded-l-lg ${period === 'day' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
+                onClick={() => setIsCustom(!isCustom)}
+                className={`px-3 py-1 text-sm rounded-lg border ${isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
               >
-                Today
-              </button>
-              <button
-                onClick={() => { setPeriod('week'); setIsCustom(false); }}
-                className={`px-3 py-1 text-sm border-t border-b ${period === 'week' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
-              >
-                This Week
-              </button>
-              <button
-                onClick={() => { setPeriod('month'); setIsCustom(false); }}
-                className={`px-3 py-1 text-sm border-t border-b ${period === 'month' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
-              >
-                This Month
-              </button>
-              <button
-                onClick={() => { setPeriod('year'); setIsCustom(false); }}
-                className={`px-3 py-1 text-sm border-t border-b border-r rounded-r-lg ${period === 'year' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
-              >
-                This Year
+                Custom
               </button>
             </div>
-
-            <button
-              onClick={() => setIsCustom(!isCustom)}
-              className={`px-3 py-1 text-sm rounded-lg border ${isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
-            >
-              Custom
-            </button>
           </div>
         </div>
 
         {/* Header - Mobile */}
         <div className="md:hidden mb-6">
-          <h2 className={`text-lg font-bold mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
+<h2 className={`text-lg font-bold mb-4 text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
           
           {/* Mobile Period Buttons - Two rows */}
           <div className="space-y-3">
@@ -152,9 +154,9 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
               </div>
             </div>
             
-            {/* Mobile - Stacked */}
-            <div className="md:hidden space-y-4">
-              <div>
+            {/* Mobile - Side by side if screen is wide enough, otherwise stacked */}
+            <div className="md:hidden flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
                 <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>Start Date</label>
                 <input
                   type="date"
@@ -163,7 +165,7 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${theme === 'dark' ? 'bg-gray-600 text-gray-100 border-gray-500' : 'bg-white text-gray-900 border-gray-300'}`}
                 />
               </div>
-              <div>
+              <div className="flex-1">
                 <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>End Date</label>
                 <input
                   type="date"
