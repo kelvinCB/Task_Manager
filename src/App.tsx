@@ -353,7 +353,7 @@ function App() {
           {/* Mobile Header - Three Level Design */}
           <div className="lg:hidden">
             {/* Level 1: Logo and App Name */}
-            <div className="flex items-center justify-center py-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center py-3">
               <div className="flex items-center gap-3">
                 <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg`}>
                   <ProgressIcon 
@@ -429,8 +429,8 @@ function App() {
 
             {/* Level 3: Theme Toggle, Filters, and Burger Menu */}
             <div className="py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 flex-1">
                   {/* Theme Toggle */}
                   <button
                     onClick={toggleTheme}
@@ -456,6 +456,41 @@ function App() {
                   >
                     <Filter size={16} />
                   </button>
+
+                  {/* Inline Filters when active */}
+                  {showFilters && (
+                    <>
+                      <div className="flex items-center gap-1">
+                        <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                          Status:
+                        </label>
+                        <select
+                          value={filter.status || ''}
+                          onChange={(e) => setFilter({ ...filter, status: e.target.value as Task['status'] || undefined })}
+                          className={`px-3 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 text-center ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
+                          style={{ minWidth: '90px' }}
+                        >
+                          <option value="" className="text-center">All</option>
+                          <option value="Open" className="text-center">Open</option>
+                          <option value="In Progress" className="text-center">In Progress</option>
+                          <option value="Done" className="text-center">Done</option>
+                        </select>
+                      </div>
+
+                      {/* Clear Filters */}
+                      {(filter.status || filter.searchTerm) && (
+                        <button
+                          onClick={() => {
+                            setFilter({});
+                            setSearchTerm('');
+                          }}
+                          className={`px-2 py-1 text-xs ${theme === 'dark' ? 'text-gray-300 hover:text-gray-100' : 'text-gray-600 hover:text-gray-800'} hover:bg-gray-100 rounded transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {/* Burger Menu */}
@@ -464,42 +499,6 @@ function App() {
                   onImportTasks={handleImportTasks}
                 />
               </div>
-
-              {/* Expandable Filters in Mobile */}
-              {showFilters && (
-                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
-                        Status:
-                      </label>
-                      <select
-                        value={filter.status || ''}
-                        onChange={(e) => setFilter({ ...filter, status: e.target.value as Task['status'] || undefined })}
-                        className={`px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
-                      >
-                        <option value="">All Status</option>
-                        <option value="Open">Open</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Done">Done</option>
-                      </select>
-                    </div>
-
-                    {/* Clear Filters */}
-                    {(filter.status || filter.searchTerm) && (
-                      <button
-                        onClick={() => {
-                          setFilter({});
-                          setSearchTerm('');
-                        }}
-                        className={`px-3 py-1.5 text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-gray-100' : 'text-gray-600 hover:text-gray-800'} hover:bg-gray-100 rounded-lg transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
-                      >
-                        Clear Filters
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
