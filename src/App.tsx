@@ -18,6 +18,7 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
+import { BurgerMenu } from './components/BurgerMenu';
 import Papa from 'papaparse';
 import { useTheme } from './contexts/ThemeContext';
 
@@ -237,10 +238,11 @@ function App() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
-      {/* Header */}
+      {/* Mobile Header - Three Level Design */}
       <header className={`bg-white border-b border-gray-200 shadow-sm ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-white dark:border-gray-700' : ''}`}>
         <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between h-16">
+          {/* Desktop Header - Original Design */}
+          <div className="hidden lg:flex items-center justify-between h-16">
             <div className="flex shrink-0 items-center gap-3 mr-4">
               <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg`}>
                 <ProgressIcon 
@@ -347,13 +349,166 @@ function App() {
               </div>
             </div>
           </div>
+
+          {/* Mobile Header - Three Level Design */}
+          <div className="lg:hidden">
+            {/* Level 1: Logo and App Name */}
+            <div className="flex items-center justify-center py-3 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg`}>
+                  <ProgressIcon 
+                    size={20} 
+                    className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} 
+                    progress={75}
+                  />
+                </div>
+                <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>TasksFun</h1>
+              </div>
+            </div>
+
+            {/* Level 2: Search, Add Task, and View Buttons */}
+            <div className="flex items-center gap-2 py-3 border-b border-gray-200 dark:border-gray-700">
+              {/* Search */}
+              <div className="flex-1 relative">
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-400'} w-4 h-4`} />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className={`pl-10 pr-3 py-2 w-full text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
+                />
+              </div>
+
+              {/* Add Task Button */}
+              <button
+                onClick={openCreateForm}
+                className={`flex items-center gap-1 px-3 py-2 ${theme === 'dark' ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg transition-colors duration-200 text-sm font-medium shadow-sm`}
+              >
+                <Plus size={16} />
+                <span>Add</span>
+              </button>
+
+              {/* View Toggle Buttons with Background */}
+              <div className={`flex items-center gap-0.5 p-1 rounded-lg ${theme === 'dark' ? 'bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100'} shadow-sm`}>
+                <button
+                  onClick={() => setView('tree')}
+                  title="Tree View"
+                  className={`p-2 rounded-lg transition-colors duration-200 ${
+                    view === 'tree' 
+                      ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
+                      : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
+                  }`}
+                >
+                  <TreePine size={16} />
+                </button>
+                <button
+                  onClick={() => setView('board')}
+                  title="Board View"
+                  className={`p-2 rounded-lg transition-colors duration-200 ${
+                    view === 'board' 
+                      ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
+                      : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
+                  }`}
+                >
+                  <LayoutGrid size={16} />
+                </button>
+                <button
+                  onClick={() => setView('stats')}
+                  title="Time Stats"
+                  className={`p-2 rounded-lg transition-colors duration-200 ${
+                    view === 'stats' 
+                      ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
+                      : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
+                  }`}
+                >
+                  <Clock size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Level 3: Theme Toggle, Filters, and Burger Menu */}
+            <div className="py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {/* Theme Toggle */}
+                  <button
+                    onClick={toggleTheme}
+                    className={`p-2 rounded-lg transition-colors duration-200 ${
+                      theme === 'dark' 
+                        ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' 
+                        : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                    }`}
+                    title="Toggle Dark Mode"
+                  >
+                    {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+                  </button>
+
+                  {/* Filters Button */}
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`p-2 rounded-lg transition-colors duration-200 ${
+                      showFilters
+                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
+                        : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-400 hover:bg-gray-200')
+                    }`}
+                    title="Filters"
+                  >
+                    <Filter size={16} />
+                  </button>
+                </div>
+
+                {/* Burger Menu */}
+                <BurgerMenu 
+                  onExportTasks={handleExportTasks}
+                  onImportTasks={handleImportTasks}
+                />
+              </div>
+
+              {/* Expandable Filters in Mobile */}
+              {showFilters && (
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+                        Status:
+                      </label>
+                      <select
+                        value={filter.status || ''}
+                        onChange={(e) => setFilter({ ...filter, status: e.target.value as Task['status'] || undefined })}
+                        className={`px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
+                      >
+                        <option value="">All Status</option>
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                      </select>
+                    </div>
+
+                    {/* Clear Filters */}
+                    {(filter.status || filter.searchTerm) && (
+                      <button
+                        onClick={() => {
+                          setFilter({});
+                          setSearchTerm('');
+                        }}
+                        className={`px-3 py-1.5 text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-gray-100' : 'text-gray-600 hover:text-gray-800'} hover:bg-gray-100 rounded-lg transition-colors duration-200 ${theme === 'dark' ? 'dark:hover:bg-gray-700' : ''}`}
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="flex-1">
-        {/* Filters Section */}
-        <div className={`bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700' : ''}`}>
+        {/* Filters Section - Desktop Only */}
+        <div className={`hidden lg:block bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700' : ''}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center flex-wrap gap-4">
               <div className="flex items-center gap-3">
@@ -412,7 +567,7 @@ function App() {
         </div>
 
         {/* Content Area */}
-        <div className="h-[calc(100vh-8rem)]">
+        <div className="h-[calc(100vh-8rem)] lg:h-[calc(100vh-8rem)]">
           {view === 'tree' ? (
             <div data-testid="tree-view-container" className="h-full overflow-auto p-6">
               <TaskTree
