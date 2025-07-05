@@ -14,18 +14,18 @@ export class AppPage {
 
   constructor(page: Page) {
     this.page = page;
-    // Navigation buttons use specific titles
-    this.boardViewButton = page.getByTitle('Board View');
-    this.treeViewButton = page.getByTitle('Tree View');
-    this.timeStatsButton = page.getByTitle('Time Stats');
-    this.themeToggle = page.getByTitle('Toggle Dark Mode');
+    // Navigation buttons use specific titles - use first() to handle desktop/mobile duplicates
+    this.boardViewButton = page.getByTitle('Board View').first();
+    this.treeViewButton = page.getByTitle('Tree View').first();
+    this.timeStatsButton = page.getByTitle('Time Stats').first();
+    this.themeToggle = page.getByTitle('Toggle Dark Mode').first();
     // Search input has specific placeholder
     this.searchInput = page.getByPlaceholder('Search tasks...');
     // Add task button - look for the button with Add Task text or Plus icon
     this.addTaskButton = page.getByRole('button', { name: /Add Task/i }).or(page.getByText('Add Task')).first();
-    // Export/Import buttons
-    this.exportButton = page.getByTitle('Export');
-    this.importButton = page.getByTitle('Import');
+    // Export/Import buttons - use first() to handle desktop/mobile duplicates
+    this.exportButton = page.getByTitle('Export').first();
+    this.importButton = page.getByTitle('Import').first();
     this.importInput = page.locator('input[type="file"]');
   }
 
@@ -73,9 +73,10 @@ export class AppPage {
   }
 
   async verifyPageLoaded() {
-    await expect(this.boardViewButton).toBeVisible();
-    await expect(this.treeViewButton).toBeVisible();
-    await expect(this.timeStatsButton).toBeVisible();
+    // Use first() to handle desktop/mobile duplicates
+    await expect(this.page.getByTitle('Board View').first()).toBeVisible();
+    await expect(this.page.getByTitle('Tree View').first()).toBeVisible();
+    await expect(this.page.getByTitle('Time Stats').first()).toBeVisible();
   }
 
   async verifyCurrentView(view: 'board' | 'tree' | 'stats') {
@@ -91,8 +92,8 @@ export class AppPage {
         await expect(this.page.getByTestId('tree-view-container')).toBeVisible();
         break;
       case 'stats':
-        // Verify stats view by looking for characteristic elements
-        await expect(this.page.getByText(/Time Tracking Statistics/i)).toBeVisible();
+        // Verify stats view by looking for characteristic elements - use first() for duplicates
+        await expect(this.page.getByText(/Time Tracking Statistics/i).first()).toBeVisible();
         break;
     }
   }

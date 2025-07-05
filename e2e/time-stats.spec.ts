@@ -60,8 +60,8 @@ test.describe('Time Stats View', () => {
     await expect(appPage.page.getByRole('button', { name: 'This Year' })).toBeVisible();
     await expect(appPage.page.getByRole('button', { name: 'Custom' })).toBeVisible();
 
-    // Verify Time Stats title/header is visible
-    await expect(appPage.page.getByText(/Time Tracking Statistics/i)).toBeVisible();
+    // Verify Time Stats title/header is visible - use first() to handle duplicates
+    await expect(appPage.page.getByText(/Time Tracking Statistics/i).first()).toBeVisible();
   });
 
   test('should filter time stats by "Today"', async () => {
@@ -79,8 +79,8 @@ test.describe('Time Stats View', () => {
     // Verify Today filter is active (using correct indigo classes)
     await expect(todayFilter).toHaveClass(/bg-indigo-100.*text-indigo-700|text-indigo-700.*bg-indigo-100/);
 
-    // Verify that today's data is shown
-    await expect(appPage.page.getByText('Today Task')).toBeVisible();
+    // Verify that today's data is shown - use first() to handle duplicates
+    await expect(appPage.page.getByText('Today Task').first()).toBeVisible();
     
     // Verify some time stats are displayed
     const timeElements = appPage.page.locator('text=/\\d+:\\d+|\\d+h|\\d+m|\\d+ seconds/');
@@ -102,8 +102,8 @@ test.describe('Time Stats View', () => {
     // Verify This Week filter is active (using correct indigo classes)
     await expect(weekFilter).toHaveClass(/bg-indigo-100.*text-indigo-700|text-indigo-700.*bg-indigo-100/);
 
-    // Verify that this week's data is shown
-    await expect(appPage.page.getByText('Week Task')).toBeVisible();
+    // Verify that this week's data is shown - use first() to handle duplicates
+    await expect(appPage.page.getByText('Week Task').first()).toBeVisible();
     
     // Verify some time stats are displayed
     const timeElements = appPage.page.locator('text=/\\d+:\\d+|\\d+h|\\d+m|\\d+ seconds/');
@@ -125,8 +125,8 @@ test.describe('Time Stats View', () => {
     // Verify This Month filter is active (using correct indigo classes)
     await expect(monthFilter).toHaveClass(/bg-indigo-100.*text-indigo-700|text-indigo-700.*bg-indigo-100/);
 
-    // Verify that this month's data is shown
-    await expect(appPage.page.getByText('Month Task')).toBeVisible();
+    // Verify that this month's data is shown - use first() to handle duplicates
+    await expect(appPage.page.getByText('Month Task').first()).toBeVisible();
     
     // Verify some time stats are displayed
     const timeElements = appPage.page.locator('text=/\\d+:\\d+|\\d+h|\\d+m|\\d+ seconds/');
@@ -148,8 +148,8 @@ test.describe('Time Stats View', () => {
     // Verify This Year filter is active (using correct indigo classes)
     await expect(yearFilter).toHaveClass(/bg-indigo-100.*text-indigo-700|text-indigo-700.*bg-indigo-100/);
 
-    // Verify that this year's data is shown
-    await expect(appPage.page.getByText('Year Task')).toBeVisible();
+    // Verify that this year's data is shown - use first() to handle duplicates
+    await expect(appPage.page.getByText('Year Task').first()).toBeVisible();
     
     // Verify some time stats are displayed
     const timeElements = appPage.page.locator('text=/\\d+:\\d+|\\d+h|\\d+m|\\d+ seconds/');
@@ -258,8 +258,8 @@ test.describe('Time Stats View', () => {
       await expect(timePatterns.first()).toBeVisible();
     }
 
-    // Verify tasks with recorded time are visible in stats
-    await expect(appPage.page.getByText('Stats Data Task 1')).toBeVisible();
-    await expect(appPage.page.getByText('Stats Data Task 2')).toBeVisible();
+    // Verify tasks with recorded time are visible in stats - use first() to handle duplicates
+    await expect(appPage.page.getByText('Stats Data Task 1').first()).toBeVisible();
+    await expect(appPage.page.getByText('Stats Data Task 2').first()).toBeVisible();
   });
 });

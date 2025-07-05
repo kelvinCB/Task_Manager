@@ -47,8 +47,8 @@ test.describe('Task Filtering', () => {
       
       await filterButton.click();
       
-      // Wait for the filters to be visible
-      await expect(statusLabel).toBeVisible({ timeout: 5000 });
+      // Wait for the filters to be visible - use first() to handle duplicates
+      await expect(statusLabel.first()).toBeVisible({ timeout: 5000 });
       await appPage.page.waitForTimeout(500); // Small wait for UI to settle
     }
   }
