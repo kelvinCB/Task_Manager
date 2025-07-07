@@ -65,10 +65,9 @@ export class AppPage {
           await button.click({ force });
           await this.page.waitForTimeout(1000);
           viewSwitched = true;
-          console.log(`Successfully clicked ${view} view button ${i}`);
           break;
         } catch (e) {
-          console.log(`Failed to click ${view} view button ${i}: ${e.message}`);
+          // Continue to next button
         }
       }
     }

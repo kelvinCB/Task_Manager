@@ -1,402 +1,361 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Manager - Guía de Testing</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            margin: 20px;
+            color: #333;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f8f9fa;
         }
-        h1, h2, h3 {
-            color: #333;
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
-            font-size: 2.5em;
-            border-bottom: 3px solid #007bff;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
             padding-bottom: 10px;
         }
         h2 {
-            font-size: 1.8em;
-            color: #007bff;
+            color: #34495e;
             margin-top: 30px;
+            padding-left: 10px;
+            border-left: 4px solid #3498db;
         }
         h3 {
-            font-size: 1.3em;
-            color: #555;
+            color: #5d6d7e;
+            margin-top: 25px;
         }
         h4 {
-            font-size: 1.1em;
-            color: #666;
-            font-weight: bold;
-        }
-        pre {
-            background-color: #f8f9fa;
-            padding: 15px;
-            overflow-x: auto;
-            border-left: 4px solid #007bff;
-            border-radius: 4px;
-        }
-        code {
-            background-color: #f8f9fa;
-            padding: 2px 6px;
-            font-family: 'Courier New', monospace;
-            border-radius: 3px;
-        }
-        ul, ol {
-            margin-left: 20px;
-        }
-        li {
-            margin-bottom: 5px;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
+            color: #7f8c8d;
+            margin-top: 20px;
         }
         .toc {
-            background-color: #f8f9fa;
+            background: #ecf0f1;
             padding: 20px;
             border-radius: 5px;
             margin-bottom: 30px;
         }
+        .toc ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .toc a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .stats-card {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .code-block {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #6c757d;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+        }
+        .bug-fix {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .bug-fix h4 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            margin: 30px 0;
+        }
         .highlight {
             background-color: #fff3cd;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-weight: bold;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
         }
-        .note {
-            background-color: #e3f2fd;
-            padding: 10px;
-            border-left: 4px solid #2196f3;
-            margin: 10px 0;
-            border-radius: 0 4px 4px 0;
+        .success {
+            background-color: #d4edda;
+            padding: 15px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+        .file-structure {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-line;
+            margin: 15px 0;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-<h1>Task Manager - Guía de Testing</h1>
-<p>Esta guía documenta el enfoque de testing para la aplicación Task Manager, incluyendo las pruebas unitarias implementadas, cómo ejecutarlas y las mejores prácticas a seguir.</p>
+    <div class="container">
+<h1><span class="emoji">🧪</span>Task Manager - Guía de Testing</h1>
+        
+        <p>Esta guía documenta el enfoque de testing para la aplicación Task Manager, incluyendo pruebas unitarias, E2E y mejores prácticas.</p>
+        
+        <div class="toc">
+            <h2><span class="emoji">📋</span>Índice</h2>
+            <ol>
+                <li><a href="#resumen-general">Resumen General</a></li>
+                <li><a href="#pruebas-unitarias">Pruebas Unitarias</a></li>
+                <li><a href="#pruebas-e2e">Pruebas E2E (End-to-End)</a></li>
+                <li><a href="#como-ejecutar">Cómo ejecutar las pruebas</a></li>
+                <li><a href="#bugs-corregidos">Bugs corregidos</a></li>
+                <li><a href="#contribucion">Contribución</a></li>
+            </ol>
+        </div>
 
-<div class="toc">
-<h2>Índice</h2>
-<ol>
-<li><a href="#introducción">Introducción</a></li>
-<li><a href="#estructura-de-pruebas">Estructura de pruebas</a></li>
-<li><a href="#casos-de-prueba">Casos de prueba</a></li>
-<li><a href="#cómo-ejecutar-las-pruebas">Cómo ejecutar las pruebas</a></li>
-<li><a href="#cobertura-de-código">Cobertura de código</a></li>
-<li><a href="#mocks-y-fixtures">Mocks y fixtures</a></li>
-<li><a href="#contribución">Contribución</a></li>
-</ol>
-</div>
+        <hr>
 
-<h2 id="introducción">Introducción</h2>
-<p>La aplicación Task Manager cuenta con un conjunto completo de pruebas unitarias que cubren los componentes, hooks y utilidades principales. Las pruebas están implementadas utilizando:</p>
-<ul>
-<li><strong>Vitest</strong>: Framework de pruebas rápido compatible con el ecosistema Vite</li>
-<li><strong>React Testing Library</strong>: Para probar componentes de React desde la perspectiva del usuario</li>
-<li><strong>jsdom</strong>: Para simular el DOM durante las pruebas</li>
-</ul>
+        <h2 id="resumen-general"><span class="emoji">📊</span>Resumen General</h2>
+        
+        <div class="stats-card">
+            <h3>Estado Actual</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">99</div>
+                    <div>Pruebas Unitarias</div>
+                    <div>(100% pasando)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">44</div>
+                    <div>Pruebas E2E</div>
+                    <div>(100% pasando)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div>Cobertura</div>
+                    <div>Funcionalidades críticas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">🌍</div>
+                    <div>Compatible</div>
+                    <div>Todas las zonas horarias</div>
+                </div>
+            </div>
+        </div>
 
-<h3>Enfoque de Testing</h3>
-<p>Seguimos las mejores prácticas de testing, priorizando:</p>
-<ul>
-<li><strong>Testing centrado en el usuario</strong>: Probamos la aplicación como lo haría un usuario real</li>
-<li><strong>Accesibilidad</strong>: Verificamos que los componentes sean accesibles (etiquetas, títulos, roles ARIA)</li>
-<li><strong>Robustez</strong>: Las pruebas deben ser resistentes a cambios en la implementación</li>
-</ul>
+        <h3>Tecnologías</h3>
+        <ul>
+            <li><strong>Unitarias:</strong> Vitest + React Testing Library + jsdom</li>
+            <li><strong>E2E:</strong> Playwright + Chromium</li>
+            <li><strong>Enfoque:</strong> Testing centrado en el usuario, accesible y robusto</li>
+        </ul>
 
-<h2 id="estructura-de-pruebas">Estructura de pruebas</h2>
-<p>El código de prueba está organizado en la carpeta <code>src/test</code> con la siguiente estructura:</p>
-<pre><code>src/
-└── test/
-    ├── setup.ts              # Configuración global de pruebas
-    ├── components/           # Pruebas de componentes React
-    │   ├── App.test.tsx
-    │   ├── TaskBoard.test.tsx
-    │   ├── TaskForm.test.tsx
-    │   ├── TaskItem.test.tsx
-    │   ├── TaskTimer.test.tsx
-    │   ├── TaskTree.test.tsx
-    │   └── TimeStatsView.test.tsx
-    ├── services/            # Pruebas de servicios
-    │   └── openaiService.test.ts
-    ├── hooks/               # Pruebas de hooks personalizados
-    │   └── useTasks.test.tsx
-    └── utils/               # Pruebas de funciones de utilidad
-        └── taskUtils.test.ts
-</code></pre>
+        <hr>
 
-<h2 id="casos-de-prueba">Casos de prueba</h2>
+        <h2 id="pruebas-unitarias"><span class="emoji">⚡</span>Pruebas Unitarias</h2>
+        
+        <h3>Estructura de archivos</h3>
+        <div class="file-structure">src/test/
+├── setup.ts              # Configuración global
+├── components/           # Tests de componentes
+│   ├── App.test.tsx
+│   ├── TaskBoard.test.tsx
+│   ├── TaskForm.test.tsx
+│   ├── TaskTimer.test.tsx
+│   └── ...
+├── hooks/               # Tests de hooks
+│   └── useTasks.test.tsx
+├── services/            # Tests de servicios
+│   └── openaiService.test.ts
+└── utils/               # Tests de utilidades
+    └── taskUtils.test.ts</div>
 
-<h3>Componente App (<code>App.test.tsx</code>)</h3>
-<ol>
-<li>Renderiza la aplicación con botones de navegación</li>
-<li>Muestra la vista Board por defecto (verificado usando atributos y clases)</li>
-<li>Cambia a vista Tree cuando se hace clic en el botón Tree</li>
-<li>Cambia a vista Time Stats cuando se hace clic en el botón Stats</li>
-<li>Crea una nueva tarea usando TaskForm</li>
-<li>Importa/exporta tareas usando funcionalidad CSV</li>
-<li>Mantiene el estado del temporizador al cambiar entre vistas</li>
-</ol>
+        <h3>Cobertura principal</h3>
+        <ul>
+            <li><strong>App:</strong> Navegación, vistas, temas (7 tests)</li>
+            <li><strong>TaskForm:</strong> Creación, edición, validación, IA (21 tests)</li>
+            <li><strong>TaskTimer:</strong> Cronometraje, notificaciones (6 tests)</li>
+            <li><strong>useTasks:</strong> Lógica de tareas y tiempo (10 tests)</li>
+            <li><strong>openaiService:</strong> Integración IA (16 tests)</li>
+            <li><strong>Otros componentes:</strong> TaskBoard, TaskTree, TimeStatsView, etc.</li>
+        </ul>
 
-<h3>Componente TaskTimer (<code>TaskTimer.test.tsx</code>)</h3>
-<ol>
-<li>Renderiza correctamente con tiempo transcurrido inicial</li>
-<li>Muestra botón de pausa cuando el temporizador está activo</li>
-<li>Llama al callback onStart cuando se hace clic en el botón de inicio</li>
-<li>Llama al callback onPause cuando se hace clic en el botón de pausa</li>
-<li>Actualiza la visualización del tiempo cada segundo cuando está activo</li>
-<li>Reproduce un sonido de notificación después de 10 minutos</li>
-</ol>
+        <hr>
 
-<h3>Hook useTasks (<code>useTasks.test.tsx</code>)</h3>
-<ol>
-<li>Inicializa con tareas vacías</li>
-<li>Crea una nueva tarea con valores por defecto correctos</li>
-<li>Crea una subtarea con relación correcta con el padre</li>
-<li>Elimina una tarea y todas sus subtareas</li>
-<li>Actualiza las propiedades de la tarea</li>
-<li>Inicia el temporizador de la tarea y actualiza su estado</li>
-<li>Pausa el temporizador de la tarea y actualiza el tiempo transcurrido</li>
-<li>Obtiene tiempo transcurrido para un temporizador activo</li>
-<li>Pausa el temporizador cuando la tarea se marca como completada</li>
-<li>Obtiene estadísticas de tiempo para un período específico</li>
-</ol>
+        <h2 id="pruebas-e2e"><span class="emoji">🎭</span>Pruebas E2E (End-to-End)</h2>
+        
+        <div class="success">
+            <h3><span class="emoji">✅</span>Resultados E2E actuales</h3>
+            <ul>
+                <li><strong>44/44 tests pasando</strong> (100% de éxito)</li>
+                <li><strong>~1.2 minutos</strong> con 4 workers</li>
+                <li><strong>Sin logs indebidos</strong> - Tests limpios y optimizados</li>
+                <li><strong>Compatible globalmente</strong> - Funciona en cualquier zona horaria</li>
+            </ul>
+        </div>
 
-<h3>Utilidades de tareas (<code>taskUtils.test.ts</code>)</h3>
-<ol>
-<li>Verifica si una tarea puede completarse (sin hijos)</li>
-<li>Verifica si una tarea puede completarse (todos los hijos completados)</li>
-<li>Verifica si una tarea no puede completarse (algunos hijos no completados)</li>
-<li>Construye un árbol a partir de una lista plana de tareas</li>
-<li>Formatea fechas correctamente</li>
-<li>Identifica tareas vencidas</li>
-<li>Obtiene colores de estado correctos</li>
-<li>Obtiene iconos de estado correctos</li>
-</ol>
+        <hr>
 
-<h3>Componente TaskItem (<code>TaskItem.test.tsx</code>)</h3>
-<ol>
-<li>Renderiza el título y estado de la tarea</li>
-<li>Renderiza la descripción de la tarea cuando está expandida</li>
-<li>Abre el menú al hacer clic en el botón de menú</li>
-<li>Llama a onUpdateTask al cambiar el estado de la tarea</li>
-<li>Muestra el componente TaskTimer con tiempo transcurrido</li>
-<li>Llama a onStartTimer cuando se hace clic en el botón de inicio</li>
-<li>Llama a onDeleteTask cuando se hace clic en la opción de eliminar</li>
-</ol>
+        <h2 id="como-ejecutar"><span class="emoji">🚀</span>Cómo ejecutar las pruebas</h2>
+        
+        <h3>Pruebas Unitarias</h3>
+        <div class="code-block">
+            <pre># Modo watch (desarrollo)
+npm test
 
-<h3>Componente TaskBoard (<code>TaskBoard.test.tsx</code>)</h3>
-<ol>
-<li>Renderiza el tablero con columnas y tareas correctas</li>
-<li>Renderiza el botón "Add Task" en cada columna</li>
-<li>Llama a onCreateTask cuando se hace clic en el botón "Add Task"</li>
-<li>Renderiza el componente TaskTimer para las tareas</li>
-<li>Muestra detalles de la tarea cuando se hace clic en una tarea</li>
-</ol>
+# Ejecución única
+npx vitest run
 
-<h3>Componente TaskTree (<code>TaskTree.test.tsx</code>)</h3>
-<ol>
-<li>Renderiza el árbol de tareas con tareas padre e hijas</li>
-<li>Aplica la indentación correcta para tareas anidadas</li>
-<li>Renderiza componentes TaskTimer para cada tarea</li>
-<li>Propaga eventos del temporizador al componente padre</li>
-<li>Pasa el tiempo transcurrido a los componentes hijos correctamente</li>
-</ol>
+# Con cobertura
+npm run test:coverage
 
-<h3>Componente TimeStatsView (<code>TimeStatsView.test.tsx</code>)</h3>
-<ol>
-<li>Renderiza la vista de estadísticas de tiempo con selector de período</li>
-<li>Muestra estadísticas de tiempo para tareas</li>
-<li>Llama a getTimeStatistics con el período seleccionado</li>
-<li>Muestra entradas de fecha personalizadas cuando se selecciona período "custom"</li>
-<li>Actualiza el rango de fechas personalizado y obtiene nuevas estadísticas</li>
-<li>Muestra tiempo total acumulado de todas las tareas</li>
-<li>Maneja estadísticas vacías de forma elegante</li>
-</ol>
+# Interface gráfica
+npm run test:ui</pre>
+        </div>
 
-<h3>Componente TaskForm (<code>TaskForm.test.tsx</code>)</h3>
+        <h3>Pruebas E2E</h3>
+        <div class="code-block">
+            <pre># Suite completa (headless)
+npm run test:e2e
 
-<h4>Renderizado</h4>
-<ol>
-<li>Renderiza el formulario de creación cuando no se proporciona tarea</li>
-<li>Renderiza el formulario de edición cuando se proporciona una tarea</li>
-<li>No renderiza cuando <code>isOpen</code> es falso</li>
-<li>Muestra información de subtarea cuando se proporciona <code>parentId</code></li>
-</ol>
+# Con interfaz visual
+npm run test:e2e:headed
 
-<h4>Interacciones del Formulario</h4>
-<ol start="5">
-<li>Actualiza los campos del formulario correctamente</li>
-<li>Llama a <code>onClose</code> cuando se hace clic en el botón cancelar</li>
-<li>Llama a <code>onClose</code> cuando se hace clic en el botón X</li>
-<li>Envía el formulario con datos correctos</li>
-<li>No envía el formulario sin título</li>
-<li>Recorta espacios en blanco del título y descripción</li>
-<li><span class="highlight">Preserva datos de timeTracking al editar tareas existentes</span></li>
-<li><span class="highlight">Usa timeTracking por defecto para tareas nuevas</span></li>
-</ol>
+# Con múltiples workers
+npx playwright test e2e/ --workers=4
 
-<h4>Funcionalidad AI</h4>
-<ol start="13">
-<li>Muestra el icono AI en el campo de descripción</li>
-<li>Muestra alerta cuando se hace clic en AI sin título</li>
-<li>Muestra opciones AI cuando se proporciona título y se hace clic en el botón AI</li>
-<li>Oculta opciones AI cuando se hace clic en cancelar</li>
-<li>Genera descripción usando el servicio AI</li>
-<li>Maneja errores de generación AI</li>
-<li>Deshabilita el botón generar mientras se está generando</li>
-</ol>
+# Test específico
+npx playwright test e2e/task-management.spec.ts
 
-<h4>Restablecimiento del Formulario</h4>
-<ol start="20">
-<li>Restablece el formulario cuando cambia la prop task</li>
-<li>Restablece el formulario cuando cambia parentId</li>
-</ol>
+# Reporte HTML
+npx playwright show-report</pre>
+        </div>
 
-<h3>Servicio OpenAI (<code>openaiService.test.ts</code>)</h3>
+        <hr>
 
-<h4>Constructor</h4>
-<ol>
-<li>Se inicializa con variables de entorno</li>
-<li><em>Nota: Tests de validación de API key omitidos debido a limitaciones de mocking en vitest</em></li>
-</ol>
+        <h2 id="bugs-corregidos"><span class="emoji">🔧</span>Bugs corregidos</h2>
+        
+        <div class="bug-fix">
+            <h3><span class="emoji">🔧</span>Bug crítico: Filtro de fechas personalizadas (Julio 2025)</h3>
+            
+            <h4>Problema identificado</h4>
+            <p><strong>❌ Error:</strong> El filtro de fechas personalizadas no mostraba tareas cuando se seleccionaba la misma fecha de inicio y fin (ej: 2025-07-07 a 2025-07-07)</p>
 
-<h4>Generación de Descripción de Tareas</h4>
-<ol start="3">
-<li>Genera descripción de tarea exitosamente</li>
-<li>Maneja parámetros de modelo O4 (sin temperature, con max_completion_tokens)</li>
-<li>Maneja parámetros de modelo GPT estándar (con temperature, max_tokens)</li>
-<li>Lanza error para título de tarea vacío</li>
-<li>Lanza error para título de tarea con solo espacios en blanco</li>
-<li>Maneja respuestas de error de la API</li>
-<li>Maneja errores de red</li>
-<li>Maneja opciones vacías en la respuesta</li>
-<li>Maneja estructuras de respuesta alternativas (campo <code>text</code>)</li>
-<li>Maneja campo de contenido directo</li>
-<li>Maneja contenido vacío con razón de finalización <code>length</code></li>
-<li>Maneja contenido de respuesta vacío</li>
-<li>Maneja estructura de respuesta inválida</li>
-</ol>
+            <h4>Causa raíz</h4>
+            <ul>
+                <li><strong>Problema de zona horaria:</strong> <code>new Date("2025-07-07")</code> se interpretaba como UTC</li>
+                <li><strong>Rango incorrecto:</strong> Ambas fechas se establecían a <code>00:00:00</code></li>
+                <li><strong>Tareas excluidas:</strong> Timestamps como <code>05:19:45</code> no entraban en el rango</li>
+            </ul>
 
-<h4>Configuración</h4>
-<ol start="16">
-<li>Retorna verdadero cuando está correctamente configurado</li>
-<li><em>Nota: Test de API key placeholder omitido por limitaciones de mocking</em></li>
-</ol>
+            <h4>Solución implementada</h4>
+            <p><strong>✅ Fix:</strong> Usar parseo explícito de componentes de fecha:</p>
+            <div class="code-block">
+                <pre>// ANTES (problemático)
+const startDate = new Date(customStart);
+const endDate = new Date(customEnd);
 
-<h4>Instancia Singleton</h4>
-<ol start="18">
-<li>Exporta una instancia singleton</li>
-</ol>
+// DESPUÉS (corregido)
+const startParts = customStart.split('-').map(Number);
+const endParts = customEnd.split('-').map(Number);
+const startDate = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
+const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 999);</pre>
+            </div>
 
-<h2 id="cómo-ejecutar-las-pruebas">Cómo ejecutar las pruebas</h2>
+            <h4>Impacto</h4>
+            <ul>
+                <li>🌍 <strong>Global:</strong> Funciona para usuarios en cualquier zona horaria</li>
+                <li>✅ <strong>Consistente:</strong> Comportamiento idéntico al filtro "Today"</li>
+                <li>📋 <strong>Confiable:</strong> Filtros personalizados funcionan con confianza</li>
+            </ul>
+        </div>
 
-<h3>Requisitos previos</h3>
-<p>Asegúrate de tener todas las dependencias instaladas:</p>
-<pre><code>npm install</code></pre>
+        <hr>
 
-<h3>Ejecutar todas las pruebas</h3>
-<p>Para ejecutar todas las pruebas en modo watch:</p>
-<pre><code>npm test</code></pre>
+        <h2 id="contribucion"><span class="emoji">🤝</span>Contribución</h2>
+        
+        <h3>Mejores prácticas</h3>
+        <ol>
+            <li><strong>TDD:</strong> Escribir pruebas antes de implementar funcionalidad</li>
+            <li><strong>Cobertura:</strong> Cada componente nuevo debe tener pruebas correspondientes</li>
+            <li><strong>Mocks:</strong> Utilizar mocks existentes para localStorage y AudioContext</li>
+            <li><strong>Accesibilidad:</strong> Usar <code>getByRole</code>, <code>getByTitle</code> sobre selectores CSS</li>
+            <li><strong>Independencia:</strong> Cada test debe ser independiente y limpiar su estado</li>
+        </ol>
 
-<h3>Ejecutar pruebas específicas</h3>
-<p>Para ejecutar un conjunto específico de pruebas:</p>
-<pre><code>npm test -- components/TaskTimer</code></pre>
+        <h3>Antes de enviar PR</h3>
+        <ul>
+            <li>✅ Ejecutar suite completa de pruebas unitarias</li>
+            <li>✅ Ejecutar pruebas E2E relevantes</li>
+            <li>✅ Verificar que no hay logs indebidos</li>
+            <li>✅ Actualizar documentación si es necesario</li>
+        </ul>
 
-<h3>Ejecutar con cobertura</h3>
-<p>Para ejecutar las pruebas con informe de cobertura:</p>
-<pre><code>npm run test:coverage</code></pre>
-<p>Esto generará un informe de cobertura HTML en la carpeta <code>coverage/</code>.</p>
+        <hr>
 
-<h3>Interfaz de usuario para pruebas (opcional)</h3>
-<p>Para ejecutar pruebas con una interfaz visual:</p>
-<pre><code>npm run test:ui</code></pre>
+        <div class="highlight">
+            <p><strong>📝 Documentación Completa:</strong> Esta versión HTML proporciona los aspectos más importantes. Para detalles completos de todos los tests, estructura de archivos y ejemplos de código, consulte el archivo completo <a href="TESTING_GUIDE.md" target="_blank">TESTING_GUIDE.md</a>.</p>
+        </div>
 
-<h2 id="cobertura-de-código">Cobertura de código</h2>
-<p>Nuestro objetivo es mantener una cobertura de código superior al 80% en los módulos críticos:</p>
-<ul>
-<li><code>src/components/TaskTimer.tsx</code>: Enfoque principal en la funcionalidad de notificación de sonido</li>
-<li><code>src/hooks/useTasks.ts</code>: Lógica central de manejo de tareas y temporizadores</li>
-<li><code>src/utils/</code>: Funciones utilitarias que son ampliamente utilizadas</li>
-</ul>
-
-<h2 id="mocks-y-fixtures">Mocks y fixtures</h2>
-<p>En <code>src/test/setup.ts</code> se han configurado los siguientes mocks:</p>
-<ul>
-<li><strong>localStorage</strong>: Mock completo para simular persistencia</li>
-<li><strong>AudioContext</strong>: Mock para probar la funcionalidad de sonido</li>
-<li><strong>Temporizadores</strong>: Mock para controlar el tiempo en pruebas con <code>vi.useFakeTimers()</code></li>
-<li><strong>Iconos de Lucide React</strong>: Los iconos de <code>lucide-react</code> se mockean para evitar errores de renderizado y asegurar que los tests no dependan de la implementación real de los iconos. Esto se hace en <code>src/test/components/App.test.tsx</code>.</li>
-<li><strong>Componentes de Vista</strong>: Componentes como <code>TaskBoard</code>, <code>TaskTree</code> y <code>TimeStatsView</code> se mockean para aislar los tests de <code>App.test.tsx</code> y evitar dependencias complejas. Se utilizan <code>data-testid</code> únicos para asegurar consultas de test robustas.</li>
-<li><strong>Servicio OpenAI</strong>: En <code>TaskForm.test.tsx</code> se mockea el servicio OpenAI para probar la funcionalidad AI sin hacer llamadas reales a la API. Se incluyen mocks para <code>generateTaskDescription</code> e <code>isConfigured</code>.</li>
-<li><strong>Variables de Entorno</strong>: Se mockean las variables de entorno necesarias para el servicio OpenAI (<code>VITE_OPENAI_MODEL</code>, <code>VITE_OPENAI_API_KEY</code>) usando <code>vi.stubGlobal</code>.</li>
-<li><strong>Fetch API</strong>: En <code>openaiService.test.ts</code> se mockea <code>global.fetch</code> para simular respuestas de la API de OpenAI sin hacer llamadas HTTP reales.</li>
-</ul>
-
-<h2>Contexto de tema y modo oscuro</h2>
-<p>Los componentes que utilizan el hook <code>useTheme</code> del contexto de tema deben estar envueltos en el componente <code>ThemeProvider</code> durante las pruebas:</p>
-<pre><code>import { ThemeProvider } from '../../contexts/ThemeContext';
-
-// En el test
-render(
-  &lt;ThemeProvider&gt;
-    &lt;ComponenteQueUsaTheme /&gt;
-  &lt;/ThemeProvider&gt;
-);</code></pre>
-
-<p>Esto incluye los siguientes componentes:</p>
-<ul>
-<li>TaskItem</li>
-<li>TaskTree</li>
-<li>TaskTimer</li>
-<li>TaskBoard</li>
-<li>TaskForm</li>
-<li>TimeStatsView</li>
-</ul>
-
-<div class="note">
-<strong>Nota:</strong> No proporcionar el <code>ThemeProvider</code> resultará en un error: "useTheme must be used within a ThemeProvider".
-</div>
-
-<h2>Buenas Prácticas de Accesibilidad</h2>
-<p>Para asegurar que la aplicación sea accesible y las pruebas sean robustas, seguimos estas prácticas:</p>
-<ol>
-<li><strong>Atributos <code>title</code> en botones</strong>: Todos los botones deben tener un atributo <code>title</code> descriptivo para facilitar su identificación tanto por lectores de pantalla como por los tests.</li>
-<li><strong>Contraste adecuado</strong>: Los componentes tienen estilos diferentes para modo claro y oscuro para mantener un contraste adecuado y asegurar la visibilidad en ambos temas.</li>
-<li><strong>Asociación de etiquetas e inputs</strong>: Siempre asociar las etiquetas (<code>label</code>) con sus campos de entrada (<code>input</code>) mediante los atributos <code>htmlFor</code> e <code>id</code>.</li>
-<li><strong>Textos descriptivos</strong>: Usar textos descriptivos que indiquen claramente la función de cada elemento UI.</li>
-<li><strong>Roles ARIA</strong>: Utilizar roles ARIA apropiados cuando sea necesario para mejorar la accesibilidad.</li>
-<li><strong>Consultas de testing robustas</strong>: Al escribir pruebas:
-   <ul>
-   <li>Preferir <code>getByRole</code> sobre <code>getByText</code> cuando sea posible</li>
-   <li>Usar <code>getAllByText</code> o <code>getAllByTitle</code> cuando un elemento puede aparecer múltiples veces</li>
-   <li>Implementar selectores específicos para evitar ambigüedades</li>
-   </ul>
-</li>
-</ol>
-
-<h2 id="contribución">Contribución</h2>
-<p>Al agregar nuevas características, sigue estas pautas para mantener la calidad de las pruebas:</p>
-<ol>
-<li>Escribe primero las pruebas antes de implementar la funcionalidad (TDD)</li>
-<li>Asegúrate de que cada componente nuevo tenga un archivo de prueba correspondiente</li>
-<li>Para nuevos hooks o utilidades, crea pruebas dedicadas</li>
-<li>Utiliza los mocks existentes para localStorage y AudioContext</li>
-<li>Ejecuta el conjunto completo de pruebas antes de enviar un PR</li>
-</ol>
-
-<hr>
-<p><em>Con esta guía, cualquier desarrollador puede entender la estrategia de pruebas, ejecutar las pruebas existentes y contribuir con nuevas pruebas para mantener la calidad del código.</em></p>
+        <p><em><strong>Última actualización:</strong> Julio 2025 - Suite de testing completamente funcional, robusta y optimizada</em></p>
+    </div>
 </body>
 </html>

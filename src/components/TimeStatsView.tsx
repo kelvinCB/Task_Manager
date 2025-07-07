@@ -17,7 +17,17 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
 
   useEffect(() => {
     if (isCustom && customStart && customEnd) {
-      const timeStats = getTimeStatistics('custom', new Date(customStart), new Date(customEnd));
+      // Parse date components to avoid timezone issues
+      const startParts = customStart.split('-').map(Number); // [2025, 7, 7]
+      const endParts = customEnd.split('-').map(Number);     // [2025, 7, 7]
+      
+      // Create dates using the same method as "Today" filter (local timezone)
+      // Note: Month is 0-indexed in JavaScript Date constructor
+      const startDate = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
+      const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 999);
+      
+      
+      const timeStats = getTimeStatistics('custom', startDate, endDate);
       setStats(timeStats);
     } else {
       const timeStats = getTimeStatistics(period);

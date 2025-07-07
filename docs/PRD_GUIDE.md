@@ -125,9 +125,8 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
 | **Frontend Unit Tests** | ✅ Complete | 100% | Comprehensive Vitest tests with timezone handling |
-|| **E2E Tests** | ✅ Complete | 100% | 44/44 Playwright E2E tests (consolidados y optimizados) |
-| **Test Debugging** | ✅ Complete | 100% | Visual debugging strategy with screenshots |
-| **Test Documentation** | ✅ Complete | 100% | Comprehensive TESTING_GUIDE.md |
+| **E2E Tests** | ✅ Complete | 100% | 44/44 Playwright E2E tests passing (all cleaned and optimized) |
+| **Test Debugging** | ✅ Complete | 100% | Visual debugging strategy with screenshots | |
 | **Backend Unit Tests** | ❌ Pending | 0% | Backend component testing |
 | **Integration Tests** | ❌ Pending | 0% | API integration testing |
 | **Performance Tests** | ❌ Pending | 0% | Load and performance testing |
