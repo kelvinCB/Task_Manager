@@ -191,11 +191,13 @@ describe('TaskItem Component', () => {
     );
     
     // Assert - Verificar que se muestra el tiempo formateado (01:00:00 para 3600000ms)
-    expect(screen.getByText('01:00:00')).toBeInTheDocument();
+    // Ahora tenemos versiones mobile y desktop, usamos getAllByText
+    const timeDisplays = screen.getAllByText('01:00:00');
+    expect(timeDisplays.length).toBeGreaterThan(0);
     
-    // Verificar que se muestra el botón de pausa
-    const pauseButton = screen.getByTitle('Pause timer');
-    expect(pauseButton).toBeInTheDocument();
+    // Verificar que se muestra el botón de pausa (puede haber múltiples)
+    const pauseButtons = screen.getAllByTitle('Pause timer');
+    expect(pauseButtons.length).toBeGreaterThan(0);
   });
   
   it('should call onStartTimer when play button is clicked', () => {
@@ -219,9 +221,10 @@ describe('TaskItem Component', () => {
       </ThemeProvider>
     );
     
-    // Clic en el botón de iniciar temporizador
-    const playButton = screen.getByTitle('Start timer');
-    fireEvent.click(playButton);
+    // Clic en el botón de iniciar temporizador (tomar el primero disponible)
+    const playButtons = screen.getAllByTitle('Start timer');
+    expect(playButtons.length).toBeGreaterThan(0);
+    fireEvent.click(playButtons[0]);
     
     // Assert
     expect(mockOnStartTimer).toHaveBeenCalledWith('task-1');
