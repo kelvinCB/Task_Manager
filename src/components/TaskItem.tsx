@@ -182,8 +182,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                             : theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                         }`}>
                           <Calendar size={12} />
-                          <span>Due {formatDate(task.dueDate)}</span>
-                          {isOverdue && <span className="text-red-600 font-semibold">• Overdue</span>}
+                          <span>Due {formatDate(task.dueDate)}{isOverdue ? ' • Overdue' : ''}</span>
                         </div>
                       ) : (
                         <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -203,7 +202,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                     )}
                   </div>
                   
-                  {/* Second Row: Timer when not active, or secondary info */}
+                  {/* Timer section */}
+                  
+                  {/* Timer when not active */}
                   {onStartTimer && onPauseTimer && getElapsedTime && !task.timeTracking.isActive && (
                     <div className="flex items-center justify-between">
                       <TaskTimer
@@ -213,17 +214,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                         onStart={onStartTimer}
                         onPause={onPauseTimer}
                       />
-                      {task.dueDate && (
-                        <div className={`flex items-center gap-1 text-xs ${
-                          isOverdue 
-                            ? 'text-red-600 font-medium' 
-                            : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                        }`}>
-                          <Calendar size={12} />
-                          <span>Due {formatDate(task.dueDate)}</span>
-                          {isOverdue && <span className="text-red-600">• Overdue</span>}
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
