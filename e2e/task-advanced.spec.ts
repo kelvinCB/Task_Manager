@@ -33,17 +33,16 @@ test.describe('Task Advanced Features', () => {
 
 
   test('should create a task with due date', async () => {
-    // Open task creation modal
-    await appPage.openAddTaskModal();
-    await taskPage.verifyModalOpen();
-
-    // Create task with due date (using a future date in 2025)
     const taskData = {
       title: 'Task with Due Date',
       description: 'This task has a due date',
-      dueDate: '2025-12-30'  // Future date (using Dec 30 to avoid timezone issues)
+      dueDate: '2025-12-30'
     };
 
+    // Open task creation modal
+    await appPage.openAddTaskModal();
+    await taskPage.verifyModalOpen();
+    
     await taskPage.createTask(taskData);
     await taskPage.verifyModalClosed();
 
@@ -51,30 +50,39 @@ test.describe('Task Advanced Features', () => {
     await expect(appPage.page.getByText(taskData.title)).toBeVisible();
     await expect(appPage.page.getByText(taskData.description)).toBeVisible();
     
-    // Switch to Tree View to see the due date (it shows in Tree View now, and we also added it to Board View)
+    // Switch to Tree View to verify due date
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
     
     // Verify due date functionality is working - validate complete date components
-    // Look for the specific task containing all date components
     const taskContainer = appPage.page.locator('.group').filter({ hasText: taskData.title });
     await expect(taskContainer).toBeVisible();
     
-    // Validate specific date components within this task's context: year, month, and day
-    // Dec 30, 2025 can be displayed in various formats, so we check for all components
-    // Look specifically for the due date span element within this task
-    const dueDateElement = taskContainer.locator('span').filter({ hasText: /Due.*2025/ });
-    await expect(dueDateElement).toBeVisible(); // Due label with year
+    // Find all due date elements and check which are visible (handles responsive dual layout)
+    const allDueDateElements = taskContainer.locator('span').filter({ hasText: /Due.*2025/ });
+    const elementCount = await allDueDateElements.count();
+    
+    let visibleDueDateElement = null;
+    for (let i = 0; i < elementCount; i++) {
+      const element = allDueDateElements.nth(i);
+      const isVisible = await element.isVisible();
+      if (isVisible && !visibleDueDateElement) {
+        visibleDueDateElement = element;
+      }
+    }
+    
+    // Ensure we found a visible element
+    expect(visibleDueDateElement).not.toBeNull();
+    await expect(visibleDueDateElement!).toBeVisible();
     
     // Validate the complete due date string contains all components
-    const dueDateText = await dueDateElement.textContent();
+    const dueDateText = await visibleDueDateElement.textContent();
     expect(dueDateText).toContain('Due');
-    expect(dueDateText).toContain('2025'); // Year
-    expect(dueDateText).toMatch(/Dec|December|12/); // Month (Dec/December/12)
-    // Day should be 29 or 30 depending on timezone
-    expect(dueDateText).toMatch(/29|30/); // Day (could be 29 or 30 due to timezone)
+    expect(dueDateText).toContain('2025');
+    expect(dueDateText).toMatch(/Dec|December|12/);
+    expect(dueDateText).toMatch(/29|30/); // Day could be 29 or 30 due to timezone
     
-    // Also verify it shows in Board View now with our fix
+    // Also verify it shows in Board View
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
     
@@ -82,16 +90,16 @@ test.describe('Task Advanced Features', () => {
     const boardTaskContainer = appPage.page.locator('.bg-white.rounded-lg.shadow-sm.p-4').filter({ hasText: taskData.title });
     await expect(boardTaskContainer).toBeVisible();
     
-    // Verify due date is also displayed in Board View with complete date validation
-    const boardDueDateElement = boardTaskContainer.locator('span').filter({ hasText: /Due.*2025/ });
+    // Verify due date is also displayed in Board View
+    const boardDueDateElement = boardTaskContainer.locator('span').filter({ hasText: /Due.*2025/ }).first();
     await expect(boardDueDateElement).toBeVisible();
     
     // Validate the complete due date string in Board View
     const boardDueDateText = await boardDueDateElement.textContent();
     expect(boardDueDateText).toContain('Due');
-    expect(boardDueDateText).toContain('2025'); // Year
-    expect(boardDueDateText).toMatch(/Dec|December|12/); // Month
-    expect(boardDueDateText).toMatch(/29|30/); // Day (could be 29 or 30 due to timezone)
+    expect(boardDueDateText).toContain('2025');
+    expect(boardDueDateText).toMatch(/Dec|December|12/);
+    expect(boardDueDateText).toMatch(/29|30/);
   });
 
   test('should validate date format in different views', async () => {
@@ -147,11 +155,26 @@ test.describe('Task Advanced Features', () => {
       
       // Validate complete date components in Tree View within the task context
       // Look for the due date element specifically
-      const treeDueDateElement = treeTaskContainer.locator('span').filter({ hasText: new RegExp(`Due.*${year}`) });
-      await expect(treeDueDateElement).toBeVisible();
+      // Try to find any visible due date element
+      const allTreeDueDateElements = treeTaskContainer.locator('span').filter({ hasText: new RegExp(`Due.*${year}`) });
+      const treeElementCount = await allTreeDueDateElements.count();
+      
+      let visibleTreeDueDateElement = null;
+      for (let i = 0; i < treeElementCount; i++) {
+        const element = allTreeDueDateElements.nth(i);
+        const isVisible = await element.isVisible();
+        if (isVisible) {
+          visibleTreeDueDateElement = element;
+          break;
+        }
+      }
+      
+      // Ensure we found a visible element
+      expect(visibleTreeDueDateElement).not.toBeNull();
+      await expect(visibleTreeDueDateElement!).toBeVisible();
       
       // Get the complete due date text and validate all components
-      const treeDueDateText = await treeDueDateElement.textContent();
+      const treeDueDateText = await visibleTreeDueDateElement.textContent();
       expect(treeDueDateText).toContain('Due');
       expect(treeDueDateText).toContain(year);
       expect(treeDueDateText).toContain(day);
@@ -176,7 +199,7 @@ test.describe('Task Advanced Features', () => {
       await expect(boardTaskContainer).toBeVisible();
       
       // Validate complete date components in Board View within the task context
-      const boardDueDateElement = boardTaskContainer.locator('span').filter({ hasText: new RegExp(`Due.*${year}`) });
+      const boardDueDateElement = boardTaskContainer.locator('span').filter({ hasText: new RegExp(`Due.*${year}`) }).first();
       await expect(boardDueDateElement).toBeVisible();
       
       // Get the complete due date text and validate all components

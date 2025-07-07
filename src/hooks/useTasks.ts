@@ -509,6 +509,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
         const entryStart = new Date(entry.startTime);
         const entryEnd = entry.endTime ? new Date(entry.endTime) : now;
         
+        
         // Check if this entry falls within our time period
         if (entryStart >= startDate && entryStart <= endDate) {
           const duration = entry.duration || (entryEnd.getTime() - entryStart.getTime());

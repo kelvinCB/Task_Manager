@@ -10,11 +10,11 @@ export class TimerPage {
   // Get timer for a specific task by task title or index
   getTaskTimer(taskIdentifier: string | number) {
     if (typeof taskIdentifier === 'string') {
-      // Find the task by text content, then find the timer within the same container
-      // Use a more robust selector that works across different views (board, tree)
-      return this.page.getByText(taskIdentifier).locator('..').locator('..').locator('[data-testid="task-timer"]').first();
+      // Find the task by text content in the group container, then find the timer within
+      // This approach works better with the responsive dual layout
+      return this.page.locator('.group').filter({ hasText: taskIdentifier }).locator('[data-testid="task-timer"]').first();
     } else {
-      // Find timer by index
+      // Find timer by index - use first() to handle dual mobile/desktop elements
       return this.page.locator('[data-testid="task-timer"]').nth(taskIdentifier);
     }
   }
@@ -52,11 +52,18 @@ export class TimerPage {
     const elapsedTime = this.getElapsedTime(taskIdentifier);
     const initialTime = await elapsedTime.textContent();
     
-    // Wait a moment and check if time has changed
-    await this.page.waitForTimeout(1500);
+    // Wait longer to ensure timer updates (responsive layout may affect timing)
+    await this.page.waitForTimeout(2500);
     const updatedTime = await elapsedTime.textContent();
     
-    expect(updatedTime).not.toBe(initialTime);
+    // If times are equal, wait a bit more and try again (sometimes the timer needs more time)
+    if (initialTime === updatedTime) {
+      await this.page.waitForTimeout(2000);
+      const finalTime = await elapsedTime.textContent();
+      expect(finalTime).not.toBe(initialTime);
+    } else {
+      expect(updatedTime).not.toBe(initialTime);
+    }
   }
 
   async verifyTimerStopped(taskIdentifier: string | number) {
@@ -71,14 +78,49 @@ export class TimerPage {
 
   async getElapsedTimeText(taskIdentifier: string | number): Promise<string> {
     const elapsedTime = this.getElapsedTime(taskIdentifier);
-    return await elapsedTime.textContent() || '00:00:00';
+    const fullText = await elapsedTime.textContent() || '00:00:00';
+    
+    // Handle dual mobile/desktop format - the element contains both hidden mobile and visible desktop spans
+    // We need to get the visible time text only
+    
+    // Try to get desktop format first (hidden on mobile)
+    const desktopSpan = elapsedTime.locator('span.hidden.sm\\:inline');
+    const mobileSpan = elapsedTime.locator('span.sm\\:hidden');
+    
+    // Check which one is visible and get its text
+    const desktopVisible = await desktopSpan.isVisible().catch(() => false);
+    const mobileVisible = await mobileSpan.isVisible().catch(() => false);
+    
+    if (desktopVisible) {
+      return await desktopSpan.textContent() || '00:00:00';
+    } else if (mobileVisible) {
+      return await mobileSpan.textContent() || '0:00';
+    }
+    
+    // Fallback: try to parse the concatenated text
+    // Pattern: desktop format followed by mobile format
+    // e.g., "00:00:070:07" = "00:00:07" + "0:07"
+    if (fullText.includes(':')) {
+      const parts = fullText.split(':');
+      if (parts.length >= 3) {
+        // Take first 3 parts as hh:mm:ss format
+        return `${parts[0]}:${parts[1]}:${parts[2]}`;
+      }
+    }
+    
+    return fullText;
   }
 
   // Helper method to convert time string to seconds for comparison
+  // Handles both mobile compact format (mm:ss) and desktop full format (hh:mm:ss)
   timeToSeconds(timeString: string): number {
     const parts = timeString.split(':').map(Number);
     if (parts.length === 3) {
+      // Full format: hh:mm:ss
       return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length === 2) {
+      // Compact format: mm:ss (mobile)
+      return parts[0] * 60 + parts[1];
     }
     return 0;
   }

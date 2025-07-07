@@ -14,18 +14,18 @@ export class AppPage {
 
   constructor(page: Page) {
     this.page = page;
-    // Navigation buttons use specific titles
-    this.boardViewButton = page.getByTitle('Board View');
-    this.treeViewButton = page.getByTitle('Tree View');
-    this.timeStatsButton = page.getByTitle('Time Stats');
-    this.themeToggle = page.getByTitle('Toggle Dark Mode');
-    // Search input has specific placeholder
-    this.searchInput = page.getByPlaceholder('Search tasks...');
-    // Add task button - look for the button with Add Task text or Plus icon
-    this.addTaskButton = page.getByRole('button', { name: /Add Task/i }).or(page.getByText('Add Task')).first();
-    // Export/Import buttons
-    this.exportButton = page.getByTitle('Export');
-    this.importButton = page.getByTitle('Import');
+    // Navigation buttons use specific titles - use first() to handle desktop/mobile duplicates
+    this.boardViewButton = page.getByTitle('Board View').first();
+    this.treeViewButton = page.getByTitle('Tree View').first();
+    this.timeStatsButton = page.getByTitle('Time Stats').first();
+    this.themeToggle = page.getByTitle('Toggle Dark Mode').first();
+    // Search input - Mobile uses 'Search...', Desktop uses 'Search tasks...'
+    this.searchInput = page.getByPlaceholder('Search tasks...').or(page.getByPlaceholder('Search...')).first();
+    // Add task button - Mobile shows 'Add', Desktop shows 'Add Task'
+    this.addTaskButton = page.getByRole('button', { name: /Add/i }).first();
+    // Export/Import buttons - use first() to handle desktop/mobile duplicates
+    this.exportButton = page.getByTitle('Export').first();
+    this.importButton = page.getByTitle('Import').first();
     this.importInput = page.locator('input[type="file"]');
   }
 
@@ -33,17 +33,47 @@ export class AppPage {
     await this.page.goto('/');
   }
 
-  async switchToView(view: 'board' | 'tree' | 'stats') {
+  async switchToView(view: 'board' | 'tree' | 'stats', force = false) {
+    let buttonSelector: string;
     switch (view) {
       case 'board':
-        await this.boardViewButton.click();
+        buttonSelector = 'button[title="Board View"]';
         break;
       case 'tree':
-        await this.treeViewButton.click();
+        buttonSelector = 'button[title="Tree View"]';
         break;
       case 'stats':
-        await this.timeStatsButton.click();
+        buttonSelector = 'button[title="Time Stats"]';
         break;
+    }
+    
+    // Find all buttons and try each one until one works
+    const buttons = await this.page.locator(buttonSelector).all();
+    
+    if (buttons.length === 0) {
+      throw new Error(`No ${view} view button found`);
+    }
+    
+    let viewSwitched = false;
+    
+    for (let i = 0; i < buttons.length; i++) {
+      const button = buttons[i];
+      const isVisible = await button.isVisible().catch(() => false);
+      
+      if (isVisible || force) {
+        try {
+          await button.click({ force });
+          await this.page.waitForTimeout(1000);
+          viewSwitched = true;
+          break;
+        } catch (e) {
+          // Continue to next button
+        }
+      }
+    }
+    
+    if (!viewSwitched) {
+      throw new Error(`Could not switch to ${view} view - no button was clickable`);
     }
   }
 
@@ -73,9 +103,10 @@ export class AppPage {
   }
 
   async verifyPageLoaded() {
-    await expect(this.boardViewButton).toBeVisible();
-    await expect(this.treeViewButton).toBeVisible();
-    await expect(this.timeStatsButton).toBeVisible();
+    // Use first() to handle desktop/mobile duplicates
+    await expect(this.page.getByTitle('Board View').first()).toBeVisible();
+    await expect(this.page.getByTitle('Tree View').first()).toBeVisible();
+    await expect(this.page.getByTitle('Time Stats').first()).toBeVisible();
   }
 
   async verifyCurrentView(view: 'board' | 'tree' | 'stats') {
@@ -91,8 +122,8 @@ export class AppPage {
         await expect(this.page.getByTestId('tree-view-container')).toBeVisible();
         break;
       case 'stats':
-        // Verify stats view by looking for characteristic elements
-        await expect(this.page.getByText(/Time Tracking Statistics/i)).toBeVisible();
+        // Verify stats view by looking for characteristic elements - use first() for duplicates
+        await expect(this.page.getByText(/Time Tracking Statistics/i).first()).toBeVisible();
         break;
     }
   }

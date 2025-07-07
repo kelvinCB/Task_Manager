@@ -47,12 +47,12 @@ describe('TimeStatsView Component', () => {
     );
     
     // Assert - verificar que se muestra el título y los botones de periodo
-    expect(screen.getByText(/Time Tracking Statistics/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Today/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /This Week/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /This Month/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /This Year/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Custom/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Time Tracking Statistics/i)).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByRole('button', { name: /Today/i })).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByRole('button', { name: /This Week/i })).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByRole('button', { name: /This Month/i })).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByRole('button', { name: /This Year/i })).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByRole('button', { name: /Custom/i })).toHaveLength(2); // Desktop (Custom) + Mobile (Custom Range)
   });
   
   it('should show time stats for tasks', () => {
@@ -64,12 +64,12 @@ describe('TimeStatsView Component', () => {
     );
     
     // Assert - verificar que se muestran los datos de las tareas
-    expect(screen.getByText('Task 1')).toBeInTheDocument();
-    expect(screen.getByText('Task 2')).toBeInTheDocument();
+    expect(screen.getAllByText('Task 1')).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByText('Task 2')).toHaveLength(2); // Desktop + Mobile
     
     // Verificar que se muestran las duraciones formateadas (formato h m s)
-    expect(screen.getByText('1h 0m 0s')).toBeInTheDocument(); // 1h
-    expect(screen.getByText('2h 0m 0s')).toBeInTheDocument(); // 2h
+    expect(screen.getAllByText('1h 0m 0s')).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByText('2h 0m 0s')).toHaveLength(2); // Desktop + Mobile
   });
   
   it('should call getTimeStatistics with the selected period', () => {
@@ -83,9 +83,9 @@ describe('TimeStatsView Component', () => {
     // Limpiar las llamadas iniciales (mount + useEffect)
     mockGetTimeStatistics.mockClear();
     
-    // Seleccionar un periodo diferente (semana)
-    const weekButton = screen.getByRole('button', { name: /This Week/i });
-    fireEvent.click(weekButton);
+    // Seleccionar un periodo diferente (semana) - usar el primer botón (desktop)
+    const weekButtons = screen.getAllByRole('button', { name: /This Week/i });
+    fireEvent.click(weekButtons[0]); // Click en la versión desktop
     
     // Assert - verificar que se llamó a getTimeStatistics con 'week'
     expect(mockGetTimeStatistics).toHaveBeenCalledWith('week');
@@ -103,16 +103,16 @@ describe('TimeStatsView Component', () => {
     expect(screen.queryByText(/Start Date/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/End Date/i)).not.toBeInTheDocument();
     
-    // Seleccionar periodo personalizado haciendo clic en el botón Custom
-    const customButton = screen.getByRole('button', { name: /Custom/i });
-    fireEvent.click(customButton);
+    // Seleccionar periodo personalizado haciendo clic en el botón Custom - usar el primer botón (desktop)
+    const customButtons = screen.getAllByRole('button', { name: /Custom/i });
+    fireEvent.click(customButtons[0]); // Click en la versión desktop
     
     // Assert - verificar que ahora se muestran los campos de fecha
-    expect(screen.getByText(/Start Date/i)).toBeInTheDocument();
-    expect(screen.getByText(/End Date/i)).toBeInTheDocument();
-    // Verificar que hay 2 inputs de tipo date
+    expect(screen.getAllByText(/Start Date/i)).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByText(/End Date/i)).toHaveLength(2); // Desktop + Mobile
+    // Verificar que hay 4 inputs de tipo date (2 desktop + 2 mobile)
     const dateInputs = screen.getAllByDisplayValue('');
-    expect(dateInputs).toHaveLength(2);
+    expect(dateInputs).toHaveLength(4);
   });
   
   it('should update custom date range and fetch new statistics', () => {
@@ -126,14 +126,14 @@ describe('TimeStatsView Component', () => {
     // Limpiar las llamadas iniciales
     mockGetTimeStatistics.mockClear();
     
-    // Seleccionar periodo personalizado haciendo clic en el botón Custom
-    const customButton = screen.getByRole('button', { name: /Custom/i });
-    fireEvent.click(customButton);
+    // Seleccionar periodo personalizado haciendo clic en el botón Custom - usar el primer botón (desktop)
+    const customButtons = screen.getAllByRole('button', { name: /Custom/i });
+    fireEvent.click(customButtons[0]); // Click en la versión desktop
     
     // Esperar a que aparezcan los inputs de fecha por tipo date
     const dateInputs = screen.getAllByDisplayValue('');
-    const startDateInput = dateInputs[0]; // Primer input (Start Date)
-    const endDateInput = dateInputs[1];   // Segundo input (End Date)
+    const startDateInput = dateInputs[0]; // Primer input (Start Date desktop)
+    const endDateInput = dateInputs[1];   // Segundo input (End Date desktop)
     
     // Cambiar las fechas (esto automáticamente dispara el useEffect)
     fireEvent.change(startDateInput, { target: { value: '2021-07-01' } });
@@ -159,8 +159,8 @@ describe('TimeStatsView Component', () => {
     // El tiempo total debería ser 3h (1h + 2h = 3h = 10800000ms)
     
     // Assert - verificar que se muestra el tiempo total
-    expect(screen.getByText(/Total Time/i)).toBeInTheDocument();
-    expect(screen.getByText('3h 0m 0s')).toBeInTheDocument(); // 3h total
+    expect(screen.getAllByText(/Total Time/i)).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByText('3h 0m 0s')).toHaveLength(2); // Desktop + Mobile
   });
   
   it('should handle empty statistics gracefully', () => {
@@ -178,6 +178,6 @@ describe('TimeStatsView Component', () => {
     expect(screen.getByText(/No time tracking data/i)).toBeInTheDocument();
     
     // El tiempo total debería ser 0 en formato h m s
-    expect(screen.getByText('0h 0m 0s')).toBeInTheDocument();
+    expect(screen.getAllByText('0h 0m 0s')).toHaveLength(2); // Desktop + Mobile
   });
 });

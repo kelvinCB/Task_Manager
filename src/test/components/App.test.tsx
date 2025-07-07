@@ -88,6 +88,7 @@ vi.mock('lucide-react', () => ({
   FileText: ({ size }: { size?: number }) => <div data-testid="file-text-icon" style={{ width: size, height: size }}>FileText</div>,
   Tag: ({ size }: { size?: number }) => <div data-testid="tag-icon" style={{ width: size, height: size }}>Tag</div>,
   Calendar: ({ size }: { size?: number }) => <div data-testid="calendar-icon" style={{ width: size, height: size }}>Calendar</div>,
+  Menu: ({ size }: { size?: number }) => <div data-testid="menu-icon" style={{ width: size, height: size }}>Menu</div>,
 }));
 
 // Mock view components
@@ -141,10 +142,10 @@ describe('App Component', () => {
       </ThemeProvider>
     );
     
-    // Assert - verify navigation buttons are displayed
-    expect(screen.getByTitle('Board View')).toBeInTheDocument();
-    expect(screen.getByTitle('Tree View')).toBeInTheDocument();
-    expect(screen.getByTitle('Time Stats')).toBeInTheDocument();
+    // Assert - verify navigation buttons are displayed (check for all instances)
+    expect(screen.getAllByTitle('Board View')).toHaveLength(2); // Desktop and mobile
+    expect(screen.getAllByTitle('Tree View')).toHaveLength(2); // Desktop and mobile
+    expect(screen.getAllByTitle('Time Stats')).toHaveLength(2); // Desktop and mobile
   });
   
   it('should show Board view by default', () => {
@@ -159,9 +160,9 @@ describe('App Component', () => {
     // Check for characteristic Board view elements
     expect(screen.getAllByText(/add task/i).length).toBeGreaterThan(0);
     
-    // Verify Board button is active (has the active class)
-    const boardViewButton = screen.getByTitle('Board View');
-    expect(boardViewButton.className).toContain('bg-indigo-100');
+    // Verify Board button is active (has the active class) - check first instance
+    const boardViewButtons = screen.getAllByTitle('Board View');
+    expect(boardViewButtons[0].className).toContain('bg-indigo-100');
   });
   
   it('should switch to Tree view when Tree button is clicked', () => {
@@ -172,13 +173,13 @@ describe('App Component', () => {
       </ThemeProvider>
     );
     
-    // Click Tree view button
-    const treeButton = screen.getByTitle('Tree View');
-    fireEvent.click(treeButton);
+    // Click Tree view button (use first instance - desktop)
+    const treeButtons = screen.getAllByTitle('Tree View');
+    fireEvent.click(treeButtons[0]);
     
     // Assert - verify switch to Tree view
     // Verify Tree button is active
-    expect(treeButton.className).toContain('bg-indigo-100');
+    expect(treeButtons[0].className).toContain('bg-indigo-100');
     
     // Verify Tree mock is displayed
     const treeContainer = screen.getByTestId('tree-view-mock');
@@ -193,13 +194,17 @@ describe('App Component', () => {
       </ThemeProvider>
     );
     
-    // Click Time Stats button
-    const statsButton = screen.getByTitle('Time Stats');
-    fireEvent.click(statsButton);
+    // Click Time Stats button (use first instance - desktop)
+    const statsButtons = screen.getAllByTitle('Time Stats');
+    fireEvent.click(statsButtons[0]);
     
     // Assert - verify switch to Time Stats view
-    // The TimeStatsView would typically contain these elements
-    expect(screen.getByText(/time statistics/i)).toBeInTheDocument();
+    // Verify Stats button is active
+    expect(statsButtons[0].className).toContain('bg-indigo-100');
+    
+    // Verify Time Stats mock is displayed
+    const statsContainer = screen.getByTestId('time-stats-view');
+    expect(statsContainer).toBeInTheDocument();
   });
   
   it('should create a new task when using the TaskForm', () => {

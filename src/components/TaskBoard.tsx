@@ -155,7 +155,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             {renderDescription(task)}
                           </div>
                           
-                          <div className={`flex items-center gap-2 text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
+                          {/* Desktop layout */}
+                          <div className={`hidden md:flex items-center gap-2 text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
                             <span>Depth: {task.depth}</span>
                             {task.childIds.length > 0 && (
                               <span>• {task.childIds.length} subtask{task.childIds.length !== 1 ? 's' : ''}</span>
@@ -177,6 +178,44 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                                 onPause={onPauseTimer}
                               />
                             )}
+                          </div>
+                          
+                          {/* Mobile layout - Optimized */}
+                          <div className={`md:hidden text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
+                            {/* Task info row */}
+                            <div className="flex items-center gap-2 mb-1">
+                              <span>Depth: {task.depth}</span>
+                              {task.childIds.length > 0 && (
+                                <span>• {task.childIds.length} subtask{task.childIds.length !== 1 ? 's' : ''}</span>
+                              )}
+                            </div>
+                            
+                            {/* Due date and timer in one row */}
+                            <div className="flex items-center justify-between">
+                              {/* Due date with overdue indicator or Created date */}
+                              {task.dueDate ? (
+                                <div className={`flex items-center gap-1 ${isTaskOverdue(task) ? 'text-red-600 font-medium' : ''}`}>
+                                  <Calendar size={12} />
+                                  <span>Due {formatDate(task.dueDate)}{isTaskOverdue(task) ? ' • Overdue' : ''}</span>
+                                </div>
+                              ) : (
+                                <div className={`flex items-center gap-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                  <Calendar size={12} />
+                                  <span>Created {formatDate(task.createdAt)}</span>
+                                </div>
+                              )}
+                              
+                              {/* Task Timer */}
+                              {onStartTimer && onPauseTimer && getElapsedTime && (
+                                <TaskTimer
+                                  taskId={task.id}
+                                  isActive={task.timeTracking.isActive}
+                                  elapsedTime={getElapsedTime(task.id)}
+                                  onStart={onStartTimer}
+                                  onPause={onPauseTimer}
+                                />
+                              )}
+                            </div>
                           </div>
                         </div>
 

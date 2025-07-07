@@ -5,14 +5,14 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
-  /* Run tests sequentially, not in parallel */
-  fullyParallel: false,
+  /* Run tests in parallel with 4 workers */
+  fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Single worker for sequential execution */
-  workers: 1,
+  /* Use four workers for parallel execution */
+  workers: 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html'],

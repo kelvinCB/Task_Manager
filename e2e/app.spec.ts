@@ -51,8 +51,9 @@ test.describe('Task Manager App', () => {
     // Verify initial theme
     await appPage.verifyTheme('light');
 
-    // Toggle to dark theme
-    await appPage.toggleTheme();
+    // Use visible theme toggle button (check both desktop and mobile versions)
+    const themeButton = appPage.page.getByTitle('Toggle Dark Mode').locator('visible=true').first();
+    await themeButton.click();
     await appPage.verifyTheme('dark');
 
     // Test persistence: reload page
@@ -61,7 +62,8 @@ test.describe('Task Manager App', () => {
     await appPage.verifyTheme('dark');
 
     // Toggle back to light theme
-    await appPage.toggleTheme();
+    const themeButtonAfterReload = appPage.page.getByTitle('Toggle Dark Mode').locator('visible=true').first();
+    await themeButtonAfterReload.click();
     await appPage.verifyTheme('light');
   });
 
@@ -71,12 +73,16 @@ test.describe('Task Manager App', () => {
     
     const mobileAppPage = new AppPage(page);
     await mobileAppPage.goto();
-    await mobileAppPage.verifyPageLoaded();
-
-    // Verify that navigation elements are still accessible
-    await expect(mobileAppPage.boardViewButton).toBeVisible();
-    await expect(mobileAppPage.treeViewButton).toBeVisible();
-    await expect(mobileAppPage.timeStatsButton).toBeVisible();
+    
+    // On mobile, navigation buttons are in a different layout (hidden desktop version)
+    // Instead of checking visibility of first(), check that mobile versions exist
+    await expect(page.getByTitle('Board View').nth(1)).toBeVisible(); // Mobile version
+    await expect(page.getByTitle('Tree View').nth(1)).toBeVisible(); // Mobile version
+    await expect(page.getByTitle('Time Stats').nth(1)).toBeVisible(); // Mobile version
+    
+    // Verify mobile-specific elements work
+    await page.getByTitle('Board View').nth(1).click();
+    await mobileAppPage.verifyCurrentView('board');
   });
 
   test('should display search functionality', async () => {

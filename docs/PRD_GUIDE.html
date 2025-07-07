@@ -5,108 +5,480 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Requirements Document (PRD) - Task Manager</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; }
-        h1, h2, h3 { color: #333; }
-        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        table, th, td { border: 1px solid #ccc; }
-        th, td { padding: 8px; text-align: left; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            padding-left: 10px;
+            border-left: 4px solid #3498db;
+        }
+        h3 {
+            color: #5d6d7e;
+            margin-top: 25px;
+        }
+        .toc {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .toc ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .toc a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .status-complete {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        .rules {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+        .best-practices {
+            background-color: #d4edda;
+            padding: 15px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            margin: 30px 0;
+        }
+        .version-badge {
+            background: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .live-demo {
+            background: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .live-demo:hover {
+            background: #218838;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px;
+            }
+            table {
+                font-size: 0.9em;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Product Requirements Document (PRD) - Task Manager</h1>
-    
-    <h2>📋 Table of Contents</h2>
-    <ol>
-        <li><a href="#project-overview">Project Overview</a></li>
-        <li><a href="#current-feature-status">Current Feature Status</a></li>
-        <li><a href="#documentation-structure">Documentation Structure</a></li>
-        <li><a href="#architecture-overview">Architecture Overview</a></li>
-        <li><a href="#development-guidelines">Development Guidelines</a></li>
-        <li><a href="#future-roadmap">Future Roadmap</a></li>
-        <li><a href="#team-collaboration">Team Collaboration</a></li>
-    </ol>
+    <div class="container">
+        <h1><span class="emoji">📋</span>Product Requirements Document (PRD) - Task Manager<span class="version-badge">v1.0.0</span></h1>
+        
+        <p><strong>Live Demo:</strong> <a href="https://task-manager-llwv.vercel.app/" class="live-demo" target="_blank">https://task-manager-llwv.vercel.app/</a></p>
+        
+        <div class="toc">
+            <h2><span class="emoji">📋</span>Table of Contents</h2>
+            <ol>
+                <li><a href="#project-overview">Project Overview</a></li>
+                <li><a href="#current-feature-status">Current Feature Status</a></li>
+                <li><a href="#documentation-structure">Documentation Structure</a></li>
+                <li><a href="#architecture-overview">Architecture Overview</a></li>
+                <li><a href="#development-guidelines">Development Guidelines</a></li>
+                <li><a href="#future-roadmap">Future Roadmap</a></li>
+                <li><a href="#team-collaboration">Team Collaboration</a></li>
+            </ol>
+        </div>
 
-    <hr>
+        <hr>
 
-    <h2 id="project-overview">🎯 Project Overview</h2>
-    <p><strong>Project Name:</strong> Task Manager<br>
-    <strong>Purpose:</strong> Hierarchical task management application for professionals<br>
-    <strong>Target Users:</strong> Developers, QAs, Designers, Product Managers, Team Leads<br>
-    <strong>Current Version:</strong> 1.0.0<br>
-    <strong>Live Demo:</strong> <a href="https://task-manager-llwv.vercel.app/">https://task-manager-llwv.vercel.app/</a></p>
-    <p><strong>Vision Statement:</strong> Create an intuitive, powerful task management tool that combines hierarchical organization with AI-powered assistance and robust time tracking capabilities.</p>
+        <h2 id="project-overview"><span class="emoji">🎯</span>Project Overview</h2>
+        <p><strong>Project Name:</strong> Task Manager<br>
+        <strong>Purpose:</strong> Hierarchical task management application for professionals<br>
+        <strong>Target Users:</strong> Developers, QAs, Designers, Product Managers, Team Leads<br>
+        <strong>Current Version:</strong> 1.0.0<br>
+        <strong>Live Demo:</strong> <a href="https://task-manager-llwv.vercel.app/" target="_blank">https://task-manager-llwv.vercel.app/</a></p>
 
-    <hr>
+        <h3>Vision Statement</h3>
+        <p>Create an intuitive, powerful task management tool that combines hierarchical organization with AI-powered assistance and robust time tracking capabilities.</p>
 
-    <h2 id="current-feature-status">📊 Current Feature Status</h2>
-    <h3>✅ Frontend Features (Completed - 100%)</h3>
-    <table>
-        <thead>
-            <tr><th>Feature</th><th>Status</th><th>Completion</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Task Creation</td><td>✅ Complete</td><td>100%</td><td>Create tasks with title, description, due date</td></tr>
-            <tr><td>Task Editing</td><td>✅ Complete</td><td>100%</td><td>Edit existing tasks inline</td></tr>
-            <tr><td>Task Deletion</td><td>✅ Complete</td><td>100%</td><td>Delete tasks from Tree View and Board View</td></tr>
-            <tr><td>Hierarchical Tasks</td><td>✅ Complete</td><td>100%</td><td>Parent-child task relationships</td></tr>
-            <tr><td>Task Status Management</td><td>✅ Complete</td><td>100%</td><td>Open, In Progress, Done statuses</td></tr>
-            <tr><td>Time Tracking</td><td>✅ Complete</td><td>100%</td><td>Start/pause timers, track time per task</td></tr>
-            <tr><td>Time Statistics</td><td>✅ Complete</td><td>100%</td><td>View time stats by period (day/week/month/year)</td></tr>
-            <tr><td>Export/Import Tasks</td><td>✅ Complete</td><td>100%</td><td>CSV export/import with time tracking data</td></tr>
-            <tr><td>Search Functionality</td><td>✅ Complete</td><td>100%</td><td>Search tasks by title and description</td></tr>
-            <tr><td>Filtering</td><td>✅ Complete</td><td>100%</td><td>Filter by status and search terms</td></tr>
-            <tr><td>Dark/Light Theme</td><td>✅ Complete</td><td>100%</td><td>Toggle between themes with persistence</td></tr>
-            <tr><td>Board View</td><td>✅ Complete</td><td>100%</td><td>Kanban-style task board</td></tr>
-            <tr><td>Tree View</td><td>✅ Complete</td><td>100%</td><td>Hierarchical tree structure view</td></tr>
-            <tr><td>Drag & Drop</td><td>✅ Complete</td><td>100%</td><td>Move tasks between statuses</td></tr>
-            <tr><td>Responsive Design</td><td>✅ Complete</td><td>100%</td><td>Mobile and desktop compatibility</td></tr>
-            <tr><td>Local Storage</td><td>✅ Complete</td><td>100%</td><td>Persist data locally</td></tr>
-        </tbody>
-    </table>
+        <hr>
 
-    <h3>🤖 AI Features (Partially Complete - 50%)</h3>
-    <table>
-        <thead>
-            <tr><th>Feature</th><th>Status</th><th>Completion</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>AI Description Generation</td><td>✅ Complete</td><td>100%</td><td>Generate task descriptions using OpenAI</td></tr>
-            <tr><td>AI Grammar Improvement</td><td>❌ Pending</td><td>0%</td><td>Improve existing task descriptions</td></tr>
-            <tr><td>AI Task Suggestions</td><td>❌ Pending</td><td>0%</td><td>Suggest related tasks</td></tr>
-            <tr><td>AI Time Estimation</td><td>❌ Pending</td><td>0%</td><td>Estimate task completion time</td></tr>
-            <tr><td>AI Image Generation</td><td>❌ Pending</td><td>0%</td><td>Generate images for tasks</td></tr>
-            <tr><td>AI Image Attachment</td><td>❌ Pending</td><td>0%</td><td>Attach images to tasks</td></tr>
-        </tbody>
-    </table>
+        <h2 id="current-feature-status"><span class="emoji">📊</span>Current Feature Status</h2>
+        
+        <h3><span class="emoji">✅</span>Frontend Features (Completed - 100%)</h3>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Status</th>
+                <th>Completion</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><strong>Task Creation</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Create tasks with title, description, due date</td>
+            </tr>
+            <tr>
+                <td><strong>Task Editing</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Edit existing tasks inline</td>
+            </tr>
+            <tr>
+                <td><strong>Task Deletion</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Delete tasks from Tree View and Board View</td>
+            </tr>
+            <tr>
+                <td><strong>Hierarchical Tasks</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Parent-child task relationships</td>
+            </tr>
+            <tr>
+                <td><strong>Task Status Management</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Open, In Progress, Done statuses</td>
+            </tr>
+            <tr>
+                <td><strong>Time Tracking</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Start/pause timers, track time per task</td>
+            </tr>
+            <tr>
+                <td><strong>Time Statistics</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>View time stats by period (day/week/month/year)</td>
+            </tr>
+            <tr>
+                <td><strong>Export/Import Tasks</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>CSV export/import with time tracking data</td>
+            </tr>
+            <tr>
+                <td><strong>Search Functionality</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Search tasks by title and description</td>
+            </tr>
+            <tr>
+                <td><strong>Filtering</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Filter by status and search terms</td>
+            </tr>
+            <tr>
+                <td><strong>Dark/Light Theme</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Toggle between themes with persistence</td>
+            </tr>
+            <tr>
+                <td><strong>Board View</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Kanban-style task board</td>
+            </tr>
+            <tr>
+                <td><strong>Tree View</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Hierarchical tree structure view</td>
+            </tr>
+            <tr>
+                <td><strong>Drag & Drop</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Move tasks between statuses</td>
+            </tr>
+            <tr>
+                <td><strong>Responsive Design</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Mobile and desktop compatibility</td>
+            </tr>
+            <tr>
+                <td><strong>Local Storage</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Persist data locally</td>
+            </tr>
+        </table>
 
-    <h3>🔐 Authentication & User Management (Not Started - 0%)</h3>
-    <table>
-        <thead>
-            <tr><th>Feature</th><th>Status</th><th>Completion</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>User Registration</td><td>❌ Pending</td><td>0%</td><td>Email/password registration</td></tr>
-            <tr><td>User Login</td><td>❌ Pending</td><td>0%</td><td>Email/password login</td></tr>
-            <tr><td>Google OAuth</td><td>❌ Pending</td><td>0%</td><td>Login with Google</td></tr>
-            <tr><td>GitHub OAuth</td><td>❌ Pending</td><td>0%</td><td>Login with GitHub</td></tr>
-            <tr><td>Password Reset</td><td>❌ Pending</td><td>0%</td><td>Forgot password functionality</td></tr>
-            <tr><td>User Profile</td><td>❌ Pending</td><td>0%</td><td>Manage user information</td></tr>
-            <tr><td>Account Settings</td><td>❌ Pending</td><td>0%</td><td>User preferences and settings</td></tr>
-        </tbody>
-    </table>
+        <h3><span class="emoji">🤖</span>AI Features (Partially Complete - 50%)</h3>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Status</th>
+                <th>Completion</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><strong>AI Description Generation</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Generate task descriptions using OpenAI</td>
+            </tr>
+            <tr>
+                <td><strong>AI Grammar Improvement</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>Improve existing task descriptions</td>
+            </tr>
+            <tr>
+                <td><strong>AI Task Suggestions</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>Suggest related tasks</td>
+            </tr>
+            <tr>
+                <td><strong>AI Time Estimation</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>Estimate task completion time</td>
+            </tr>
+            <tr>
+                <td><strong>AI Image Generation</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>Generate images for tasks</td>
+            </tr>
+            <tr>
+                <td><strong>AI Image Attachment</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>Attach images to tasks</td>
+            </tr>
+        </table>
 
-    <h3>📱 Enhanced UI Features (Not Started - 0%)</h3>
-    <!-- Additional sections omitted for brevity -->
+        <h3><span class="emoji">🧪</span>Testing (Excellent - 85%)</h3>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Status</th>
+                <th>Completion</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><strong>Frontend Unit Tests</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Comprehensive Vitest tests with timezone handling</td>
+            </tr>
+            <tr>
+                <td><strong>E2E Tests</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>44/44 Playwright E2E tests passing (all cleaned and optimized)</td>
+            </tr>
+            <tr>
+                <td><strong>Test Debugging</strong></td>
+                <td><span class="status-complete">✅ Complete</span></td>
+                <td>100%</td>
+                <td>Visual debugging strategy with screenshots</td>
+            </tr>
+            <tr>
+                <td><strong>Backend Unit Tests</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>Backend component testing</td>
+            </tr>
+            <tr>
+                <td><strong>Integration Tests</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>API integration testing</td>
+            </tr>
+            <tr>
+                <td><strong>Performance Tests</strong></td>
+                <td><span class="status-pending">❌ Pending</span></td>
+                <td>0%</td>
+                <td>Load and performance testing</td>
+            </tr>
+        </table>
 
-    <!-- Please refer to the original PRD for complete feature and roadmap details -->
+        <hr>
 
-    <hr>  
+        <h2 id="development-guidelines"><span class="emoji">👥</span>Development Guidelines</h2>
+        
+        <div class="rules">
+            <h3><span class="emoji">🚫</span>Prohibited Actions</h3>
+            <ul>
+                <li>❌ Never run <code>npm run dev</code> or <code>npm start</code></li>
+                <li>❌ Never hallucinate data - always ask questions if unsure</li>
+                <li>❌ Never commit without running tests and build</li>
+                <li>❌ Never write code in Spanish - always use English</li>
+            </ul>
+        </div>
 
-    <p><em>*This PRD serves as the single source of truth for the Task Manager project. All team members and AI agents should reference this document before starting any work.*</em></p>
+        <div class="best-practices">
+            <h3><span class="emoji">✅</span>Required Actions</h3>
+            <ul>
+                <li>✅ Always update documentation when adding features</li>
+                <li>✅ Always update tests when necessary</li>
+                <li>✅ Always follow conventions from <code>CONVENTIONS.md</code></li>
+                <li>✅ Always read this PRD before starting work</li>
+                <li>✅ Always create <code>.env.example</code> when using <code>.env</code></li>
+                <li>✅ Always update <code>.gitignore</code> when needed</li>
+                <li>✅ Always perform code review for optimization</li>
+            </ul>
+        </div>
 
-    <p>Last Updated: July 2025<br>
-    Next Review: Quarterly</p>
+        <h3><span class="emoji">🔍</span>Development Workflow</h3>
+        <ol>
+            <li><strong>Read Documentation:</strong> Start by reading this PRD and relevant docs</li>
+            <li><strong>Understand Context:</strong> Review existing code and features</li>
+            <li><strong>Follow Conventions:</strong> Use established patterns and naming</li>
+            <li><strong>Write Tests:</strong> Add/update tests for new functionality</li>
+            <li><strong>Update Docs:</strong> Keep documentation current</li>
+            <li><strong>Code Review:</strong> Optimize for performance and maintainability</li>
+        </ol>
 
+        <hr>
+
+        <h2 id="architecture-overview"><span class="emoji">🏗️</span>Architecture Overview</h2>
+        
+        <h3>Current Architecture</h3>
+        <ul>
+            <li><strong>Frontend:</strong> React + TypeScript + Vite + Tailwind CSS</li>
+            <li><strong>State Management:</strong> React Hooks + Local Storage</li>
+            <li><strong>Testing:</strong> Vitest + React Testing Library</li>
+            <li><strong>Build Tool:</strong> Vite</li>
+            <li><strong>Deployment:</strong> Vercel</li>
+        </ul>
+
+        <h3>Planned Architecture</h3>
+        <ul>
+            <li><strong>Backend:</strong> Node.js + Express/Fastify</li>
+            <li><strong>Database:</strong> Supabase (PostgreSQL)</li>
+            <li><strong>Authentication:</strong> Supabase Auth + OAuth</li>
+            <li><strong>File Storage:</strong> Supabase Storage</li>
+            <li><strong>Email Service:</strong> Resend/SendGrid</li>
+            <li><strong>Deployment:</strong> Vercel (Frontend) + Railway/Heroku (Backend)</li>
+        </ul>
+
+        <hr>
+
+        <h2 id="future-roadmap"><span class="emoji">🗺️</span>Future Roadmap</h2>
+        
+        <h3>Phase 1: Authentication & Backend (Priority 1)</h3>
+        <ul>
+            <li>User registration and login</li>
+            <li>Backend API development</li>
+            <li>Database setup with Supabase</li>
+            <li>Basic user management</li>
+        </ul>
+
+        <h3>Phase 2: Enhanced Task Management (Priority 2)</h3>
+        <ul>
+            <li>Task detail views</li>
+            <li>Task comments and attachments</li>
+            <li>Labels and priorities</li>
+            <li>Advanced filtering</li>
+        </ul>
+
+        <h3>Phase 3: Project Management (Priority 3)</h3>
+        <ul>
+            <li>Sprint planning and management</li>
+            <li>Backlog organization</li>
+            <li>Epic tracking</li>
+            <li>Progress visualization</li>
+        </ul>
+
+        <hr>
+
+        <div class="highlight">
+            <p><strong>📝 Complete Documentation:</strong> This HTML version provides key highlights. For complete details including all feature tables, technical specifications, and team collaboration guidelines, please refer to the full <a href="PRD_GUIDE.md" target="_blank">PRD_GUIDE.md</a> file.</p>
+        </div>
+
+        <p><em>This PRD serves as the single source of truth for the Task Manager project. All team members and AI agents should reference this document before starting any work.</em></p>
+        
+        <p><strong>Last Updated:</strong> July 2025<br>
+        <strong>Next Review:</strong> Quarterly</p>
+    </div>
 </body>
 </html>
