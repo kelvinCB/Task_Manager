@@ -1,0 +1,99 @@
+/* Animaciones para el logo TasksFun en móvil */
+/* Animación para cada letra individual del logo */
+@keyframes letterDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  60% {
+    transform: translateY(10px);
+  }
+  80% {
+    transform: translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Breve destello al final de la animación */
+@keyframes briefGlow {
+  0% {
+    text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+  100% {
+    text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+/* Contenedor para el logo animado */
+.mobile-logo-animation {
+  display: inline-block;
+  position: relative;
+}
+
+/* Estilo para cada letra individual */
+.mobile-logo-animation span {
+  display: inline-block;
+  opacity: 0;
+  animation: letterDrop 0.6s ease-in-out forwards, briefGlow 0.5s ease-in-out 0.6s;
+}
+
+/* Retraso escalonado para cada letra */
+.mobile-logo-animation span:nth-child(1) { animation-delay: 0.1s; }
+.mobile-logo-animation span:nth-child(2) { animation-delay: 0.2s; }
+.mobile-logo-animation span:nth-child(3) { animation-delay: 0.3s; }
+.mobile-logo-animation span:nth-child(4) { animation-delay: 0.4s; }
+.mobile-logo-animation span:nth-child(5) { animation-delay: 0.5s; }
+.mobile-logo-animation span:nth-child(6) { animation-delay: 0.6s; }
+.mobile-logo-animation span:nth-child(7) { animation-delay: 0.7s; }
+.mobile-logo-animation span:nth-child(8) { animation-delay: 0.8s; }
+
+/* Estilos específicos para tema oscuro */
+.mobile-logo-animation.dark span {
+  color: #f59e0b;
+}
+
+/* Estilos específicos para tema claro */
+.mobile-logo-animation.light span {
+  color: #4f46e5;
+}
+
+/* Animación del icono de progreso */
+@keyframes iconBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  80% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotateProgress {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.mobile-icon-animation {
+  animation: iconBounce 0.8s ease-out forwards;
+}
+
+.mobile-icon-animation:hover {
+  animation: rotateProgress 1.5s ease-in-out;
+}
