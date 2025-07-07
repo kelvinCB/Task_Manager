@@ -52,7 +52,6 @@ function App() {
   const [parentId, setParentId] = useState<string | undefined>();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
   const handleCreateTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>) => {
     if (editingTask) {
@@ -238,17 +237,7 @@ function App() {
     document.body.removeChild(link);
   };
 
-  // Detectar si es móvil para la animación del logo
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
@@ -258,7 +247,7 @@ function App() {
           {/* Desktop Header - Original Design */}
           <div className="hidden lg:flex items-center justify-between h-16">
             <div className="flex shrink-0 items-center gap-3 mr-4">
-              <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg`}>
+              <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg mobile-icon-animation`}>
                 <ProgressIcon 
                   size={24} 
                   className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} 
@@ -266,7 +255,11 @@ function App() {
                 />
               </div>
               <div className="whitespace-nowrap">
-                <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>TasksFun</h1>
+                <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} mobile-logo-animation ${theme}`}>
+                  {'TasksFun'.split('').map((letter, index) => (
+                    <span key={index}>{letter}</span>
+                  ))}
+                </h1>
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Hierarchical Task Management</p>
               </div>
             </div>
@@ -369,20 +362,17 @@ function App() {
             {/* Level 1: Logo and App Name */}
             <div className="flex items-center justify-center py-3">
               <div className="flex items-center gap-3">
-                <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg ${isMobile ? 'mobile-icon-animation' : ''}`}>
+                <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg mobile-icon-animation`}>
                   <ProgressIcon 
                     size={20} 
                     className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} 
                     progress={75}
                   />
                 </div>
-                <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} ${isMobile ? 'mobile-logo-animation ' + theme : ''}`}>
-                  {isMobile ? (
-                    // Renderizar cada letra individualmente para la animación
-                    'TasksFun'.split('').map((letter, index) => (
-                      <span key={index}>{letter}</span>
-                    ))
-                  ) : 'TasksFun'}
+                <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} mobile-logo-animation ${theme}`}>
+                  {'TasksFun'.split('').map((letter, index) => (
+                    <span key={index}>{letter}</span>
+                  ))}
                 </h1>
               </div>
             </div>
