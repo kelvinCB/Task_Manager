@@ -154,7 +154,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
         {/* Task Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between space-x-2">
             <div className="flex-1 min-w-0">
               {renderTitle()}
               {renderDescription()}
@@ -163,11 +163,30 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               <div className="mt-2">
                 {/* Mobile Layout */}
                 <div className="sm:hidden space-y-1">
-                  {/* First Row: Timer (if active) or Due Date */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {/* Priority info: Timer or Due Date */}
-                      {onStartTimer && onPauseTimer && getElapsedTime && task.timeTracking.isActive ? (
+                  {/* Task Info with Timer and Due Date in one compact line */}
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2 flex-nowrap overflow-hidden">
+                      {/* Date info (Created or Due) */}
+                      {task.dueDate ? (
+                        <div className={`flex items-center gap-1 text-xs ${
+                          isOverdue 
+                            ? 'text-red-600 font-medium' 
+                            : theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                        }`}>
+                          <Calendar size={12} />
+                          <span className="whitespace-nowrap">Due {formatDate(task.dueDate)}{isOverdue ? ' • Overdue' : ''}</span>
+                        </div>
+                      ) : (
+                        <div className={`flex items-center gap-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <Calendar size={12} />
+                          <span className="whitespace-nowrap">Created {formatDate(task.createdAt)}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Timer - always show if available */}
+                    {onStartTimer && onPauseTimer && getElapsedTime && (
+                      <div className="flex-shrink-0">
                         <TaskTimer
                           taskId={task.id}
                           isActive={task.timeTracking.isActive}
@@ -175,45 +194,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                           onStart={onStartTimer}
                           onPause={onPauseTimer}
                         />
-                      ) : task.dueDate ? (
-                        <div className={`flex items-center gap-1 text-xs ${
-                          isOverdue 
-                            ? 'text-red-600 font-medium' 
-                            : theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                        }`}>
-                          <Calendar size={12} />
-                          <span>Due {formatDate(task.dueDate)}{isOverdue ? ' • Overdue' : ''}</span>
-                        </div>
-                      ) : (
-                        <div className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          <div className="flex items-center gap-1">
-                            <Calendar size={12} />
-                            <span>Created {formatDate(task.createdAt)}</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Hierarchy Info */}
-                    {(hasChildren || task.depth > 0) && (
-                      <div className={`text-xs px-2 py-1 rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
-                        {hasChildren ? 'Has subtasks' : `Level ${task.depth}`}
                       </div>
                     )}
                   </div>
-                  
-                  {/* Timer section */}
-                  
-                  {/* Timer when not active */}
-                  {onStartTimer && onPauseTimer && getElapsedTime && !task.timeTracking.isActive && (
-                    <div className="flex items-center justify-between">
-                      <TaskTimer
-                        taskId={task.id}
-                        isActive={task.timeTracking.isActive}
-                        elapsedTime={getElapsedTime(task.id)}
-                        onStart={onStartTimer}
-                        onPause={onPauseTimer}
-                      />
+                    
+                  {/* Hierarchy Info */}
+                  {(hasChildren || task.depth > 0) && (
+                    <div className={`text-xs px-2 py-1 rounded-full ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                      {hasChildren ? 'Has subtasks' : `Level ${task.depth}`}
                     </div>
                   )}
                 </div>
@@ -250,16 +238,16 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4">
+            <div className="flex items-center gap-1 sm:gap-2 ml-0 sm:ml-2">
               {/* Status Selector */}
               <select
                 value={task.status}
                 onChange={handleStatusChange}
                 className={`
-                  px-1 sm:px-2 py-1 text-xs font-medium border rounded-md transition-colors duration-200
+                  px-1 sm:px-2 py-0.5 text-xs font-medium border rounded-md transition-colors duration-200
                   ${getStatusColor(task.status)}
-                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1
-                  min-w-0 max-w-[80px] sm:max-w-none
+                  focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-1
+                  min-w-0 max-w-[70px] sm:max-w-none
                 `}
               >
                 <option value="Open">Open</option>
