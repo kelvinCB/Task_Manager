@@ -8,15 +8,16 @@ This guide provides comprehensive documentation for frontend development in the 
 
 1. [Architecture Overview](#architecture-overview)
 2. [Project Structure](#project-structure)
-3. [Component Development](#component-development)
-4. [State Management](#state-management)
-5. [Styling Guidelines](#styling-guidelines)
-6. [Performance Optimization](#performance-optimization)
-7. [Accessibility Standards](#accessibility-standards)
-8. [Error Handling](#error-handling)
-9. [API Integration](#api-integration)
-10. [Testing Guidelines](#testing-guidelines)
-11. [Build and Deployment](#build-and-deployment)
+3. [Authentication Integration](#authentication-integration)
+4. [Component Development](#component-development)
+5. [State Management](#state-management)
+6. [Styling Guidelines](#styling-guidelines)
+7. [Performance Optimization](#performance-optimization)
+8. [Accessibility Standards](#accessibility-standards)
+9. [Error Handling](#error-handling)
+10. [API Integration](#api-integration)
+11. [Testing Guidelines](#testing-guidelines)
+12. [Build and Deployment](#build-and-deployment)
 
 ---
 
@@ -27,6 +28,8 @@ This guide provides comprehensive documentation for frontend development in the 
 - **Build Tool**: Vite for fast development and optimized builds
 - **Styling**: Tailwind CSS for utility-first styling
 - **State Management**: React Hooks + Custom Hooks
+- **Authentication**: Supabase Auth with React Context
+- **Backend Integration**: Supabase client + REST API
 - **Testing**: Vitest + React Testing Library + jsdom
 - **Icons**: Lucide React for consistent iconography
 
@@ -55,10 +58,20 @@ src/
 │   ├── TimeStatsView.tsx # Time analytics view
 │   ├── ProgressIcon.tsx # Custom progress icon
 │   └── AIIcon.tsx       # AI integration icon
+├── components/
+│   └── features/        # Feature-specific components
+│       └── auth/        # Authentication components
+│           └── AuthForm.tsx # Reusable auth form
 ├── contexts/            # React contexts
-│   └── ThemeContext.tsx # Theme management
+│   ├── ThemeContext.tsx # Theme management
+│   └── AuthContext.tsx  # Authentication context
 ├── hooks/               # Custom hooks
 │   └── useTasks.ts      # Main task management hook
+├── lib/                 # Third-party integrations
+│   └── supabaseClient.ts # Supabase client setup
+├── pages/               # Page-level components
+│   ├── LoginPage.tsx    # Login page
+│   └── RegisterPage.tsx # Registration page
 ├── services/            # External service integrations
 │   └── openaiService.ts # OpenAI API integration
 ├── types/               # TypeScript type definitions
@@ -75,6 +88,127 @@ src/
 └── vite-env.d.ts        # Vite type definitions
 ```
 
+## Authentication Integration
+
+### Overview
+The authentication system uses **Supabase Auth** for secure user management with React Context for state management.
+
+### Key Components
+
+#### 1. AuthContext (`src/contexts/AuthContext.tsx`)
+```typescript
+// Provides authentication state and methods
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  // ... authentication logic
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+```
+
+#### 2. Supabase Client (`src/lib/supabaseClient.ts`)
+```typescript
+// Configured Supabase client for authentication
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+
+export default supabase;
+```
+
+#### 3. Authentication Components
+
+**AuthForm Component** (`src/components/features/auth/AuthForm.tsx`)
+- Reusable form for both login and registration
+- Includes email/password validation
+- Loading states and error handling
+- Responsive design with Tailwind CSS
+
+**Login Page** (`src/pages/LoginPage.tsx`)
+- Dedicated login page with form validation
+- Navigation to registration page
+- Error handling and loading states
+- Integration with AuthContext
+
+**Register Page** (`src/pages/RegisterPage.tsx`)
+- User registration with email confirmation
+- Password strength validation
+- Navigation to login page
+- Success feedback and error handling
+
+### Authentication Flow
+
+1. **User Registration:**
+   ```typescript
+   const { error } = await supabase.auth.signUp({
+     email,
+     password,
+   });
+   ```
+
+2. **User Login:**
+   ```typescript
+   const { error } = await supabase.auth.signInWithPassword({
+     email,
+     password,
+   });
+   ```
+
+3. **Session Management:**
+   ```typescript
+   useEffect(() => {
+     const { data: authListener } = supabase.auth.onAuthStateChange(
+       (event, session) => {
+         setSession(session);
+         setUser(session?.user ?? null);
+       }
+     );
+     return () => authListener.subscription.unsubscribe();
+   }, []);
+   ```
+
+### Router Integration
+
+```typescript
+// App.tsx routing with authentication
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/*" element={<MainApp />} />
+      </Routes>
+    </Router>
+  );
+}
+```
+
+### Environment Variables
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### Security Features
+- **Email validation** with regex patterns
+- **Password strength** requirements
+- **Session management** with automatic token refresh
+- **Error handling** with user-friendly messages
+- **Input sanitization** and validation
+
 ### Recommended Future Structure
 ```
 src/
@@ -88,6 +222,7 @@ src/
 ├── pages/               # Page-level components
 ├── hooks/               # Custom hooks
 ├── contexts/            # React contexts
+├── lib/                 # Third-party integrations
 ├── services/            # API and external services
 ├── utils/               # Utility functions
 ├── types/               # TypeScript definitions

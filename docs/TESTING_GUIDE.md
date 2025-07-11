@@ -6,22 +6,25 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 1. [Resumen General](#resumen-general)
 2. [Pruebas Unitarias](#pruebas-unitarias)
-3. [Pruebas E2E (End-to-End)](#pruebas-e2e-end-to-end)
-4. [Cómo ejecutar las pruebas](#cómo-ejecutar-las-pruebas)
-5. [Bugs corregidos](#bugs-corregidos)
-6. [Contribución](#contribución)
+3. [Pruebas de Backend](#pruebas-de-backend)
+4. [Pruebas E2E (End-to-End)](#pruebas-e2e-end-to-end)
+5. [Cómo ejecutar las pruebas](#cómo-ejecutar-las-pruebas)
+6. [Bugs corregidos](#bugs-corregidos)
+7. [Contribución](#contribución)
 
 ## Resumen General
 
 ### Estado Actual
 ✅ **99 pruebas unitarias** (100% pasando)  
 ✅ **44 pruebas E2E** (100% pasando)  
+✅ **19 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
 
 ### Tecnologías
 - **Unitarias**: Vitest + React Testing Library + jsdom
 - **E2E**: Playwright + Chromium
+- **Backend**: Jest + Supertest + mocks
 - **Enfoque**: Testing centrado en el usuario, accesible y robusto
 
 ## Pruebas Unitarias
@@ -77,6 +80,54 @@ src/test/
 - Manejo de diferentes modelos (GPT-4, O1)
 - Gestión de errores y timeouts
 - Validación de configuración
+
+## Pruebas de Backend
+
+### Configuración y Tecnologías
+- **Jest**: Framework de testing principal
+- **Supertest**: Testing de endpoints HTTP
+- **Mocks**: Cliente Supabase mockeado para testing aislado
+- **Cobertura**: 90.62% en controladores, 100% en rutas
+
+### Estructura de archivos Backend
+```
+backend/src/tests/
+├── setup.js                           # Configuración global de tests
+├── controllers/
+│   └── authController.test.js         # Tests unitarios del controlador (10 tests)
+└── routes/
+    └── auth.test.js                   # Tests de integración de rutas (9 tests)
+```
+
+### Cobertura de Tests Backend
+
+#### Controlador de Autenticación (10 tests)
+- **Registro exitoso**: Validación de usuario registrado
+- **Validación de entrada**: Email y contraseña requeridos
+- **Validación de formato**: Email inválido, contraseña corta
+- **Errores de Supabase**: Manejo de errores de autenticación
+- **Errores inesperados**: Manejo de fallos del servidor
+
+#### Rutas de Autenticación (9 tests)
+- **POST /api/auth/register**: Tests de integración completos
+- **POST /api/auth/login**: Tests de integración completos
+- **Códigos de estado**: 200, 201, 400, 401, 500
+- **Formatos de respuesta**: JSON estructurado
+- **Rutas no encontradas**: Manejo de 404
+
+### Características de Testing Backend
+- **Mocking completo**: Supabase Auth completamente mockeado
+- **Validación robusta**: Email format, password strength
+- **Error handling**: Manejo completo de errores
+- **HTTP Testing**: Requests/responses reales con Supertest
+- **Configuración aislada**: Tests independientes sin efectos secundarios
+
+### Resultados Backend
+✅ **19/19 tests pasando** (100% de éxito)  
+📊 **90.62%** cobertura en controladores  
+📊 **100%** cobertura en rutas  
+⚡ **Rápido**: Ejecución en ~25 segundos  
+🔒 **Seguro**: Validación completa de inputs y errors
 
 ## Pruebas E2E (End-to-End)
 
@@ -162,6 +213,27 @@ npm run test:coverage
 
 # Interface gráfica
 npm run test:ui
+```
+
+### Pruebas Backend
+```bash
+# Navegar al directorio backend
+cd backend
+
+# Instalar dependencias
+npm install
+
+# Ejecutar todos los tests
+npm test
+
+# Modo watch (desarrollo)
+npm run test:watch
+
+# Con cobertura
+npm run test:coverage
+
+# Test específico
+npx jest src/tests/controllers/authController.test.js
 ```
 
 ### Pruebas E2E

@@ -1,0 +1,26 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "theme",
+          "value": "light"
+        },
+        {
+          "name": "taskflow_expanded_nodes",
+          "value": "[\"1\",\"2\"]"
+        },
+        {
+          "name": "sb-uuepapqtfvufcgxvghwn-auth-token",
+          "value": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsImtpZCI6Ii9HOTJYb0ZOdkxCUmRJajQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3V1ZXBhcHF0ZnZ1ZmNneHZnaHduLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJiMzBhMTFkZC02MDViLTQyNDUtYmM5MS0zYmE0YTgzNWE4MDciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzUyMjI1MzA5LCJpYXQiOjE3NTIyMjE3MDksImVtYWlsIjoidGFza2ktdGVzdEB5b3BtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0YXNraS10ZXN0QHlvcG1haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiYjMwYTExZGQtNjA1Yi00MjQ1LWJjOTEtM2JhNGE4MzVhODA3In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NTIyMjE3MDl9XSwic2Vzc2lvbl9pZCI6IjBlMzRlZWIwLTQwMmUtNGRmZi04Yjg4LTk2ZTNjM2M0Yzg1NCIsImlzX2Fub255bW91cyI6ZmFsc2V9.b-4HnxtBRk6io-_bYBFZ39c9cvkMyYm75rTziis1dcY\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":1752225309,\"refresh_token\":\"4kdufzkkt6nt\",\"user\":{\"id\":\"b30a11dd-605b-4245-bc91-3ba4a835a807\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"taski-test@yopmail.com\",\"email_confirmed_at\":\"2025-07-11T07:39:56.206479Z\",\"phone\":\"\",\"confirmation_sent_at\":\"2025-07-11T07:34:59.280879Z\",\"confirmed_at\":\"2025-07-11T07:39:56.206479Z\",\"last_sign_in_at\":\"2025-07-11T08:15:09.48151276Z\",\"app_metadata\":{\"provider\":\"email\",\"providers\":[\"email\"]},\"user_metadata\":{\"email\":\"taski-test@yopmail.com\",\"email_verified\":true,\"phone_verified\":false,\"sub\":\"b30a11dd-605b-4245-bc91-3ba4a835a807\"},\"identities\":[{\"identity_id\":\"a99870e6-028e-4243-bdbd-1ef6327e3c4f\",\"id\":\"b30a11dd-605b-4245-bc91-3ba4a835a807\",\"user_id\":\"b30a11dd-605b-4245-bc91-3ba4a835a807\",\"identity_data\":{\"email\":\"taski-test@yopmail.com\",\"email_verified\":true,\"phone_verified\":false,\"sub\":\"b30a11dd-605b-4245-bc91-3ba4a835a807\"},\"provider\":\"email\",\"last_sign_in_at\":\"2025-07-11T07:34:59.277031Z\",\"created_at\":\"2025-07-11T07:34:59.277087Z\",\"updated_at\":\"2025-07-11T07:34:59.277087Z\",\"email\":\"taski-test@yopmail.com\"}],\"created_at\":\"2025-07-11T07:34:59.273129Z\",\"updated_at\":\"2025-07-11T08:15:09.484119Z\",\"is_anonymous\":false}}"
+        },
+        {
+          "name": "taskflow_tasks",
+          "value": "[{\"id\":\"1\",\"title\":\"Frontend Development\",\"description\":\"Complete the user interface components\",\"status\":\"In Progress\",\"createdAt\":\"2024-01-15T00:00:00.000Z\",\"dueDate\":\"2024-02-15T00:00:00.000Z\",\"childIds\":[\"2\",\"3\"],\"depth\":0,\"timeTracking\":{\"totalTimeSpent\":0,\"isActive\":false,\"timeEntries\":[]}},{\"id\":\"2\",\"title\":\"Design System\",\"description\":\"Create reusable UI components\",\"status\":\"Done\",\"createdAt\":\"2024-01-16T00:00:00.000Z\",\"parentId\":\"1\",\"childIds\":[\"4\"],\"depth\":1,\"timeTracking\":{\"totalTimeSpent\":0,\"isActive\":false,\"timeEntries\":[]}},{\"id\":\"3\",\"title\":\"API Integration\",\"description\":\"Connect frontend with backend services\",\"status\":\"Open\",\"createdAt\":\"2024-01-17T00:00:00.000Z\",\"parentId\":\"1\",\"childIds\":[],\"depth\":1,\"timeTracking\":{\"totalTimeSpent\":0,\"isActive\":false,\"timeEntries\":[]}},{\"id\":\"4\",\"title\":\"Button Components\",\"description\":\"Create various button styles and states\",\"status\":\"Done\",\"createdAt\":\"2024-01-18T00:00:00.000Z\",\"parentId\":\"2\",\"childIds\":[],\"depth\":2,\"timeTracking\":{\"totalTimeSpent\":0,\"isActive\":false,\"timeEntries\":[]}}]"
+        }
+      ]
+    }
+  ]
+}

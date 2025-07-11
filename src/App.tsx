@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useTasks } from './hooks/useTasks';
 import { TaskTree } from './components/TaskTree';
 import { TaskBoard } from './components/TaskBoard';
 import { TaskForm } from './components/TaskForm';
 import { TimeStatsView } from './components/TimeStatsView';
 import { ProgressIcon } from './components/ProgressIcon';
-import { Task, ImportedTaskRow, TaskNode } from './types/Task';
+import { Task, TaskNode } from './types/Task';
 import { 
   TreePine, 
   LayoutGrid, 
@@ -20,10 +21,14 @@ import {
 } from 'lucide-react';
 import { BurgerMenu } from './components/BurgerMenu';
 import Papa from 'papaparse';
-import { useTheme } from './contexts/ThemeContext';
-import './styles/logoAnimation.css';
 
-function App() {
+import { useTheme } from './contexts/ThemeContext';
+
+import './styles/logoAnimation.css';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
+const MainApp = () => {
   const {
     filteredTasks,
     filteredTaskTree,
@@ -187,7 +192,7 @@ function App() {
     const csv = Papa.unparse(tasksToExport.map(task => {
       // Calculate total time including active sessions
       let totalTimeForExport = task.timeTracking.totalTimeSpent;
-      let timeEntriesForExport = [...task.timeTracking.timeEntries];
+      const timeEntriesForExport = [...task.timeTracking.timeEntries];
       
       // If task is currently active, calculate the current session time
       if (task.timeTracking.isActive && task.timeTracking.lastStarted) {
@@ -644,5 +649,21 @@ function App() {
     </div>
   );
 }
+
+const App = () => {
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route 
+          path="/*" 
+          element={<MainApp />}
+        />
+      </Routes>
+    </Router>
+  );
+};
 
 export default App;

@@ -9,6 +9,7 @@
 ## ✨ Features
 
 -   **Hierarchical Task Structure**: Organize your tasks in a tree-like structure with parents and sub-tasks, allowing for clear and detailed project planning.
+-   **User Authentication**: Secure user registration and login system with email/password authentication.
 -   **AI-Powered Task Assistant**: Generate detailed task descriptions automatically using OpenAI's language models.
 -   **Intuitive User Interface**: A clean and modern design that makes task management easy and enjoyable.
 -   **Task Status Tracking**: Easily track the status of each task (e.g., *Open*, *In Progress*, *Done*).
@@ -43,22 +44,45 @@ To get a local copy up and running, follow these simple steps.
     ```sh
     npm install
     ```
-4.  **Set up environment variables (optional for AI features):**
+4.  **Set up environment variables:**
     ```sh
     cp .env.example .env
     ```
-    Edit `.env` file and add your OpenAI API key for AI-powered features:
+    Edit `.env` file and add your configuration:
     ```
+    # Required for authentication
+    VITE_SUPABASE_URL=your-supabase-project-url
+    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+    
+    # Optional for AI features
     VITE_OPENAI_API_KEY=your-openai-api-key-here
     VITE_OPENAI_MODEL=gpt-4o
     VITE_OPENAI_BASE_URL=https://api.openai.com/v1
     ```
 
-5.  **Run the development server:**
+5.  **Set up the backend (for authentication):**
     ```sh
+    cd backend
+    npm install
+    cp .env.example .env
+    ```
+    Edit `backend/.env` file and add your Supabase configuration:
+    ```
+    SUPABASE_URL=your-supabase-project-url
+    SUPABASE_KEY=your-supabase-service-key
+    PORT=3001
+    ```
+
+6.  **Run the development servers:**
+    ```sh
+    # Terminal 1 - Frontend
+    npm run dev
+    
+    # Terminal 2 - Backend
+    cd backend
     npm run dev
     ```
-    The application will be available at `http://localhost:5173`.
+    The frontend will be available at `http://localhost:5173` and the backend at `http://localhost:3001`.
 
 ---
 
@@ -94,11 +118,63 @@ TaskFlow includes an AI-powered assistant that can automatically generate detail
 
 ## 🛠️ Technologies Used
 
--   **Frontend:** [React](https://reactjs.org/)
+### Frontend
+-   **Framework:** [React](https://reactjs.org/) 18+ with TypeScript
 -   **Build Tool:** [Vite](https://vitejs.dev/)
 -   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
--   **Programming Language:** [TypeScript](https://www.typescriptlang.org/)
 -   **Icons:** [Lucide React](https://lucide.dev/guide/packages/lucide-react)
+-   **Testing:** [Vitest](https://vitest.dev/) + [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+-   **E2E Testing:** [Playwright](https://playwright.dev/)
+
+### Backend
+-   **Runtime:** [Node.js](https://nodejs.org/)
+-   **Framework:** [Express.js](https://expressjs.com/)
+-   **Database:** [Supabase](https://supabase.com/) (PostgreSQL)
+-   **Authentication:** [Supabase Auth](https://supabase.com/docs/guides/auth)
+-   **Testing:** [Jest](https://jestjs.io/) + [Supertest](https://github.com/visionmedia/supertest)
+
+### AI Integration
+-   **OpenAI API:** For task description generation
+-   **Supported Models:** GPT-4, GPT-4 Turbo, O4 series
+
+## 🧪 Testing
+
+This project includes comprehensive testing at multiple levels:
+
+### Frontend Testing
+```bash
+# Run unit tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run E2E tests
+npm run test:e2e
+
+# Run E2E tests with UI
+npm run test:e2e:headed
+```
+
+### Backend Testing
+```bash
+# Navigate to backend directory
+cd backend
+
+# Run unit tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+### Test Coverage
+- **Frontend:** 99 unit tests + 44 E2E tests (100% passing)
+- **Backend:** 19 unit/integration tests (100% passing, 90.62% coverage)
+- **E2E:** Complete user workflow testing with Playwright
 
 ---
 
