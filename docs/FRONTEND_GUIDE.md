@@ -98,7 +98,31 @@ The authentication system uses **Supabase Auth** for secure user management with
 
 ### Key Components
 
-#### 1. AuthContext (`src/contexts/AuthContext.tsx`)
+#### 1. Login and Registration Pages
+
+**Login Page** (`src/pages/LoginPage.tsx`)
+- Modern interface based on Scale's design system
+- Gradient background with indigo/blue/purple colors
+- Animated TaskLite logo in header
+- Visual social login buttons (Google and GitHub)
+- Input fields with integrated icons
+- "Don't remember your password?" link for password recovery
+- "Sign up" link for user registration
+- Loading, error and success states management
+- Responsive design with mobile and desktop layouts
+- Dark mode support with appropriate color gradients
+- Comprehensive test coverage with 7 tests
+
+**Registration Page** (`src/pages/RegisterPage.tsx`)
+- Consistent design matching login page
+- Form validation and error handling
+- Email and password validation
+- Animated logo and social registration options
+- Success confirmation with navigation
+- Dark mode support and responsive design
+- Comprehensive test coverage with 8 tests
+
+#### 2. AuthContext (`src/contexts/AuthContext.tsx`)
 ```typescript
 // Provides authentication state and methods
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -139,16 +163,7 @@ export default supabase;
 - Loading states and error handling
 - Responsive design with Tailwind CSS
 
-**Login Page** (`src/pages/LoginPage.tsx`)
-- Dedicated login page with form validation
-- Navigation to registration page
-- Error handling and loading states
-- Integration with AuthContext
 
-**Register Page** (`src/pages/RegisterPage.tsx`)
-- User registration with email confirmation
-- Password strength validation
-- Navigation to login page
 - Success feedback and error handling
 
 ### Authentication Flow

@@ -59,7 +59,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **AI Image Generation** | ❌ Pending | 0% | Generate images for tasks |
 | **AI Image Attachment** | ❌ Pending | 0% | Attach images to tasks |
 
-### 🔐 Authentication & User Management (Partially Complete - 28%)
+### 🔐 Authentication & User Management (Partially Complete - 30%)
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|

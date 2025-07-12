@@ -15,7 +15,7 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ## Resumen General
 
 ### Estado Actual
-✅ **99 pruebas unitarias** (100% pasando)  
+✅ **114 pruebas unitarias** (100% pasando)  
 ✅ **46 pruebas E2E** (100% pasando)  
 ✅ **19 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
@@ -49,6 +49,7 @@ src/test/
 
 ### Cobertura principal
 - **App**: Navegación, vistas, temas (7 tests)
+- **Authentication**: Páginas de login y registro, validación y flujos de autenticación (15 tests)
 - **TaskForm**: Creación, edición, validación, IA (21 tests)
 - **TaskTimer**: Cronometraje, notificaciones (6 tests)
 - **useTasks**: Lógica de tareas y tiempo (10 tests)
@@ -59,9 +60,18 @@ src/test/
 - **localStorage**: Simulación de persistencia
 - **AudioContext**: Sonidos de notificación
 - **fetch**: Llamadas API de OpenAI
+- **Supabase**: Autenticación y respuestas de API
+- **React Router**: Navegación entre páginas
 - **Temporizadores**: Control de tiempo con `vi.useFakeTimers()`
 
 ### Componentes críticos
+
+#### Authentication Pages (15 tests)
+- LoginPage: Interfaz, validación, gestión de errores
+- RegisterPage: Registro de usuarios, validación de datos
+- Elementos UI: Animación del logo, botones sociales, gradientes
+- Estados: Loading, error, navegación
+- Responsive design y soporte para dark mode
 
 #### TaskForm (21 tests)
 - Renderizado y validación de formularios
