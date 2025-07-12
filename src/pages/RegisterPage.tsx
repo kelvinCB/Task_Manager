@@ -33,21 +33,39 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">Create your account</h2>
-        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          Already have an account?{' '}
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Sign in
-          </Link>
-        </p>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
+      {/* Header con logo a la izquierda */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="flex justify-start mb-8 px-4 sm:px-10 lg:px-20">
+          <div className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
+            {'TaskLite'.split('').map((letter, index) => (
+              <span key={index}>{letter}</span>
+            ))}
+          </div>
+        </div>
       </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          <AuthForm onSubmit={handleRegister} buttonText="Register" isLoading={isLoading} />
+      
+      {/* Main content */}
+      <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div>
+            <h1 className="text-center text-2xl font-bold text-gray-900 dark:text-white">Create your account</h1>
+          </div>
+          
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 text-sm">
+              {error}
+            </div>
+          )}
+          
+          <AuthForm onSubmit={handleRegister} buttonText="Register" isLoading={isLoading} isSignUp={true} />
+          
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>
