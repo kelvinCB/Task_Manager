@@ -16,7 +16,7 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 ✅ **99 pruebas unitarias** (100% pasando)  
-✅ **44 pruebas E2E** (100% pasando)  
+✅ **46 pruebas E2E** (100% pasando)  
 ✅ **19 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
@@ -160,7 +160,8 @@ e2e/
 - Carga de aplicación y navegación
 - Toggle de temas y persistencia
 - Diseño responsivo móvil
-- Exportar/importar funcionalidad
+- Menú My Account (verificación de botón y opciones)
+- Funcionalidad Export/Import Tasks desde el menú de cuenta
 
 #### Gestión de Tareas (5 tests)
 - Crear, editar, eliminar tareas
@@ -193,7 +194,7 @@ e2e/
 - Cambio entre filtros y visualización de datos
 
 ### Resultados E2E actuales
-✅ **44/44 tests pasando** (100% de éxito)  
+✅ **46/46 tests pasando** (100% de éxito)  
 ⏱️ **~1.2 minutos** con 4 workers  
 🧹 **Sin logs indebidos** - Tests limpios y optimizados  
 🌍 **Compatible globalmente** - Funciona en cualquier zona horaria

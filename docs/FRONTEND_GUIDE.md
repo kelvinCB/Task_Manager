@@ -60,8 +60,11 @@ src/
 │   └── AIIcon.tsx       # AI integration icon
 ├── components/
 │   └── features/        # Feature-specific components
-│       └── auth/        # Authentication components
-│           └── AuthForm.tsx # Reusable auth form
+│       ├── auth/        # Authentication components
+│       │   ├── AuthForm.tsx # Reusable auth form
+│       │   └── LoginButton.tsx # Login button component
+│       └── account/      # Account-related components
+│           └── AccountMenu.tsx # Unified account menu component
 ├── contexts/            # React contexts
 │   ├── ThemeContext.tsx # Theme management
 │   └── AuthContext.tsx  # Authentication context
@@ -299,6 +302,12 @@ export const ComponentName: React.FC<ComponentNameProps> = ({
 - **Purpose**: Time tracking functionality
 - **Features**: Start/pause timer, elapsed time display, notifications
 - **Props**: `taskId`, `isActive`, `elapsedTime`, `onStart`, `onPause`
+
+#### AccountMenu Component
+- **Purpose**: Unified account and task management menu
+- **Features**: Login/logout toggle, export/import functionality, responsive design with compact mode for mobile
+- **Props**: `onExport`, `onImport`, `compact`
+- **Integration**: Uses AuthContext for authentication state and ThemeContext for styling
 
 ---
 

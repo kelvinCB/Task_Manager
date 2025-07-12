@@ -90,9 +90,31 @@ test.describe('Task Manager App', () => {
     await expect(appPage.searchInput).toHaveAttribute('placeholder', 'Search tasks...');
   });
 
-  test('should show export and import buttons', async () => {
-    await expect(appPage.exportButton).toBeVisible();
-    await expect(appPage.importButton).toBeVisible();
+  test('should show My Account menu button', async () => {
+    // Verify the My Account menu button is visible
+    await expect(appPage.accountMenu).toBeVisible();
+  });
+
+  test('should show Export Tasks option in account menu', async () => {
+    // Open the account menu
+    await appPage.accountMenu.click();
+    
+    // Verify Export Tasks option exists
+    await expect(appPage.page.getByRole('menuitem').filter({ hasText: 'Export Tasks' })).toBeVisible();
+    
+    // Close menu by clicking elsewhere
+    await appPage.page.mouse.click(10, 10);
+  });
+
+  test('should show Import Tasks option in account menu', async () => {
+    // Open the account menu
+    await appPage.accountMenu.click();
+    
+    // Verify Import Tasks option exists
+    await expect(appPage.page.getByRole('menuitem').filter({ hasText: 'Import Tasks' })).toBeVisible();
+    
+    // Close menu by clicking elsewhere
+    await appPage.page.mouse.click(10, 10);
   });
 
   test('should maintain view state when navigating between views', async () => {
