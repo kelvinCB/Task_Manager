@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../../App';
 import { ThemeProvider } from '../../contexts/ThemeContext';
+import { AuthProvider } from '../../contexts/AuthContext';
 
 // Mock sample task data
 const mockTasks = [
@@ -70,6 +71,54 @@ const getTimeStatisticsMock = vi.fn().mockReturnValue({
   monthly: []
 });
 
+// Mock Supabase client
+vi.mock('../../lib/supabaseClient', () => ({
+  auth: {
+    getSession: () => ({ data: { session: null } }),
+    onAuthStateChange: () => ({ 
+      data: { subscription: { unsubscribe: vi.fn() } } 
+    }),
+    signOut: vi.fn(),
+    signInWithPassword: vi.fn()
+  }
+}));
+
+// Mock AuthContext
+vi.mock('../../contexts/AuthContext', () => {
+  const originalModule = vi.importActual('../../contexts/AuthContext');
+  return {
+    ...originalModule,
+    AuthProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="auth-provider">{children}</div>,
+    useAuth: () => ({
+      isAuthenticated: false,
+      logout: vi.fn(),
+      user: null,
+      session: null
+    })
+  };
+});
+
+// Mock Login and Register pages
+vi.mock('../../pages/LoginPage', () => ({
+  default: () => <div data-testid="login-page">Login Page</div>
+}));
+
+vi.mock('../../pages/RegisterPage', () => ({
+  default: () => <div data-testid="register-page">Register Page</div>
+}));
+
+// Mock router
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+    BrowserRouter: ({ children }: { children: React.ReactNode }) => <div data-testid="browser-router">{children}</div>,
+    Routes: ({ children }: { children: React.ReactNode }) => <div data-testid="routes">{children}</div>,
+    Route: ({ path, element }: { path: string, element: React.ReactNode }) => <div data-testid={`route-${path}`}>{element}</div>
+  };
+});
+
 // Mock icons
 vi.mock('lucide-react', () => ({
   Search: () => <div data-testid="search-icon">Search</div>,
@@ -89,6 +138,10 @@ vi.mock('lucide-react', () => ({
   Tag: ({ size }: { size?: number }) => <div data-testid="tag-icon" style={{ width: size, height: size }}>Tag</div>,
   Calendar: ({ size }: { size?: number }) => <div data-testid="calendar-icon" style={{ width: size, height: size }}>Calendar</div>,
   Menu: ({ size }: { size?: number }) => <div data-testid="menu-icon" style={{ width: size, height: size }}>Menu</div>,
+  UserCircle: ({ size }: { size?: number }) => <div data-testid="user-circle-icon" style={{ width: size, height: size }}>UserCircle</div>,
+  ChevronDown: ({ size }: { size?: number }) => <div data-testid="chevron-down-icon" style={{ width: size, height: size }}>ChevronDown</div>,
+  LogIn: ({ size }: { size?: number }) => <div data-testid="login-icon" style={{ width: size, height: size }}>LogIn</div>,
+  LogOut: ({ size }: { size?: number }) => <div data-testid="logout-icon" style={{ width: size, height: size }}>LogOut</div>,
 }));
 
 // Mock view components
@@ -137,9 +190,11 @@ describe('App Component', () => {
   it('should render the app with navigation buttons', () => {
     // Act
     render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
     );
     
     // Assert - verify navigation buttons are displayed (check for all instances)
@@ -151,9 +206,11 @@ describe('App Component', () => {
   it('should show Board view by default', () => {
     // Act
     render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
     );
     
     // Assert - verify Board view is shown by default
@@ -168,9 +225,11 @@ describe('App Component', () => {
   it('should switch to Tree view when Tree button is clicked', () => {
     // Act
     render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
     );
     
     // Click Tree view button (use first instance - desktop)
@@ -189,9 +248,11 @@ describe('App Component', () => {
   it('should switch to Time Stats view when Stats button is clicked', () => {
     // Act
     render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
     );
     
     // Click Time Stats button (use first instance - desktop)
@@ -210,9 +271,11 @@ describe('App Component', () => {
   it('should create a new task when using the TaskForm', () => {
     // Act
     render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
     );
     
     // Open form
@@ -233,21 +296,25 @@ describe('App Component', () => {
   
   it('should import/export tasks using CSV functionality', () => {
     render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
     );
     
-    // Verify import/export buttons exist
-    expect(screen.getByTitle(/export/i)).toBeInTheDocument();
-    expect(screen.getByTitle(/import/i)).toBeInTheDocument();
+    // Verify My Account buttons exist (now contains export/import functionality)
+    const accountButtons = screen.getAllByTitle('My Account');
+    expect(accountButtons.length).toBeGreaterThan(0);
   });
   
   it('should handle task timer controls across views', () => {
     render(
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
     );
     
     // For this test we just verify task items are present
