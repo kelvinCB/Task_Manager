@@ -13,16 +13,14 @@ import {
   Plus, 
   Search, 
   Filter,
-  Download,
-  Upload,
   Clock,
   Sun,
   Moon
 } from 'lucide-react';
-import { BurgerMenu } from './components/BurgerMenu';
 import Papa from 'papaparse';
 
 import { useTheme } from './contexts/ThemeContext';
+import { AccountMenu } from './components/features/account/AccountMenu';
 
 import './styles/logoAnimation.css';
 import LoginPage from './pages/LoginPage';
@@ -285,7 +283,6 @@ const MainApp = () => {
               </div>
               
               <div className="flex items-center gap-3 sm:gap-4">
-                {/* Add Task Button - Slightly bigger */}
                 <button
                   onClick={openCreateForm}
                   className={`flex items-center gap-2 px-5 py-2.5 ${theme === 'dark' ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg transition-colors duration-200 text-base font-medium shadow-sm`}
@@ -335,29 +332,14 @@ const MainApp = () => {
                     <span className="hidden sm:inline">Time Stats</span>
                   </button>
                 </div>
-
-                {/* Export Button */}
-                <button
-                  onClick={handleExportTasks}
-                  title="Export"
-                  className={`flex items-center gap-2 px-4 py-2 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} rounded-lg transition-colors duration-200`}
-                >
-                  <Download size={16} />
-                  <span className="hidden sm:inline">Export</span>
-                </button>
-
-                {/* Import Button */}
-                <label htmlFor="import-csv" title="Import" className={`flex items-center gap-2 px-4 py-2 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} rounded-lg transition-colors duration-200 cursor-pointer`}>
-                  <Upload size={16} />
-                  <span className="hidden sm:inline">Import</span>
-                  <input
-                    type="file"
-                    id="import-csv"
-                    accept=".csv"
-                    onChange={handleImportTasks}
-                    className="hidden"
-                  />
-                </label>
+              </div>
+              
+              {/* Account Menu - At the far right */}
+              <div className="flex items-center ml-3">
+                <AccountMenu 
+                  onExport={handleExportTasks}
+                  onImport={handleImportTasks}
+                />
               </div>
             </div>
           </div>
@@ -396,6 +378,8 @@ const MainApp = () => {
                 />
               </div>
 
+              {/* Account Menu removed from here - moved to burger menu area */}
+              
               {/* Add Task Button */}
               <button
                 onClick={openCreateForm}
@@ -443,7 +427,7 @@ const MainApp = () => {
               </div>
             </div>
 
-            {/* Level 3: Theme Toggle, Filters, and Burger Menu */}
+            {/* Level 3: Theme Toggle, Filters, Account Menu and Burger Menu */}
             <div className="py-3">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 flex-1">
@@ -472,6 +456,8 @@ const MainApp = () => {
                   >
                     <Filter size={16} />
                   </button>
+                  
+                  {/* Account Menu removed from here - moved to replace burger menu */}
 
                   {/* Inline Filters when active */}
                   {showFilters && (
@@ -509,10 +495,11 @@ const MainApp = () => {
                   )}
                 </div>
 
-                {/* Burger Menu */}
-                <BurgerMenu 
-                  onExportTasks={handleExportTasks}
-                  onImportTasks={handleImportTasks}
+                {/* Account Menu - Replaced Burger Menu */}
+                <AccountMenu 
+                  onExport={handleExportTasks}
+                  onImport={handleImportTasks}
+                  compact={true}
                 />
               </div>
             </div>
