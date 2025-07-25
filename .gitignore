@@ -34,4 +34,21 @@ playwright/.cache/
 .env.development.local
 .env.test.local
 .env.production.local
-.env
+
+# Coverage reports
+coverage/
+*/coverage/
+backend/coverage/
+
+# Test artifacts
+*.tgz
+*.tar.gz
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# nyc test coverage
+.nyc_output
