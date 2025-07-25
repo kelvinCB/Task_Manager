@@ -41,7 +41,7 @@ Welcome to the Task Manager User Guide. This guide will help you understand the 
 
 ### Theme Toggle
 
-- **Dark/Lite Mode:** Switch between dark and light themes using the theme toggle.
+- **Dark/Light Mode:** Switch between dark and light themes using the theme toggle.
 
 ## Settings
 
