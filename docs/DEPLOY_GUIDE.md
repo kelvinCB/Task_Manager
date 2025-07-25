@@ -14,15 +14,19 @@ This guide covers deploying the Task Manager application to production environme
    - Select the Task Manager project
 
 2. **Environment Variables:**
-   Set the following environment variables in Vercel dashboard:
+   Set the following **REQUIRED** environment variables in Vercel dashboard:
    ```
-   VITE_OPENAI_API_KEY=your-openai-api-key
-   VITE_OPENAI_MODEL=gpt-4
-   VITE_OPENAI_BASE_URL=https://api.openai.com/v1
-   VITE_API_BASE_URL=https://your-backend-url.com/api
-   VITE_SUPABASE_URL=your-supabase-url
+   # REQUIRED - Supabase Configuration
+   VITE_SUPABASE_URL=your-supabase-project-url
    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   
+   # OPTIONAL - AI Features (only if using AI functionality)
+   VITE_OPENAI_API_KEY=your-openai-api-key
+   VITE_OPENAI_MODEL=o4-mini-2025-04-16
+   VITE_OPENAI_BASE_URL=https://api.openai.com/v1
    ```
+   
+   **⚠️ IMPORTANT:** Without `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, the app will show a blank page!
 
 3. **Build Settings:**
    - Build Command: `npm run build`
@@ -270,20 +274,29 @@ This guide covers deploying the Task Manager application to production environme
 
 ### Common Issues
 
-1. **Build Failures:**
+1. **🚨 BLANK PAGE ISSUE (Most Common):**
+   **Symptoms:** App loads but shows blank white page
+   **Cause:** Missing Supabase environment variables
+   **Solution:** 
+   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+   - Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+   - Redeploy the application
+   - **Verify:** Check browser console for "Supabase client not initialized" errors
+
+2. **Build Failures:**
    - Check environment variables are set
    - Verify all dependencies are in package.json
    - Check build logs for specific errors
 
-2. **API Connection Issues:**
-   - Verify backend URL is correct
-   - Check CORS configuration
-   - Ensure authentication tokens are valid
+3. **Authentication Issues:**
+   - Verify Supabase credentials are correct
+   - Check RLS policies in Supabase dashboard
+   - Test authentication in local environment first
 
-3. **Database Connection:**
-   - Verify Supabase credentials
-   - Check RLS policies
-   - Ensure database is accessible from backend
+4. **App Loads but No Functionality:**
+   - Verify all required environment variables are set
+   - Check browser console for JavaScript errors
+   - Ensure Supabase database schema is properly set up
 
 ### Debug Commands
 
