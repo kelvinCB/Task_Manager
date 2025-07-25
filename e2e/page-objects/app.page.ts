@@ -8,8 +8,7 @@ export class AppPage {
   readonly themeToggle: Locator;
   readonly searchInput: Locator;
   readonly addTaskButton: Locator;
-  readonly exportButton: Locator;
-  readonly importButton: Locator;
+  readonly accountMenu: Locator;
   readonly importInput: Locator;
 
   constructor(page: Page) {
@@ -23,9 +22,8 @@ export class AppPage {
     this.searchInput = page.getByPlaceholder('Search tasks...').or(page.getByPlaceholder('Search...')).first();
     // Add task button - Mobile shows 'Add', Desktop shows 'Add Task'
     this.addTaskButton = page.getByRole('button', { name: /Add/i }).first();
-    // Export/Import buttons - use first() to handle desktop/mobile duplicates
-    this.exportButton = page.getByTitle('Export').first();
-    this.importButton = page.getByTitle('Import').first();
+    // My Account menu
+    this.accountMenu = page.getByTitle('My Account').first();
     this.importInput = page.locator('input[type="file"]');
   }
 
@@ -62,9 +60,7 @@ export class AppPage {
       
       if (isVisible || force) {
         try {
-          await button.click({ force });
-          await this.page.waitForTimeout(1000);
-          viewSwitched = true;
+          await button.click({ force });          viewSwitched = true;
           break;
         } catch (e) {
           // Continue to next button
@@ -94,11 +90,17 @@ export class AppPage {
   }
 
   async exportTasks() {
-    await this.exportButton.click();
+    // Open account menu first
+    await this.accountMenu.click();
+    // Click the Export Tasks option in the dropdown
+    await this.page.getByRole('menuitem').filter({ hasText: 'Export Tasks' }).click();
   }
 
   async importTasks(filePath: string) {
-    await this.importButton.click();
+    // Open account menu first
+    await this.accountMenu.click();
+    // Click on the Import Tasks option which is associated with a hidden file input
+    await this.page.getByRole('menuitem').filter({ hasText: 'Import Tasks' }).click();
     await this.importInput.setInputFiles(filePath);
   }
 

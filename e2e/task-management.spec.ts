@@ -20,16 +20,8 @@ test.describe('Task Management', () => {
   });
 
   test.afterEach(async ({ page }, testInfo) => {
-    // Wait 1 second before ending test
-    await page.waitForTimeout(1000);
-    
-    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    await page.screenshot({ 
-      path: `test-results/screenshots/${testName}_final.png`,
-      fullPage: true 
-    });
-  });
+    // Wait 1 second before ending test    // Take final screenshot with test name
+    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();  });
 
   test('should create a new task successfully', async () => {
     // Open task creation modal
@@ -84,9 +76,7 @@ test.describe('Task Management', () => {
     await appPage.verifyCurrentView('tree');
     
     const taskRow = appPage.page.locator('.group').filter({ hasText: 'Original Tree Task' });
-    await taskRow.hover();
-    await appPage.page.waitForTimeout(500);
-    const moreButton = taskRow.locator('button').filter({ has: appPage.page.locator('svg') }).last();
+    await taskRow.hover();    const moreButton = taskRow.locator('button').filter({ has: appPage.page.locator('svg') }).last();
     await moreButton.click();
     
     const editOption = appPage.page.getByText('Edit').first();
@@ -126,22 +116,13 @@ test.describe('Task Management', () => {
     await expect(appPage.page.getByText('Task to Delete in Tree')).toBeVisible();
 
     const taskRow = appPage.page.locator('.group').filter({ hasText: 'Task to Delete in Tree' });
-    await taskRow.hover();
-    await appPage.page.waitForTimeout(1000);
-    
-    const buttons = taskRow.locator('button');
+    await taskRow.hover();    const buttons = taskRow.locator('button');
     const buttonCount = await buttons.count();
     const moreButton = buttons.nth(buttonCount - 1);
     await expect(moreButton).toBeVisible();
-    await moreButton.click();
-    
-    await appPage.page.waitForTimeout(500);
-    const deleteOption = appPage.page.getByRole('button', { name: 'Delete' });
+    await moreButton.click();    const deleteOption = appPage.page.getByRole('button', { name: 'Delete' });
     await expect(deleteOption).toBeVisible();
-    await deleteOption.click();
-
-    await appPage.page.waitForTimeout(1000);
-    await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
+    await deleteOption.click();    await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
   });
 
   test('should prevent creating task without title (required field validation)', async () => {

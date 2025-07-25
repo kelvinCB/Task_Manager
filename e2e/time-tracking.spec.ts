@@ -21,14 +21,6 @@ test.describe('Time Tracking', () => {
 
   test.afterEach(async ({ page }, testInfo) => {
     // Wait 1 second before ending test
-    await page.waitForTimeout(1000);
-    
-    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    await page.screenshot({ 
-      path: `test-results/screenshots/${testName}_final.png`,
-      fullPage: true 
-    });
   });
 
   test('should start and stop timer for a task', async () => {
@@ -51,8 +43,8 @@ test.describe('Time Tracking', () => {
     await timerPage.verifyTimerRunning('Timer Test Task');
 
     // Wait a moment for time to elapse
-    await appPage.page.waitForTimeout(2000);
-
+    await appPage.page.waitForTimeout(3000);
+    
     // Stop the timer
     await timerPage.pauseTimer('Timer Test Task');
     await timerPage.verifyTimerStopped('Timer Test Task');
@@ -78,7 +70,7 @@ test.describe('Time Tracking', () => {
 
     // Wait for a specific duration (3 seconds)
     await appPage.page.waitForTimeout(3000);
-
+    
     // Stop timer
     await timerPage.pauseTimer('Accuracy Test Task');
 
