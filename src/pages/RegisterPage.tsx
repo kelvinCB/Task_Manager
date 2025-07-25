@@ -37,7 +37,7 @@ const RegisterPage: React.FC = () => {
       {/* Header con logo a la izquierda */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
         <div className="flex justify-start mb-8 px-4 sm:px-10 lg:px-20">
-          <div className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
+          <div data-testid="app-logo" className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
             {'TaskLite'.split('').map((letter, index) => (
               <span key={index}>{letter}</span>
             ))}
@@ -53,7 +53,7 @@ const RegisterPage: React.FC = () => {
           </div>
           
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 text-sm">
+            <div data-testid="error-message" className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 text-sm">
               {error}
             </div>
           )}
@@ -62,7 +62,7 @@ const RegisterPage: React.FC = () => {
           
           <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+            <Link to="/login" data-testid="signin-link" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
               Sign in
             </Link>
           </p>

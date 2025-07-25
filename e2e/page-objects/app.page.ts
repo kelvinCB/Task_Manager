@@ -60,9 +60,7 @@ export class AppPage {
       
       if (isVisible || force) {
         try {
-          await button.click({ force });
-          await this.page.waitForTimeout(1000);
-          viewSwitched = true;
+          await button.click({ force });          viewSwitched = true;
           break;
         } catch (e) {
           // Continue to next button

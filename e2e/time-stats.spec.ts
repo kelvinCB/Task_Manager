@@ -21,14 +21,6 @@ test.describe('Time Stats View', () => {
 
   test.afterEach(async ({ page }, testInfo) => {
     // Wait 1 second before ending test
-    await page.waitForTimeout(1000);
-    
-    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    await page.screenshot({ 
-      path: `test-results/screenshots/${testName}_final.png`,
-      fullPage: true 
-    });
   });
 
   // Helper function to create a task and record some time
@@ -234,7 +226,6 @@ test.describe('Time Stats View', () => {
       await expect(filter.button).toHaveClass(/bg-indigo-100.*text-indigo-700|text-indigo-700.*bg-indigo-100/);
       
       // Wait a bit for any data loading
-      await appPage.page.waitForTimeout(500);
     }
   });
 

@@ -20,17 +20,8 @@ test.describe('Task Advanced Features', () => {
   });
 
   test.afterEach(async ({ page }, testInfo) => {
-    // Wait 1 second before ending test
-    await page.waitForTimeout(1000);
-    
-    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    await page.screenshot({ 
-      path: `test-results/screenshots/${testName}_final.png`,
-      fullPage: true 
-    });
-  });
-
+    // Wait 1 second before ending test    // Take final screenshot with test name
+    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();  });
 
   test('should create a task with due date', async () => {
     const taskData = {
@@ -237,10 +228,7 @@ test.describe('Task Advanced Features', () => {
     // Click the generate button
     await taskPage.aiGenerateButton.click();
 
-    // Wait for AI to generate description (up to 10 seconds as you mentioned)
-    await appPage.page.waitForTimeout(10000);
-    
-    // Check that description was generated
+    // Wait for AI to generate description (up to 10 seconds as you mentioned)    // Check that description was generated
     await appPage.page.waitForFunction(() => {
       const descInput = document.querySelector('#task-description') as HTMLTextAreaElement;
       return descInput && descInput.value.length > 0;

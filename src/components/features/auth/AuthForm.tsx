@@ -18,10 +18,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="auth-form">
         {/* Social Login Buttons */}
         <button
           type="button"
+          data-testid="google-login"
           className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium text-blue-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -46,6 +47,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
         </button>
         <button
           type="button"
+          data-testid="github-login"
           className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none"
         >
           <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -78,6 +80,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              data-testid="email-input"
               className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
@@ -99,6 +102,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              data-testid="password-input"
               className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
@@ -107,7 +111,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
         {/* Forgot password link - solo mostrar en login */}
         {!isSignUp && (
           <div className="text-right">
-            <a href="#" className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+            <a href="#" data-testid="forgot-password-link" className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
               Don't remember your password?
             </a>
           </div>
@@ -117,6 +121,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
           <button
             type="submit"
             disabled={isLoading}
+            data-testid={isSignUp ? "register-button" : "login-button"}
             className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
             {isLoading ? 'Processing...' : buttonText}

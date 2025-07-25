@@ -53,12 +53,12 @@ export class TimerPage {
     const initialTime = await elapsedTime.textContent();
     
     // Wait longer to ensure timer updates (responsive layout may affect timing)
-    await this.page.waitForTimeout(2500);
+    await this.page.waitForTimeout(2000);
     const updatedTime = await elapsedTime.textContent();
     
     // If times are equal, wait a bit more and try again (sometimes the timer needs more time)
     if (initialTime === updatedTime) {
-      await this.page.waitForTimeout(2000);
+      await this.page.waitForTimeout(3000);
       const finalTime = await elapsedTime.textContent();
       expect(finalTime).not.toBe(initialTime);
     } else {

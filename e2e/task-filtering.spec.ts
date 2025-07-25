@@ -21,7 +21,6 @@ test.describe('Task Filtering', () => {
 
   test.afterEach(async ({ page }, testInfo) => {
     // Small wait before ending test for stability
-    await page.waitForTimeout(500);
   });
 
   // Helper function to show filters - DESKTOP/MOBILE COMPATIBLE
@@ -59,8 +58,6 @@ test.describe('Task Filtering', () => {
           
           if (isVisible) {
             await btn.click();
-            await appPage.page.waitForTimeout(1000);
-            
             const newSelectCount = await selectLocator.count();
             
             if (newSelectCount > initialSelectCount) {
@@ -83,8 +80,6 @@ test.describe('Task Filtering', () => {
       if (isVisible) {
         try {
           await button.click();
-          await appPage.page.waitForTimeout(800);
-          
           const newSelectCount = await selectLocator.count();
           
           if (newSelectCount > initialSelectCount) {
@@ -166,7 +161,6 @@ test.describe('Task Filtering', () => {
     }
     
     // Wait for filtering to take effect
-    await appPage.page.waitForTimeout(1000);
   }
 
   // Helper function to create tasks with different statuses

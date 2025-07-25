@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
       {/* Header with logo on the left */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
         <div className="flex justify-start mb-8 px-4 sm:px-10 lg:px-20">
-          <div className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
+          <div data-testid="app-logo" className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
             {'TaskLite'.split('').map((letter, index) => (
               <span key={index}>{letter}</span>
             ))}
@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
           </div>
           
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 text-sm">
+            <div data-testid="error-message" className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 text-sm">
               {error}
             </div>
           )}
@@ -63,7 +63,7 @@ const LoginPage: React.FC = () => {
           {/* Option to register at the end */}
           <div className="text-base text-center mt-8">
             <span className="text-gray-600 dark:text-gray-300 mr-2">Don't have an account?</span>
-            <Link to="/register" className="text-indigo-600 dark:text-indigo-400 font-semibold">
+            <Link to="/register" data-testid="signup-link" className="text-indigo-600 dark:text-indigo-400 font-semibold">
               Sign up →
             </Link>
           </div>

@@ -59,6 +59,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
     <div className="relative" ref={menuRef}>
       <button
         onClick={toggleMenu}
+        data-testid="account-menu-button"
         className={`
           flex items-center ${compact ? 'p-2' : 'gap-2 px-4 py-2'} rounded-lg transition-all duration-200
           ${theme === 'dark' 
@@ -93,6 +94,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
             {isAuthenticated ? (
               <button
                 onClick={handleLogout}
+                data-testid="logout-button"
                 className={`
                   w-full text-left px-4 py-2 flex items-center gap-2
                   ${theme === 'dark' 
@@ -108,6 +110,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
             ) : (
               <button
                 onClick={handleLogin}
+                data-testid="login-button-menu"
                 className={`
                   w-full text-left px-4 py-2 flex items-center gap-2
                   ${theme === 'dark' 

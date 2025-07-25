@@ -17,16 +17,8 @@ test.describe('Task Search Functionality', () => {
   });
 
   test.afterEach(async ({ page }, testInfo) => {
-    // Wait 1 second before ending test
-    await page.waitForTimeout(1000);
-    
-    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    await page.screenshot({ 
-      path: `test-results/screenshots/${testName}_final.png`,
-      fullPage: true 
-    });
-  });
+    // Wait 1 second before ending test    // Take final screenshot with test name
+    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();  });
 
   // Helper function to create test tasks with different title patterns
   async function createSearchTestTasks() {

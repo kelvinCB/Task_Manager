@@ -16,7 +16,7 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 ✅ **114 pruebas unitarias** (100% pasando)  
-✅ **46 pruebas E2E** (100% pasando)  
+✅ **61 pruebas E2E** (100% pasando)  
 ✅ **19 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
@@ -151,17 +151,22 @@ backend/src/tests/
 ```
 e2e/
 ├── app.spec.ts                    # Funcionalidad básica (9 tests)
+├── auth.spec.ts                   # Autenticación (15 tests)
 ├── task-search.spec.ts             # Búsqueda (7 tests)
 ├── task-filtering.spec.ts          # Filtrado global (10 tests)
 ├── task-management.spec.ts         # Gestión de tareas (5 tests)
 ├── task-advanced.spec.ts           # IA y fechas (4 tests)
 ├── time-tracking.spec.ts           # Seguimiento de tiempo (3 tests)
 ├── time-stats.spec.ts              # Estadísticas (8 tests)
-└── page-objects/
-    ├── app.page.ts                 # Navegación general
-    ├── task.page.ts                # Formularios de tareas
-    ├── board.page.ts               # Vista Board
-    └── timer.page.ts               # Funcionalidades de timer
+├── global-setup.ts                 # Configuración global para tests
+├── global-teardown.ts              # Limpieza global después de tests
+└── page-objects/                   # Objetos de página para E2E
+    ├── app.page.ts                 # Interacciones con la App
+    ├── auth.page.ts                # Interacciones de Autenticación
+    ├── board.page.ts               # Interacciones con TaskBoard
+    ├── task.page.ts                # Interacciones con tareas
+    ├── timer.page.ts               # Interacciones con Timer
+    └── tree.page.ts                # Interacciones con TaskTree
 ```
 
 ### Casos de prueba E2E por categoría
@@ -203,8 +208,14 @@ e2e/
 - **Filtro de fecha personalizada** 📅 (fix de zona horaria)
 - Cambio entre filtros y visualización de datos
 
+#### Authentication (15 tests)
+- **Login**: Acceso desde menú Account, validación de campos, gestión de errores (6 tests)
+- **Logout**: Cierre de sesión y verificación de acceso restringido (1 test)
+- **Register**: Registro de nuevos usuarios, validaciones, manejo de errores (5 tests)
+- **UI Elements**: Verificación de botones sociales, links y estilos de página (3 tests)
+
 ### Resultados E2E actuales
-✅ **46/46 tests pasando** (100% de éxito)  
+✅ **61/61 tests pasando** (100% de éxito)  
 ⏱️ **~1.2 minutos** con 4 workers  
 🧹 **Sin logs indebidos** - Tests limpios y optimizados  
 🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
