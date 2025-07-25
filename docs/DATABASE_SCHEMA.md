@@ -18,6 +18,19 @@ This table is automatically created and managed by Supabase Authentication. We d
 - **email**: `text`
 - ... and other metadata columns managed by Supabase.
 
+### `public.profiles`
+
+Extends user information beyond what Supabase Auth provides. Each profile is linked to a user.
+
+| Column        | Type        | Constraints                                        |
+|---------------|-------------|----------------------------------------------------|
+| `id`          | `uuid`      | Primary Key, Foreign Key to `auth.users(id)`, On Delete Cascade |
+| `username`    | `text`      | Not Null, Unique, Check length >= 3 AND <= 50    |
+| `display_name`| `text`      | Nullable                                           |
+| `avatar_url`  | `text`      | Nullable                                           |
+| `created_at`  | `timestamptz` | Not Null, Default `now()`                          |
+| `updated_at`  | `timestamptz` | Not Null, Default `now()`                          |
+
 ### `public.tasks`
 
 Stores the tasks for each user. Each task is linked to a user.
@@ -50,11 +63,13 @@ Stores time tracking entries for each task.
 
 RLS is enabled for all tables in the `public` schema to ensure users can only access their own data.
 
+- **`profiles` table policies**: Users can perform `SELECT`, `INSERT`, `UPDATE` only on rows where `profiles.id` matches their own session `auth.uid()`.
 - **`tasks` table policies**: Users can perform `SELECT`, `INSERT`, `UPDATE`, `DELETE` only on rows where `tasks.user_id` matches their own session `auth.uid()`.
 - **`time_entries` table policies**: Users can perform `SELECT`, `INSERT`, `UPDATE`, `DELETE` only on rows where `time_entries.user_id` matches their own session `auth.uid()`.
 
 ## Relationships
 
+- **Users to Profiles**: One-to-one. Each user has exactly one profile. Implemented via `profiles.id` -> `auth.users.id`.
 - **Users to Tasks**: One-to-many. A user can have many tasks. Implemented via `tasks.user_id` -> `auth.users.id`.
 - **Tasks to Time Entries**: One-to-many. A task can have many time entries. Implemented via `time_entries.task_id` -> `public.tasks.id`.
 - **Tasks to Tasks (Subtasks)**: One-to-many. A task can have many subtasks. Implemented via `tasks.parent_id` -> `public.tasks.id`.

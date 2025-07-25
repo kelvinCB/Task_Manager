@@ -15,11 +15,12 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ## Resumen General
 
 ### Estado Actual
-✅ **114 pruebas unitarias** (100% pasando)  
-✅ **61 pruebas E2E** (100% pasando)  
+✅ **131 pruebas unitarias** (100% pasando)  
+✅ **58 pruebas E2E** (100% pasando)  
 ✅ **19 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
+✅ **Feature de Username** con tests específicos implementados
 
 ### Tecnologías
 - **Unitarias**: Vitest + React Testing Library + jsdom
@@ -54,6 +55,8 @@ src/test/
 - **TaskTimer**: Cronometraje, notificaciones (6 tests)
 - **useTasks**: Lógica de tareas y tiempo (10 tests)
 - **openaiService**: Integración IA (16 tests)
+- **AccountMenu**: Menú de cuenta con username display (11 tests)
+- **useUserProfile**: Hook para gestión de perfiles de usuario (6 tests)
 - **Otros componentes**: TaskBoard, TaskTree, TimeStatsView, etc.
 
 ### Mocks configurados
@@ -72,6 +75,12 @@ src/test/
 - Elementos UI: Animación del logo, botones sociales, gradientes
 - Estados: Loading, error, navegación
 - Responsive design y soporte para dark mode
+
+#### Username Feature (17 tests)
+- **AccountMenu (11 tests)**: Display de username, dropdown functionality, login/logout states
+- **useUserProfile (6 tests)**: Fetch profile data, update profile, error handling
+- Integración con Supabase para datos de perfil
+- Generación automática de usernames aleatorios
 
 #### TaskForm (21 tests)
 - Renderizado y validación de formularios

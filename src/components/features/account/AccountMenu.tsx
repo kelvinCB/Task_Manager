@@ -6,10 +6,12 @@ import {
   UserCircle,
   ChevronDown,
   LogIn,
-  LogOut
+  LogOut,
+  User
 } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useUserProfile } from '../../../hooks/useUserProfile';
 
 interface AccountMenuProps {
   onExport: () => void;
@@ -26,6 +28,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const { isAuthenticated, logout } = useAuth();
+  const { profile, loading: profileLoading } = useUserProfile();
   const navigate = useNavigate();
 
   // Close menu when clicking outside
@@ -90,6 +93,37 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
           `}
         >
           <div className="py-1" role="menu" aria-orientation="vertical">
+            {/* User info section - only show when authenticated */}
+            {isAuthenticated && profile && (
+              <>
+                <div className={`px-4 py-3 border-b ${
+                  theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${
+                      theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                    }`}>
+                      <User size={16} className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium truncate ${
+                        theme === 'dark' ? 'text-gray-200' : 'text-gray-900'
+                      }`}>
+                        @{profile.username}
+                      </p>
+                      {profile.display_name && (
+                        <p className={`text-xs truncate ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {profile.display_name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+            
             {/* Login/Logout depending on auth state */}
             {isAuthenticated ? (
               <button

@@ -59,16 +59,18 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **AI Image Generation** | ❌ Pending | 0% | Generate images for tasks |
 | **AI Image Attachment** | ❌ Pending | 0% | Attach images to tasks |
 
-### 🔐 Authentication & User Management (Partially Complete - 30%)
+### 🔐 Authentication & User Management (Partially Complete - 50%)
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
 | **User Registration** | ✅ Complete | 100% | Email/password registration with validation |
 | **User Login** | ✅ Complete | 100% | Email/password login with session management |
+| **Random Username Generation** | ✅ Complete | 100% | Auto-generated food-based usernames (e.g., pizza1234) |
+| **Username Display** | ✅ Complete | 100% | Show username in My Account dropdown menu |
+| **User Profile Management** | ✅ Complete | 100% | Hook for fetching and updating user profiles |
 | **Google OAuth** | ❌ Pending | 0% | Login with Google |
 | **GitHub OAuth** | ❌ Pending | 0% | Login with GitHub |
 | **Password Reset** | ❌ Pending | 0% | Forgot password functionality |
-| **User Profile** | ❌ Pending | 0% | Manage user information |
 | **Account Settings** | ❌ Pending | 0% | User preferences and settings |
 
 ### 📱 Enhanced UI Features (Not Started - 0%)
@@ -120,12 +122,13 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Daily/Weekly Summaries** | ❌ Pending | 0% | Progress summary emails |
 | **In-App Notifications** | ❌ Pending | 0% | Real-time notifications |
 
-### 🧪 Testing (Excellent - 90%)
+### 🧪 Testing (Excellent - 95%)
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
-| **Frontend Unit Tests** | ✅ Complete | 100% | Comprehensive Vitest tests with timezone handling |
-|| **E2E Tests** | ✅ Complete | 100% | 58/58 Playwright E2E tests passing (all cleaned and optimized) |
+| **Frontend Unit Tests** | ✅ Complete | 100% | 131 comprehensive Vitest tests including username features |
+| **E2E Tests** | ✅ Complete | 100% | 58/58 Playwright E2E tests passing (all cleaned and optimized) |
+| **Username Feature Tests** | ✅ Complete | 100% | 17 tests covering AccountMenu and useUserProfile hook |
 | **Test Debugging** | ✅ Complete | 100% | Visual debugging strategy with screenshots |
 | **Backend Unit Tests** | ✅ Complete | 100% | 19/19 Jest tests passing with 90.62% coverage |
 | **Integration Tests** | ✅ Complete | 100% | API integration testing with Supertest |
