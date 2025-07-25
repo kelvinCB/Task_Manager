@@ -167,6 +167,7 @@ e2e/
 ├── task-advanced.spec.ts           # IA y fechas (4 tests)
 ├── time-tracking.spec.ts           # Seguimiento de tiempo (3 tests)
 ├── time-stats.spec.ts              # Estadísticas (8 tests)
+├── username-display.spec.ts         # Display de username (8 tests)
 ├── global-setup.ts                 # Configuración global para tests
 ├── global-teardown.ts              # Limpieza global después de tests
 └── page-objects/                   # Objetos de página para E2E
@@ -223,11 +224,19 @@ e2e/
 - **Register**: Registro de nuevos usuarios, validaciones, manejo de errores (5 tests)
 - **UI Elements**: Verificación de botones sociales, links y estilos de página (3 tests)
 
+#### Username Display (8 tests)
+- **Button Display**: Verificación de "My Account" en estados autenticados y no autenticados (2 tests)
+- **Dropdown Username**: Display del username generado automáticamente en dropdown (2 tests)
+- **Mobile Consistency**: Funcionamiento consistente en vista móvil (1 test)
+- **Authentication States**: Comportamiento correcto según estado de autenticación (2 tests)
+- **UI Interactions**: Abrir/cerrar dropdown y click fuera para cerrar (1 test)
+
 ### Resultados E2E actuales
-✅ **61/61 tests pasando** (100% de éxito)  
-⏱️ **~1.2 minutos** con 4 workers  
+✅ **66/66 tests pasando** (100% de éxito)  
+⏱️ **~1.4 minutos** con 4 workers  
 🧹 **Sin logs indebidos** - Tests limpios y optimizados  
 🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
+✨ **Username Feature** - Tests completos para display de username
 
 ## Cómo ejecutar las pruebas
 
