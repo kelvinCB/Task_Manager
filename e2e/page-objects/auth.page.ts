@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page, expect, Locator } from '@playwright/test';
 
 export class AuthPage {
   readonly page: Page;
@@ -39,7 +39,7 @@ export class AuthPage {
     const menuCount = await menuButtons.count();
     
     // Try to find the AccountMenu button by looking for the one that has UserCircle icon or "My Account" text
-    let correctMenuButton = null;
+    let correctMenuButton: Locator | null = null;
     
     for (let i = 0; i < menuCount; i++) {
       const button = menuButtons.nth(i);
@@ -240,7 +240,7 @@ export class AuthPage {
     
     // Check absence of logged-in user indicators
     const userIndicators = this.page.locator('[data-testid="user-name"], [data-testid="user-avatar"]');
-    const noUserIndicators = await userIndicators.count() === 0;
+    const noUserIndicators = (await userIndicators.count()) === 0;
     
     // Check that logout button is not present
     let logoutButtonPresent = false;
