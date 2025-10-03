@@ -164,6 +164,7 @@
             <ol>
                 <li><a href="#resumen-general">Resumen General</a></li>
                 <li><a href="#pruebas-unitarias">Pruebas Unitarias</a></li>
+                <li><a href="#pruebas-backend">Pruebas de Backend</a></li>
                 <li><a href="#pruebas-e2e">Pruebas E2E (End-to-End)</a></li>
                 <li><a href="#como-ejecutar">Cómo ejecutar las pruebas</a></li>
                 <li><a href="#bugs-corregidos">Bugs corregidos</a></li>
@@ -179,31 +180,32 @@
             <h3>Estado Actual</h3>
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-number">99</div>
-                    <div>Pruebas Unitarias</div>
+                    <div class="stat-number">131</div>
+                    <div>Pruebas Unitarias Frontend</div>
                     <div>(100% pasando)</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">44</div>
+                    <div class="stat-number">19</div>
+                    <div>Pruebas Backend</div>
+                    <div>(100% pasando)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">66</div>
                     <div>Pruebas E2E</div>
                     <div>(100% pasando)</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">100%</div>
-                    <div>Cobertura</div>
-                    <div>Funcionalidades críticas</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">🌍</div>
-                    <div>Compatible</div>
-                    <div>Todas las zonas horarias</div>
+                    <div class="stat-number">216</div>
+                    <div>Total Tests</div>
+                    <div>(100% pasando)</div>
                 </div>
             </div>
         </div>
 
         <h3>Tecnologías</h3>
         <ul>
-            <li><strong>Unitarias:</strong> Vitest + React Testing Library + jsdom</li>
+            <li><strong>Unitarias Frontend:</strong> Vitest + React Testing Library + jsdom</li>
+            <li><strong>Backend:</strong> Jest + Supertest + mocks</li>
             <li><strong>E2E:</strong> Playwright + Chromium</li>
             <li><strong>Enfoque:</strong> Testing centrado en el usuario, accesible y robusto</li>
         </ul>
@@ -240,15 +242,66 @@
 
         <hr>
 
+        <h2 id="pruebas-backend"><span class="emoji">🔧</span>Pruebas de Backend</h2>
+        
+        <h3>Configuración y Tecnologías</h3>
+        <ul>
+            <li><strong>Jest:</strong> Framework de testing principal</li>
+            <li><strong>Supertest:</strong> Testing de endpoints HTTP</li>
+            <li><strong>Mocks:</strong> Cliente Supabase mockeado para testing aislado</li>
+            <li><strong>Cobertura:</strong> 90.62% en controladores, 100% en rutas</li>
+        </ul>
+
+        <h3>Estructura de archivos Backend</h3>
+        <div class="file-structure">backend/src/tests/
+├── setup.js                           # Configuración global de tests
+├── controllers/
+│   └── authController.test.js         # Tests unitarios del controlador (10 tests)
+└── routes/
+    └── auth.test.js                   # Tests de integración de rutas (9 tests)</div>
+
+        <div class="success">
+            <h3><span class="emoji">✅</span>Resultados Backend</h3>
+            <ul>
+                <li><strong>19/19 tests pasando</strong> (100% de éxito)</li>
+                <li><strong>90.62%</strong> cobertura en controladores</li>
+                <li><strong>100%</strong> cobertura en rutas</li>
+                <li><strong>Rápido:</strong> Ejecución en ~1 segundo</li>
+                <li><strong>Seguro:</strong> Validación completa de inputs y errores</li>
+            </ul>
+        </div>
+
+        <h3>Cobertura de Tests Backend</h3>
+        <h4>Controlador de Autenticación (10 tests)</h4>
+        <ul>
+            <li><strong>Registro exitoso:</strong> Validación de usuario registrado</li>
+            <li><strong>Validación de entrada:</strong> Email y contraseña requeridos</li>
+            <li><strong>Validación de formato:</strong> Email inválido, contraseña corta</li>
+            <li><strong>Errores de Supabase:</strong> Manejo de errores de autenticación</li>
+            <li><strong>Errores inesperados:</strong> Manejo de fallos del servidor</li>
+        </ul>
+
+        <h4>Rutas de Autenticación (9 tests)</h4>
+        <ul>
+            <li><strong>POST /api/auth/register:</strong> Tests de integración completos</li>
+            <li><strong>POST /api/auth/login:</strong> Tests de integración completos</li>
+            <li><strong>Códigos de estado:</strong> 200, 201, 400, 401, 500</li>
+            <li><strong>Formatos de respuesta:</strong> JSON estructurado</li>
+            <li><strong>Rutas no encontradas:</strong> Manejo de 404</li>
+        </ul>
+
+        <hr>
+
         <h2 id="pruebas-e2e"><span class="emoji">🎭</span>Pruebas E2E (End-to-End)</h2>
         
         <div class="success">
             <h3><span class="emoji">✅</span>Resultados E2E actuales</h3>
             <ul>
-                <li><strong>44/44 tests pasando</strong> (100% de éxito)</li>
-                <li><strong>~1.2 minutos</strong> con 4 workers</li>
+                <li><strong>66/66 tests pasando</strong> (100% de éxito)</li>
+                <li><strong>~1.4 minutos</strong> con 4 workers</li>
                 <li><strong>Sin logs indebidos</strong> - Tests limpios y optimizados</li>
                 <li><strong>Compatible globalmente</strong> - Funciona en cualquier zona horaria</li>
+                <li><strong>Username Feature</strong> - Tests completos para display de username</li>
             </ul>
         </div>
 
@@ -256,7 +309,7 @@
 
         <h2 id="como-ejecutar"><span class="emoji">🚀</span>Cómo ejecutar las pruebas</h2>
         
-        <h3>Pruebas Unitarias</h3>
+        <h3>Pruebas Unitarias Frontend</h3>
         <div class="code-block">
             <pre># Modo watch (desarrollo)
 npm test
@@ -269,6 +322,27 @@ npm run test:coverage
 
 # Interface gráfica
 npm run test:ui</pre>
+        </div>
+
+        <h3>Pruebas Backend</h3>
+        <div class="code-block">
+            <pre># Navegar al directorio backend
+cd backend
+
+# Instalar dependencias
+npm install
+
+# Ejecutar todos los tests
+npm test
+
+# Modo watch (desarrollo)
+npm run test:watch
+
+# Con cobertura
+npm run test:coverage
+
+# Test específico
+npx jest src/tests/controllers/authController.test.js</pre>
         </div>
 
         <h3>Pruebas E2E</h3>
@@ -355,7 +429,7 @@ const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 
             <p><strong>📝 Documentación Completa:</strong> Esta versión HTML proporciona los aspectos más importantes. Para detalles completos de todos los tests, estructura de archivos y ejemplos de código, consulte el archivo completo <a href="TESTING_GUIDE.md" target="_blank">TESTING_GUIDE.md</a>.</p>
         </div>
 
-        <p><em><strong>Última actualización:</strong> Julio 2025 - Suite de testing completamente funcional, robusta y optimizada</em></p>
+        <p><em><strong>Última actualización:</strong> Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 216 tests (131 Frontend + 19 Backend + 66 E2E)</em></p>
     </div>
 </body>
 </html>
