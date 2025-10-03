@@ -16,12 +16,13 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 ✅ **131 pruebas unitarias** (100% pasando)  
-✅ **66 pruebas E2E** (100% pasando)  
+✅ **72 pruebas E2E** (100% pasando)  
 ✅ **58 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
 ✅ **Task CRUD con aislamiento de usuarios** implementado y testeado
+✅ **Tests E2E de aislamiento** verificando seguridad multi-usuario
 
 ### Tecnologías
 - **Unitarias**: Vitest + React Testing Library + jsdom
@@ -189,6 +190,7 @@ e2e/
 ├── task-filtering.spec.ts          # Filtrado global (10 tests)
 ├── task-management.spec.ts         # Gestión de tareas (5 tests)
 ├── task-advanced.spec.ts           # IA y fechas (4 tests)
+├── task-isolation.spec.ts          # Aislamiento de usuarios (6 tests)
 ├── time-tracking.spec.ts           # Seguimiento de tiempo (3 tests)
 ├── time-stats.spec.ts              # Estadísticas (8 tests)
 ├── username-display.spec.ts         # Display de username (8 tests)
@@ -255,12 +257,21 @@ e2e/
 - **Authentication States**: Comportamiento correcto según estado de autenticación (2 tests)
 - **UI Interactions**: Abrir/cerrar dropdown y click fuera para cerrar (1 test)
 
+#### Task User Isolation (6 tests)
+- **User 1 Private Tasks**: Usuario 1 solo ve sus propias tareas (1 test)
+- **Cross-User Invisibility**: Usuario 2 no ve tareas de Usuario 1 (1 test)
+- **Modification Prevention**: Usuarios no pueden modificar tareas ajenas (1 test)
+- **Search Isolation**: Búsqueda respeta aislamiento de usuarios (1 test)
+- **Filter Isolation**: Filtros respetan aislamiento por usuario (1 test)
+- **Unauthenticated Access**: Usuarios no autenticados no acceden a tareas (1 test)
+
 ### Resultados E2E actuales
-✅ **66/66 tests pasando** (100% de éxito)  
-⏱️ **~1.4 minutos** con 4 workers  
+✅ **72/72 tests pasando** (100% de éxito)  
+⏱️ **~1.5 minutos** con 4 workers  
 🧹 **Sin logs indebidos** - Tests limpios y optimizados  
 🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
+🔒 **User Isolation** - Tests de seguridad multi-usuario
 
 ## Cómo ejecutar las pruebas
 
@@ -390,4 +401,4 @@ render(
 
 ---
 
-**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 255 tests (131 Frontend + 58 Backend + 66 E2E)
+**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 261 tests (131 Frontend + 58 Backend + 72 E2E)
