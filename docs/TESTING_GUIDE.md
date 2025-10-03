@@ -17,10 +17,11 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ### Estado Actual
 ✅ **131 pruebas unitarias** (100% pasando)  
 ✅ **66 pruebas E2E** (100% pasando)  
-✅ **19 pruebas de backend** (100% pasando)  
+✅ **58 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
+✅ **Task CRUD con aislamiento de usuarios** implementado y testeado
 
 ### Tecnologías
 - **Unitarias**: Vitest + React Testing Library + jsdom
@@ -113,9 +114,13 @@ src/test/
 backend/src/tests/
 ├── setup.js                           # Configuración global de tests
 ├── controllers/
-│   └── authController.test.js         # Tests unitarios del controlador (10 tests)
-└── routes/
-    └── auth.test.js                   # Tests de integración de rutas (9 tests)
+│   ├── authController.test.js         # Tests unitarios de autenticación (10 tests)
+│   └── taskController.test.js         # Tests unitarios de tareas (22 tests)
+├── routes/
+│   ├── auth.test.js                   # Tests de integración de autenticación (9 tests)
+│   └── tasks.test.js                  # Tests de integración de tareas (17 tests)
+└── middleware/
+    └── authMiddleware.js              # Middleware de autenticación JWT
 ```
 
 ### Cobertura de Tests Backend
@@ -134,19 +139,38 @@ backend/src/tests/
 - **Formatos de respuesta**: JSON estructurado
 - **Rutas no encontradas**: Manejo de 404
 
+#### Controlador de Tareas (22 tests)
+- **createTask**: Creación exitosa, validación de título, validación de status, verificación de parent_task_id
+- **getTasks**: Obtener todas las tareas del usuario, filtrado por status, validación de filtros
+- **getTaskById**: Obtener tarea específica, validación de ID, verificación de propiedad
+- **updateTask**: Actualización exitosa, validación de campos, prevención de ciclos (tarea como su propio padre)
+- **deleteTask**: Eliminación exitosa, validación de ID, verificación de existencia
+- **Manejo de errores**: Database errors, validaciones, autenticación
+
+#### Rutas de Tareas (17 tests)
+- **POST /api/tasks**: Creación de tareas, validación de campos, estados válidos
+- **GET /api/tasks**: Obtener todas las tareas, filtrado por status, validación de filtros
+- **GET /api/tasks/:id**: Obtener tarea específica, manejo de IDs inválidos, tareas no encontradas
+- **PUT /api/tasks/:id**: Actualización de tareas, validación de campos, tareas no existentes
+- **DELETE /api/tasks/:id**: Eliminación de tareas, validación de IDs, tareas no encontradas
+- **Manejo de errores**: Errores de base de datos, requests malformados, respuestas JSON
+- **Seguridad**: Aislamiento por usuario, validación de JWT, prevención de acceso no autorizado
+
 ### Características de Testing Backend
-- **Mocking completo**: Supabase Auth completamente mockeado
-- **Validación robusta**: Email format, password strength
-- **Error handling**: Manejo completo de errores
+- **Mocking completo**: Supabase Auth y Database completamente mockeados
+- **Validación robusta**: Email format, password strength, task fields
+- **Error handling**: Manejo completo de errores de autenticación y base de datos
 - **HTTP Testing**: Requests/responses reales con Supertest
 - **Configuración aislada**: Tests independientes sin efectos secundarios
+- **Seguridad**: Aislamiento de datos por usuario, validación JWT
+- **CRUD Completo**: Cobertura completa de operaciones Create, Read, Update, Delete
 
 ### Resultados Backend
-✅ **19/19 tests pasando** (100% de éxito)  
-📊 **90.62%** cobertura en controladores  
-📊 **100%** cobertura en rutas  
-⚡ **Rápido**: Ejecución en ~25 segundos  
-🔒 **Seguro**: Validación completa de inputs y errors
+✅ **58/58 tests pasando** (100% de éxito)  
+📊 **Alta cobertura** en controladores y rutas  
+⚡ **Rápido**: Ejecución en ~1 segundo  
+🔒 **Seguro**: Validación completa de inputs, autenticación y aislamiento de usuarios  
+🎯 **Completo**: CRUD de tareas + autenticación + middleware JWT
 
 ## Pruebas E2E (End-to-End)
 
@@ -274,6 +298,7 @@ npm run test:coverage
 
 # Test específico
 npx jest src/tests/controllers/authController.test.js
+npx jest src/tests/routes/tasks.test.js
 ```
 
 ### Pruebas E2E
@@ -365,4 +390,4 @@ render(
 
 ---
 
-**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 216 tests (131 Frontend + 19 Backend + 66 E2E)
+**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 255 tests (131 Frontend + 58 Backend + 66 E2E)

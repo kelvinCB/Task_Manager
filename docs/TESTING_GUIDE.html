@@ -185,7 +185,7 @@
                     <div>(100% pasando)</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">19</div>
+                    <div class="stat-number">58</div>
                     <div>Pruebas Backend</div>
                     <div>(100% pasando)</div>
                 </div>
@@ -195,7 +195,7 @@
                     <div>(100% pasando)</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">216</div>
+                    <div class="stat-number">255</div>
                     <div>Total Tests</div>
                     <div>(100% pasando)</div>
                 </div>
@@ -256,18 +256,22 @@
         <div class="file-structure">backend/src/tests/
 ├── setup.js                           # Configuración global de tests
 ├── controllers/
-│   └── authController.test.js         # Tests unitarios del controlador (10 tests)
-└── routes/
-    └── auth.test.js                   # Tests de integración de rutas (9 tests)</div>
+│   ├── authController.test.js         # Tests unitarios de autenticación (10 tests)
+│   └── taskController.test.js         # Tests unitarios de tareas (22 tests)
+├── routes/
+│   ├── auth.test.js                   # Tests de integración de autenticación (9 tests)
+│   └── tasks.test.js                  # Tests de integración de tareas (17 tests)
+└── middleware/
+    └── authMiddleware.js              # Middleware de autenticación JWT</div>
 
         <div class="success">
             <h3><span class="emoji">✅</span>Resultados Backend</h3>
             <ul>
-                <li><strong>19/19 tests pasando</strong> (100% de éxito)</li>
-                <li><strong>90.62%</strong> cobertura en controladores</li>
-                <li><strong>100%</strong> cobertura en rutas</li>
+                <li><strong>58/58 tests pasando</strong> (100% de éxito)</li>
+                <li><strong>Alta cobertura</strong> en controladores y rutas</li>
                 <li><strong>Rápido:</strong> Ejecución en ~1 segundo</li>
-                <li><strong>Seguro:</strong> Validación completa de inputs y errores</li>
+                <li><strong>Seguro:</strong> Validación completa de inputs, autenticación y aislamiento de usuarios</li>
+                <li><strong>Completo:</strong> CRUD de tareas + autenticación + middleware JWT</li>
             </ul>
         </div>
 
@@ -288,6 +292,27 @@
             <li><strong>Códigos de estado:</strong> 200, 201, 400, 401, 500</li>
             <li><strong>Formatos de respuesta:</strong> JSON estructurado</li>
             <li><strong>Rutas no encontradas:</strong> Manejo de 404</li>
+        </ul>
+
+        <h4>Controlador de Tareas (22 tests)</h4>
+        <ul>
+            <li><strong>createTask:</strong> Creación exitosa, validación de título, validación de status, verificación de parent_task_id</li>
+            <li><strong>getTasks:</strong> Obtener todas las tareas del usuario, filtrado por status, validación de filtros</li>
+            <li><strong>getTaskById:</strong> Obtener tarea específica, validación de ID, verificación de propiedad</li>
+            <li><strong>updateTask:</strong> Actualización exitosa, validación de campos, prevención de ciclos (tarea como su propio padre)</li>
+            <li><strong>deleteTask:</strong> Eliminación exitosa, validación de ID, verificación de existencia</li>
+            <li><strong>Manejo de errores:</strong> Database errors, validaciones, autenticación</li>
+        </ul>
+
+        <h4>Rutas de Tareas (17 tests)</h4>
+        <ul>
+            <li><strong>POST /api/tasks:</strong> Creación de tareas, validación de campos, estados válidos</li>
+            <li><strong>GET /api/tasks:</strong> Obtener todas las tareas, filtrado por status, validación de filtros</li>
+            <li><strong>GET /api/tasks/:id:</strong> Obtener tarea específica, manejo de IDs inválidos, tareas no encontradas</li>
+            <li><strong>PUT /api/tasks/:id:</strong> Actualización de tareas, validación de campos, tareas no existentes</li>
+            <li><strong>DELETE /api/tasks/:id:</strong> Eliminación de tareas, validación de IDs, tareas no encontradas</li>
+            <li><strong>Manejo de errores:</strong> Errores de base de datos, requests malformados, respuestas JSON</li>
+            <li><strong>Seguridad:</strong> Aislamiento por usuario, validación JWT, prevención de acceso no autorizado</li>
         </ul>
 
         <hr>
@@ -342,7 +367,8 @@ npm run test:watch
 npm run test:coverage
 
 # Test específico
-npx jest src/tests/controllers/authController.test.js</pre>
+npx jest src/tests/controllers/authController.test.js
+npx jest src/tests/routes/tasks.test.js</pre>
         </div>
 
         <h3>Pruebas E2E</h3>
@@ -429,7 +455,7 @@ const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 
             <p><strong>📝 Documentación Completa:</strong> Esta versión HTML proporciona los aspectos más importantes. Para detalles completos de todos los tests, estructura de archivos y ejemplos de código, consulte el archivo completo <a href="TESTING_GUIDE.md" target="_blank">TESTING_GUIDE.md</a>.</p>
         </div>
 
-        <p><em><strong>Última actualización:</strong> Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 216 tests (131 Frontend + 19 Backend + 66 E2E)</em></p>
+        <p><em><strong>Última actualización:</strong> Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 255 tests (131 Frontend + 58 Backend + 66 E2E)</em></p>
     </div>
 </body>
 </html>
