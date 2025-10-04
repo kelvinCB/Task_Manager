@@ -22,7 +22,7 @@ describe('useTasks Hook', () => {
   
   it('should initialize with empty tasks', () => {
     // Arrange & Act
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Assert
     expect(result.current.filteredTasks).toEqual([]);
@@ -31,7 +31,7 @@ describe('useTasks Hook', () => {
   
   it('should create a new task with correct default values', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     const taskData = { title: 'Test Task', description: 'Test Description', status: 'Open' as TaskStatus };
     
     // Act
@@ -54,7 +54,7 @@ describe('useTasks Hook', () => {
   
   it('should create a subtask with correct parent relationship', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Act - create parent task
     act(() => {
@@ -81,7 +81,7 @@ describe('useTasks Hook', () => {
   
   it('should delete a task and all its subtasks', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Create task structure
     act(() => {
@@ -112,7 +112,7 @@ describe('useTasks Hook', () => {
   
   it('should update task properties', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Create task
     act(() => {
@@ -133,7 +133,7 @@ describe('useTasks Hook', () => {
   
   it('should start task timer and update task status', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Create task
     act(() => {
@@ -163,7 +163,7 @@ describe('useTasks Hook', () => {
   
   it('should pause task timer and update time spent', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Create task and start timer
     act(() => {
@@ -202,7 +202,7 @@ describe('useTasks Hook', () => {
   
   it('should get elapsed time for active timer', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Create task and start timer
     act(() => {
@@ -227,7 +227,7 @@ describe('useTasks Hook', () => {
   
   it('should pause timer when task is marked as done', () => {
     // Arrange
-    const { result } = renderHook(() => useTasks({ useDefaultTasks: false }));
+    const { result } = renderHook(() => useTasks({ useDefaultTasks: false, useApi: false }));
     
     // Create task and start timer
     act(() => {
@@ -339,7 +339,7 @@ describe('useTasks Hook', () => {
     
     // Create a hook with custom getTimeStatistics
     const { result: resultWithData } = renderHook(() => {
-      const tasks = useTasks();
+      const tasks = useTasks({ useApi: false });
       // Override getTimeStatistics function with our mock
       tasks.getTimeStatistics = mockGetTimeStats;
       return tasks;
