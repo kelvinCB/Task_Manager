@@ -180,22 +180,22 @@
             <h3>Estado Actual</h3>
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-number">131</div>
-                    <div>Pruebas Unitarias Frontend</div>
+                    <div class="stat-number">170</div>
+                    <div>Pruebas Unitarias</div>
                     <div>(100% pasando)</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">58</div>
+                    <div class="stat-number">81</div>
                     <div>Pruebas Backend</div>
                     <div>(100% pasando)</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">66</div>
+                    <div class="stat-number">85</div>
                     <div>Pruebas E2E</div>
                     <div>(100% pasando)</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">255</div>
+                    <div class="stat-number">336</div>
                     <div>Total Tests</div>
                     <div>(100% pasando)</div>
                 </div>
@@ -219,9 +219,14 @@
 ├── setup.ts              # Configuración global
 ├── components/           # Tests de componentes
 │   ├── App.test.tsx
+│   ├── PasswordInput.test.tsx
 │   ├── TaskBoard.test.tsx
 │   ├── TaskForm.test.tsx
 │   ├── TaskTimer.test.tsx
+│   └── ...
+├── pages/                # Tests de páginas
+│   ├── ForgotPasswordPage.test.tsx
+│   ├── ResetPasswordPage.test.tsx
 │   └── ...
 ├── hooks/               # Tests de hooks
 │   └── useTasks.test.tsx
@@ -233,10 +238,15 @@
         <h3>Cobertura principal</h3>
         <ul>
             <li><strong>App:</strong> Navegación, vistas, temas (7 tests)</li>
+            <li><strong>Authentication:</strong> Páginas de login y registro, validación y flujos de autenticación (15 tests)</li>
+            <li><strong>Password Reset:</strong> Páginas de restablecimiento de contraseña con validación completa (15 tests)</li>
+            <li><strong>PasswordInput:</strong> Componente de contraseña con toggle de visibilidad (8 tests)</li>
             <li><strong>TaskForm:</strong> Creación, edición, validación, IA (21 tests)</li>
             <li><strong>TaskTimer:</strong> Cronometraje, notificaciones (6 tests)</li>
             <li><strong>useTasks:</strong> Lógica de tareas y tiempo (10 tests)</li>
             <li><strong>openaiService:</strong> Integración IA (16 tests)</li>
+            <li><strong>AccountMenu:</strong> Menú de cuenta con username display (11 tests)</li>
+            <li><strong>useUserProfile:</strong> Hook para gestión de perfiles de usuario (6 tests)</li>
             <li><strong>Otros componentes:</strong> TaskBoard, TaskTree, TimeStatsView, etc.</li>
         </ul>
 
@@ -256,10 +266,10 @@
         <div class="file-structure">backend/src/tests/
 ├── setup.js                           # Configuración global de tests
 ├── controllers/
-│   ├── authController.test.js         # Tests unitarios de autenticación (10 tests)
+│   ├── authController.test.js         # Tests unitarios de autenticación (22 tests)
 │   └── taskController.test.js         # Tests unitarios de tareas (22 tests)
 ├── routes/
-│   ├── auth.test.js                   # Tests de integración de autenticación (9 tests)
+│   ├── auth.test.js                   # Tests de integración de autenticación (20 tests)
 │   └── tasks.test.js                  # Tests de integración de tareas (17 tests)
 └── middleware/
     └── authMiddleware.js              # Middleware de autenticación JWT</div>
@@ -267,16 +277,16 @@
         <div class="success">
             <h3><span class="emoji">✅</span>Resultados Backend</h3>
             <ul>
-                <li><strong>58/58 tests pasando</strong> (100% de éxito)</li>
+                <li><strong>81/81 tests pasando</strong> (100% de éxito)</li>
                 <li><strong>Alta cobertura</strong> en controladores y rutas</li>
-                <li><strong>Rápido:</strong> Ejecución en ~1 segundo</li>
+                <li><strong>Rápido:</strong> Ejecución en ~1.2 segundos</li>
                 <li><strong>Seguro:</strong> Validación completa de inputs, autenticación y aislamiento de usuarios</li>
                 <li><strong>Completo:</strong> CRUD de tareas + autenticación + middleware JWT</li>
             </ul>
         </div>
 
         <h3>Cobertura de Tests Backend</h3>
-        <h4>Controlador de Autenticación (10 tests)</h4>
+        <h4>Controlador de Autenticación (22 tests)</h4>
         <ul>
             <li><strong>Registro exitoso:</strong> Validación de usuario registrado</li>
             <li><strong>Validación de entrada:</strong> Email y contraseña requeridos</li>
@@ -285,7 +295,7 @@
             <li><strong>Errores inesperados:</strong> Manejo de fallos del servidor</li>
         </ul>
 
-        <h4>Rutas de Autenticación (9 tests)</h4>
+        <h4>Rutas de Autenticación (20 tests)</h4>
         <ul>
             <li><strong>POST /api/auth/register:</strong> Tests de integración completos</li>
             <li><strong>POST /api/auth/login:</strong> Tests de integración completos</li>
@@ -322,8 +332,8 @@
         <div class="success">
             <h3><span class="emoji">✅</span>Resultados E2E actuales</h3>
             <ul>
-                <li><strong>66/66 tests pasando</strong> (100% de éxito)</li>
-                <li><strong>~1.4 minutos</strong> con 4 workers</li>
+                <li><strong>85/85 tests pasando</strong> (100% de éxito)</li>
+                <li><strong>~1.6 minutos</strong> con 4 workers</li>
                 <li><strong>Sin logs indebidos</strong> - Tests limpios y optimizados</li>
                 <li><strong>Compatible globalmente</strong> - Funciona en cualquier zona horaria</li>
                 <li><strong>Username Feature</strong> - Tests completos para display de username</li>
@@ -455,7 +465,7 @@ const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 
             <p><strong>📝 Documentación Completa:</strong> Esta versión HTML proporciona los aspectos más importantes. Para detalles completos de todos los tests, estructura de archivos y ejemplos de código, consulte el archivo completo <a href="TESTING_GUIDE.md" target="_blank">TESTING_GUIDE.md</a>.</p>
         </div>
 
-        <p><em><strong>Última actualización:</strong> Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 255 tests (131 Frontend + 58 Backend + 66 E2E)</em></p>
+        <p><em><strong>Última actualización:</strong> Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 336 tests (170 Frontend + 81 Backend + 85 E2E)</em></p>
     </div>
 </body>
 </html>
