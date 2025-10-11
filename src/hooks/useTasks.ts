@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Task, TaskStatus, TaskFilter, TimeEntry } from '../types/Task';
 import { generateId, buildTaskTree, canCompleteTask } from '../utils/taskUtils';
+import { taskService } from '../services/taskService';
+import supabase from '../lib/supabaseClient';
 
 // Initial tasks for new users
 const defaultTasks: Task[] = [
@@ -98,7 +100,12 @@ const parseTasksFromStorage = (storedTasks: string, useDefaultTasks: boolean = t
 };
 
 // Option for tests that allows disabling default tasks
-export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTasks: true }) => {
+export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean } = { useDefaultTasks: true, useApi: true }) => {
+  // Track if we're using API or localStorage
+  const [useApi, setUseApi] = useState<boolean>(options.useApi !== false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+
   // Load tasks from localStorage or use defaults
   const [tasks, setTasks] = useState<Task[]>(() => {
     const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
@@ -166,7 +173,113 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     return buildTaskTree(tasksForTree);
   }, [tasks, taskTree, filteredTasks, filter]);
 
-  const createTask = useCallback((taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth' | 'timeTracking'>) => {
+  // Load tasks from API on mount if authenticated
+  useEffect(() => {
+    const loadTasksFromApi = async () => {
+      if (!useApi) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const isAuthenticated = await taskService.isAuthenticated();
+        
+        if (!isAuthenticated) {
+          // User not authenticated, use localStorage
+          setUseApi(false);
+          setIsLoading(false);
+          return;
+        }
+
+        // Try to fetch tasks from API
+        const response = await taskService.getTasks();
+        
+        if (response.error) {
+          console.error('Failed to load tasks from API:', response.error);
+          setApiError(response.error);
+          // Fallback to localStorage on error
+          setUseApi(false);
+        } else if (response.data) {
+          // Successfully loaded from API
+          setTasks(response.data);
+          setApiError(null);
+        }
+      } catch (error) {
+        console.error('Error loading tasks from API:', error);
+        setApiError(error instanceof Error ? error.message : 'Unknown error');
+        // Fallback to localStorage on error
+        setUseApi(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTasksFromApi();
+
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // User just signed in, try to load from API
+        setUseApi(true);
+        setIsLoading(true);
+        loadTasksFromApi();
+      } else if (event === 'SIGNED_OUT') {
+        // User signed out, switch to localStorage
+        setUseApi(false);
+        const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+        setTasks(storedTasks ? parseTasksFromStorage(storedTasks, options.useDefaultTasks) : (options.useDefaultTasks ? defaultTasks : []));
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [useApi, options.useDefaultTasks]);
+
+  const createTask = useCallback(async (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth' | 'timeTracking'>) => {
+    // If using API, try to create task on backend
+    if (useApi) {
+      try {
+        const response = await taskService.createTask({
+          ...taskData,
+          timeTracking: {
+            totalTimeSpent: 0,
+            isActive: false,
+            timeEntries: []
+          }
+        });
+
+        if (response.error) {
+          console.error('Failed to create task on API:', response.error);
+          setApiError(response.error);
+          // Fallback to localStorage
+        } else if (response.data) {
+          // Successfully created on API, update local state
+          setTasks(prev => {
+            const updated = [...prev, response.data!];
+            
+            if (taskData.parentId) {
+              const parentIndex = updated.findIndex(t => t.id === taskData.parentId);
+              if (parentIndex !== -1) {
+                updated[parentIndex] = {
+                  ...updated[parentIndex],
+                  childIds: [...updated[parentIndex].childIds, response.data!.id]
+                };
+              }
+            }
+            
+            return updated;
+          });
+          return response.data.id;
+        }
+      } catch (error) {
+        console.error('Error creating task:', error);
+        setApiError(error instanceof Error ? error.message : 'Unknown error');
+        // Continue to localStorage fallback
+      }
+    }
+
+    // localStorage fallback
     const newTask: Task = {
       ...taskData,
       id: generateId(),
@@ -197,7 +310,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     });
 
     return newTask.id;
-  }, [tasks]);
+  }, [tasks, useApi]);
 
   // Special createTask function for imports that preserves timeTracking data
   const createTaskWithTimeTracking = useCallback((taskData: Omit<Task, 'id' | 'childIds' | 'depth'>) => {
@@ -233,16 +346,87 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     return newTask.id;
   }, [tasks]);
 
-  const updateTask = useCallback((id: string, updates: Partial<Task>) => {
+  const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
+    // If using API, try to update task on backend
+    if (useApi) {
+      try {
+        const response = await taskService.updateTask(id, updates);
+
+        if (response.error) {
+          console.error('Failed to update task on API:', response.error);
+          setApiError(response.error);
+          // Fallback to localStorage update
+        } else if (response.data) {
+          // Successfully updated on API, update local state
+          setTasks(prev => prev.map(task => 
+            task.id === id ? { ...task, ...response.data } : task
+          ));
+          return;
+        }
+      } catch (error) {
+        console.error('Error updating task:', error);
+        setApiError(error instanceof Error ? error.message : 'Unknown error');
+        // Continue to localStorage fallback
+      }
+    }
+
+    // localStorage fallback
     setTasks(prev => prev.map(task => 
       task.id === id ? { ...task, ...updates } : task
     ));
-  }, []);
+  }, [useApi]);
 
-  const deleteTask = useCallback((id: string) => {
+  const deleteTask = useCallback(async (id: string) => {
     const taskToDelete = tasks.find(t => t.id === id);
     if (!taskToDelete) return;
 
+    // If using API, try to delete task on backend
+    if (useApi) {
+      try {
+        const response = await taskService.deleteTask(id);
+
+        if (response.error) {
+          console.error('Failed to delete task on API:', response.error);
+          setApiError(response.error);
+          // Fallback to localStorage delete
+        } else {
+          // Successfully deleted on API, update local state
+          setTasks(prev => {
+            let updated = [...prev];
+            
+            // Remove from parent's childIds
+            if (taskToDelete.parentId) {
+              const parentIndex = updated.findIndex(t => t.id === taskToDelete.parentId);
+              if (parentIndex !== -1) {
+                updated[parentIndex] = {
+                  ...updated[parentIndex],
+                  childIds: updated[parentIndex].childIds.filter(childId => childId !== id)
+                };
+              }
+            }
+
+            // Recursively delete children
+            const deleteRecursive = (taskId: string) => {
+              const task = updated.find(t => t.id === taskId);
+              if (task) {
+                task.childIds.forEach(childId => deleteRecursive(childId));
+                updated = updated.filter(t => t.id !== taskId);
+              }
+            };
+
+            deleteRecursive(id);
+            return updated;
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('Error deleting task:', error);
+        setApiError(error instanceof Error ? error.message : 'Unknown error');
+        // Continue to localStorage fallback
+      }
+    }
+
+    // localStorage fallback
     setTasks(prev => {
       let updated = [...prev];
       
@@ -269,7 +453,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
       deleteRecursive(id);
       return updated;
     });
-  }, [tasks]);
+  }, [tasks, useApi]);
 
   // We will move this function after defining pauseTaskTimer
   const moveTaskImpl = (id: string, newStatus: TaskStatus) => {
@@ -344,14 +528,16 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     return tasks.filter(task => task.status === status);
   }, [tasks]);
 
-  // Save tasks to localStorage whenever they change
+  // Save tasks to localStorage whenever they change (only if not using API)
   useEffect(() => {
-    try {
-      localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
-    } catch (error) {
-      console.error('Error saving tasks to localStorage:', error);
+    if (!useApi) {
+      try {
+        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+      } catch (error) {
+        console.error('Error saving tasks to localStorage:', error);
+      }
     }
-  }, [tasks]);
+  }, [tasks, useApi]);
 
   // Save expanded nodes to localStorage
   useEffect(() => {
@@ -553,6 +739,10 @@ export const useTasks = (options: { useDefaultTasks?: boolean } = { useDefaultTa
     startTaskTimer,
     pauseTaskTimer,
     getElapsedTime,
-    getTimeStatistics
+    getTimeStatistics,
+    // API state
+    isLoading,
+    apiError,
+    useApi
   };
 };

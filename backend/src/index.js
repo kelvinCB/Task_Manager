@@ -18,8 +18,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
+const taskRoutes = require('./routes/tasks');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
 
 app.get('/', (req, res) => {
   res.send('Task Manager Backend is running!');

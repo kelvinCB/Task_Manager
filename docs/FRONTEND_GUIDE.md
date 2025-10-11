@@ -69,14 +69,16 @@ src/
 │   ├── ThemeContext.tsx # Theme management
 │   └── AuthContext.tsx  # Authentication context
 ├── hooks/               # Custom hooks
-│   └── useTasks.ts      # Main task management hook
+│   ├── useTasks.ts      # Main task management hook (API + localStorage)
+│   └── useUserProfile.ts # User profile management hook
 ├── lib/                 # Third-party integrations
 │   └── supabaseClient.ts # Supabase client setup
 ├── pages/               # Page-level components
 │   ├── LoginPage.tsx    # Login page
 │   └── RegisterPage.tsx # Registration page
 ├── services/            # External service integrations
-│   └── openaiService.ts # OpenAI API integration
+│   ├── openaiService.ts # OpenAI API integration
+│   └── taskService.ts   # Task API service layer
 ├── types/               # TypeScript type definitions
 │   └── Task.ts          # Task-related types
 ├── utils/               # Utility functions
@@ -377,12 +379,188 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(undefine
 - **Custom Hooks**: Reusable stateful logic
 - **Context**: Global state (theme, auth, etc.)
 - **Local Storage**: Persistent client-side data
+- **API Integration**: Server-synced state via taskService
 
 #### State Structure Guidelines
 - **Normalize data** to avoid deep nesting
 - **Separate concerns** (UI state vs. data state)
 - **Use TypeScript** for state shape definitions
 - **Immutable updates** for all state changes
+
+---
+
+## API Integration
+
+### Overview
+
+The frontend integrates with the backend API through a service layer pattern, providing automatic fallback to localStorage when offline or unauthenticated.
+
+### Task Service Layer
+
+#### TaskService Class (`src/services/taskService.ts`)
+
+Centralized service for all task-related API operations:
+
+```typescript
+import { taskService } from '../services/taskService';
+
+// Get all tasks
+const response = await taskService.getTasks();
+if (response.data) {
+  setTasks(response.data);
+} else {
+  console.error(response.error);
+}
+
+// Create task
+const newTask = await taskService.createTask({
+  title: 'New Task',
+  description: 'Description',
+  status: 'Open',
+  timeTracking: { totalTimeSpent: 0, isActive: false, timeEntries: [] }
+});
+
+// Update task
+const updated = await taskService.updateTask(taskId, { title: 'Updated' });
+
+// Delete task
+const result = await taskService.deleteTask(taskId);
+```
+
+#### Key Features
+
+1. **JWT Authentication**: Automatic token extraction from Supabase session
+2. **Error Handling**: Consistent error response format
+3. **Type Safety**: Full TypeScript support with interfaces
+4. **Data Transformation**: Automatic conversion between frontend/backend formats
+
+#### Response Format
+
+```typescript
+interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+  message?: string;
+}
+```
+
+### useTasks Hook Integration
+
+#### Hybrid Architecture
+
+The `useTasks` hook intelligently switches between API and localStorage:
+
+```typescript
+export const useTasks = (options = { useApi: true }) => {
+  const [useApi, setUseApi] = useState(options.useApi !== false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+  
+  // Automatic API detection on mount
+  useEffect(() => {
+    const loadTasks = async () => {
+      const isAuth = await taskService.isAuthenticated();
+      if (isAuth) {
+        const response = await taskService.getTasks();
+        if (response.data) {
+          setTasks(response.data);
+        } else {
+          setUseApi(false); // Fallback to localStorage
+        }
+      } else {
+        setUseApi(false);
+      }
+    };
+    loadTasks();
+  }, []);
+};
+```
+
+#### Auth State Synchronization
+
+```typescript
+// Listen for auth changes
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN') {
+    setUseApi(true);
+    // Reload from API
+  } else if (event === 'SIGNED_OUT') {
+    setUseApi(false);
+    // Switch to localStorage
+  }
+});
+```
+
+#### Exposed State
+
+```typescript
+const {
+  tasks,          // Current tasks array
+  isLoading,      // Loading state
+  apiError,       // API error message
+  useApi,         // Current mode (API vs localStorage)
+  createTask,     // Async CRUD operations
+  updateTask,
+  deleteTask
+} = useTasks();
+```
+
+### Backend API Endpoints
+
+#### Base URL Configuration
+
+```typescript
+// Development
+const baseUrl = 'http://localhost:3001/api';
+
+// Production (from .env)
+const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+```
+
+#### Available Endpoints
+
+- `GET /api/tasks` - Get all user tasks (with optional status filter)
+- `GET /api/tasks/:id` - Get specific task
+- `POST /api/tasks` - Create new task
+- `PUT /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task
+
+**Note:** All endpoints require JWT authentication via `Authorization: Bearer <token>` header.
+
+### Error Handling Pattern
+
+```typescript
+// Service layer handles errors gracefully
+try {
+  const response = await taskService.createTask(taskData);
+  if (response.error) {
+    // API error (validation, auth, etc.)
+    setApiError(response.error);
+    // Fall back to localStorage
+  } else if (response.data) {
+    // Success - update state
+    setTasks(prev => [...prev, response.data!]);
+  }
+} catch (error) {
+  // Network error
+  console.error('Network error:', error);
+  setUseApi(false);
+}
+```
+
+### Testing API Integration
+
+```typescript
+// Tests disable API mode
+const { result } = renderHook(() => 
+  useTasks({ useApi: false, useDefaultTasks: false })
+);
+
+// All operations use localStorage in test environment
+act(() => {
+  result.current.createTask({ title: 'Test Task' });
+});
+```
 
 ---
 

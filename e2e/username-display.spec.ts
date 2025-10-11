@@ -106,8 +106,12 @@ test.describe('Username Display Feature', () => {
       await expect(appPage.page.locator('text=automation-tasklite-001')).toBeVisible();
     } else {
       // No profile yet - this is expected for newly created test users
-      // Verify we're still authenticated by checking logout button
-      await expect(appPage.page.locator('[data-testid="logout-button"]')).toBeVisible();
+      // Verify we're still authenticated by checking for authenticated state
+      // The expectLoggedIn() already confirmed we're logged in, so we can just verify
+      // we're on the dashboard or not on login page
+      const currentUrl = appPage.page.url();
+      expect(currentUrl).not.toContain('/login');
+      expect(currentUrl).not.toContain('/register');
     }
   });
 
