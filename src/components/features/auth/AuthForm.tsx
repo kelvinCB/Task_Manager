@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { PasswordInput } from '../../ui/PasswordInput';
+import { Link } from 'react-router-dom';
 
 interface AuthFormProps {
   onSubmit: (email: string, password: string) => void;
@@ -87,33 +89,24 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
         </div>
 
         <div>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-              </svg>
-            </div>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              data-testid="password-input"
-              className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
+          <PasswordInput
+            id="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+            autoComplete="current-password"
+            data-testid="password-input"
+          />
         </div>
 
         {/* Forgot password link - solo mostrar en login */}
         {!isSignUp && (
           <div className="text-right">
-            <a href="#" data-testid="forgot-password-link" className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+            <Link to="/forgot-password" data-testid="forgot-password-link" className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
               Don't remember your password?
-            </a>
+            </Link>
           </div>
         )}
 

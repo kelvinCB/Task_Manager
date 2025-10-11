@@ -107,6 +107,14 @@ vi.mock('../../pages/RegisterPage', () => ({
   default: () => <div data-testid="register-page">Register Page</div>
 }));
 
+vi.mock('../../pages/ForgotPasswordPage', () => ({
+  default: () => <div data-testid="forgot-password-page">Forgot Password Page</div>
+}));
+
+vi.mock('../../pages/ResetPasswordPage', () => ({
+  default: () => <div data-testid="reset-password-page">Reset Password Page</div>
+}));
+
 // Mock router
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -142,6 +150,12 @@ vi.mock('lucide-react', () => ({
   ChevronDown: ({ size }: { size?: number }) => <div data-testid="chevron-down-icon" style={{ width: size, height: size }}>ChevronDown</div>,
   LogIn: ({ size }: { size?: number }) => <div data-testid="login-icon" style={{ width: size, height: size }}>LogIn</div>,
   LogOut: ({ size }: { size?: number }) => <div data-testid="logout-icon" style={{ width: size, height: size }}>LogOut</div>,
+  Mail: ({ size }: { size?: number }) => <div data-testid="mail-icon" style={{ width: size, height: size }}>Mail</div>,
+  ArrowLeft: ({ size }: { size?: number }) => <div data-testid="arrow-left-icon" style={{ width: size, height: size }}>ArrowLeft</div>,
+  Lock: ({ size }: { size?: number }) => <div data-testid="lock-icon" style={{ width: size, height: size }}>Lock</div>,
+  Eye: ({ size }: { size?: number }) => <div data-testid="eye-icon" style={{ width: size, height: size }}>Eye</div>,
+  EyeOff: ({ size }: { size?: number }) => <div data-testid="eye-off-icon" style={{ width: size, height: size }}>EyeOff</div>,
+  CheckCircle: ({ size }: { size?: number }) => <div data-testid="check-circle-icon" style={{ width: size, height: size }}>CheckCircle</div>,
 }));
 
 // Mock view components
