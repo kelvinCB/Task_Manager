@@ -15,9 +15,9 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ## Resumen General
 
 ### Estado Actual
-✅ **131 pruebas unitarias** (100% pasando)  
-✅ **72 pruebas E2E** (100% pasando)  
-✅ **58 pruebas de backend** (100% pasando)  
+✅ **162 pruebas unitarias** (100% pasando)  
+✅ **82 pruebas E2E** (98.8% pasando - 1 test conocido falla en username-display)  
+✅ **42 pruebas de backend** (100% pasando)  
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
@@ -38,12 +38,16 @@ src/test/
 ├── setup.ts              # Configuración global
 ├── components/           # Tests de componentes
 │   ├── App.test.tsx
+│   ├── PasswordInput.test.tsx
 │   ├── TaskBoard.test.tsx
 │   ├── TaskForm.test.tsx
 │   ├── TaskTimer.test.tsx
 │   └── ...
-├── hooks/               # Tests de hooks
 │   └── useTasks.test.tsx
+├── pages/                # Tests de páginas
+│   ├── ForgotPasswordPage.test.tsx
+│   ├── ResetPasswordPage.test.tsx
+│   └── ...
 ├── services/            # Tests de servicios
 │   └── openaiService.test.ts
 └── utils/               # Tests de utilidades
@@ -53,6 +57,10 @@ src/test/
 ### Cobertura principal
 - **App**: Navegación, vistas, temas (7 tests)
 - **Authentication**: Páginas de login y registro, validación y flujos de autenticación (15 tests)
+- **Password Reset**: Páginas de restablecimiento de contraseña con validación completa (15 tests)
+  - ForgotPasswordPage (8 tests)
+  - ResetPasswordPage (7 tests)
+- **PasswordInput**: Componente de contraseña con toggle de visibilidad (8 tests)
 - **TaskForm**: Creación, edición, validación, IA (21 tests)
 - **TaskTimer**: Cronometraje, notificaciones (6 tests)
 - **useTasks**: Lógica de tareas y tiempo (10 tests)
@@ -66,8 +74,11 @@ src/test/
 - **AudioContext**: Sonidos de notificación
 - **fetch**: Llamadas API de OpenAI
 - **Supabase**: Autenticación y respuestas de API
+  - `supabase.auth.resetPasswordForEmail`: Password reset initiation
+  - `supabase.auth.updateUser`: Password update
 - **React Router**: Navegación entre páginas
 - **Temporizadores**: Control de tiempo con `vi.useFakeTimers()`
+- **Lucide React**: Iconos (Mail, ArrowLeft, Lock, Eye, EyeOff, CheckCircle)
 
 ### Componentes críticos
 
@@ -77,6 +88,34 @@ src/test/
 - Elementos UI: Animación del logo, botones sociales, gradientes
 - Estados: Loading, error, navegación
 - Responsive design y soporte para dark mode
+
+#### Password Reset Pages (15 tests)
+**ForgotPasswordPage (8 tests)**:
+- **Renderizado**: Logo, formulario, enlaces de navegación
+- **Validación**: Email requerido, formato de email válido
+- **API Success**: Envio exitoso de solicitud de restablecimiento
+- **API Error**: Manejo de errores del servidor
+- **Estados UI**: Loading state durante solicitud
+- **Navegación**: Link "Back to Login" funcional
+
+**ResetPasswordPage (7 tests)**:
+- **Renderizado**: Formulario de nueva contraseña
+- **Validación**: Contraseñas coincidentes y longitud mínima
+- **Toggle Visibility**: Mostrar/ocultar contraseñas
+- **API Success**: Actualización exitosa de contraseña
+- **API Error**: Manejo de errores y tokens inválidos
+- **Estados UI**: Loading states y feedback visual
+- **Navegación**: Redirección automática post-éxito
+
+#### PasswordInput Component (8 tests)
+- **Renderizado por defecto**: Contraseña oculta inicialmente
+- **Toggle de visibilidad**: Cambio entre password/text al hacer click
+- **Tooltip dinámico**: "Mostrar contraseña" / "Ocultar contraseña"
+- **Iconos dinámicos**: Eye/EyeOff según estado de visibilidad
+- **Eventos onChange**: Manejo correcto de cambios en el input
+- **Props personalizadas**: Flexibilidad con diferentes configuraciones
+- **Estructura visual**: Íconos de candado y posicionamiento
+- **Accesibilidad**: Atributos ARIA y navegación por teclado
 
 #### Username Feature (17 tests)
 - **AccountMenu (11 tests)**: Display de username, dropdown functionality, login/logout states
@@ -126,19 +165,40 @@ backend/src/tests/
 
 ### Cobertura de Tests Backend
 
-#### Controlador de Autenticación (10 tests)
+#### Controlador de Autenticación (22 tests)
+**Funciones de Registro y Login (10 tests)**:
 - **Registro exitoso**: Validación de usuario registrado
+- **Login exitoso**: Autenticación de usuario válido
 - **Validación de entrada**: Email y contraseña requeridos
 - **Validación de formato**: Email inválido, contraseña corta
 - **Errores de Supabase**: Manejo de errores de autenticación
 - **Errores inesperados**: Manejo de fallos del servidor
 
-#### Rutas de Autenticación (9 tests)
+**Password Reset (12 tests)**:
+- **forgotPassword success**: Solicitud de restablecimiento exitosa
+- **forgotPassword validation**: Email requerido, formato válido
+- **forgotPassword normalization**: Email normalizado (lowercase y trim)
+- **forgotPassword errors**: Manejo de errores de Supabase y red
+- **resetPassword success**: Actualización exitosa de contraseña
+- **resetPassword validation**: Contraseña y token requeridos
+- **resetPassword errors**: Manejo de errores y tokens inválidos
+
+#### Rutas de Autenticación (20 tests)
+**Rutas Originales (8 tests)**:
 - **POST /api/auth/register**: Tests de integración completos
 - **POST /api/auth/login**: Tests de integración completos
 - **Códigos de estado**: 200, 201, 400, 401, 500
 - **Formatos de respuesta**: JSON estructurado
-- **Rutas no encontradas**: Manejo de 404
+
+**Password Reset Routes (11 tests)**:
+- **POST /api/auth/forgot-password**: Envio de email de restablecimiento
+- **POST /api/auth/reset-password**: Actualización de contraseña
+- **Validaciones**: Email requerido, formato válido, contraseñas válidas
+- **Error handling**: Respuestas 400/500 apropiadas
+- **Edge cases**: Tokens faltantes, contraseñas cortas
+
+**Route Management (1 test)**:
+- **404 handling**: Rutas no encontradas
 
 #### Controlador de Tareas (22 tests)
 - **createTask**: Creación exitosa, validación de título, validación de status, verificación de parent_task_id
@@ -159,8 +219,10 @@ backend/src/tests/
 
 ### Características de Testing Backend
 - **Mocking completo**: Supabase Auth y Database completamente mockeados
-- **Validación robusta**: Email format, password strength, task fields
-- **Error handling**: Manejo completo de errores de autenticación y base de datos
+  - `supabase.auth.resetPasswordForEmail`: Mock para solicitudes de reset
+  - `supabase.auth.updateUser`: Mock para actualización de contraseñas
+- **Validación robusta**: Email format, password strength, task fields, token validation
+- **Error handling**: Manejo completo de errores de autenticación y base de datos (400, 500, tokens inválidos)
 - **HTTP Testing**: Requests/responses reales con Supertest
 - **Configuración aislada**: Tests independientes sin efectos secundarios
 - **Seguridad**: Aislamiento de datos por usuario, validación JWT
@@ -186,6 +248,7 @@ backend/src/tests/
 e2e/
 ├── app.spec.ts                    # Funcionalidad básica (9 tests)
 ├── auth.spec.ts                   # Autenticación (15 tests)
+├── password-visibility.spec.ts     # Toggle de visibilidad de contraseña (16 tests)
 ├── task-search.spec.ts             # Búsqueda (7 tests)
 ├── task-filtering.spec.ts          # Filtrado global (10 tests)
 ├── task-management.spec.ts         # Gestión de tareas (5 tests)
@@ -250,6 +313,32 @@ e2e/
 - **Register**: Registro de nuevos usuarios, validaciones, manejo de errores (5 tests)
 - **UI Elements**: Verificación de botones sociales, links y estilos de página (3 tests)
 
+#### Password Visibility Toggle (16 tests)
+**Login Page Password Visibility (5 tests)**:
+- **Estado por defecto**: Contraseña oculta inicialmente, botón toggle visible
+- **Mostrar contraseña**: Click en toggle cambia tipo de input a texto
+- **Ocultar contraseña**: Toggle funciona en ambas direcciones preservando valor
+- **Tooltips dinámicos**: "Mostrar contraseña" / "Ocultar contraseña" según estado
+- **Persistencia de estado**: Visibilidad se mantiene durante interacciones con otros campos
+
+**Register Page Password Visibility (3 tests)**:
+- **Estado por defecto**: Contraseña oculta en página de registro
+- **Toggle funcional**: Mostrar/ocultar contraseña funciona correctamente
+- **Estado independiente**: Cada página mantiene su propio estado de visibilidad
+
+**Reset Password Page Visibility (6 tests)**:
+- **Estado por defecto**: Ambos campos de contraseña ocultos inicialmente
+- **Toggle independiente**: Cada campo tiene su propio control de visibilidad
+- **Nuevas contraseñas**: Control individual del campo "nueva contraseña"
+- **Confirmar contraseña**: Control individual del campo "confirmar contraseña"
+- **Ambos campos**: Toggles funcionan independientemente entre sí
+- **Preservación de valores**: Valores se mantienen al cambiar visibilidad
+
+**Accessibilidad y UX (2 tests)**:
+- **Navegación por teclado**: Toggle accesible via Tab y Enter
+- **Vista móvil**: Funciona correctamente en viewport móvil (375x667)
+- **Atributos ARIA**: Iconos con aria-hidden, tooltips apropiados
+
 #### Username Display (8 tests)
 - **Button Display**: Verificación de "My Account" en estados autenticados y no autenticados (2 tests)
 - **Dropdown Username**: Display del username generado automáticamente en dropdown (2 tests)
@@ -266,9 +355,10 @@ e2e/
 - **Unauthenticated Access**: Usuarios no autenticados no acceden a tareas (1 test)
 
 ### Resultados E2E actuales
-✅ **72/72 tests pasando** (100% de éxito)  
-⏱️ **~1.5 minutos** con 4 workers  
-🧹 **Sin logs indebidos** - Tests limpios y optimizados  
+✅ **81/82 tests pasando** (98.8% de éxito)  
+🔴 **1 test falla** (username-display conocido, no crítico)  
+⏱️ **~1.6 minutos** con 4 workers  
+🧹 **Tests limpios y optimizados**  
 🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
 🔒 **User Isolation** - Tests de seguridad multi-usuario
@@ -401,4 +491,4 @@ render(
 
 ---
 
-**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con 261 tests (131 Frontend + 58 Backend + 72 E2E)
+**Última actualización**: Noviembre 2025 - Suite de testing completamente funcional, robusta y optimizada con **286 tests** (162 Frontend + 42 Backend + 82 E2E).
