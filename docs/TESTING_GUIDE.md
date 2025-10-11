@@ -21,6 +21,8 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ✅ **Cobertura completa** de funcionalidades críticas  
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
+✅ **Task CRUD con aislamiento de usuarios** implementado y testeado
+✅ **Tests E2E de aislamiento** verificando seguridad multi-usuario
 
 ### Tecnologías
 - **Unitarias**: Vitest + React Testing Library + jsdom
@@ -152,9 +154,13 @@ src/test/
 backend/src/tests/
 ├── setup.js                           # Configuración global de tests
 ├── controllers/
-│   └── authController.test.js         # Tests unitarios del controlador (22 tests)
-└── routes/
-    └── auth.test.js                   # Tests de integración de rutas (20 tests)
+│   ├── authController.test.js         # Tests unitarios de autenticación (10 tests)
+│   └── taskController.test.js         # Tests unitarios de tareas (22 tests)
+├── routes/
+│   ├── auth.test.js                   # Tests de integración de autenticación (9 tests)
+│   └── tasks.test.js                  # Tests de integración de tareas (17 tests)
+└── middleware/
+    └── authMiddleware.js              # Middleware de autenticación JWT
 ```
 
 ### Cobertura de Tests Backend
@@ -194,22 +200,40 @@ backend/src/tests/
 **Route Management (1 test)**:
 - **404 handling**: Rutas no encontradas
 
+#### Controlador de Tareas (22 tests)
+- **createTask**: Creación exitosa, validación de título, validación de status, verificación de parent_task_id
+- **getTasks**: Obtener todas las tareas del usuario, filtrado por status, validación de filtros
+- **getTaskById**: Obtener tarea específica, validación de ID, verificación de propiedad
+- **updateTask**: Actualización exitosa, validación de campos, prevención de ciclos (tarea como su propio padre)
+- **deleteTask**: Eliminación exitosa, validación de ID, verificación de existencia
+- **Manejo de errores**: Database errors, validaciones, autenticación
+
+#### Rutas de Tareas (17 tests)
+- **POST /api/tasks**: Creación de tareas, validación de campos, estados válidos
+- **GET /api/tasks**: Obtener todas las tareas, filtrado por status, validación de filtros
+- **GET /api/tasks/:id**: Obtener tarea específica, manejo de IDs inválidos, tareas no encontradas
+- **PUT /api/tasks/:id**: Actualización de tareas, validación de campos, tareas no existentes
+- **DELETE /api/tasks/:id**: Eliminación de tareas, validación de IDs, tareas no encontradas
+- **Manejo de errores**: Errores de base de datos, requests malformados, respuestas JSON
+- **Seguridad**: Aislamiento por usuario, validación de JWT, prevención de acceso no autorizado
+
 ### Características de Testing Backend
-- **Mocking completo**: Supabase Auth completamente mockeado
+- **Mocking completo**: Supabase Auth y Database completamente mockeados
   - `supabase.auth.resetPasswordForEmail`: Mock para solicitudes de reset
   - `supabase.auth.updateUser`: Mock para actualización de contraseñas
-- **Validación robusta**: Email format, password strength, token validation
-- **Error handling**: Manejo completo de errores (400, 500, tokens inválidos)
+- **Validación robusta**: Email format, password strength, task fields, token validation
+- **Error handling**: Manejo completo de errores de autenticación y base de datos (400, 500, tokens inválidos)
 - **HTTP Testing**: Requests/responses reales con Supertest
 - **Configuración aislada**: Tests independientes sin efectos secundarios
+- **Seguridad**: Aislamiento de datos por usuario, validación JWT
+- **CRUD Completo**: Cobertura completa de operaciones Create, Read, Update, Delete
 
 ### Resultados Backend
-✅ **42/42 tests pasando** (100% de éxito)  
-📈 **95%** cobertura en controladores (incluye password reset con normalización)  
-📈 **100%** cobertura en rutas  
+✅ **58/58 tests pasando** (100% de éxito)  
+📊 **Alta cobertura** en controladores y rutas  
 ⚡ **Rápido**: Ejecución en ~1 segundo  
-🔒 **Seguro**: Validación completa de inputs y errors
-🔐 **Password Reset**: Cobertura completa con normalización de email
+🔒 **Seguro**: Validación completa de inputs, autenticación y aislamiento de usuarios  
+🎯 **Completo**: CRUD de tareas + autenticación + middleware JWT
 
 ## Pruebas E2E (End-to-End)
 
@@ -229,6 +253,7 @@ e2e/
 ├── task-filtering.spec.ts          # Filtrado global (10 tests)
 ├── task-management.spec.ts         # Gestión de tareas (5 tests)
 ├── task-advanced.spec.ts           # IA y fechas (4 tests)
+├── task-isolation.spec.ts          # Aislamiento de usuarios (6 tests)
 ├── time-tracking.spec.ts           # Seguimiento de tiempo (3 tests)
 ├── time-stats.spec.ts              # Estadísticas (8 tests)
 ├── username-display.spec.ts         # Display de username (8 tests)
@@ -321,6 +346,14 @@ e2e/
 - **Authentication States**: Comportamiento correcto según estado de autenticación (2 tests)
 - **UI Interactions**: Abrir/cerrar dropdown y click fuera para cerrar (1 test)
 
+#### Task User Isolation (6 tests)
+- **User 1 Private Tasks**: Usuario 1 solo ve sus propias tareas (1 test)
+- **Cross-User Invisibility**: Usuario 2 no ve tareas de Usuario 1 (1 test)
+- **Modification Prevention**: Usuarios no pueden modificar tareas ajenas (1 test)
+- **Search Isolation**: Búsqueda respeta aislamiento de usuarios (1 test)
+- **Filter Isolation**: Filtros respetan aislamiento por usuario (1 test)
+- **Unauthenticated Access**: Usuarios no autenticados no acceden a tareas (1 test)
+
 ### Resultados E2E actuales
 ✅ **81/82 tests pasando** (98.8% de éxito)  
 🔴 **1 test falla** (username-display conocido, no crítico)  
@@ -328,7 +361,7 @@ e2e/
 🧹 **Tests limpios y optimizados**  
 🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
-👁️ **Password Visibility** - Cobertura completa E2E para toggle de contraseña
+🔒 **User Isolation** - Tests de seguridad multi-usuario
 
 ## Cómo ejecutar las pruebas
 
@@ -366,6 +399,7 @@ npm run test:coverage
 
 # Test específico
 npx jest src/tests/controllers/authController.test.js
+npx jest src/tests/routes/tasks.test.js
 ```
 
 ### Pruebas E2E
