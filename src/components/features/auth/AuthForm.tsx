@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PasswordInput } from '../../ui/PasswordInput';
+import { PasswordInput } from '../../PasswordInput';
 import { Link } from 'react-router-dom';
 
 interface AuthFormProps {

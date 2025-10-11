@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
-import { PasswordInput } from '../../../components/ui/PasswordInput';
+import { PasswordInput } from '../../../components/PasswordInput';
 
 describe('PasswordInput Component', () => {
   const mockOnChange = vi.fn();
