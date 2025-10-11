@@ -8,9 +8,12 @@ const register = async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
+  // Normalize email first
+  const normalizedEmail = email.toLowerCase().trim();
+
   // Basic email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!emailRegex.test(normalizedEmail)) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
 
@@ -21,7 +24,7 @@ const register = async (req, res) => {
 
   try {
     const { data, error } = await supabase.auth.signUp({
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
       password,
     });
 
@@ -44,15 +47,18 @@ const login = async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
+  // Normalize email first
+  const normalizedEmail = email.toLowerCase().trim();
+
   // Basic email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!emailRegex.test(normalizedEmail)) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
       password,
     });
 
@@ -75,15 +81,18 @@ const forgotPassword = async (req, res) => {
     return res.status(400).json({ error: 'Email is required' });
   }
 
+  // Normalize email first
+  const normalizedEmail = email.toLowerCase().trim();
+
   // Basic email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!emailRegex.test(normalizedEmail)) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
 
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(
-      email.toLowerCase().trim(),
+      normalizedEmail,
       {
         redirectTo: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password`,
       }
