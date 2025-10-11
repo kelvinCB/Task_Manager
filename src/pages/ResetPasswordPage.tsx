@@ -12,16 +12,55 @@ const ResetPasswordPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [searchParams] = useSearchParams();
+  const [isSessionValid, setIsSessionValid] = useState(false);
+  const [isValidatingSession, setIsValidatingSession] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if we have the necessary parameters for password reset
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    const handlePasswordReset = async () => {
+      setIsValidatingSession(true);
+      
+      // Handle the auth callback from email link
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const type = hashParams.get('type');
+      
+      // Also check URL search params as backup
+      const urlAccessToken = searchParams.get('access_token');
+      const urlRefreshToken = searchParams.get('refresh_token');
+      const urlType = searchParams.get('type');
 
-    if (!accessToken || !refreshToken) {
-      setError('Invalid or missing reset link. Please request a new password reset.');
-    }
+      const finalAccessToken = accessToken || urlAccessToken;
+      const finalRefreshToken = refreshToken || urlRefreshToken;
+      const finalType = type || urlType;
+
+      if (finalType === 'recovery' && finalAccessToken && finalRefreshToken) {
+        try {
+          // Set the session using the tokens from the reset link
+          const { error } = await supabase.auth.setSession({
+            access_token: finalAccessToken,
+            refresh_token: finalRefreshToken
+          });
+
+          if (error) {
+            console.error('Error setting session:', error);
+            setError('Invalid or expired reset link. Please request a new password reset.');
+          } else {
+            setIsSessionValid(true);
+          }
+        } catch (err: any) {
+          console.error('Error handling password reset:', err);
+          setError('Error processing reset link. Please request a new password reset.');
+        }
+      } else {
+        setError('Invalid or missing reset link. Please request a new password reset.');
+      }
+      
+      setIsValidatingSession(false);
+    };
+
+    handlePasswordReset();
   }, [searchParams]);
 
   const validatePassword = (password: string): string | null => {
@@ -34,6 +73,12 @@ const ResetPasswordPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Check if session is valid first
+    if (!isSessionValid) {
+      setError('Invalid or expired reset link. Please request a new password reset.');
+      return;
+    }
 
     // Validate password
     const passwordError = validatePassword(password);
@@ -66,6 +111,39 @@ const ResetPasswordPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Show loading screen while validating session
+  if (isValidatingSession) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
+        {/* Header with logo on the left */}
+        <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="flex justify-start mb-8 px-4 sm:px-10 lg:px-20">
+            <div data-testid="app-logo" className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
+              {'TaskLite'.split('').map((letter, index) => (
+                <span key={index}>{letter}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 dark:bg-indigo-900 mb-4">
+                <div className="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full"></div>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Validating reset link</h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                Please wait while we verify your password reset link...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isPasswordReset) {
     return (
