@@ -21,6 +21,7 @@ import Papa from 'papaparse';
 
 import { useTheme } from './contexts/ThemeContext';
 import { AccountMenu } from './components/features/account/AccountMenu';
+import { Analytics } from '@vercel/analytics/react';
 
 import './styles/logoAnimation.css';
 import LoginPage from './pages/LoginPage';
@@ -648,11 +649,12 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route 
-          path="/*" 
+        <Route
+          path="/*"
           element={<MainApp />}
         />
       </Routes>
+      <Analytics />
     </Router>
   );
 };
