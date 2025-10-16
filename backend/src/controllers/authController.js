@@ -94,7 +94,7 @@ const forgotPassword = async (req, res) => {
     const { error } = await supabase.auth.resetPasswordForEmail(
       normalizedEmail,
       {
-        redirectTo: `${process.env.FRONTEND_URL || 'https://task-manager-llwv.vercel.app/'}/reset-password`,
+        redirectTo: `${process.env.FRONTEND_URL}/reset-password`,
       }
     );
 
