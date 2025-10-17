@@ -19,7 +19,7 @@ vi.stubGlobal('import', {
   meta: {
     env: {
       VITE_OPENAI_MODEL: 'gpt-4o',
-      VITE_OPENAI_API_KEY: 'test-key'
+      OPENAI_API_KEY: 'test-key'
     }
   }
 });

@@ -30,9 +30,9 @@ export class OpenAIService {
   private defaultModel: string;
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    this.baseUrl = import.meta.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1';
-    this.defaultModel = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+    this.apiKey = import.meta.env.OPENAI_API_KEY;
+    this.baseUrl = import.meta.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
+    this.defaultModel = import.meta.env.OPENAI_MODEL || 'gpt-4o';
     
     if (!this.apiKey || this.apiKey === 'your-openai-api-key-here') {
       throw new Error('OpenAI API key not configured. Please add your API key to the .env file.');

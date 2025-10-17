@@ -92,7 +92,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### AI Integration
 - OpenAI service for task description generation
-- Configurable via environment variables (`VITE_OPENAI_API_KEY`)
+- Configurable via environment variables (`OPENAI_API_KEY`)
 - Supports multiple OpenAI models including O4 series
 
 ### Mobile Responsiveness

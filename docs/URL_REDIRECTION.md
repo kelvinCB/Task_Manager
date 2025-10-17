@@ -14,13 +14,13 @@ Ensure your `.env` file points to the correct Supabase URLs based on your target
 
 ```env
 # For Development Environment
-VITE_SUPABASE_URL=https://xktrbmbuneceginxqshy.supabase.co
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_URL=https://xktrbmbuneceginxqshy.supabase.co
+SUPABASE_KEY=your_SUPABASE_KEY
 
 
 # For Production Environment (uncomment when needed)
-# VITE_SUPABASE_URL=https://uuepapqtfvufcgxvghwn.supabase.co
-# VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# SUPABASE_URL=https://uuepapqtfvufcgxvghwn.supabase.co
+# SUPABASE_KEY=your_SUPABASE_KEY
 ```
 
 ### 2. Supabase URL Configuration

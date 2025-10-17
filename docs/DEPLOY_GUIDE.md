@@ -17,16 +17,16 @@ This guide covers deploying the Task Manager application to production environme
    Set the following **REQUIRED** environment variables in Vercel dashboard:
    ```
    # REQUIRED - Supabase Configuration
-   VITE_SUPABASE_URL=your-supabase-project-url
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   SUPABASE_URL=your-supabase-project-url
+   SUPABASE_KEY=your-supabase-anon-key
    
    # OPTIONAL - AI Features (only if using AI functionality)
-   VITE_OPENAI_API_KEY=your-openai-api-key
+   OPENAI_API_KEY=your-openai-api-key
    VITE_OPENAI_MODEL=o4-mini-2025-04-16
    VITE_OPENAI_BASE_URL=https://api.openai.com/v1
    ```
    
-   **⚠️ IMPORTANT:** Without `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, the app will show a blank page!
+   **⚠️ IMPORTANT:** Without `SUPABASE_URL` and `SUPABASE_KEY`, the app will show a blank page!
 
 3. **Build Settings:**
    - Build Command: `npm run build`
@@ -279,7 +279,7 @@ This guide covers deploying the Task Manager application to production environme
    **Cause:** Missing Supabase environment variables
    **Solution:** 
    - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
-   - Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+   - Add `SUPABASE_URL` and `SUPABASE_KEY`
    - Redeploy the application
    - **Verify:** Check browser console for "Supabase client not initialized" errors
 

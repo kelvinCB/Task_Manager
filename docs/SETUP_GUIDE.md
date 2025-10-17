@@ -37,7 +37,7 @@
 
 - Configure `.env` with sensitive information:
   ```
-  VITE_OPENAI_API_KEY=your-openai-api-key-here
+  OPENAI_API_KEY=your-openai-api-key-here
   VITE_OPENAI_MODEL=gpt-4
   VITE_OPENAI_BASE_URL=https://api.openai.com/v1
   ```

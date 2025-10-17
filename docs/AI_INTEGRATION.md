@@ -33,7 +33,7 @@ class OpenAIService {
 
 | Variable | Description | Default Value | Required |
 |----------|-------------|---------------|----------|
-| `VITE_OPENAI_API_KEY` | OpenAI API key | - | Yes (for AI features) |
+| `OPENAI_API_KEY` | OpenAI API key | - | Yes (for AI features) |
 | `VITE_OPENAI_MODEL` | Default model to use | `gpt-4o` | No |
 | `VITE_OPENAI_BASE_URL` | API base URL | `https://api.openai.com/v1` | No |
 
@@ -176,7 +176,7 @@ npm run test:coverage
 ### Common Issues
 
 1. **"API key not configured" error**
-   - Ensure `VITE_OPENAI_API_KEY` is set in `.env` file
+   - Ensure `OPENAI_API_KEY` is set in `.env` file
    - Verify the key is not the placeholder value
 
 2. **"Failed to connect to OpenAI API" error**

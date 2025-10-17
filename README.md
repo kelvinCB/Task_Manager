@@ -51,11 +51,11 @@ To get a local copy up and running, follow these simple steps.
     Edit `.env` file and add your configuration:
     ```
     # Required for authentication
-    VITE_SUPABASE_URL=your-supabase-project-url
-    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+    SUPABASE_URL=your-supabase-project-url
+    SUPABASE_KEY=your-supabase-anon-key
     
     # Optional for AI features
-    VITE_OPENAI_API_KEY=your-openai-api-key-here
+    OPENAI_API_KEY=your-openai-api-key-here
     VITE_OPENAI_MODEL=gpt-4o
     VITE_OPENAI_BASE_URL=https://api.openai.com/v1
     ```
@@ -100,7 +100,7 @@ TaskFlow includes an AI-powered assistant that can automatically generate detail
 
 **Setup:**
 1. Obtain an API key from [OpenAI](https://platform.openai.com/api-keys)
-2. Add the key to your `.env` file as `VITE_OPENAI_API_KEY`
+2. Add the key to your `.env` file as `OPENAI_API_KEY`
 3. Optionally configure the model and base URL
 
 **Usage:**

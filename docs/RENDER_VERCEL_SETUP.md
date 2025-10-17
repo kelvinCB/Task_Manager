@@ -12,10 +12,10 @@
 En tu dashboard de Vercel, configura estas variables:
 
 ```
-VITE_SUPABASE_URL=tu_supabase_url_real
-VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key_real
+SUPABASE_URL=tu_supabase_url_real
+SUPABASE_KEY=tu_SUPABASE_KEY_real
 VITE_API_BASE_URL=https://task-manager-8p1p.onrender.com
-VITE_OPENAI_API_KEY=tu_openai_key_opcional
+OPENAI_API_KEY=tu_openai_key_opcional
 VITE_OPENAI_MODEL=o4-mini-2025-04-16
 ```
 
@@ -25,7 +25,7 @@ En tu dashboard de Render, configura estas variables:
 ```
 NODE_ENV=production
 SUPABASE_URL=tu_supabase_url_real
-SUPABASE_KEY=tu_supabase_anon_key_real
+SUPABASE_KEY=tu_SUPABASE_KEY_real
 FRONTEND_URL=https://task-manager-llwv.vercel.app
 ```
 
