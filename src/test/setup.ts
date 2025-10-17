@@ -1,6 +1,17 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Load environment variables from .env.development for tests
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env.development file
+dotenv.config({ path: path.resolve(__dirname, '../../.env.development') });
+
 // Mock para localStorage
 const localStorageMock = (function() {
   let store: Record<string, string> = {};
