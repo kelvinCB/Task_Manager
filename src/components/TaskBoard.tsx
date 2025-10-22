@@ -2,8 +2,7 @@ import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { Task, TaskStatus } from '../types/Task';
 import { getStatusColor, getStatusIcon, formatDate, isTaskOverdue } from '../utils/taskUtils';
-import { Plus, Calendar } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { Plus, Calendar, Circle, Clock, CheckCircle, Edit2, Trash2 } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 
 interface TaskBoardProps {
@@ -114,7 +113,15 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
         {statusColumns.map(column => {
           const columnTasks = getTasksByStatus(column.status);
-          const StatusIcon = LucideIcons[getStatusIcon(column.status) as keyof typeof LucideIcons] as React.ComponentType<{className?: string}>;
+          const getIconComponent = (status: TaskStatus) => {
+            switch (status) {
+              case 'Open': return Circle;
+              case 'In Progress': return Clock;
+              case 'Done': return CheckCircle;
+              default: return Circle;
+            }
+          };
+          const StatusIcon = getIconComponent(column.status);
           
           return (
             <div key={column.status} className={`flex flex-col h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
@@ -225,14 +232,14 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-600' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded transition-colors duration-200`}
                             title="Edit task"
                           >
-                            <LucideIcons.Edit2 size={14} />
+                            <Edit2 size={14} />
                           </button>
                           <button
                             onClick={() => onDelete(task.id)}
                             className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-red-400 hover:bg-gray-600' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'} rounded transition-colors duration-200`}
                             title="Delete task"
                           >
-                            <LucideIcons.Trash2 size={14} />
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </div>

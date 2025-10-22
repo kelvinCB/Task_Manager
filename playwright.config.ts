@@ -1,4 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env.production file
+dotenv.config({ path: path.resolve(__dirname, '.env.production') });
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -50,12 +60,23 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run dev -- --mode production',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
     stdout: 'ignore',
     stderr: 'pipe',
+    env: {
+      NODE_ENV: 'production',
+      // Pass environment variables to the dev server
+      VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL,
+      VITE_SUPABASE_KEY: process.env.VITE_SUPABASE_KEY,
+      VITE_OPENAI_API_KEY: process.env.VITE_OPENAI_API_KEY,
+      VITE_OPENAI_BASE_URL: process.env.VITE_OPENAI_BASE_URL,
+      VITE_OPENAI_MODEL: process.env.VITE_OPENAI_MODEL,
+      E2E_TEST_USER_EMAIL: process.env.E2E_TEST_USER_EMAIL,
+      E2E_TEST_USER_PASSWORD: process.env.E2E_TEST_USER_PASSWORD,
+    }
   },
 
   /* Global setup and teardown */

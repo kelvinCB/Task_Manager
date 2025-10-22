@@ -21,7 +21,7 @@ This guide outlines the setup, architecture, and standards for backend developme
 Required environment variables in `.env`:
 ```
 SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_KEY=your_SUPABASE_KEY
 PORT=3001
 ```
 

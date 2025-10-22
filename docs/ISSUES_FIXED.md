@@ -2,6 +2,97 @@
 
 This file documents issues that have been identified and resolved in the TaskManager project.
 
+---
+
+## Issue: Supabase Environment Variables Not Loading (Fixed: 2025-10-22)
+
+### Problem
+The application was throwing an error on startup:
+```
+Error: Supabase URL and Anon Key must be defined in .env file
+```
+
+### Root Cause
+Environment variables in Vite **MUST** have the `VITE_` prefix to be exposed to client-side code. Without this prefix, Vite does not make the variables available in the browser for security reasons.
+
+The code was trying to access:
+- `import.meta.env.SUPABASE_URL` ❌
+- `import.meta.env.SUPABASE_KEY` ❌
+- `import.meta.env.OPENAI_API_KEY` ❌
+
+But they needed to be:
+- `import.meta.env.VITE_SUPABASE_URL` ✅
+- `import.meta.env.VITE_SUPABASE_KEY` ✅
+- `import.meta.env.VITE_OPENAI_API_KEY` ✅
+
+### Solution Applied
+
+#### 1. Updated Source Code
+- **File**: `src/lib/supabaseClient.ts`
+  - Changed `import.meta.env.SUPABASE_URL` → `import.meta.env.VITE_SUPABASE_URL`
+  - Changed `import.meta.env.SUPABASE_KEY` → `import.meta.env.VITE_SUPABASE_KEY`
+
+- **File**: `src/services/openaiService.ts`
+  - Changed `import.meta.env.OPENAI_API_KEY` → `import.meta.env.VITE_OPENAI_API_KEY`
+  - Changed `import.meta.env.OPENAI_BASE_URL` → `import.meta.env.VITE_OPENAI_BASE_URL`
+  - Changed `import.meta.env.OPENAI_MODEL` → `import.meta.env.VITE_OPENAI_MODEL`
+
+#### 2. Updated Environment Files
+- `.env.development`
+- `.env.production`
+- `.env.example`
+
+All variables renamed with `VITE_` prefix:
+```bash
+# Before ❌
+SUPABASE_URL=...
+SUPABASE_KEY=...
+OPENAI_API_KEY=...
+
+# After ✅
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_KEY=...
+VITE_OPENAI_API_KEY=...
+```
+
+#### 3. Added TypeScript Types
+- **File**: `src/vite-env.d.ts`
+- Added `ImportMetaEnv` interface with all environment variables for type safety and IntelliSense support
+
+### Files Modified
+1. `src/lib/supabaseClient.ts`
+2. `src/services/openaiService.ts`
+3. `src/vite-env.d.ts`
+4. `.env.development`
+5. `.env.production`
+6. `.env.example`
+
+### Testing
+After these changes, the application should:
+1. ✅ Load Supabase client correctly
+2. ✅ Initialize authentication context without errors
+3. ✅ Connect to Supabase database
+4. ✅ Load OpenAI service for AI features
+
+### Prevention
+To prevent this issue in the future:
+1. Always use `VITE_` prefix for client-side environment variables in Vite projects
+2. Backend environment variables (Node.js) don't need the prefix
+3. Update `.env.example` with proper documentation
+4. Add TypeScript types in `vite-env.d.ts` for autocomplete and validation
+
+### References
+- [Vite Environment Variables Documentation](https://vitejs.dev/guide/env-and-mode.html#env-variables)
+- Project PRD: `docs/PRD_GUIDE.md`
+- Frontend Guide: `docs/FRONTEND_GUIDE.md`
+
+### How to Verify the Fix
+1. Stop the development server (if running)
+2. Restart the server: `npm run dev`
+3. Open browser DevTools (F12)
+4. Check Console tab - should see no Supabase errors
+5. Check Network tab - Supabase API calls should be successful
+
 ## E2E Test Failures (10 tests) - Fixed on 2025-01-03
 
 ### Issue Description

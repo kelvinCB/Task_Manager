@@ -28,12 +28,19 @@ test-results/
 playwright-report/
 playwright/.cache/
 
-# Environment variables (contains API keys)
+# Environment variables (contains API keys - block all except .env.example)
 .env
+.env.*
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+!.env.example
+!backend/.env.example
+backend/.env*
 
 # Coverage reports
 coverage/

@@ -3,7 +3,7 @@ import { OpenAIService, openaiService } from '../../services/openaiService';
 
 // Mock environment variables
 const mockEnv = {
-  VITE_OPENAI_API_KEY: 'test-api-key',
+  OPENAI_API_KEY: 'test-api-key',
   VITE_OPENAI_BASE_URL: 'https://api.openai.com/v1',
   VITE_OPENAI_MODEL: 'gpt-4o'
 };

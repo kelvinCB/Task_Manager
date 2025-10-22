@@ -150,8 +150,8 @@ export const useAuth = () => {
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  import.meta.env.SUPABASE_URL,
+  import.meta.env.SUPABASE_KEY
 );
 
 export default supabase;
@@ -218,8 +218,8 @@ function App() {
 
 ### Environment Variables
 ```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_SUPABASE_KEY
 ```
 
 ### Security Features
@@ -1161,10 +1161,10 @@ export default defineConfig({
 // Environment variable handling
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string;
-  readonly VITE_OPENAI_API_KEY: string;
+  readonly OPENAI_API_KEY: string;
   readonly VITE_OPENAI_MODEL: string;
-  readonly VITE_SUPABASE_URL: string;
-  readonly VITE_SUPABASE_ANON_KEY: string;
+  readonly SUPABASE_URL: string;
+  readonly SUPABASE_KEY: string;
 }
 
 interface ImportMeta {

@@ -32,6 +32,8 @@ describe('Auth Controller', () => {
       json: jest.fn()
     };
     jest.clearAllMocks();
+    // Set FRONTEND_URL for tests
+    process.env.FRONTEND_URL = 'http://localhost:5173';
   });
 
   describe('register', () => {
