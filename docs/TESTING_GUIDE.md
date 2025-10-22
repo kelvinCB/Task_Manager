@@ -363,9 +363,57 @@ e2e/
 ✨ **Username Feature** - Tests completos para display de username
 🔒 **User Isolation** - Tests de seguridad multi-usuario
 
+## Variables de Entorno para Testing
+
+### Resumen de Configuración
+
+El proyecto utiliza diferentes archivos `.env` para diferentes entornos de testing:
+
+| Tipo de Test | Archivo Env | Carga Automática | Notas |
+|--------------|-------------|------------------|-------|
+| **Unitarios** | `.env.development` | ✅ Sí (via Vitest) | Usa mocks, credenciales opcionales |
+| **Backend** | `.env` (backend) | ✅ Sí (via Jest) | Credenciales de desarrollo |
+| **E2E** | `.env.production` | ✅ Sí (via dotenv-cli) | Requiere backend en producción |
+
+### Prefijos de Variables
+
+- **`VITE_`**: Variables expuestas al cliente (frontend)
+  - Ejemplos: `VITE_SUPABASE_URL`, `VITE_OPENAI_API_KEY`
+  - Usadas en: Código del navegador, E2E tests
+
+- **Sin prefijo**: Variables solo del servidor/scripts
+  - Ejemplos: `E2E_TEST_USER_EMAIL`, `E2E_TEST_USER_PASSWORD`
+  - Usadas en: Scripts de test, global-setup
+
+### Archivos de Ejemplo
+
+- **`.env.example`**: Template con todas las variables necesarias
+- **`.env.development.example`**: Específico para desarrollo (si existe)
+- **`.env.production.example`**: Específico para producción (si existe)
+
+**⚠️ Importante**: Nunca commitear archivos `.env` con credenciales reales. Usar siempre los archivos `.example` como referencia.
+
 ## Cómo ejecutar las pruebas
 
 ### Pruebas Unitarias
+
+#### Variables de Entorno
+Las pruebas unitarias usan automáticamente las variables de entorno de `.env.development`:
+
+```bash
+# Supabase Development
+VITE_SUPABASE_URL=https://...supabase.co
+VITE_SUPABASE_KEY=eyJhbG...
+
+# OpenAI Development (opcional para tests)
+VITE_OPENAI_API_KEY=sk-proj-...
+VITE_OPENAI_BASE_URL=https://api.openai.com/v1
+VITE_OPENAI_MODEL=o4-mini-2025-04-16
+```
+
+**Nota**: Las pruebas unitarias utilizan mocks extensivos, por lo que las credenciales reales de Supabase y OpenAI no son necesarias para la mayoría de los tests.
+
+#### Comandos de Ejecución
 ```bash
 # Modo watch (desarrollo)
 npm test
@@ -403,22 +451,59 @@ npx jest src/tests/routes/tasks.test.js
 ```
 
 ### Pruebas E2E
+
+#### Variables de Entorno
+Las pruebas E2E requieren variables de entorno de producción configuradas en `.env.production`:
+
 ```bash
-# Suite completa (headless)
+# Supabase (con prefijo VITE_ para Vite)
+VITE_SUPABASE_URL=https://...supabase.co
+VITE_SUPABASE_KEY=eyJhbG...
+
+# OpenAI (con prefijo VITE_)
+VITE_OPENAI_API_KEY=sk-proj-...
+VITE_OPENAI_BASE_URL=https://api.openai.com/v1
+VITE_OPENAI_MODEL=o4-mini-2025-04-16
+
+# Credenciales de usuario de prueba E2E
+E2E_TEST_USER_EMAIL=taski-test@yopmail.com
+E2E_TEST_USER_PASSWORD=holamundo1
+```
+
+**Nota importante**: Las pruebas E2E **deben ejecutarse con el backend en modo producción**:
+```bash
+# 1. Iniciar backend en producción primero
+npm run production
+
+# 2. En otra terminal, ejecutar las pruebas E2E
+npm run test:e2e
+```
+
+#### Comandos de Ejecución
+```bash
+# Suite completa (headless) - usa .env.production automáticamente
 npm run test:e2e
 
 # Con interfaz visual
 npm run test:e2e:headed
 
-# Con múltiples workers
-npx playwright test e2e/ --workers=4
+# Solo chromium (más rápido)
+npm run test:e2e:headless
+
+# Modo debug
+npm run test:e2e:debug
+
+# Con múltiples workers (requiere backend activo)
+npx dotenv -e .env.production -- playwright test e2e/ --workers=4
 
 # Test específico
-npx playwright test e2e/task-management.spec.ts
+npx dotenv -e .env.production -- playwright test e2e/task-management.spec.ts
 
 # Reporte HTML
 npx playwright show-report
 ```
+
+**📚 Documentación completa**: Ver `docs/E2E_ENV_CONFIG.md` para más detalles sobre la configuración de variables de entorno.
 
 ## Bugs corregidos
 
