@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env.development file
+// Load .env.development file for unit tests
 dotenv.config({ path: path.resolve(__dirname, '../../.env.development') });
 
 // Mock para localStorage
@@ -52,14 +52,9 @@ class AudioContextMock {
     return {
       connect: vi.fn(),
       gain: {
-        setValueAtTime: vi.fn(),
-        exponentialRampToValueAtTime: vi.fn()
+        setValueAtTime: vi.fn()
       }
     };
-  }
-
-  get currentTime() {
-    return 0;
   }
 
   get destination() {
@@ -67,10 +62,4 @@ class AudioContextMock {
   }
 }
 
-// Asegurar que ambas variantes de AudioContext sean mockeadas correctamente
-window.AudioContext = vi.fn().mockImplementation(() => new AudioContextMock()) as any;
-(window as any).webkitAudioContext = vi.fn().mockImplementation(() => new AudioContextMock());
-
-// Silenciar los logs en las pruebas
-vi.spyOn(console, 'error').mockImplementation(() => {});
-vi.spyOn(console, 'warn').mockImplementation(() => {});
+Object.defineProperty(window, 'AudioContext', { value: AudioContextMock });

@@ -40,6 +40,7 @@ playwright/.cache/
 .env.production.local
 !.env.example
 !backend/.env.example
+backend/.env*
 
 # Coverage reports
 coverage/

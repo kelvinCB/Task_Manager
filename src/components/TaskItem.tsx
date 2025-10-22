@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Task, TaskStatus } from '../types/Task';
 import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon } from '../utils/taskUtils';
-import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, CheckCircle } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -38,7 +37,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const StatusIcon = LucideIcons[getStatusIcon(task.status) as keyof typeof LucideIcons] as React.ComponentType<{className?: string}>;
+  const getIconComponent = (status: TaskStatus) => {
+    switch (status) {
+      case 'Open': return Circle;
+      case 'In Progress': return Clock;
+      case 'Done': return CheckCircle;
+      default: return Circle;
+    }
+  };
+  const StatusIcon = getIconComponent(task.status);
   const isOverdue = isTaskOverdue(task);
 
   useEffect(() => {
