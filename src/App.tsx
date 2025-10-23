@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useTasks } from './hooks/useTasks';
 import { TaskTree } from './components/TaskTree';
@@ -641,6 +641,20 @@ const MainApp = () => {
 }
 
 const App = () => {
+  // Handle unhandled promise rejections from Vercel Analytics
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      // Suppress Vercel Analytics MessageChannel errors silently
+      if (event.reason?.message?.includes('message channel closed')) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
 
   return (
     <Router>
