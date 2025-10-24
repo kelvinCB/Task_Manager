@@ -30,7 +30,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+// Express 5 uses path-to-regexp v6; wildcard '*' is invalid -> use '(.*)'
+app.options('(.*)', cors(corsOptions));
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
