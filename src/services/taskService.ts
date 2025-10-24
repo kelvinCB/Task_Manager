@@ -12,28 +12,44 @@ interface ApiResponse<T> {
 
 /**
  * Backend Task interface (matches backend structure)
+ * Note: Types reflect the API, not the DB exactly.
  */
 interface BackendTask {
-  id: string;
+  id: number; // Supabase returns numeric id (int8)
   user_id: string;
   title: string;
   description: string;
-  status: TaskStatus;
-  parent_task_id: string | null;
+  // Backend status enum: 'todo' | 'in_progress' | 'done'
+  status: 'todo' | 'in_progress' | 'done';
+  parent_id: number | null;
   created_at: string;
-  updated_at: string;
-  due_date: string | null;
-  time_tracking: {
-    totalTimeSpent: number;
-    isActive: boolean;
-    lastStarted?: number;
-    timeEntries: Array<{
-      startTime: number;
-      endTime?: number;
-      duration?: number;
-    }>;
-  };
+  updated_at?: string;
+  due_date: string | null; // ISO date string (YYYY-MM-DD)
 }
+
+/** Map backend -> frontend status */
+const toFrontendStatus = (s: BackendTask['status']): TaskStatus => {
+  switch (s) {
+    case 'todo':
+      return 'Open';
+    case 'in_progress':
+      return 'In Progress';
+    case 'done':
+      return 'Done';
+  }
+};
+
+/** Map frontend -> backend status */
+const toBackendStatus = (s: TaskStatus): BackendTask['status'] => {
+  switch (s) {
+    case 'Open':
+      return 'todo';
+    case 'In Progress':
+      return 'in_progress';
+    case 'Done':
+      return 'done';
+  }
+};
 
 /**
  * Service for managing tasks through the backend API
@@ -43,7 +59,8 @@ export class TaskService {
 
   constructor() {
     // Use backend API URL from environment or default to localhost
-    this.baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+    const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
+    this.baseUrl = env.VITE_BACKEND_URL || env.VITE_API_BASE_URL || 'http://localhost:3001';
   }
 
   /**
@@ -77,15 +94,15 @@ export class TaskService {
         },
       });
 
-      const data = await response.json();
+      const data = (await response.json().catch(() => ({}))) as unknown as T & { error?: string; message?: string };
 
       if (!response.ok) {
         return {
-          error: data.error || data.message || `Request failed with status ${response.status}`,
+          error: data && (data as any).error || (data as any).message || `Request failed with status ${response.status}`,
         };
       }
 
-      return { data };
+      return { data } as ApiResponse<T>;
     } catch (error) {
       console.error('API request error:', error);
       return {
@@ -101,16 +118,17 @@ export class TaskService {
    */
   private convertBackendToFrontend(backendTask: BackendTask): Task {
     return {
-      id: backendTask.id,
+      id: String(backendTask.id),
       title: backendTask.title,
-      description: backendTask.description,
-      status: backendTask.status,
+      description: backendTask.description || '',
+      status: toFrontendStatus(backendTask.status),
       createdAt: new Date(backendTask.created_at),
       dueDate: backendTask.due_date ? new Date(backendTask.due_date) : undefined,
-      parentId: backendTask.parent_task_id || undefined,
+      parentId: backendTask.parent_id !== null ? String(backendTask.parent_id) : undefined,
       childIds: [], // Will be computed on frontend
       depth: 0, // Will be computed on frontend
-      timeTracking: backendTask.time_tracking || {
+      // Backend does not store time tracking; default locally
+      timeTracking: {
         totalTimeSpent: 0,
         isActive: false,
         timeEntries: [],
@@ -126,13 +144,10 @@ export class TaskService {
 
     if (task.title !== undefined) backendTask.title = task.title;
     if (task.description !== undefined) backendTask.description = task.description;
-    if (task.status !== undefined) backendTask.status = task.status;
-    if (task.parentId !== undefined) backendTask.parent_task_id = task.parentId || null;
+    if (task.status !== undefined) backendTask.status = toBackendStatus(task.status);
+    if (task.parentId !== undefined) backendTask.parent_id = task.parentId ? Number(task.parentId) : null;
     if (task.dueDate !== undefined) {
-      backendTask.due_date = task.dueDate ? task.dueDate.toISOString() : null;
-    }
-    if (task.timeTracking !== undefined) {
-      backendTask.time_tracking = task.timeTracking;
+      backendTask.due_date = task.dueDate ? task.dueDate.toISOString().split('T')[0] : null;
     }
 
     return backendTask;
@@ -142,7 +157,11 @@ export class TaskService {
    * Get all tasks for the authenticated user
    */
   async getTasks(status?: TaskStatus): Promise<ApiResponse<Task[]>> {
-    const endpoint = status ? `/api/tasks?status=${status}` : '/api/tasks';
+    // Map status filter to backend enum if provided
+    const endpoint = status 
+      ? `/api/tasks?status=${toBackendStatus(status)}` 
+      : '/api/tasks';
+
     const response = await this.makeRequest<{ tasks: BackendTask[] }>(endpoint);
 
     if (response.error) {
@@ -150,7 +169,7 @@ export class TaskService {
     }
 
     if (response.data?.tasks) {
-      const tasks = response.data.tasks.map(bt => this.convertBackendToFrontend(bt));
+      const tasks = response.data.tasks.map((bt) => this.convertBackendToFrontend(bt));
       return { data: tasks };
     }
 
