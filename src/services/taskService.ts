@@ -19,37 +19,15 @@ interface BackendTask {
   user_id: string;
   title: string;
   description: string;
-  // Backend status enum: 'todo' | 'in_progress' | 'done'
-  status: 'todo' | 'in_progress' | 'done';
+  // Backend status enum now matches frontend: 'Open' | 'In Progress' | 'Done'
+  status: 'Open' | 'In Progress' | 'Done';
   parent_id: number | null;
   created_at: string;
   updated_at?: string;
   due_date: string | null; // ISO date string (YYYY-MM-DD)
 }
 
-/** Map backend -> frontend status */
-const toFrontendStatus = (s: BackendTask['status']): TaskStatus => {
-  switch (s) {
-    case 'todo':
-      return 'Open';
-    case 'in_progress':
-      return 'In Progress';
-    case 'done':
-      return 'Done';
-  }
-};
-
-/** Map frontend -> backend status */
-const toBackendStatus = (s: TaskStatus): BackendTask['status'] => {
-  switch (s) {
-    case 'Open':
-      return 'todo';
-    case 'In Progress':
-      return 'in_progress';
-    case 'Done':
-      return 'done';
-  }
-};
+// No mapping needed; backend and frontend share the same status values
 
 /**
  * Service for managing tasks through the backend API
@@ -121,7 +99,7 @@ export class TaskService {
       id: String(backendTask.id),
       title: backendTask.title,
       description: backendTask.description || '',
-      status: toFrontendStatus(backendTask.status),
+      status: backendTask.status,
       createdAt: new Date(backendTask.created_at),
       dueDate: backendTask.due_date ? new Date(backendTask.due_date) : undefined,
       parentId: backendTask.parent_id !== null ? String(backendTask.parent_id) : undefined,
@@ -144,7 +122,7 @@ export class TaskService {
 
     if (task.title !== undefined) backendTask.title = task.title;
     if (task.description !== undefined) backendTask.description = task.description;
-    if (task.status !== undefined) backendTask.status = toBackendStatus(task.status);
+    if (task.status !== undefined) backendTask.status = task.status;
     if (task.parentId !== undefined) backendTask.parent_id = task.parentId ? Number(task.parentId) : null;
     if (task.dueDate !== undefined) {
       backendTask.due_date = task.dueDate ? task.dueDate.toISOString().split('T')[0] : null;
@@ -157,9 +135,8 @@ export class TaskService {
    * Get all tasks for the authenticated user
    */
   async getTasks(status?: TaskStatus): Promise<ApiResponse<Task[]>> {
-    // Map status filter to backend enum if provided
     const endpoint = status 
-      ? `/api/tasks?status=${toBackendStatus(status)}` 
+      ? `/api/tasks?status=${encodeURIComponent(status)}` 
       : '/api/tasks';
 
     const response = await this.makeRequest<{ tasks: BackendTask[] }>(endpoint);

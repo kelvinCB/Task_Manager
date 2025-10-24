@@ -1,10 +1,22 @@
 const { createTask, getTasks, getTaskById, updateTask, deleteTask } = require('../../controllers/taskController');
 const supabase = require('../../config/supabaseClient');
 
-// Mock Supabase client
-jest.mock('../../config/supabaseClient', () => ({
+// Mock Supabase client (compatible with both legacy and new exports)
+const buildClient = () => ({
   from: jest.fn(),
-}));
+  auth: { getUser: jest.fn() }
+});
+jest.mock('../../config/supabaseClient', () => {
+  const client = buildClient();
+  return {
+    // legacy shape used in some tests: require(...).from(...)
+    from: client.from,
+    auth: client.auth,
+    // new named export shape: { supabase, createClientWithToken }
+    supabase: client,
+    createClientWithToken: jest.fn(() => buildClient())
+  };
+});
 
 describe('Task Controller', () => {
   let req, res;
@@ -39,14 +51,14 @@ describe('Task Controller', () => {
       req.body = {
         title: 'Test Task',
         description: 'Test Description',
-        status: 'todo'
+        status: 'Open'
       };
 
       const mockTask = {
         id: 1,
         title: 'Test Task',
         description: 'Test Description',
-        status: 'todo',
+        status: 'Open',
         user_id: 'user-123'
       };
 
@@ -87,7 +99,7 @@ describe('Task Controller', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Validation error',
-        message: 'Invalid status. Must be one of: todo, in_progress, done'
+        message: 'Invalid status. Must be one of: Open, In Progress, Done'
       });
     });
 
@@ -157,9 +169,9 @@ describe('Task Controller', () => {
     });
 
     it('should filter tasks by status', async () => {
-      req.query.status = 'done';
+      req.query.status = 'Done';
 
-      const mockTasks = [{ id: 1, title: 'Task 1', status: 'done', user_id: 'user-123' }];
+      const mockTasks = [{ id: 1, title: 'Task 1', status: 'Done', user_id: 'user-123' }];
 
       const mockEqStatus = jest.fn().mockResolvedValue({ data: mockTasks, error: null });
       const mockOrder = jest.fn().mockReturnValue({ eq: mockEqStatus });
@@ -276,10 +288,10 @@ describe('Task Controller', () => {
   describe('updateTask', () => {
     it('should update a task successfully', async () => {
       req.params.id = '1';
-      req.body = { title: 'Updated Task', status: 'in_progress' };
+      req.body = { title: 'Updated Task', status: 'In Progress' };
 
-      const existingTask = { id: 1, title: 'Old Task', status: 'todo', user_id: 'user-123' };
-      const updatedTask = { id: 1, title: 'Updated Task', status: 'in_progress', user_id: 'user-123' };
+      const existingTask = { id: 1, title: 'Old Task', status: 'Open', user_id: 'user-123' };
+      const updatedTask = { id: 1, title: 'Updated Task', status: 'In Progress', user_id: 'user-123' };
 
       // Mock for checking existing task
       const mockSingleExisting = jest.fn().mockResolvedValue({ data: existingTask, error: null });
