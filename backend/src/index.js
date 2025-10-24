@@ -6,14 +6,31 @@ const cors = require('cors');
 const app = express();
 
 // Configure CORS for production
+// Normalize allowed origins and allow localhost in dev
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // e.g. https://task-manager-llwv.vercel.app (no trailing slash)
+  'http://localhost:5173',
+  'http://127.0.0.1:5173'
+].filter(Boolean);
+
+const normalize = (url) => (url ? url.replace(/\/$/, '') : url);
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow same-origin and non-browser clients
+    if (!origin) return callback(null, true);
+    const normalizedOrigin = normalize(origin);
+    const isAllowed = allowedOrigins.some((o) => normalize(o) === normalizedOrigin);
+    callback(null, isAllowed);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
