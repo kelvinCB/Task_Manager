@@ -108,6 +108,10 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
   // Load tasks from localStorage or use defaults
   const [tasks, setTasks] = useState<Task[]>(() => {
+    // Avoid showing default tasks while we don't know auth state yet
+    if (options.useApi !== false) {
+      return [];
+    }
     const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
     return storedTasks ? parseTasksFromStorage(storedTasks, options.useDefaultTasks) : (options.useDefaultTasks ? defaultTasks : []);
   });
@@ -185,8 +189,10 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
         const isAuthenticated = await taskService.isAuthenticated();
         
         if (!isAuthenticated) {
-          // User not authenticated, use localStorage
+          // User not authenticated, switch to localStorage & (re)load defaults
           setUseApi(false);
+          const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+          setTasks(storedTasks ? parseTasksFromStorage(storedTasks, options.useDefaultTasks) : (options.useDefaultTasks ? defaultTasks : []));
           setIsLoading(false);
           return;
         }

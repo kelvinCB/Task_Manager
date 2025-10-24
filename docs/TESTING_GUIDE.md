@@ -15,16 +15,18 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ## Resumen General
 
 ### Estado Actual
-✅ **170 pruebas unitarias** (100% pasando)  
-✅ **85 pruebas E2E** (100% pasando)  
-✅ **81 pruebas de backend** (100% pasando)  
-✅ **Cobertura completa** de funcionalidades críticas  
+
+✅ **165 pruebas unitarias** (100% pasando)
+✅ **85 pruebas E2E** (100% pasando)
+✅ **81 pruebas de backend** (100% pasando)
+✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
 ✅ **Task CRUD con aislamiento de usuarios** implementado y testeado
 ✅ **Tests E2E de aislamiento** verificando seguridad multi-usuario
 
 ### Tecnologías
+
 - **Unitarias**: Vitest + React Testing Library + jsdom
 - **E2E**: Playwright + Chromium
 - **Backend**: Jest + Supertest + mocks
@@ -33,6 +35,7 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ## Pruebas Unitarias
 
 ### Estructura de archivos
+
 ```
 src/test/
 ├── setup.ts              # Configuración global
@@ -55,6 +58,7 @@ src/test/
 ```
 
 ### Cobertura principal
+
 - **App**: Navegación, vistas, temas (7 tests)
 - **Authentication**: Páginas de login y registro, validación y flujos de autenticación (15 tests)
 - **Password Reset**: Páginas de restablecimiento de contraseña con validación completa (15 tests)
@@ -70,6 +74,7 @@ src/test/
 - **Otros componentes**: TaskBoard, TaskTree, TimeStatsView, etc.
 
 ### Mocks configurados
+
 - **localStorage**: Simulación de persistencia
 - **AudioContext**: Sonidos de notificación
 - **fetch**: Llamadas API de OpenAI
@@ -83,6 +88,7 @@ src/test/
 ### Componentes críticos
 
 #### Authentication Pages (15 tests)
+
 - LoginPage: Interfaz, validación, gestión de errores
 - RegisterPage: Registro de usuarios, validación de datos
 - Elementos UI: Animación del logo, botones sociales, gradientes
@@ -90,7 +96,9 @@ src/test/
 - Responsive design y soporte para dark mode
 
 #### Password Reset Pages (15 tests)
+
 **ForgotPasswordPage (8 tests)**:
+
 - **Renderizado**: Logo, formulario, enlaces de navegación
 - **Validación**: Email requerido, formato de email válido
 - **API Success**: Envio exitoso de solicitud de restablecimiento
@@ -99,6 +107,7 @@ src/test/
 - **Navegación**: Link "Back to Login" funcional
 
 **ResetPasswordPage (7 tests)**:
+
 - **Renderizado**: Formulario de nueva contraseña
 - **Validación**: Contraseñas coincidentes y longitud mínima
 - **Toggle Visibility**: Mostrar/ocultar contraseñas
@@ -108,6 +117,7 @@ src/test/
 - **Navegación**: Redirección automática post-éxito
 
 #### PasswordInput Component (8 tests)
+
 - **Renderizado por defecto**: Contraseña oculta inicialmente
 - **Toggle de visibilidad**: Cambio entre password/text al hacer click
 - **Tooltip dinámico**: "Mostrar contraseña" / "Ocultar contraseña"
@@ -118,24 +128,28 @@ src/test/
 - **Accesibilidad**: Atributos ARIA y navegación por teclado
 
 #### Username Feature (17 tests)
+
 - **AccountMenu (11 tests)**: Display de username, dropdown functionality, login/logout states
 - **useUserProfile (6 tests)**: Fetch profile data, update profile, error handling
 - Integración con Supabase para datos de perfil
 - Generación automática de usernames aleatorios
 
 #### TaskForm (21 tests)
+
 - Renderizado y validación de formularios
 - Funcionalidad IA (generación, errores, timeouts)
 - Preservación de datos de timeTracking
 - Restablecimiento de formularios
 
 #### useTasks Hook (10 tests)
+
 - Gestión de tareas (crear, editar, eliminar)
 - Seguimiento de tiempo (iniciar, pausar, estadísticas)
 - Persistencia en localStorage
 - Relaciones padre-hijo de tareas
 
 #### openaiService (16 tests)
+
 - Generación de descripciones con IA
 - Manejo de diferentes modelos (GPT-4, O1)
 - Gestión de errores y timeouts
@@ -144,12 +158,14 @@ src/test/
 ## Pruebas de Backend
 
 ### Configuración y Tecnologías
+
 - **Jest**: Framework de testing principal
 - **Supertest**: Testing de endpoints HTTP
 - **Mocks**: Cliente Supabase mockeado para testing aislado
 - **Cobertura**: 90.62% en controladores, 100% en rutas
 
 ### Estructura de archivos Backend
+
 ```
 backend/src/tests/
 ├── setup.js                           # Configuración global de tests
@@ -166,7 +182,9 @@ backend/src/tests/
 ### Cobertura de Tests Backend
 
 #### Controlador de Autenticación (22 tests)
+
 **Funciones de Registro y Login (10 tests)**:
+
 - **Registro exitoso**: Validación de usuario registrado
 - **Login exitoso**: Autenticación de usuario válido
 - **Validación de entrada**: Email y contraseña requeridos
@@ -175,6 +193,7 @@ backend/src/tests/
 - **Errores inesperados**: Manejo de fallos del servidor
 
 **Password Reset (12 tests)**:
+
 - **forgotPassword success**: Solicitud de restablecimiento exitosa
 - **forgotPassword validation**: Email requerido, formato válido
 - **forgotPassword normalization**: Email normalizado (lowercase y trim)
@@ -184,13 +203,16 @@ backend/src/tests/
 - **resetPassword errors**: Manejo de errores y tokens inválidos
 
 #### Rutas de Autenticación (20 tests)
+
 **Rutas Originales (8 tests)**:
+
 - **POST /api/auth/register**: Tests de integración completos
 - **POST /api/auth/login**: Tests de integración completos
 - **Códigos de estado**: 200, 201, 400, 401, 500
 - **Formatos de respuesta**: JSON estructurado
 
 **Password Reset Routes (11 tests)**:
+
 - **POST /api/auth/forgot-password**: Envio de email de restablecimiento
 - **POST /api/auth/reset-password**: Actualización de contraseña
 - **Validaciones**: Email requerido, formato válido, contraseñas válidas
@@ -198,9 +220,11 @@ backend/src/tests/
 - **Edge cases**: Tokens faltantes, contraseñas cortas
 
 **Route Management (1 test)**:
+
 - **404 handling**: Rutas no encontradas
 
 #### Controlador de Tareas (22 tests)
+
 - **createTask**: Creación exitosa, validación de título, validación de status, verificación de parent_task_id
 - **getTasks**: Obtener todas las tareas del usuario, filtrado por status, validación de filtros
 - **getTaskById**: Obtener tarea específica, validación de ID, verificación de propiedad
@@ -209,6 +233,7 @@ backend/src/tests/
 - **Manejo de errores**: Database errors, validaciones, autenticación
 
 #### Rutas de Tareas (17 tests)
+
 - **POST /api/tasks**: Creación de tareas, validación de campos, estados válidos
 - **GET /api/tasks**: Obtener todas las tareas, filtrado por status, validación de filtros
 - **GET /api/tasks/:id**: Obtener tarea específica, manejo de IDs inválidos, tareas no encontradas
@@ -218,9 +243,11 @@ backend/src/tests/
 - **Seguridad**: Aislamiento por usuario, validación de JWT, prevención de acceso no autorizado
 
 ### Características de Testing Backend
+
 - **Mocking completo**: Supabase Auth y Database completamente mockeados
   - `supabase.auth.resetPasswordForEmail`: Mock para solicitudes de reset
   - `supabase.auth.updateUser`: Mock para actualización de contraseñas
+  - Compatibilidad con el nuevo export de cliente: `{ supabase, createClientWithToken }` (per-request JWT para RLS). Los tests usan un `buildClient()` para simular ambas formas (legacy y actual).
 - **Validación robusta**: Email format, password strength, task fields, token validation
 - **Error handling**: Manejo completo de errores de autenticación y base de datos (400, 500, tokens inválidos)
 - **HTTP Testing**: Requests/responses reales con Supertest
@@ -229,21 +256,24 @@ backend/src/tests/
 - **CRUD Completo**: Cobertura completa de operaciones Create, Read, Update, Delete
 
 ### Resultados Backend
-✅ **81/81 tests pasando** (100% de éxito)  
-📊 **Alta cobertura** en controladores y rutas  
-⚡ **Rápido**: Ejecución en ~1.2 segundos  
-🔒 **Seguro**: Validación completa de inputs, autenticación y aislamiento de usuarios  
+
+✅ **81/81 tests pasando** (100% de éxito)
+📊 **Alta cobertura** en controladores y rutas
+⚡ **Rápido**: Ejecución en ~1.2 segundos
+🔒 **Seguro**: Validación completa de inputs, autenticación y aislamiento de usuarios
 🎯 **Completo**: CRUD de tareas + autenticación + middleware JWT
 
 ## Pruebas E2E (End-to-End)
 
 ### Configuración Playwright
+
 - **Solo Chromium**: Optimizado para velocidad y consistencia
 - **Ejecución paralela**: Soporte para múltiples workers
 - **Screenshots**: Capturas automáticas al final de cada test
 - **Page Objects**: Patrón para mejor mantenibilidad
 
 ### Estructura de archivos E2E
+
 ```
 e2e/
 ├── app.spec.ts                    # Funcionalidad básica (9 tests)
@@ -271,6 +301,7 @@ e2e/
 ### Casos de prueba E2E por categoría
 
 #### Funcionalidad Básica (9 tests)
+
 - Carga de aplicación y navegación
 - Toggle de temas y persistencia
 - Diseño responsivo móvil
@@ -278,43 +309,52 @@ e2e/
 - Funcionalidad Export/Import Tasks desde el menú de cuenta
 
 #### Gestión de Tareas (5 tests)
+
 - Crear, editar, eliminar tareas
 - Validación de campos requeridos
 - Cancelación de formularios
 
 #### Filtrado Global (10 tests)
+
 - Filtros por estado en Board View (4 tests)
 - Filtros por estado en Tree View con contexto jerárquico (4 tests)
 - Consistencia entre vistas (2 tests)
 
 #### Búsqueda (7 tests)
+
 - Texto normal, caracteres especiales, números
 - Búsqueda case-insensitive
 - Búsqueda vacía y sin resultados
 
 #### Funciones Avanzadas (4 tests)
+
 - Creación de tareas con fechas de vencimiento
 - Generación de descripción con IA 🤖
 - Manejo de timeouts y cancelaciones de IA
 
 #### Seguimiento de Tiempo (3 tests)
+
 - Iniciar/detener timers
 - Precisión de medición
 - Exportación de datos CSV
 
 #### Estadísticas de Tiempo (8 tests)
+
 - Filtros temporales (Today, Week, Month, Year)
 - **Filtro de fecha personalizada** 📅 (fix de zona horaria)
 - Cambio entre filtros y visualización de datos
 
 #### Authentication (15 tests)
+
 - **Login**: Acceso desde menú Account, validación de campos, gestión de errores (6 tests)
 - **Logout**: Cierre de sesión y verificación de acceso restringido (1 test)
 - **Register**: Registro de nuevos usuarios, validaciones, manejo de errores (5 tests)
 - **UI Elements**: Verificación de botones sociales, links y estilos de página (3 tests)
 
 #### Password Visibility Toggle (16 tests)
+
 **Login Page Password Visibility (5 tests)**:
+
 - **Estado por defecto**: Contraseña oculta inicialmente, botón toggle visible
 - **Mostrar contraseña**: Click en toggle cambia tipo de input a texto
 - **Ocultar contraseña**: Toggle funciona en ambas direcciones preservando valor
@@ -322,11 +362,13 @@ e2e/
 - **Persistencia de estado**: Visibilidad se mantiene durante interacciones con otros campos
 
 **Register Page Password Visibility (3 tests)**:
+
 - **Estado por defecto**: Contraseña oculta en página de registro
 - **Toggle funcional**: Mostrar/ocultar contraseña funciona correctamente
 - **Estado independiente**: Cada página mantiene su propio estado de visibilidad
 
 **Reset Password Page Visibility (6 tests)**:
+
 - **Estado por defecto**: Ambos campos de contraseña ocultos inicialmente
 - **Toggle independiente**: Cada campo tiene su propio control de visibilidad
 - **Nuevas contraseñas**: Control individual del campo "nueva contraseña"
@@ -335,11 +377,13 @@ e2e/
 - **Preservación de valores**: Valores se mantienen al cambiar visibilidad
 
 **Accessibilidad y UX (2 tests)**:
+
 - **Navegación por teclado**: Toggle accesible via Tab y Enter
 - **Vista móvil**: Funciona correctamente en viewport móvil (375x667)
 - **Atributos ARIA**: Iconos con aria-hidden, tooltips apropiados
 
 #### Username Display (8 tests)
+
 - **Button Display**: Verificación de "My Account" en estados autenticados y no autenticados (2 tests)
 - **Dropdown Username**: Display del username generado automáticamente en dropdown (2 tests)
 - **Mobile Consistency**: Funcionamiento consistente en vista móvil (1 test)
@@ -347,6 +391,7 @@ e2e/
 - **UI Interactions**: Abrir/cerrar dropdown y click fuera para cerrar (1 test)
 
 #### Task User Isolation (6 tests)
+
 - **User 1 Private Tasks**: Usuario 1 solo ve sus propias tareas (1 test)
 - **Cross-User Invisibility**: Usuario 2 no ve tareas de Usuario 1 (1 test)
 - **Modification Prevention**: Usuarios no pueden modificar tareas ajenas (1 test)
@@ -355,13 +400,12 @@ e2e/
 - **Unauthenticated Access**: Usuarios no autenticados no acceden a tareas (1 test)
 
 ### Resultados E2E actuales
-✅ **85/85 tests pasando** (100% de éxito)  
-✅ **Todos los tests funcionando** (incluido username-display)  
-⏱️ **~1.6 minutos** con 4 workers  
-🧹 **Tests limpios y optimizados**  
-🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
+
+✅ **85/85 tests pasando** (100% de éxito)✅ **Todos los tests funcionando** (incluido username-display)⏱️ **~1.6 minutos** con 4 workers🧹 **Tests limpios y optimizados**🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
 🔒 **User Isolation** - Tests de seguridad multi-usuario
+
+> Nota: En modo autenticado no se muestran tareas por defecto; en modo offline/no autenticado se usan `defaultTasks`/localStorage. Los tests de `useTasks` cubren ambos flujos.
 
 ## Variables de Entorno para Testing
 
@@ -369,19 +413,20 @@ e2e/
 
 El proyecto utiliza diferentes archivos `.env` para diferentes entornos de testing:
 
-| Tipo de Test | Archivo Env | Carga Automática | Notas |
-|--------------|-------------|------------------|-------|
-| **Unitarios** | `.env.development` | ✅ Sí (via Vitest) | Usa mocks, credenciales opcionales |
-| **Backend** | `.env` (backend) | ✅ Sí (via Jest) | Credenciales de desarrollo |
-| **E2E** | `.env.production` | ✅ Sí (via dotenv-cli) | Requiere backend en producción |
+| Tipo de Test        | Archivo Env          | Carga Automática       | Notas                              |
+| ------------------- | -------------------- | ----------------------- | ---------------------------------- |
+| **Unitarios** | `.env.development` | ✅ Sí (via Vitest)     | Usa mocks, credenciales opcionales |
+| **Backend**   | `.env` (backend)   | ✅ Sí (via Jest)       | Credenciales de desarrollo         |
+| **E2E**       | `.env.production`  | ✅ Sí (via dotenv-cli) | Requiere backend en producción    |
 
 ### Prefijos de Variables
 
 - **`VITE_`**: Variables expuestas al cliente (frontend)
+
   - Ejemplos: `VITE_SUPABASE_URL`, `VITE_OPENAI_API_KEY`
   - Usadas en: Código del navegador, E2E tests
-
 - **Sin prefijo**: Variables solo del servidor/scripts
+
   - Ejemplos: `E2E_TEST_USER_EMAIL`, `E2E_TEST_USER_PASSWORD`
   - Usadas en: Scripts de test, global-setup
 
@@ -398,6 +443,7 @@ El proyecto utiliza diferentes archivos `.env` para diferentes entornos de testi
 ### Pruebas Unitarias
 
 #### Variables de Entorno
+
 Las pruebas unitarias usan automáticamente las variables de entorno de `.env.development`:
 
 ```bash
@@ -414,6 +460,7 @@ VITE_OPENAI_MODEL=o4-mini-2025-04-16
 **Nota**: Las pruebas unitarias utilizan mocks extensivos, por lo que las credenciales reales de Supabase y OpenAI no son necesarias para la mayoría de los tests.
 
 #### Comandos de Ejecución
+
 ```bash
 # Modo watch (desarrollo)
 npm test
@@ -429,6 +476,7 @@ npm run test:ui
 ```
 
 ### Pruebas Backend
+
 ```bash
 # Navegar al directorio backend
 cd backend
@@ -453,6 +501,7 @@ npx jest src/tests/routes/tasks.test.js
 ### Pruebas E2E
 
 #### Variables de Entorno
+
 Las pruebas E2E requieren variables de entorno de producción configuradas en `.env.production`:
 
 ```bash
@@ -471,6 +520,7 @@ E2E_TEST_USER_PASSWORD=holamundo1
 ```
 
 **Nota importante**: Las pruebas E2E **deben ejecutarse con el backend en modo producción**:
+
 ```bash
 # 1. Iniciar backend en producción primero
 npm run production
@@ -480,6 +530,7 @@ npm run test:e2e
 ```
 
 #### Comandos de Ejecución
+
 ```bash
 # Suite completa (headless) - usa .env.production automáticamente
 npm run test:e2e
@@ -510,15 +561,19 @@ npx playwright show-report
 ### 🔧 Bug crítico: Filtro de fechas personalizadas (Enero 2025)
 
 #### Problema identificado
+
 ❌ **Error**: El filtro de fechas personalizadas no mostraba tareas cuando se seleccionaba la misma fecha de inicio y fin (ej: 2025-07-07 a 2025-07-07)
 
 #### Causa raíz
+
 - **Problema de zona horaria**: `new Date("2025-07-07")` se interpretaba como UTC
 - **Rango incorrecto**: Ambas fechas se establecían a `00:00:00`
 - **Tareas excluidas**: Timestamps como `05:19:45` no entraban en el rango
 
 #### Solución implementada
+
 ✅ **Fix**: Usar parseo explícito de componentes de fecha:
+
 ```typescript
 // ANTES (problemático)
 const startDate = new Date(customStart);
@@ -532,22 +587,26 @@ const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 
 ```
 
 #### Validación
-✅ **Probado**: UTC-4 (República Dominicana)  
-✅ **Compatible**: Funciona globalmente en cualquier zona horaria  
+
+✅ **Probado**: UTC-4 (República Dominicana)
+✅ **Compatible**: Funciona globalmente en cualquier zona horaria
 ✅ **Test E2E**: Incluido en `time-stats.spec.ts`
 
 #### Archivos modificados
+
 - `src/components/TimeStatsView.tsx` - Lógica de parseo corregida
 - `e2e/time-stats.spec.ts` - Test de validación
 
 #### Impacto
-🌍 **Global**: Funciona para usuarios en cualquier zona horaria  
-✅ **Consistente**: Comportamiento idéntico al filtro "Today"  
+
+🌍 **Global**: Funciona para usuarios en cualquier zona horaria
+✅ **Consistente**: Comportamiento idéntico al filtro "Today"
 📋 **Confiable**: Filtros personalizados funcionan con confianza
 
 ## Contribución
 
 ### Mejores prácticas
+
 1. **TDD**: Escribir pruebas antes de implementar funcionalidad
 2. **Cobertura**: Cada componente nuevo debe tener pruebas correspondientes
 3. **Mocks**: Utilizar mocks existentes para localStorage y AudioContext
@@ -555,13 +614,16 @@ const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 
 5. **Independencia**: Cada test debe ser independiente y limpiar su estado
 
 ### Antes de enviar PR
+
 - ✅ Ejecutar suite completa de pruebas unitarias
 - ✅ Ejecutar pruebas E2E relevantes
 - ✅ Verificar que no hay logs indebidos
 - ✅ Actualizar documentación si es necesario
 
 ### Requisitos de ThemeProvider
+
 Los siguientes componentes requieren `ThemeProvider` en sus tests:
+
 - TaskItem, TaskTree, TaskTimer, TaskBoard, TaskForm, TimeStatsView
 
 ```jsx
@@ -576,4 +638,4 @@ render(
 
 ---
 
-**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con **336 tests** (170 Frontend + 81 Backend + 85 E2E).
+**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con **336 tests** (165 Frontend + 81 Backend + 85 E2E).
