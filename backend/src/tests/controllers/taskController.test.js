@@ -1,10 +1,22 @@
 const { createTask, getTasks, getTaskById, updateTask, deleteTask } = require('../../controllers/taskController');
 const supabase = require('../../config/supabaseClient');
 
-// Mock Supabase client
-jest.mock('../../config/supabaseClient', () => ({
+// Mock Supabase client (compatible with both legacy and new exports)
+const buildClient = () => ({
   from: jest.fn(),
-}));
+  auth: { getUser: jest.fn() }
+});
+jest.mock('../../config/supabaseClient', () => {
+  const client = buildClient();
+  return {
+    // legacy shape used in some tests: require(...).from(...)
+    from: client.from,
+    auth: client.auth,
+    // new named export shape: { supabase, createClientWithToken }
+    supabase: client,
+    createClientWithToken: jest.fn(() => buildClient())
+  };
+});
 
 describe('Task Controller', () => {
   let req, res;

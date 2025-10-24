@@ -9,13 +9,20 @@ const app = express();
 app.use(express.json());
 app.use('/api/tasks', taskRoutes);
 
-// Mock Supabase client
-jest.mock('../../config/supabaseClient', () => ({
-  auth: {
-    getUser: jest.fn(),
-  },
+// Mock Supabase client (compatible with both legacy and new exports)
+const buildClient = () => ({
   from: jest.fn(),
-}));
+  auth: { getUser: jest.fn() }
+});
+jest.mock('../../config/supabaseClient', () => {
+  const client = buildClient();
+  return {
+    from: client.from,
+    auth: client.auth,
+    supabase: client,
+    createClientWithToken: jest.fn(() => buildClient())
+  };
+});
 
 // Mock authentication middleware
 jest.mock('../../middlewares/authMiddleware', () => ({
