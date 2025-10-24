@@ -4,6 +4,54 @@ This file documents issues that have been identified and resolved in the TaskMan
 
 ---
 
+## Tasks not saved in production (Supabase) + data isolation broken — Fixed on 2025-10-24
+
+### Symptoms
+- New tasks created in production were not persisted; after reload/login they disappeared.
+- Users could see everyone else’s tasks.
+- Browser console showed: CORS preflight blocked, then “Validation error”, later 500 "Internal server error" on POST /api/tasks.
+
+### Root Causes
+1) Frontend/Backend contract mismatch
+- Frontend sent status "Open | In Progress | Done" while backend validates "todo | in_progress | done".
+- Field differences: backend expects numeric `id`, `parent_id`, and `due_date` as date string.
+
+2) CORS and Express 5 routing
+- Allowed origin didn’t match (trailing slash), preflight failed.
+- `app.options('*', ...)` breaks in Express 5 (path-to-regexp v6). Render crashed on boot.
+
+3) RLS not receiving user context
+- Backend Supabase client executed DB queries with anon key but WITHOUT the user JWT Authorization header, so RLS policies (auth.uid()) evaluated to null and blocked inserts/selects → surfaced as 500.
+
+### Fixes Applied
+- src/services/taskService.ts
+  - Added status mappers FE⇄BE, mapped `parent_id`, converted numeric ids to strings, normalized `due_date` (YYYY-MM-DD).
+  - Base URL now uses `VITE_BACKEND_URL` (fallback `VITE_API_BASE_URL`).
+- .env.example
+  - Documented `VITE_BACKEND_URL` and kept `VITE_API_BASE_URL` as fallback.
+- backend/src/index.js
+  - Robust CORS: normalize origins, allow FRONTEND_URL without trailing slash, removed problematic `app.options('*', ...)` handler.
+- backend/package.json
+  - Pinned Node to `20.x` for Render.
+- backend/src/config/supabaseClient.js, middlewares/authMiddleware.js, controllers/taskController.js
+  - Implemented per-request Supabase client authorized with the user’s JWT (`req.supabase = createClientWithToken(token)`), and used it for all task queries. This honors RLS and isolates data by `user_id`.
+
+### Deployment/Config
+- Render (backend):
+  - SUPABASE_URL, SUPABASE_KEY (anon public), FRONTEND_URL=https://task-manager-llwv.vercel.app, Node 20.x. Redeploy.
+- Vercel (frontend):
+  - VITE_BACKEND_URL=https://task-manager-8p1p.onrender.com. Redeploy.
+
+### Verification
+- Login (taski001@yopmail.com). POST /api/tasks → 201 with body `{ id, user_id, ... }`.
+- GET /api/tasks returns only the user’s tasks; cross-user access blocked by RLS.
+- UI persists tasks after reload.
+
+### Prevention
+- Keep FE/BE DTOs and enums documented; add integration tests for API contract.
+- Avoid wildcard `app.options('*')` with Express 5; prefer `app.use(cors(opts))` (and origin normalization).
+- Always run DB writes under the user’s JWT when relying on RLS.
+
 ## Issue: Supabase Environment Variables Not Loading (Fixed: 2025-10-22)
 
 ### Problem
