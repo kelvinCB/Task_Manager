@@ -1,4 +1,4 @@
-const supabase = require('../config/supabaseClient');
+const { supabase } = require('../config/supabaseClient');
 
 /**
  * Create a new task
@@ -43,8 +43,11 @@ const createTask = async (req, res) => {
       }
     }
 
+    // Choose RLS-aware client if available
+    const db = req.supabase || supabase;
+
     // Create the task
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('tasks')
       .insert([{
         title: title.trim(),
@@ -80,7 +83,9 @@ const getTasks = async (req, res) => {
     const user_id = req.user.id;
     const { status } = req.query;
 
-    let query = supabase
+    const db = req.supabase || supabase;
+
+    let query = db
       .from('tasks')
       .select('*')
       .eq('user_id', user_id)
@@ -131,7 +136,8 @@ const getTaskById = async (req, res) => {
       });
     }
 
-    const { data, error } = await supabase
+    const db = req.supabase || supabase;
+    const { data, error } = await db
       .from('tasks')
       .select('*')
       .eq('id', id)
@@ -174,7 +180,8 @@ const updateTask = async (req, res) => {
     }
 
     // Check if task exists and belongs to user
-    const { data: existingTask, error: fetchError } = await supabase
+    const db = req.supabase || supabase;
+    const { data: existingTask, error: fetchError } = await db
       .from('tasks')
       .select('*')
       .eq('id', id)
@@ -209,7 +216,7 @@ const updateTask = async (req, res) => {
           message: 'A task cannot be its own parent' 
         });
       } else {
-        const { data: parentTask, error: parentError } = await supabase
+        const { data: parentTask, error: parentError } = await (req.supabase || supabase)
           .from('tasks')
           .select('id, user_id')
           .eq('id', parent_id)
@@ -250,7 +257,7 @@ const updateTask = async (req, res) => {
     }
 
     // Update the task
-    const { data, error } = await supabase
+    const { data, error } = await (req.supabase || supabase)
       .from('tasks')
       .update(updates)
       .eq('id', id)
@@ -291,7 +298,7 @@ const deleteTask = async (req, res) => {
     }
 
     // Check if task exists and belongs to user
-    const { data: existingTask, error: fetchError } = await supabase
+    const { data: existingTask, error: fetchError } = await (req.supabase || supabase)
       .from('tasks')
       .select('id')
       .eq('id', id)
@@ -306,7 +313,7 @@ const deleteTask = async (req, res) => {
     }
 
     // Delete the task (child tasks will be deleted by CASCADE)
-    const { error } = await supabase
+    const { error } = await (req.supabase || supabase)
       .from('tasks')
       .delete()
       .eq('id', id)

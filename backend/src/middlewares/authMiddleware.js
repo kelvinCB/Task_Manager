@@ -1,4 +1,4 @@
-const supabase = require('../config/supabaseClient');
+const { supabase, createClientWithToken } = require('../config/supabaseClient');
 
 /**
  * Authentication middleware to validate JWT tokens and extract user information
@@ -43,6 +43,9 @@ const authenticateUser = async (req, res, next) => {
       email: user.email,
       ...user
     };
+
+    // Attach a per-request Supabase client authorized with the user's JWT
+    req.supabase = createClientWithToken(token);
 
     // Continue to the next middleware/route handler
     next();
