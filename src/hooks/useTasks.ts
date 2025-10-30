@@ -363,9 +363,11 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           setApiError(response.error);
           // Fallback to localStorage update
         } else if (response.data) {
-          // Successfully updated on API, update local state
+          // Successfully updated on API, merge fields but preserve local-only timeTracking
           setTasks(prev => prev.map(task => 
-            task.id === id ? { ...task, ...response.data } : task
+            task.id === id 
+              ? { ...task, ...response.data as any, timeTracking: task.timeTracking }
+              : task
           ));
           return;
         }
@@ -503,6 +505,11 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
               timeEntries: newTimeEntries
             }
           });
+
+          // Persist stop in backend as well
+          if (useApi) {
+            taskService.stopTimeEntry(lastEntry.backendId, id, now).catch(() => {});
+          }
         }
       }
     }
@@ -582,6 +589,24 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           timeEntries: [...task.timeTracking.timeEntries, newEntry]
         }
       });
+
+      // Persist start in backend (best effort)
+      if (useApi) {
+        taskService.startTimeEntry(taskId, now).then((resp) => {
+          if ((resp as any).data?.id) {
+            const backendId = (resp as any).data.id;
+            setTasks(prev => prev.map(t => {
+              if (t.id !== taskId) return t;
+              const updatedEntries = [...t.timeTracking.timeEntries];
+              const idx = updatedEntries.length - 1;
+              if (idx >= 0 && updatedEntries[idx].startTime === now) {
+                updatedEntries[idx] = { ...updatedEntries[idx], backendId } as any;
+              }
+              return { ...t, timeTracking: { ...t.timeTracking, timeEntries: updatedEntries } };
+            }));
+          }
+        }).catch(() => {});
+      }
     }
   }, [tasks, updateTask, moveTask]);
 
@@ -615,6 +640,11 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           timeEntries: newTimeEntries
         }
       });
+
+      // Persist stop in backend (best effort)
+      if (useApi) {
+        taskService.stopTimeEntry(lastEntry.backendId, taskId, now).catch(() => {});
+      }
     }
   }, [tasks, updateTask]);
 

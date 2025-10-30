@@ -234,6 +234,32 @@ export class TaskService {
     return response;
   }
 
+  // --- Time entries API ---
+  async startTimeEntry(taskId: string, startedAt?: number): Promise<ApiResponse<{ id: number }>> {
+    const response = await this.makeRequest<{ entry: { id: number } }>(`/api/time-entries/start`, {
+      method: 'POST',
+      body: JSON.stringify({ task_id: Number(taskId), start_time: startedAt ? new Date(startedAt).toISOString() : undefined })
+    });
+    if (response.error) return { error: response.error };
+    return { data: { id: (response.data as any).entry.id } } as any;
+  }
+
+  async stopTimeEntry(entryId?: number, taskId?: string, endedAt?: number): Promise<ApiResponse<{ id: number }>> {
+    const response = await this.makeRequest<{ entry: { id: number } }>(`/api/time-entries/stop`, {
+      method: 'POST',
+      body: JSON.stringify({ entry_id: entryId, task_id: taskId ? Number(taskId) : undefined, end_time: endedAt ? new Date(endedAt).toISOString() : undefined })
+    });
+    if (response.error) return { error: response.error };
+    return { data: { id: (response.data as any).entry.id } } as any;
+  }
+
+  async getTimeSummary(start: Date, end: Date): Promise<ApiResponse<{ id: string; title: string; status: TaskStatus; timeSpent: number; }[]>> {
+    const qs = new URLSearchParams({ start: start.toISOString(), end: end.toISOString() });
+    const response = await this.makeRequest<{ stats: { id: string; title: string; status: TaskStatus; timeSpent: number; }[] }>(`/api/time-entries/summary?${qs.toString()}`);
+    if (response.error) return { error: response.error };
+    return { data: (response.data as any).stats } as any;
+  }
+
   /**
    * Check if user is authenticated
    */
