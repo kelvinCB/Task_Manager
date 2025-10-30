@@ -199,6 +199,12 @@ export class TaskService {
    */
   async updateTask(id: string, updates: Partial<Task>): Promise<ApiResponse<Task>> {
     const backendUpdates = this.convertFrontendToBackend(updates);
+
+    // If there are no backend-mappable fields (e.g., only timeTracking was provided),
+    // skip the API call to avoid a 400 "No fields to update" from the backend.
+    if (!backendUpdates || Object.keys(backendUpdates).length === 0) {
+      return { message: 'No-op: nothing to sync to backend' };
+    }
     
     const response = await this.makeRequest<{ task: BackendTask }>(`/api/tasks/${id}`, {
       method: 'PUT',
