@@ -231,7 +231,8 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
               mergedTask = { ...apiTask, timeTracking: prev.timeTracking };
             }
             const lsStart = activeTimers[apiTask.id];
-            if (lsStart && apiTask.status !== 'Done') {
+            // Only rehydrate running timers for tasks actually in "In Progress"
+            if (lsStart && apiTask.status === 'In Progress') {
               mergedTask = {
                 ...mergedTask,
                 timeTracking: { ...mergedTask.timeTracking, isActive: true, lastStarted: lsStart }
