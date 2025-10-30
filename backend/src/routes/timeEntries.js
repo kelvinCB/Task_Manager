@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateUser } = require('../middlewares/authMiddleware');
-const { startEntry, stopEntry, getSummary } = require('../controllers/timeEntryController');
+const { startEntry, stopEntry, getSummary, completeEntry } = require('../controllers/timeEntryController');
 
 router.use(authenticateUser);
 
@@ -14,5 +14,7 @@ router.post('/stop', stopEntry);
 // Get summary for a period: ?start=ISO&end=ISO
 router.get('/summary', getSummary);
 
-module.exports = router;
+// Record a single summary row when task is completed
+router.post('/complete', completeEntry);
 
+module.exports = router;

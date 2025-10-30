@@ -120,4 +120,45 @@ const getSummary = async (req, res) => {
 };
 
 module.exports = { startEntry, stopEntry, getSummary };
+// New: record a single summary row when a task is completed
+const completeEntry = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { task_id, duration_ms } = req.body;
 
+    if (!task_id || duration_ms === undefined) {
+      return res.status(400).json({ error: 'Validation error', message: 'task_id and duration_ms are required' });
+    }
+
+    const db = req.supabase || supabase;
+
+    // Ensure task belongs to user
+    const { data: task, error: taskErr } = await db
+      .from('tasks')
+      .select('id, user_id')
+      .eq('id', task_id)
+      .eq('user_id', user_id)
+      .single();
+
+    if (taskErr || !task) {
+      return res.status(404).json({ error: 'Not found', message: 'Task not found' });
+    }
+
+    const end = new Date();
+    const start = new Date(end.getTime() - Math.max(0, Number(duration_ms)));
+
+    const { data, error } = await db
+      .from('time_entries')
+      .insert([{ task_id, user_id, start_time: start.toISOString(), end_time: end.toISOString() }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.status(201).json({ entry: data });
+  } catch (error) {
+    console.error('Complete time entry error:', error);
+    res.status(500).json({ error: 'Internal server error', message: 'Failed to record time summary' });
+  }
+};
+
+module.exports.completeEntry = completeEntry;

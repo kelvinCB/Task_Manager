@@ -6,7 +6,7 @@ const { supabase } = require('../config/supabaseClient');
  */
 const createTask = async (req, res) => {
   try {
-    const { title, description, status, due_date, parent_id } = req.body;
+    const { title, description, status, due_date, parent_id, total_time_ms } = req.body;
     const user_id = req.user.id;
 
     // Validation
@@ -55,7 +55,8 @@ const createTask = async (req, res) => {
         status: status || 'Open',
         due_date: due_date || null,
         parent_id: parent_id || null,
-        user_id
+        user_id,
+        total_time_ms: total_time_ms ?? 0
       }])
       .select()
       .single();
@@ -169,7 +170,7 @@ const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
     const user_id = req.user.id;
-    const { title, description, status, due_date, parent_id } = req.body;
+    const { title, description, status, due_date, parent_id, total_time_ms } = req.body;
 
     // Validate ID format
     if (!id || isNaN(parseInt(id))) {
@@ -239,6 +240,7 @@ const updateTask = async (req, res) => {
     if (status !== undefined) updates.status = status;
     if (due_date !== undefined) updates.due_date = due_date;
     if (parent_id !== undefined) updates.parent_id = parent_id;
+    if (total_time_ms !== undefined) updates.total_time_ms = total_time_ms;
 
     // Validate that at least one field is being updated
     if (Object.keys(updates).length === 0) {

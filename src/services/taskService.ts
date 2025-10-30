@@ -25,6 +25,7 @@ interface BackendTask {
   created_at: string;
   updated_at?: string;
   due_date: string | null; // ISO date string (YYYY-MM-DD)
+  total_time_ms?: number; // Summary total (persisted only when Done)
 }
 
 // No mapping needed; backend and frontend share the same status values
@@ -107,7 +108,8 @@ export class TaskService {
       depth: 0, // Will be computed on frontend
       // Backend does not store time tracking; default locally
       timeTracking: {
-        totalTimeSpent: 0,
+        // If backend provided a summary, prefer it (especially for Done)
+        totalTimeSpent: backendTask.total_time_ms ?? 0,
         isActive: false,
         timeEntries: [],
       },
@@ -127,6 +129,8 @@ export class TaskService {
     if (task.dueDate !== undefined) {
       backendTask.due_date = task.dueDate ? task.dueDate.toISOString().split('T')[0] : null;
     }
+    // pass-through for backend-specific fields (e.g., total_time_ms)
+    if ((task as any).total_time_ms !== undefined) backendTask.total_time_ms = (task as any).total_time_ms;
 
     return backendTask;
   }
@@ -258,6 +262,15 @@ export class TaskService {
     const response = await this.makeRequest<{ stats: { id: string; title: string; status: TaskStatus; timeSpent: number; }[] }>(`/api/time-entries/summary?${qs.toString()}`);
     if (response.error) return { error: response.error };
     return { data: (response.data as any).stats } as any;
+  }
+
+  async recordTimeSummary(taskId: string, durationMs: number): Promise<ApiResponse<{ id: number }>> {
+    const response = await this.makeRequest<{ entry: { id: number } }>(`/api/time-entries/complete`, {
+      method: 'POST',
+      body: JSON.stringify({ task_id: Number(taskId), duration_ms: durationMs })
+    });
+    if (response.error) return { error: response.error };
+    return { data: { id: (response.data as any).entry.id } } as any;
   }
 
   /**

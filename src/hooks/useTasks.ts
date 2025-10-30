@@ -177,6 +177,21 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     return buildTaskTree(tasksForTree);
   }, [tasks, taskTree, filteredTasks, filter]);
 
+  // Local persistence for active timers to resist reloads/tab changes
+  const ACTIVE_TIMERS_KEY = 'taskflow_active_timers';
+  const getActiveTimers = (): Record<string, number> => {
+    try { return JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}'); } catch { return {}; }
+  };
+  const setActiveTimer = (taskId: string, startedAt: number) => {
+    const map = getActiveTimers();
+    map[taskId] = startedAt;
+    try { localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map)); } catch {}
+  };
+  const clearActiveTimer = (taskId: string) => {
+    const map = getActiveTimers();
+    if (map[taskId]) { delete map[taskId]; try { localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map)); } catch {} }
+  };
+
   // Load tasks from API on mount if authenticated
   useEffect(() => {
     const loadTasksFromApi = async () => {
@@ -207,7 +222,24 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           setUseApi(false);
         } else if (response.data) {
           // Successfully loaded from API
-          setTasks(response.data);
+          const activeTimers = getActiveTimers();
+          const prevMap = new Map(tasks.map(t => [t.id, t]));
+          const merged = response.data.map(apiTask => {
+            const prev = prevMap.get(apiTask.id);
+            let mergedTask = apiTask;
+            if (prev && (prev.timeTracking.isActive || prev.timeTracking.totalTimeSpent > 0 || prev.timeTracking.timeEntries.length > 0)) {
+              mergedTask = { ...apiTask, timeTracking: prev.timeTracking };
+            }
+            const lsStart = activeTimers[apiTask.id];
+            if (lsStart && apiTask.status !== 'Done') {
+              mergedTask = {
+                ...mergedTask,
+                timeTracking: { ...mergedTask.timeTracking, isActive: true, lastStarted: lsStart }
+              };
+            }
+            return mergedTask;
+          });
+          setTasks(merged);
           setApiError(null);
         }
       } catch (error) {
@@ -473,9 +505,9 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       return false;
     }
 
-    // If the task is being marked as completed and the timer is active,
+    // If the task is being marked as completed or moved back to Open and the timer is active,
     // we must pause it first
-    if (newStatus === 'Done' && task.timeTracking.isActive) {
+    if ((newStatus === 'Done' || newStatus === 'Open') && task.timeTracking.isActive) {
       const taskToUpdate = tasks.find(t => t.id === id);
       if (taskToUpdate && taskToUpdate.timeTracking.isActive) {
         // We pause the timer directly here instead of using pauseTaskTimer
@@ -505,16 +537,52 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
               timeEntries: newTimeEntries
             }
           });
-
-          // Persist stop in backend as well
-          if (useApi) {
-            taskService.stopTimeEntry(lastEntry.backendId, id, now).catch(() => {});
-          }
+          // Clear persisted running state
+          try {
+            const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
+            delete map[id];
+            localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
+          } catch {}
+          // Do not persist partial times to backend
+        } else {
+          // Fallback: synthesize entry from lastStarted so completion/open always closes timer
+          const effectiveStart = taskToUpdate.timeTracking.lastStarted || now;
+          const duration = Math.max(0, now - effectiveStart);
+          const newTimeEntries = [...taskToUpdate.timeTracking.timeEntries, { startTime: effectiveStart, endTime: now, duration } as TimeEntry];
+          updateTask(id, {
+            timeTracking: {
+              ...taskToUpdate.timeTracking,
+              isActive: false,
+              totalTimeSpent: taskToUpdate.timeTracking.totalTimeSpent + duration,
+              timeEntries: newTimeEntries
+            }
+          });
+          try {
+            const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
+            delete map[id];
+            localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
+          } catch {}
         }
       }
     }
 
-    updateTask(id, { status: newStatus });
+    // If moving to Done, persist the final total time to backend in the task row
+    if (newStatus === 'Done') {
+      const current = tasks.find(t => t.id === id);
+      let finalTotal = current?.timeTracking.totalTimeSpent || 0;
+      // If there is an open entry, include it (should already be closed above)
+      const last = current?.timeTracking.timeEntries.slice(-1)[0];
+      if (last && last.endTime && last.duration) {
+        finalTotal = current!.timeTracking.totalTimeSpent; // already included
+      }
+      updateTask(id, { status: newStatus, ...( { total_time_ms: finalTotal } as any) });
+      // Also record a single summary row in backend time_entries
+      if (useApi) {
+        taskService.recordTimeSummary(id, finalTotal).catch(() => {});
+      }
+    } else {
+      updateTask(id, { status: newStatus });
+    }
     return true;
   };
 
@@ -589,24 +657,14 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           timeEntries: [...task.timeTracking.timeEntries, newEntry]
         }
       });
+      // Persist running state locally to resist tab changes/reloads
+      try { 
+        const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
+        map[taskId] = now;
+        localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
+      } catch {}
 
-      // Persist start in backend (best effort)
-      if (useApi) {
-        taskService.startTimeEntry(taskId, now).then((resp) => {
-          if ((resp as any).data?.id) {
-            const backendId = (resp as any).data.id;
-            setTasks(prev => prev.map(t => {
-              if (t.id !== taskId) return t;
-              const updatedEntries = [...t.timeTracking.timeEntries];
-              const idx = updatedEntries.length - 1;
-              if (idx >= 0 && updatedEntries[idx].startTime === now) {
-                updatedEntries[idx] = { ...updatedEntries[idx], backendId } as any;
-              }
-              return { ...t, timeTracking: { ...t.timeTracking, timeEntries: updatedEntries } };
-            }));
-          }
-        }).catch(() => {});
-      }
+      // Do not persist to backend on start; only persist when task is completed
     }
   }, [tasks, updateTask, moveTask]);
 
@@ -640,11 +698,27 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           timeEntries: newTimeEntries
         }
       });
+      // Clear persisted running state
+      try {
+        const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
+        delete map[taskId];
+        localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
+      } catch {}
 
-      // Persist stop in backend (best effort)
-      if (useApi) {
-        taskService.stopTimeEntry(lastEntry.backendId, taskId, now).catch(() => {});
-      }
+      // Do not persist to backend on pause; we only persist on Done
+    } else {
+      // Fallback: synthesize an entry using lastStarted so pause always works
+      const effectiveStart = task.timeTracking.lastStarted || now;
+      const duration = Math.max(0, now - effectiveStart);
+      const newTimeEntries = [...task.timeTracking.timeEntries, { startTime: effectiveStart, endTime: now, duration } as TimeEntry];
+      updateTask(taskId, {
+        timeTracking: {
+          ...task.timeTracking,
+          isActive: false,
+          totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
+          timeEntries: newTimeEntries
+        }
+      });
     }
   }, [tasks, updateTask]);
 
