@@ -47,7 +47,7 @@ describe('Task Routes Integration Tests', () => {
         id: 1,
         title: 'Test Task',
         description: 'Test Description',
-        status: 'todo',
+        status: 'Open',
         user_id: 'user-123'
       };
 
@@ -62,7 +62,7 @@ describe('Task Routes Integration Tests', () => {
         .send({
           title: 'Test Task',
           description: 'Test Description',
-          status: 'todo'
+          status: 'Open'
         });
 
       expect(response.status).toBe(201);
@@ -121,7 +121,7 @@ describe('Task Routes Integration Tests', () => {
 
     it('should filter tasks by status', async () => {
       const mockTasks = [
-        { id: 1, title: 'Task 1', status: 'done', user_id: 'user-123' }
+        { id: 1, title: 'Task 1', status: 'Done', user_id: 'user-123' }
       ];
 
       const mockEqStatus = jest.fn().mockResolvedValue({ data: mockTasks, error: null });
@@ -133,11 +133,11 @@ describe('Task Routes Integration Tests', () => {
 
       const response = await request(app)
         .get('/api/tasks')
-        .query({ status: 'done' });
+        .query({ status: 'Done' });
 
       expect(response.status).toBe(200);
       expect(response.body.tasks).toHaveLength(1);
-      expect(response.body.tasks[0].status).toBe('done');
+      expect(response.body.tasks[0].status).toBe('Done');
     });
 
     it('should return 400 for invalid status filter', async () => {
@@ -193,8 +193,8 @@ describe('Task Routes Integration Tests', () => {
 
   describe('PUT /api/tasks/:id', () => {
     it('should update a task successfully', async () => {
-      const existingTask = { id: 1, title: 'Old Task', status: 'todo', user_id: 'user-123' };
-      const updatedTask = { id: 1, title: 'Updated Task', status: 'in_progress', user_id: 'user-123' };
+      const existingTask = { id: 1, title: 'Old Task', status: 'Open', user_id: 'user-123' };
+      const updatedTask = { id: 1, title: 'Updated Task', status: 'In Progress', user_id: 'user-123' };
 
       const mockSingleExisting = jest.fn().mockResolvedValue({ data: existingTask, error: null });
       const mockEqUserExisting = jest.fn().mockReturnValue({ single: mockSingleExisting });
@@ -221,7 +221,7 @@ describe('Task Routes Integration Tests', () => {
         .put('/api/tasks/1')
         .send({
           title: 'Updated Task',
-          status: 'in_progress'
+          status: 'In Progress'
         });
 
       expect(response.status).toBe(200);

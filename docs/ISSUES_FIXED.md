@@ -13,8 +13,10 @@ This file documents issues that have been identified and resolved in the TaskMan
 
 ### Root Causes
 1) Frontend/Backend contract mismatch
-- Frontend sent status "Open | In Progress | Done" while backend validates "todo | in_progress | done".
+- Frontend sent status "Open | In Progress | Done" while backend validated "todo | in_progress | done".
 - Field differences: backend expects numeric `id`, `parent_id`, and `due_date` as date string.
+  
+  Follow-up (2025-10-30): Backend validation and defaults updated to "Open | In Progress | Done" and a migration script added at `scripts/migrations/20251030_status_titlecase.sql` to convert existing rows and enforce a CHECK constraint and default.
 
 2) CORS and Express 5 routing
 - Allowed origin didn’t match (trailing slash), preflight failed.

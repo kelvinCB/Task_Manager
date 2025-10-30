@@ -18,11 +18,11 @@ const createTask = async (req, res) => {
     }
 
     // Validate status if provided
-    const validStatuses = ['todo', 'in_progress', 'done'];
+    const validStatuses = ['Open', 'In Progress', 'Done'];
     if (status && !validStatuses.includes(status)) {
       return res.status(400).json({ 
         error: 'Validation error',
-        message: 'Invalid status. Must be one of: todo, in_progress, done' 
+        message: 'Invalid status. Must be one of: Open, In Progress, Done' 
       });
     }
 
@@ -52,7 +52,7 @@ const createTask = async (req, res) => {
       .insert([{
         title: title.trim(),
         description: description?.trim() || null,
-        status: status || 'todo',
+        status: status || 'Open',
         due_date: due_date || null,
         parent_id: parent_id || null,
         user_id
@@ -93,7 +93,7 @@ const getTasks = async (req, res) => {
 
     // Filter by status if provided
     if (status) {
-      const validStatuses = ['todo', 'in_progress', 'done'];
+      const validStatuses = ['Open', 'In Progress', 'Done'];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ 
           error: 'Validation error',
@@ -197,11 +197,11 @@ const updateTask = async (req, res) => {
 
     // Validate status if provided
     if (status) {
-      const validStatuses = ['todo', 'in_progress', 'done'];
+      const validStatuses = ['Open', 'In Progress', 'Done'];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ 
           error: 'Validation error',
-          message: 'Invalid status. Must be one of: todo, in_progress, done' 
+          message: 'Invalid status. Must be one of: Open, In Progress, Done' 
         });
       }
     }

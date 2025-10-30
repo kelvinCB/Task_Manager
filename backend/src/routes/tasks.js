@@ -24,8 +24,8 @@ router.post('/', createTask);
  * @route   GET /api/tasks
  * @desc    Get all tasks for authenticated user
  * @access  Private (requires authentication)
- * @query   status? - Filter tasks by status (todo|in_progress|done)
- */
+ * @query   status? - Filter tasks by status (Open | In Progress | Done)
+*/
 router.get('/', getTasks);
 
 /**
