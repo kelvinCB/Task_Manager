@@ -16,7 +16,7 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 
-✅ **165 pruebas unitarias** (100% pasando)
+✅ **167 pruebas unitarias** (100% pasando)
 ✅ **85 pruebas E2E** (100% pasando)
 ✅ **81 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
@@ -52,7 +52,8 @@ src/test/
 │   ├── ResetPasswordPage.test.tsx
 │   └── ...
 ├── services/            # Tests de servicios
-│   └── openaiService.test.ts
+│   ├── openaiService.test.ts
+│   └── taskService.test.ts   # Verifica que no se envíen updates vacíos al backend
 └── utils/               # Tests de utilidades
     └── taskUtils.test.ts
 ```
@@ -638,4 +639,4 @@ render(
 
 ---
 
-**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con **336 tests** (165 Frontend + 81 Backend + 85 E2E).
+**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con **338 tests** (167 Frontend + 81 Backend + 85 E2E).
