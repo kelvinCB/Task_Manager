@@ -65,4 +65,21 @@ describe('taskService.updateTask', () => {
     expect((init as RequestInit).body as string).toContain('"status":"In Progress"');
     expect(res).toHaveProperty('data');
   });
+
+  it('should POST a single summary on recordTimeSummary', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ entry: { id: 123 } })
+    } as any);
+    (globalThis as any).fetch = fetchMock;
+
+    const res = await taskService.recordTimeSummary('42', 7777);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(String(url)).toMatch(/\/api\/time-entries\/complete$/);
+    expect((init as RequestInit).method).toBe('POST');
+    expect(String((init as RequestInit).body)).toContain('"task_id":42');
+    expect(String((init as RequestInit).body)).toContain('"duration_ms":7777');
+    expect(res).toHaveProperty('data');
+  });
 });
