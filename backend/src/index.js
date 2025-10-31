@@ -34,9 +34,11 @@ app.use(express.json());
 
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
+const timeEntryRoutes = require('./routes/timeEntries');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/time-entries', timeEntryRoutes);
 
 app.get('/', (req, res) => {
   res.send('Task Manager Backend is running!');

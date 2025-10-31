@@ -22,6 +22,7 @@ export interface TimeEntry {
   startTime: number;     // Timestamp when tracking started
   endTime?: number;      // Timestamp when tracking ended (undefined if still active)
   duration?: number;     // Duration in milliseconds (calculated when ended)
+  backendId?: number;    // Optional: ID of the time_entries row in backend
 }
 
 export type TaskStatus = 'Open' | 'In Progress' | 'Done';
