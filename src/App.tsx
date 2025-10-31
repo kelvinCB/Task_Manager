@@ -5,6 +5,7 @@ import { TaskTree } from './components/TaskTree';
 import { TaskBoard } from './components/TaskBoard';
 import { TaskForm } from './components/TaskForm';
 import { TimeStatsView } from './components/TimeStatsView';
+import { taskService } from './services/taskService';
 import { ProgressIcon } from './components/ProgressIcon';
 import { Task, TaskNode } from './types/Task';
 import { 
@@ -601,25 +602,56 @@ const MainApp = () => {
               getElapsedTime={getElapsedTime}
             />
           ) : (
-            <TimeStatsView getTimeStatistics={(period, startDate, endDate) => {
-              let stats;
-              
-              if (period === 'custom' && startDate && endDate) {
-                stats = getTimeStatistics({start: startDate, end: endDate});
-              } else {
-                stats = getTimeStatistics(period as 'day' | 'week' | 'month' | 'year');
-              }
-              
-              // Convert from format returned by useTasks to format expected by TimeStatsView
-              return stats.taskStats.map(item => ({
-                id: item.taskId,
-                title: item.title,
-                timeSpent: item.timeSpent,
-                status: 'Open', // Required field but not used for statistics
-                startDate: Date.now(),
-                endDate: Date.now()
-              }));
-            }} />
+            <TimeStatsView
+              getTimeStatistics={async (period, startDate, endDate) => {
+                // Compute date range
+                const now = new Date();
+                let start: Date;
+                let end: Date = now;
+
+                if (period === 'custom' && startDate && endDate) {
+                  start = startDate;
+                  end = endDate;
+                } else if (period === 'day') {
+                  start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+                } else if (period === 'week') {
+                  const dayOfWeek = now.getDay();
+                  start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek, 0, 0, 0, 0);
+                } else if (period === 'month') {
+                  start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+                } else {
+                  // year
+                  start = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+                }
+
+                // Try backend summary first
+                const resp = await taskService.getTimeSummary(start, end);
+                if (resp.data && Array.isArray(resp.data)) {
+                  return resp.data.map((item) => ({
+                    id: item.id,
+                    title: item.title,
+                    timeSpent: item.timeSpent,
+                    status: item.status,
+                    startDate: start.getTime(),
+                    endDate: end.getTime()
+                  }));
+                }
+
+                // Fallback to local computation from useTasks (offline or error)
+                const local = period === 'custom' && startDate && endDate
+                  ? getTimeStatistics({ start: startDate, end: endDate })
+                  : getTimeStatistics(period as 'day' | 'week' | 'month' | 'year');
+
+                return local.taskStats.map(item => ({
+                  id: item.taskId,
+                  title: item.title,
+                  timeSpent: item.timeSpent,
+                  status: 'Open', // Not relevant for charting here
+                  startDate: (period === 'custom' && startDate) ? startDate.getTime() : start.getTime(),
+                  endDate: (period === 'custom' && endDate) ? endDate.getTime() : end.getTime()
+                }));
+              }}
+            />
           )}
         </div>
       </main>

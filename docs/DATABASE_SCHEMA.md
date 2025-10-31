@@ -33,43 +33,20 @@ Extends user information beyond what Supabase Auth provides. Each profile is lin
 
 ### `public.tasks`
 
-Stores the tasks for each user. Each task is linked to a user and supports hierarchical relationships.
+Stores the tasks for each user. Each task is linked to a user and supports hierarchical relationships. Task timing is summarized in `total_time_ms` and detailed sessions are stored in `public.time_entries`.
 
-| Column            | Type        | Constraints                                        |
-|-------------------|-------------|----------------------------------------------------|
-| `id`              | `uuid`      | Primary Key, Default `gen_random_uuid()`           |
-| `user_id`         | `uuid`      | Not Null, Foreign Key to `auth.users(id)`, On Delete Cascade |
-| `title`           | `text`      | Not Null                                           |
-| `description`     | `text`      | Not Null, Default `''`                             |
-| `status`          | `text`      | Not Null, Default `'Open'`, Check (status IN ('Open', 'In Progress', 'Done')) |
-| `parent_task_id`  | `uuid`      | Nullable, Foreign Key to `public.tasks(id)`, On Delete Set Null |
-| `due_date`        | `timestamptz` | Nullable                                           |
-| `time_tracking`   | `jsonb`     | Nullable, Stores time tracking data                |
+| Column            | Type          | Constraints                                        |
+|-------------------|---------------|----------------------------------------------------|
+| `id`              | `bigint`      | Primary Key, generated identity                    |
+| `user_id`         | `uuid`        | Not Null, Foreign Key to `auth.users(id)`, On Delete Cascade |
+| `title`           | `text`        | Not Null                                           |
+| `description`     | `text`        | Nullable                                           |
+| `status`          | `text`        | Not Null, Default `'Open'`, CHECK (status IN ('Open', 'In Progress', 'Done')) |
+| `parent_id`       | `bigint`      | Nullable, Foreign Key to `public.tasks(id)`, On Delete SET NULL |
+| `due_date`        | `date`        | Nullable                                           |
+| `total_time_ms`   | `bigint`      | Not Null, Default `0` (persisted total when task is Done) |
 | `created_at`      | `timestamptz` | Not Null, Default `now()`                          |
 | `updated_at`      | `timestamptz` | Not Null, Default `now()`                          |
-
-#### time_tracking JSONB Structure
-
-```json
-{
-  "totalTimeSpent": 0,
-  "isActive": false,
-  "lastStarted": 1704124800000,
-  "timeEntries": [
-    {
-      "startTime": 1704124800000,
-      "endTime": 1704128400000,
-      "duration": 3600000
-    }
-  ]
-}
-```
-
-**Fields:**
-- `totalTimeSpent`: Total time in milliseconds
-- `isActive`: Whether timer is currently running
-- `lastStarted`: Timestamp when timer was last started (optional)
-- `timeEntries`: Array of time tracking sessions
 
 ### Indexes
 
@@ -77,13 +54,13 @@ For optimal query performance:
 
 ```sql
 -- Index for querying user's tasks
-CREATE INDEX idx_tasks_user_id ON public.tasks(user_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON public.tasks(user_id);
 
 -- Index for parent-child relationships
-CREATE INDEX idx_tasks_parent_task_id ON public.tasks(parent_task_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_parent_id ON public.tasks(parent_id);
 
 -- Composite index for filtering by user and status
-CREATE INDEX idx_tasks_user_status ON public.tasks(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_tasks_user_status ON public.tasks(user_id, status);
 ```
 
 ## Row Level Security (RLS) Policies
@@ -145,6 +122,30 @@ CREATE POLICY "Users can delete own tasks"
 
 **Note:** Backend API implements additional user isolation at the application level through JWT validation.
 
+### `time_entries` Table Policies
+
+Users can only see and manage their own time entries. Policies assume `time_entries.user_id` is set on insert/update by the backend.
+
+```sql
+-- Enable RLS
+ALTER TABLE public.time_entries ENABLE ROW LEVEL SECURITY;
+
+-- Select policy
+CREATE POLICY "Users can view own time entries"
+  ON public.time_entries FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Insert policy
+CREATE POLICY "Users can insert own time entries"
+  ON public.time_entries FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- Update policy (allow closing entries)
+CREATE POLICY "Users can update own time entries"
+  ON public.time_entries FOR UPDATE
+  USING (auth.uid() = user_id);
+```
+
 ## Relationships
 
 ```
@@ -152,10 +153,12 @@ auth.users (1) ----< (N) public.profiles
     |                        (One-to-One)
     |
     +------< (N) public.tasks
-                    |  (One-to-Many)
-                    |
-                    +-- self-reference (parent_task_id)
-                        (Hierarchical structure for subtasks)
+    |               |  (One-to-Many)
+    |               +-- self-reference (parent_id)
+    |                   (Hierarchical structure for subtasks)
+    |
+    +------< (N) public.time_entries
+                    (Detailed timing sessions per task)
 ```
 
 ### Detailed Relationships
@@ -180,31 +183,48 @@ auth.users (1) ----< (N) public.profiles
 
 ## Data Migration
 
-### Creating the tasks table
+### Creating core tables
 
 ```sql
-CREATE TABLE public.tasks (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+-- tasks
+CREATE TABLE IF NOT EXISTS public.tasks (
+    id bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
     user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     title text NOT NULL,
-    description text NOT NULL DEFAULT '',
+    description text,
     status text NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Done')),
-    parent_task_id uuid REFERENCES public.tasks(id) ON DELETE SET NULL,
-    due_date timestamptz,
-    time_tracking jsonb,
+    parent_id bigint REFERENCES public.tasks(id) ON DELETE SET NULL,
+    due_date date,
+    total_time_ms bigint NOT NULL DEFAULT 0,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Create indexes
-CREATE INDEX idx_tasks_user_id ON public.tasks(user_id);
-CREATE INDEX idx_tasks_parent_task_id ON public.tasks(parent_task_id);
-CREATE INDEX idx_tasks_user_status ON public.tasks(user_id, status);
+-- indexes
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON public.tasks(user_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_parent_id ON public.tasks(parent_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_user_status ON public.tasks(user_id, status);
 
--- Enable RLS
+-- RLS
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 
--- Create RLS policies (see Row Level Security section above)
+-- time_entries
+CREATE TABLE IF NOT EXISTS public.time_entries (
+    id bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    task_id bigint NOT NULL REFERENCES public.tasks(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL,
+    start_time timestamptz NOT NULL,
+    end_time timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- indexes
+CREATE INDEX IF NOT EXISTS idx_time_entries_task_id ON public.time_entries(task_id);
+CREATE INDEX IF NOT EXISTS idx_time_entries_user_id ON public.time_entries(user_id);
+CREATE INDEX IF NOT EXISTS idx_time_entries_start_time ON public.time_entries(start_time);
+
+-- RLS
+ALTER TABLE public.time_entries ENABLE ROW LEVEL SECURITY;
 ```
 
 ### Automatic updated_at trigger

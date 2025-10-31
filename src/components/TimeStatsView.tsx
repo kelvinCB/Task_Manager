@@ -4,7 +4,12 @@ import { BarChart } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface TimeStatsViewProps {
-  getTimeStatistics: (period: 'day' | 'week' | 'month' | 'year' | 'custom', startDate?: Date, endDate?: Date) => TaskTimeStats[];
+  // Accepts either a synchronous or asynchronous provider
+  getTimeStatistics: (
+    period: 'day' | 'week' | 'month' | 'year' | 'custom',
+    startDate?: Date,
+    endDate?: Date
+  ) => TaskTimeStats[] | Promise<TaskTimeStats[]>;
 }
 
 export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics }) => {
@@ -16,23 +21,42 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
   const [isCustom, setIsCustom] = useState(false);
 
   useEffect(() => {
-    if (isCustom && customStart && customEnd) {
-      // Parse date components to avoid timezone issues
-      const startParts = customStart.split('-').map(Number); // [2025, 7, 7]
-      const endParts = customEnd.split('-').map(Number);     // [2025, 7, 7]
-      
-      // Create dates using the same method as "Today" filter (local timezone)
-      // Note: Month is 0-indexed in JavaScript Date constructor
-      const startDate = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
-      const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 999);
-      
-      
-      const timeStats = getTimeStatistics('custom', startDate, endDate);
-      setStats(timeStats);
-    } else {
-      const timeStats = getTimeStatistics(period);
-      setStats(timeStats);
-    }
+    const load = async () => {
+      if (isCustom && customStart && customEnd) {
+        // Parse date components to avoid timezone issues
+        const startParts = customStart.split('-').map(Number);
+        const endParts = customEnd.split('-').map(Number);
+
+        // Month is 0-indexed in JavaScript Date constructor
+        const startDate = new Date(startParts[0], startParts[1] - 1, startParts[2], 0, 0, 0, 0);
+        const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2], 23, 59, 59, 999);
+
+        const result = getTimeStatistics('custom', startDate, endDate);
+        if (Array.isArray(result)) {
+          setStats(result);
+        } else {
+          try {
+            const asyncRes = await result;
+            setStats(asyncRes);
+          } catch {
+            setStats([]);
+          }
+        }
+      } else {
+        const result = getTimeStatistics(period);
+        if (Array.isArray(result)) {
+          setStats(result);
+        } else {
+          try {
+            const asyncRes = await result;
+            setStats(asyncRes);
+          } catch {
+            setStats([]);
+          }
+        }
+      }
+    };
+    void load();
   }, [period, customStart, customEnd, isCustom, getTimeStatistics]);
 
   // Format time from milliseconds to readable format
