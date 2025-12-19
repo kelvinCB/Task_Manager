@@ -127,6 +127,7 @@ Handles authentication logic with:
 - Email normalization (lowercase, trim whitespace)
 - Comprehensive error handling
 - Supabase Auth integration
+- **Note**: Google OAuth is handled directly by the Supabase Client in the frontend, bypassing the backend API for increased security and simplicity.
 
 #### taskController.js
 Manages task CRUD operations with:

@@ -32,6 +32,24 @@ const RegisterPage: React.FC = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || 'Error connecting to Google.');
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
       {/* Header con logo a la izquierda */}
@@ -58,7 +76,13 @@ const RegisterPage: React.FC = () => {
             </div>
           )}
           
-          <AuthForm onSubmit={handleRegister} buttonText="Register" isLoading={isLoading} isSignUp={true} />
+          <AuthForm 
+            onSubmit={handleRegister} 
+            buttonText="Register" 
+            isLoading={isLoading} 
+            isSignUp={true}
+            onGoogleLogin={handleGoogleLogin}
+          />
           
           <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
