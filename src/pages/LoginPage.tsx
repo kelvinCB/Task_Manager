@@ -51,6 +51,24 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleGithubLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || 'Error connecting to GitHub.');
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
       {/* Header with logo on the left */}
@@ -82,6 +100,7 @@ const LoginPage: React.FC = () => {
             buttonText="Log in" 
             isLoading={isLoading} 
             onGoogleLogin={handleGoogleLogin}
+            onGithubLogin={handleGithubLogin}
           />
           
           {/* Option to register at the end */}
