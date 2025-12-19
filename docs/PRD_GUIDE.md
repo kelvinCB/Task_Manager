@@ -88,7 +88,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Random Username Generation** | ✅ Complete | 100% | Auto-generated food-based usernames (e.g., pizza1234) |
 | **Username Display** | ✅ Complete | 100% | Show username in My Account dropdown menu |
 | **User Profile Management** | ✅ Complete | 100% | Hook for fetching and updating user profiles |
-| **Google OAuth** | ❌ Pending | 0% | Login with Google |
+| **Google OAuth** | ✅ Complete | 100% | Login with Google (Client-side implementation) |
 | **GitHub OAuth** | ❌ Pending | 0% | Login with GitHub |
 | **Password Reset** | ✅ Complete | 100% | Forgot password functionality |
 | **Account Settings** | ❌ Pending | 0% | User preferences and settings |

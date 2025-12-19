@@ -256,6 +256,40 @@ backend/src/tests/
 - **Seguridad**: Aislamiento de datos por usuario, validación JWT
 - **CRUD Completo**: Cobertura completa de operaciones Create, Read, Update, Delete
 
+## Manual Testing (Google Auth)
+
+Since Google Authentication requires interactions with real Google servers and accounts, it cannot be fully automated in CI/CD without exposing credentials. Follow these steps to verify:
+
+### Prerequisites
+1.  Ensure you have a valid Google account.
+2.  Ensure `VITE_SUPABASE_URL` and `VITE_SUPABASE_KEY` are configured in `.env`.
+3.  Ensure Google Provider is enabled in Supabase Dashboard.
+4.  Ensure `http://localhost:5173/auth/callback` (or your local port) is in Supabase Redirect URLs.
+
+### Test Cases
+
+#### TC-MAN-001: Google Login Flow
+1.  Navigate to `/login`.
+2.  Click "Log in with Google" button.
+3.  **Expected**: Pop-up window or redirect to accounts.google.com.
+4.  Enter valid credentials.
+5.  **Expected**: Redirect back to app (`/`) and user is logged in (visible in Account Menu).
+
+#### TC-MAN-002: Google Registration Flow
+1.  Navigate to `/register`.
+2.  Click "Sign up with Google".
+3.  **Expected**: Same behavior as Login (Google treats them interchangeably for OAuth).
+4.  **Verification**: Check Supabase Dashboard > Authentication > Users to see the new user with `google` provider.
+
+#### TC-MAN-003: Existing Account Link
+1.  If you have an existing account with `example@gmail.com` (password based).
+2.  Try to Log in with Google using the same email.
+3.  **Expected**: Supabase should link the identities or log you in (depending on project config "Enable Confirm Email").
+
+### Troubleshooting
+- **400: redirect_uri_mismatch**: Check that the URL in the browser address bar exactly matches one of the "Redirect URLs" in Supabase.
+- **Error connecting to Google**: Check console logs. Often related to missing Supabase keys or network blocks.
+
 ### Resultados Backend
 
 ✅ **81/81 tests pasando** (100% de éxito)
@@ -524,7 +558,7 @@ E2E_TEST_USER_PASSWORD=holamundo1
 
 ```bash
 # 1. Iniciar backend en producción primero
-npm run production
+npm run start
 
 # 2. En otra terminal, ejecutar las pruebas E2E
 npm run test:e2e

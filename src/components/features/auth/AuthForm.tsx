@@ -7,9 +7,10 @@ interface AuthFormProps {
   buttonText: string;
   isLoading: boolean;
   isSignUp?: boolean;
+  onGoogleLogin?: () => void;
 }
 
-export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoading, isSignUp = false }) => {
+export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoading, isSignUp = false, onGoogleLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -25,6 +26,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
         <button
           type="button"
           data-testid="google-login"
+          onClick={onGoogleLogin}
           className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium text-blue-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:outline-none"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
