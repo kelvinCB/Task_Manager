@@ -37,9 +37,9 @@ test.describe('User Task Isolation', () => {
   });
 
   test('User can successfully authenticate and access the application', async ({ page }) => {
-    // Login as User 1
+    // Login as User 2 (using different user than auth.spec.ts to avoid parallel execution conflicts)
     await authPage.goToLogin();
-    await authPage.login(user1.email, user1.password);
+    await authPage.login(user2.email, user2.password);
     await authPage.expectLoggedIn();
     
     // Wait for page to be ready
@@ -62,7 +62,7 @@ test.describe('User Task Isolation', () => {
   test('User can login and logout multiple times', async ({ page, context }) => {
     // First login
     await authPage.goToLogin();
-    await authPage.login(user1.email, user1.password);
+    await authPage.login(user2.email, user2.password);
     await authPage.expectLoggedIn();
     
     // Wait for page to be ready
@@ -82,7 +82,7 @@ test.describe('User Task Isolation', () => {
     expect(currentUrl).toContain('/login');
     
     // Login again (second time)
-    await authPage.login(user1.email, user1.password);
+    await authPage.login(user2.email, user2.password);
     await authPage.expectLoggedIn();
     
     // Wait for page to load
