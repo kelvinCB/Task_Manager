@@ -8,9 +8,10 @@ interface AuthFormProps {
   isLoading: boolean;
   isSignUp?: boolean;
   onGoogleLogin?: () => void;
+  onGithubLogin?: () => void;
 }
 
-export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoading, isSignUp = false, onGoogleLogin }) => {
+export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoading, isSignUp = false, onGoogleLogin, onGithubLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -52,6 +53,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
         <button
           type="button"
           data-testid="github-login"
+          onClick={onGithubLogin}
           className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none"
         >
           <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -16,9 +16,9 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 
-✅ **168 pruebas unitarias** (100% pasando)
-✅ **85 pruebas E2E** (100% pasando)
-✅ **81 pruebas de backend** (100% pasando)
+✅ **173 pruebas unitarias** (100% pasando)
+✅ **83 pruebas E2E** (100% pasando)
+✅ **82 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
@@ -288,11 +288,22 @@ Since Google Authentication requires interactions with real Google servers and a
 
 ### Troubleshooting
 - **400: redirect_uri_mismatch**: Check that the URL in the browser address bar exactly matches one of the "Redirect URLs" in Supabase.
-- **Error connecting to Google**: Check console logs. Often related to missing Supabase keys or network blocks.
+#### TC-MAN-004: GitHub Login Flow
+1.  Navigate to `/login`.
+2.  Click "Log in with GitHub" button.
+3.  **Expected**: Redirect to GitHub authorization page.
+4.  Authorize the application.
+5.  **Expected**: Redirect back to app and user is logged in.
+
+#### TC-MAN-005: GitHub Registration Flow
+1.  Navigate to `/register`.
+2.  Click "Sign up with GitHub".
+3.  **Expected**: Same behavior as Login.
+4.  **Verification**: Check Supabase Dashboard > Authentication > Users to see the new user with `github` provider.
 
 ### Resultados Backend
 
-✅ **81/81 tests pasando** (100% de éxito)
+✅ **82/82 tests pasando** (100% de éxito)
 📊 **Alta cobertura** en controladores y rutas
 ⚡ **Rápido**: Ejecución en ~1.2 segundos
 🔒 **Seguro**: Validación completa de inputs, autenticación y aislamiento de usuarios
@@ -436,7 +447,8 @@ e2e/
 
 ### Resultados E2E actuales
 
-✅ **85/85 tests pasando** (100% de éxito)✅ **Todos los tests funcionando** (incluido username-display)⏱️ **~1.6 minutos** con 4 workers🧹 **Tests limpios y optimizados**🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
+✅ **83/83 tests pasando** (100% de éxito)
+✅ **Todos los tests funcionando** (incluido username-display)⏱️ **~1.6 minutos** con 4 workers🧹 **Tests limpios y optimizados**🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
 🔒 **User Isolation** - Tests de seguridad multi-usuario
 
@@ -673,4 +685,4 @@ render(
 
 ---
 
-**Última actualización**: Octubre 2025 - Suite de testing completamente funcional, robusta y optimizada con **335 tests** (168 Frontend + 82 Backend + 85 E2E).
+**Última actualización**: Diciembre 2025 - Suite de testing completamente funcional, robusta y optimizada con **335 tests** (173 Frontend + 82 Backend + 83 E2E).
