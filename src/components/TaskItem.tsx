@@ -18,6 +18,7 @@ interface TaskItemProps {
   onStartTimer?: (taskId: string) => void;
   onPauseTimer?: (taskId: string) => void;
   getElapsedTime?: (taskId: string) => number;
+  onTaskClick?: (taskId: string) => void;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -32,7 +33,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   canComplete,
   onStartTimer,
   onPauseTimer,
-  getElapsedTime
+  getElapsedTime,
+  onTaskClick
 }) => {
   const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -83,7 +85,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
           {truncated}
           <button
-            onClick={() => onEdit(task)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(task);
+            }}
             className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
           >
             ...
@@ -111,7 +116,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
           {truncated}
           <button
-            onClick={() => onEdit(task)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(task);
+            }}
             className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
           >
             ...See more
@@ -160,7 +168,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         </div>
 
         {/* Task Content */}
-        <div className="flex-1 min-w-0">
+        <div 
+          className="flex-1 min-w-0 cursor-pointer"
+          onClick={() => onTaskClick?.(task.id)}
+        >
           <div className="flex items-start justify-between space-x-2">
             <div className="flex-1 min-w-0">
               {renderTitle()}
@@ -281,19 +292,31 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                   <div className={`absolute right-0 mt-1 w-32 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-md shadow-lg z-10`}>
                     <button
                       className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
-                      onClick={() => { onEdit(task); setIsMenuOpen(false); }}
+                      onClick={(e) => { 
+                        e.stopPropagation();
+                        onEdit(task); 
+                        setIsMenuOpen(false); 
+                      }}
                     >
                       Edit
                     </button>
                     <button
                       className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'}`}
-                      onClick={() => { onAddChild(task.id); setIsMenuOpen(false); }}
+                      onClick={(e) => { 
+                        e.stopPropagation();
+                        onAddChild(task.id); 
+                        setIsMenuOpen(false); 
+                      }}
                     >
                       Add Subtask
                     </button>
                     <button
                       className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-red-400 hover:bg-red-900' : 'text-red-600 hover:bg-red-50'}`}
-                      onClick={() => { onDelete(task.id); setIsMenuOpen(false); }}
+                      onClick={(e) => { 
+                        e.stopPropagation();
+                        onDelete(task.id); 
+                        setIsMenuOpen(false); 
+                      }}
                     >
                       Delete
                     </button>

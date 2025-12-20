@@ -14,6 +14,7 @@ interface TaskBoardProps {
   onStartTimer?: (taskId: string) => void;
   onPauseTimer?: (taskId: string) => void;
   getElapsedTime?: (taskId: string) => number;
+  onTaskClick?: (taskId: string) => void;
 }
 
 const statusColumns: { status: TaskStatus; title: string; description: string }[] = [
@@ -30,7 +31,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onCreateTask,
   onStartTimer,
   onPauseTimer,
-  getElapsedTime
+  getElapsedTime,
+  onTaskClick
 }) => {
   const { theme } = useTheme();
   
@@ -149,12 +151,13 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
               >
                 <div className="space-y-3">
                   {columnTasks.map(task => (
-                    <div
-                      key={task.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, task.id)}
-                      className={`group mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
-                    >
+                      <div
+                        key={task.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, task.id)}
+                        onClick={() => onTaskClick?.(task.id)}
+                        className={`group mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
+                      >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className={theme === 'dark' ? 'text-gray-100' : ''}>
@@ -228,14 +231,20 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           <button
-                            onClick={() => onEdit(task)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(task);
+                            }}
                             className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-600' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded transition-colors duration-200`}
                             title="Edit task"
                           >
                             <Edit2 size={14} />
                           </button>
                           <button
-                            onClick={() => onDelete(task.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(task.id);
+                            }}
                             className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-red-400 hover:bg-gray-600' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'} rounded transition-colors duration-200`}
                             title="Delete task"
                           >

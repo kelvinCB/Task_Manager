@@ -251,10 +251,17 @@ test.describe('Username Display Feature', () => {
     // Verify dropdown is open by checking for logout button
     await expect(logoutButton).toBeVisible({ timeout: 5000 });
 
-    // Click somewhere else to close
-    await appPage.page.click('body', { position: { x: 100, y: 100 } });
+    // Click on the main content area (e.g., header or empty space) - avoid body coords
+    // Use force: true to ensure it clicks even if something thinks it's covering
+    const mainContent = appPage.page.locator('main').first();
+    if (await mainContent.isVisible()) {
+        await mainContent.click({ force: true, position: { x: 10, y: 10 } });
+    } else {
+        // Fallback to title
+        await appPage.page.locator('h1').first().click({ force: true });
+    }
 
-    // Dropdown should be closed
+    // Dropdown should be closed (wait for it)
     await expect(logoutButton).not.toBeVisible();
   });
 });

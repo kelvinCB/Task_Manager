@@ -29,6 +29,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import { TaskDetailModal } from './components/TaskDetailModal';
 
 const MainApp = () => {
   const {
@@ -53,12 +54,28 @@ const MainApp = () => {
 
   const { theme, toggleTheme } = useTheme();
 
+
   const [view, setView] = useState<'tree' | 'board' | 'stats'>('board');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>();
   const [parentId, setParentId] = useState<string | undefined>();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Task Detail Modal State
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedTaskId(null);
+  };
+
 
   const handleCreateTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>) => {
     if (editingTask) {
@@ -588,6 +605,7 @@ const MainApp = () => {
                 onStartTimer={startTaskTimer}
                 onPauseTimer={pauseTaskTimer}
                 getElapsedTime={getElapsedTime}
+                onTaskClick={handleTaskClick}
               />
             </div>
           ) : view === 'board' ? (
@@ -600,6 +618,7 @@ const MainApp = () => {
               onStartTimer={startTaskTimer}
               onPauseTimer={pauseTaskTimer}
               getElapsedTime={getElapsedTime}
+              onTaskClick={handleTaskClick}
             />
           ) : (
             <TimeStatsView
@@ -639,7 +658,7 @@ const MainApp = () => {
 
                 // Fallback to local computation from useTasks (offline or error)
                 const local = period === 'custom' && startDate && endDate
-                  ? getTimeStatistics({ start: startDate, end: endDate })
+                  ? getTimeStatistics('custom', startDate, endDate)
                   : getTimeStatistics(period as 'day' | 'week' | 'month' | 'year');
 
                 return local.taskStats.map(item => ({
@@ -667,6 +686,18 @@ const MainApp = () => {
           setParentId(undefined);
         }}
         onSubmit={handleCreateTask}
+      />
+
+      {/* Task Detail Modal */}
+      <TaskDetailModal
+        task={selectedTaskId ? getTaskById(selectedTaskId) || null : null}
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetailModal}
+        onEdit={(task) => {
+          handleCloseDetailModal();
+          handleEditTask(task);
+        }}
+        getElapsedTime={getElapsedTime}
       />
     </div>
   );

@@ -29,7 +29,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     parentId: parentId || ''
   });
   const [showAIOptions, setShowAIOptions] = useState(false);
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [aiProcessingState, setAiProcessingState] = useState<'idle' | 'generating' | 'improving'>('idle');
   const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
@@ -174,7 +174,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   <button
                     type="button"
                     onClick={async () => {
-                      setIsGeneratingAI(true);
+                      setAiProcessingState('generating');
                       try {
                         const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
                         const generatedDescription = await openaiService.generateTaskDescription(formData.title, model);
@@ -187,17 +187,17 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         console.error('Error generating AI description:', error);
                         alert(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`);
                       } finally {
-                        setIsGeneratingAI(false);
+                        setAiProcessingState('idle');
                       }
                     }}
-                    disabled={isGeneratingAI}
+                    disabled={aiProcessingState !== 'idle'}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg font-medium transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:opacity-70 ${
                       theme === 'dark' 
                         ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-md'
                         : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-md'
                     }`}
                   >
-                    {isGeneratingAI ? (
+                    {aiProcessingState === 'generating' ? (
                       <>
                         <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         <span>Generating...</span>
@@ -210,12 +210,49 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     )}
                   </button>
                   
-                  {/* Future buttons will go here */}
-                  {/* 
-                  <button className="...">Improve Description</button>
-                  <button className="...">Fix Grammar</button>
-                  <button className="...">Translate</button>
-                  */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!formData.description.trim()) {
+                        alert('Please enter a description first to improve its grammar.');
+                        return;
+                      }
+                      
+                      setAiProcessingState('improving');
+                      try {
+                        const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+                        const improvedDescription = await openaiService.improveGrammar(formData.description, model);
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          description: improvedDescription
+                        }));
+                        setShowAIOptions(false);
+                      } catch (error) {
+                        console.error('Error improving grammar:', error);
+                        alert(`Failed to improve grammar: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                      } finally {
+                        setAiProcessingState('idle');
+                      }
+                    }}
+                    disabled={aiProcessingState !== 'idle'}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg font-medium transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:opacity-70 ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-md'
+                    }`}
+                  >
+                    {aiProcessingState === 'improving' ? (
+                       <>
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <AIIcon size={14} />
+                        <span>Improve Grammar</span>
+                      </>
+                    )}
+                  </button>
                   
                   <button
                     type="button"
