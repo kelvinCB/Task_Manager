@@ -10,12 +10,12 @@ export class TimerPage {
   // Get timer for a specific task by task title or index
   getTaskTimer(taskIdentifier: string | number) {
     if (typeof taskIdentifier === 'string') {
-      // Find the task by text content in the group container, then find the timer within
-      // This approach works better with the responsive dual layout
-      return this.page.locator('.group').filter({ hasText: taskIdentifier }).locator('[data-testid="task-timer"]').first();
+      // Find the task by text content in the group container
+      // Use :visible to ensure we get the currently displayed timer (handling mobile/desktop duplicates)
+      return this.page.locator('.group').filter({ hasText: taskIdentifier }).locator('[data-testid="task-timer"]:visible').first();
     } else {
       // Find timer by index - use first() to handle dual mobile/desktop elements
-      return this.page.locator('[data-testid="task-timer"]').nth(taskIdentifier);
+      return this.page.locator('[data-testid="task-timer"]:visible').nth(taskIdentifier);
     }
   }
 

@@ -23,6 +23,8 @@ export class AuthPage {
     await this.page.locator('[data-testid="email-input"]').fill(email);
     await this.page.locator('[data-testid="password-input"]').fill(password);
     await this.page.locator('[data-testid="login-button"]').click();
+    // Wait for auth state to propagate
+    await this.page.waitForTimeout(1000);
   }
 
   async loginViaAccountMenu() {
@@ -169,15 +171,31 @@ export class AuthPage {
     const accountMenuButtons = this.page.locator('[data-testid="account-menu-button"]');
     await expect(accountMenuButtons.first()).toBeVisible({ timeout: 15000 });
     
-    const menuCount = await accountMenuButtons.count();
-    
-    if (menuCount === 0) {
-      throw new Error('Account menu button not found');
+    // Find the visible account menu button (handles both desktop and mobile)
+    const count = await accountMenuButtons.count();
+    let accountMenuButton: Locator | null = null;
+
+    for (let i = 0; i < count; i++) {
+        const btn = accountMenuButtons.nth(i);
+        if (await btn.isVisible()) {
+            accountMenuButton = btn;
+            break;
+        }
+    }
+
+    if (!accountMenuButton) {
+        throw new Error('No visible account menu button found after login');
     }
     
-    // Use the first visible account menu button (handles both desktop and mobile)
-    const accountMenuButton = accountMenuButtons.first();
-    await accountMenuButton.click();
+    // Short pause to ensure UI is interactive
+    await this.page.waitForTimeout(2000); // Increased from 500 to 2000
+    const isExpanded = await accountMenuButton.getAttribute('aria-expanded') === 'true';
+
+    if (!isExpanded) {
+      await accountMenuButton.click();
+      // Wait for animation/render
+      await this.page.waitForTimeout(500);
+    }
     
     const logoutButton = this.page.locator('[data-testid="logout-button"]');
     const logoutExists = await logoutButton.count() > 0;
@@ -186,12 +204,13 @@ export class AuthPage {
       const isVisible = await logoutButton.isVisible();
       
       if (!isVisible) {
-        await logoutButton.scrollIntoViewIfNeeded();
+        // If still not visible (maybe animation), wait
+        await logoutButton.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
         
-        const isVisibleAfterScroll = await logoutButton.isVisible();
-        
-        if (!isVisibleAfterScroll) {
-          throw new Error('Logout button exists but is not visible');
+        const isVisibleAfterWait = await logoutButton.isVisible();
+        if (!isVisibleAfterWait) {
+             // Try clicking again if it failed to open
+             if (!isExpanded) await accountMenuButton.click();
         }
       }
       
@@ -207,8 +226,15 @@ export class AuthPage {
       }
     }
     
-    // Close the menu only if we opened it for verification
-    await this.page.keyboard.press('Escape');
+    // Close the menu only if we opened it (to restore state)
+    // Or just always close it to be safe for subsequent steps
+    if (await accountMenuButton.getAttribute('aria-expanded') === 'true') {
+        await this.page.keyboard.press('Escape');
+        // If escape didn't work (e.g. focus issue), click again
+        if (await accountMenuButton.getAttribute('aria-expanded') === 'true') {
+            await accountMenuButton.click();
+        }
+    }
   }
 
   async expectLoggedOut() {

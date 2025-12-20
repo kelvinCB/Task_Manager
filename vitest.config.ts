@@ -22,5 +22,9 @@ export default defineConfig({
       reporter: ['text', 'html'],
       exclude: ['node_modules/', 'src/test/', 'e2e/'],
     },
+    env: {
+      SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_KEY: 'dummy-key',
+    },
   },
 });

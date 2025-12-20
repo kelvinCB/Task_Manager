@@ -16,6 +16,7 @@ interface TaskTreeProps {
   onStartTimer?: (taskId: string) => void;
   onPauseTimer?: (taskId: string) => void;
   getElapsedTime?: (taskId: string) => number;
+  onTaskClick?: (taskId: string) => void;
 }
 
 export const TaskTree: React.FC<TaskTreeProps> = ({
@@ -29,7 +30,8 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
   onAddChild,
   onStartTimer,
   onPauseTimer,
-  getElapsedTime
+  getElapsedTime,
+  onTaskClick
 }) => {
   const { theme } = useTheme();
   const flattenTasks = (nodes: TaskNode[]): TaskNode[] => {
@@ -83,6 +85,7 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
           onStartTimer={onStartTimer}
           onPauseTimer={onPauseTimer}
           getElapsedTime={getElapsedTime}
+          onTaskClick={onTaskClick}
         />
       ))}
     </div>

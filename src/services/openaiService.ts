@@ -47,8 +47,8 @@ export class OpenAIService {
       throw new Error('Task title is required to generate description');
     }
 
-    // Check if it's an O4 model (o4-mini, o4-preview, etc.)
-    const isO4Model = model.startsWith('o4-');
+    // Check if it's an O4 or GPT-5 model (o4-mini, o4-preview, gpt-5-*)
+    const isNewModel = model.startsWith('o4-') || model.startsWith('gpt-5');
 
     const messages: OpenAIMessage[] = [
       {
@@ -79,10 +79,11 @@ Generate a description that would help someone understand exactly what needs to 
         messages
       };
 
-      // O4 models use different parameters
-      if (isO4Model) {
-        // O4 models don't support these parameters and use max_completion_tokens instead of max_tokens
-        requestBody.max_completion_tokens = 800;
+      // New models (O4, GPT-5) use different parameters
+      if (isNewModel) {
+        // Newer models use max_completion_tokens instead of max_tokens
+        // Increased to 2500 to account for reasoning tokens in newer models
+        requestBody.max_completion_tokens = 2500;
       } else {
         // Standard GPT models
         requestBody.max_tokens = 300;
@@ -164,6 +165,104 @@ Generate a description that would help someone understand exactly what needs to 
       } else {
         // Handle unknown errors
         throw new Error('Failed to connect to OpenAI API. Please check your internet connection and try again.');
+      }
+    }
+  }
+
+  /**
+   * Improve the grammar and flow of a text
+   */
+  async improveGrammar(text: string, model: string = 'gpt-4o'): Promise<string> {
+    if (!text.trim()) {
+      throw new Error('Text is required to improve grammar');
+    }
+
+    // Check if it's an O4 or GPT-5 model
+    const isNewModel = model.startsWith('o4-') || model.startsWith('gpt-5');
+
+    const messages: OpenAIMessage[] = [
+      {
+        role: 'system',
+        content: `You are an expert editor. Your job is to improve the grammar, spelling, and flow of the text provided.
+        
+Guidelines:
+- Fix grammar and spelling errors
+- Improve sentence flow and clarity
+- Maintain the original meaning and tone
+- Return ONLY the corrected text, no explanations or conversational filler`
+      },
+      {
+        role: 'user',
+        content: `Improve this text: "${text}"`
+      }
+    ];
+
+    try {
+      // Reuse the same fetch logic / request body construction as generateTaskDescription
+      // For DRYness, ideally we would refactor the common API call logic into a private method,
+      // but to minimize changes we will duplicate the fetch logic here for now, or we can refactor.
+      // Let's copy the logic to ensure stability first.
+      
+      const requestBody: any = {
+        model,
+        messages
+      };
+
+      if (isNewModel) {
+        requestBody.max_completion_tokens = 2500;
+      } else {
+        requestBody.max_tokens = 500;
+        requestBody.temperature = 0.3; // Lower temperature for grammar correction
+        requestBody.top_p = 1;
+        requestBody.frequency_penalty = 0;
+        requestBody.presence_penalty = 0;
+      }
+
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorData: OpenAIError = await response.json();
+        console.error('OpenAI API Error:', errorData);
+        throw new Error(`OpenAI API Error: ${errorData.error.message}`);
+      }
+
+      const data: OpenAIResponse = await response.json();
+      
+      if (!data.choices || data.choices.length === 0) {
+        throw new Error('No response received from OpenAI API');
+      }
+
+      const choice = data.choices[0];
+      let content: string | null = null;
+      
+      if (choice.message && choice.message.content !== undefined) {
+        content = choice.message.content;
+      } else if (choice.text) {
+        content = choice.text;
+      } else if (choice.content) {
+        content = choice.content;
+      } else if (choice.message && choice.message.text) {
+        content = choice.message.text;
+      }
+      
+      if (!content) {
+        throw new Error('Invalid response structure from OpenAI API - no content found');
+      }
+
+      return content.trim();
+
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Failed to connect to OpenAI API.');
       }
     }
   }

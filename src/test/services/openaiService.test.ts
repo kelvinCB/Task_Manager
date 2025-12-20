@@ -96,7 +96,7 @@ describe('OpenAIService', () => {
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.model).toBe('o4-mini');
-      expect(requestBody.max_completion_tokens).toBe(800);
+      expect(requestBody.max_completion_tokens).toBe(2500);
       expect(requestBody.temperature).toBeUndefined();
       expect(requestBody.top_p).toBeUndefined();
     });
@@ -298,6 +298,55 @@ describe('OpenAIService', () => {
     it('should export a singleton instance', () => {
       expect(openaiService).toBeInstanceOf(OpenAIService);
       expect(openaiService.isConfigured()).toBe(true);
+    });
+  });
+
+  describe('improveGrammar', () => {
+    let service: OpenAIService;
+
+    beforeEach(() => {
+      service = new OpenAIService();
+    });
+
+    it('should improve grammar successfully', async () => {
+      const mockResponse = {
+        choices: [
+          {
+            message: {
+              content: 'Corrected text content'
+            }
+          }
+        ]
+      };
+
+      (fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      });
+
+      const result = await service.improveGrammar('bad text');
+
+      expect(result).toBe('Corrected text content');
+      expect(fetch).toHaveBeenCalledWith(
+        'https://api.openai.com/v1/chat/completions',
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.stringContaining('bad text')
+        })
+      );
+    });
+
+    it('should throw error for empty text', async () => {
+      await expect(service.improveGrammar('')).rejects.toThrow('Text is required');
+    });
+
+    it('should handle API errors', async () => {
+      (fetch as any).mockResolvedValueOnce({
+        ok: false,
+        json: () => Promise.resolve({ error: { message: 'API Error' } })
+      });
+
+      await expect(service.improveGrammar('text')).rejects.toThrow('OpenAI API Error: API Error');
     });
   });
 });

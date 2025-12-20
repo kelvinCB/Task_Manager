@@ -10,6 +10,7 @@ import * as openaiService from '../../services/openaiService';
 vi.mock('../../services/openaiService', () => ({
   openaiService: {
     generateTaskDescription: vi.fn(),
+    improveGrammar: vi.fn(),
     isConfigured: vi.fn(() => true)
   }
 }));
@@ -269,8 +270,8 @@ describe('TaskForm', () => {
           timeEntries: [
             {
               id: 'entry-1',
-              startTime: new Date('2024-01-01T10:00:00'),
-              endTime: new Date('2024-01-01T10:50:00'),
+              startTime: new Date('2024-01-01T10:00:00').getTime(),
+              endTime: new Date('2024-01-01T10:50:00').getTime(),
               duration: 3000
             }
           ]
@@ -309,8 +310,8 @@ describe('TaskForm', () => {
           timeEntries: [
             {
               id: 'entry-1',
-              startTime: new Date('2024-01-01T10:00:00'),
-              endTime: new Date('2024-01-01T10:50:00'),
+              startTime: new Date('2024-01-01T10:00:00').getTime(),
+              endTime: new Date('2024-01-01T10:50:00').getTime(),
               duration: 3000
             }
           ]
@@ -537,12 +538,87 @@ describe('TaskForm', () => {
       const disabledButton = screen.getByRole('button', { name: /generating/i });
       expect(disabledButton).toBeDisabled();
 
+      // Ensure Improve Grammar button is NOT showing processing state
+      expect(screen.queryByText('Processing...')).not.toBeInTheDocument();
+      expect(screen.getByText('Improve Grammar')).toBeInTheDocument();
+
       // Resolve the promise
       resolvePromise!('Generated description');
       
       await waitFor(() => {
         expect(screen.queryByText('Generating...')).not.toBeInTheDocument();
       });
+    });
+
+    it('should improve grammar using AI service', async () => {
+      const mockImproved = 'Improved description.';
+      (openaiService.openaiService.improveGrammar as any).mockResolvedValue(mockImproved);
+
+      render(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const titleInput = screen.getByRole('textbox', { name: /title/i });
+      fireEvent.change(titleInput, { target: { value: 'Test Title' } });
+
+      const descriptionInput = screen.getByRole('textbox', { name: /description/i });
+      fireEvent.change(descriptionInput, { target: { value: 'Bad grammar text' } });
+
+      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      fireEvent.click(aiButton);
+
+      const improveButton = screen.getByText('Improve Grammar');
+      fireEvent.click(improveButton);
+
+      // Should show processing state
+      expect(screen.getByText('Processing...')).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(openaiService.openaiService.improveGrammar).toHaveBeenCalledWith('Bad grammar text', expect.any(String));
+      });
+
+      await waitFor(() => {
+        expect(descriptionInput).toHaveValue(mockImproved);
+      });
+      
+      expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument();
+    });
+
+    it('should require description for grammar improvement', async () => {
+       /* Mock alert */
+       const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+       render(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const titleInput = screen.getByRole('textbox', { name: /title/i });
+      fireEvent.change(titleInput, { target: { value: 'Test Title' } });
+      
+      // Empty description
+      
+      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      fireEvent.click(aiButton);
+
+      const improveButton = screen.getByText('Improve Grammar');
+      fireEvent.click(improveButton);
+      
+      expect(alertSpy).toHaveBeenCalledWith('Please enter a description first to improve its grammar.');
+      expect(openaiService.openaiService.improveGrammar).not.toHaveBeenCalled();
+      
+      alertSpy.mockRestore();
     });
   });
 

@@ -1,31 +1,34 @@
-const { createTask, getTasks, getTaskById, updateTask, deleteTask } = require('../../controllers/taskController');
-const supabase = require('../../config/supabaseClient');
 
-// Mock Supabase client (compatible with both legacy and new exports)
-const buildClient = () => ({
-  from: jest.fn(),
-  auth: { getUser: jest.fn() }
-});
-jest.mock('../../config/supabaseClient', () => {
-  const client = buildClient();
-  return {
-    // legacy shape used in some tests: require(...).from(...)
-    from: client.from,
-    auth: client.auth,
-    // new named export shape: { supabase, createClientWithToken }
-    supabase: client,
-    createClientWithToken: jest.fn(() => buildClient())
-  };
-});
+const { createTask, getTasks, getTaskById, updateTask, deleteTask } = require('../../controllers/taskController');
+const supabaseMod = require('../../config/supabaseClient');
+
+// Save original items
+const originalSupabase = supabaseMod.supabase;
+const originalCreateClientWithToken = supabaseMod.createClientWithToken;
 
 describe('Task Controller', () => {
   let req, res;
+  let mockClient;
+  let supabase;
 
   beforeEach(() => {
-    // Reset mocks before each test
     jest.clearAllMocks();
+
+    // Create fresh mock client for each test
+    const mockFrom = jest.fn();
+    mockClient = {
+        from: mockFrom,
+        auth: { getUser: jest.fn() }
+    };
     
-    // Mock request and response objects
+    // Inject mock into the live module
+    supabaseMod.supabase = mockClient;
+    supabaseMod.createClientWithToken = jest.fn(() => mockClient);
+    
+    // Expose as 'supabase' for test convenience
+    // This allows existing test code `supabase.from` to access `mockClient.from`
+    supabase = mockClient;
+
     req = {
       user: { id: 'user-123', email: 'test@example.com' },
       body: {},
@@ -37,13 +40,13 @@ describe('Task Controller', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis()
     };
-
-    // Mock console.error to avoid cluttering test output
-    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    console.error.mockRestore();
+    // Restore original module state!
+    supabaseMod.supabase = originalSupabase;
+    supabaseMod.createClientWithToken = originalCreateClientWithToken;
+    jest.restoreAllMocks();
   });
 
   describe('createTask', () => {
@@ -188,6 +191,12 @@ describe('Task Controller', () => {
 
     it('should return 400 for invalid status filter', async () => {
       req.query.status = 'invalid_status';
+      
+      // Mock db chain (needed because query is built before validation)
+      const mockOrder = jest.fn().mockReturnThis();
+      const mockEq = jest.fn().mockReturnValue({ order: mockOrder });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+      supabase.from.mockReturnValue({ select: mockSelect });
 
       await getTasks(req, res);
 
@@ -282,6 +291,34 @@ describe('Task Controller', () => {
         error: 'Internal server error',
         message: 'Failed to fetch task'
       });
+    });
+
+    it('should return all task fields including total_time_ms', async () => {
+      req.params.id = '1';
+
+      const mockTask = {
+        id: 1,
+        title: 'Task 1',
+        description: 'Desc',
+        status: 'Done',
+        user_id: 'user-123',
+        created_at: '2023-01-01T00:00:00Z',
+        due_date: '2023-01-02',
+        parent_id: null,
+        total_time_ms: 5000
+      };
+
+      const mockSingle = jest.fn().mockResolvedValue({ data: mockTask, error: null });
+      const mockEqUser = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockEq = jest.fn().mockReturnValue({ eq: mockEqUser });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+
+      supabase.from.mockReturnValue({ select: mockSelect });
+
+      await getTaskById(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ task: mockTask });
     });
   });
 

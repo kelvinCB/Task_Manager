@@ -149,9 +149,10 @@ src/test/
 - Persistencia en localStorage
 - Relaciones padre-hijo de tareas
 
-#### openaiService (16 tests)
+#### openaiService (20 tests)
 
 - Generación de descripciones con IA
+- Mejora de gramática (improveGrammar) 🆕
 - Manejo de diferentes modelos (GPT-4, O1)
 - Gestión de errores y timeouts
 - Validación de configuración

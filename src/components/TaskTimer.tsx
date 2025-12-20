@@ -125,7 +125,10 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
       </span>
       {isActive ? (
         <button 
-          onClick={() => onPause(taskId)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPause(taskId);
+          }}
           className={`p-0.5 sm:p-1 ${theme === 'dark' 
             ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700' 
             : 'text-orange-500 hover:text-orange-700 hover:bg-orange-50'} rounded transition-all`}
@@ -135,7 +138,10 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
         </button>
       ) : (
         <button 
-          onClick={() => onStart(taskId)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onStart(taskId);
+          }}
           className={`p-0.5 sm:p-1 ${theme === 'dark' 
             ? 'text-green-400 hover:text-green-300 hover:bg-gray-700' 
             : 'text-green-500 hover:text-green-700 hover:bg-green-50'} rounded transition-all`}
