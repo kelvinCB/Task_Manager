@@ -305,6 +305,7 @@ const MainApp = () => {
               
               <div className="flex items-center gap-3 sm:gap-4">
                 <button
+                  data-testid="add-task-button"
                   onClick={openCreateForm}
                   className={`flex items-center gap-2 px-5 py-2.5 ${theme === 'dark' ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg transition-colors duration-200 text-base font-medium shadow-sm`}
                 >

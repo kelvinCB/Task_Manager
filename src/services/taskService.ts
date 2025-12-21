@@ -1,6 +1,18 @@
 import supabase from '../lib/supabaseClient';
 import { Task, TaskStatus } from '../types/Task';
 
+export interface UploadResult {
+  message: string;
+  file: {
+    name: string;
+    path: string;
+    fullPath: string;
+    url: string;
+    size: number;
+    mimetype: string;
+  };
+}
+
 /**
  * API Response interface
  */
@@ -39,7 +51,7 @@ export class TaskService {
   constructor() {
     // Use backend API URL from environment or default to localhost
     const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
-    this.baseUrl = env.VITE_BACKEND_URL || env.VITE_API_BASE_URL || 'http://localhost:3001';
+    this.baseUrl = env.VITE_BACKEND_URL || env.VITE_API_BASE_URL || 'http://127.0.0.1:3001';
   }
 
   /**
@@ -236,6 +248,48 @@ export class TaskService {
     });
 
     return response;
+  }
+
+  /**
+   * Upload a file
+   */
+  async uploadFile(file: File): Promise<ApiResponse<UploadResult>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = await this.getAuthToken();
+    console.log('[TaskService] Uploading file...', { fileName: file.name, fileSize: file.size, hasToken: !!token, baseUrl: this.baseUrl });
+    
+    if (!token) {
+      console.error('[TaskService] No auth token found!');
+      return { error: 'Not authenticated' };
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/api/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // Content-Type header must NOT be set manually for FormData, browser sets it with boundary
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error || data.message || 'Upload failed' };
+      }
+
+      return { data: data };
+    } catch (error) {
+      console.error('Upload request error:', error);
+       return {
+        error: error instanceof Error 
+          ? error.message 
+          : 'Failed to upload file',
+      };
+    }
   }
 
   // --- Time entries API ---

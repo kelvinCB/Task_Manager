@@ -67,7 +67,7 @@ test.describe('Task Advanced Features', () => {
     await expect(visibleDueDateElement!).toBeVisible();
     
     // Validate the complete due date string contains all components
-    const dueDateText = await visibleDueDateElement.textContent();
+    const dueDateText = await visibleDueDateElement!.textContent();
     expect(dueDateText).toContain('Due');
     expect(dueDateText).toContain('2025');
     expect(dueDateText).toMatch(/Dec|December|12/);
@@ -165,7 +165,7 @@ test.describe('Task Advanced Features', () => {
       await expect(visibleTreeDueDateElement!).toBeVisible();
       
       // Get the complete due date text and validate all components
-      const treeDueDateText = await visibleTreeDueDateElement.textContent();
+      const treeDueDateText = await visibleTreeDueDateElement!.textContent();
       expect(treeDueDateText).toContain('Due');
       expect(treeDueDateText).toContain(year);
       expect(treeDueDateText).toContain(day);
@@ -211,7 +211,8 @@ test.describe('Task Advanced Features', () => {
     }
   });
 
-  test('should create a task using AI description generation', async () => {
+  test('should create a task using AI description generation', async ({ page }) => {
+    test.setTimeout(90000); // Allow up to 90 seconds for AI generation
     // Open task creation modal
     await appPage.openAddTaskModal();
     await taskPage.verifyModalOpen();
@@ -228,11 +229,12 @@ test.describe('Task Advanced Features', () => {
     // Click the generate button
     await taskPage.aiGenerateButton.click();
 
-    // Wait for AI to generate description (up to 10 seconds as you mentioned)    // Check that description was generated
+    // Wait for AI to generate description (up to 60 seconds for slow API responses)
+    // Check that description was generated
     await appPage.page.waitForFunction(() => {
       const descInput = document.querySelector('#task-description') as HTMLTextAreaElement;
       return descInput && descInput.value.length > 0;
-    }, {}, { timeout: 15000 });
+    }, {}, { timeout: 60000 });
     
     const descriptionValue = await taskPage.descriptionInput.inputValue();
     expect(descriptionValue.length).toBeGreaterThan(0);
