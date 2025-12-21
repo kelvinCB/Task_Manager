@@ -4,6 +4,8 @@ import { X, Calendar, FileText, Tag } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { AIIcon } from './AIIcon';
 import { openaiService } from '../services/openaiService';
+import { FileUploader } from './FileUploader';
+import { UploadResult } from '../services/taskService';
 
 interface TaskFormProps {
   task?: Task;
@@ -301,6 +303,26 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white'}`}
             />
+          </div>
+
+          {/* Attachments (File Upload) */}
+          <div>
+             <label className={`flex items-center gap-2 text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                <Tag size={16} /> {/* Reusing Tag icon for now or better Paperclip if available in imports */}
+                Attachments
+             </label>
+             <FileUploader 
+               onUploadComplete={(result: UploadResult) => {
+                  // For now, append the file URL to the description as we don't have an attachments column
+                  const startNewLine = formData.description ? '\n\n' : '';
+                  const attachmentText = `${startNewLine}**Attachment:** [${result.file.name}](${result.file.url})`;
+                  setFormData(prev => ({
+                    ...prev,
+                    description: prev.description + attachmentText
+                  }));
+               }}
+               onError={(msg) => setValidationError(msg)}
+             />
           </div>
 
           {/* Parent Info */}
