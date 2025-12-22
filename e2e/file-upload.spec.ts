@@ -14,7 +14,7 @@ test.describe('File Upload Service', () => {
     authPage = new AuthPage(page);
     appPage = new AppPage(page);
     taskPage = new TaskPage(page);
-    
+
     // Log browser console messages to stdout
     page.on('console', msg => console.log(`[BROWSER]: ${msg.text()}`));
 
@@ -23,35 +23,36 @@ test.describe('File Upload Service', () => {
     // Assuming E2E_TEST_USER credentials are set in environment
     await authPage.login(process.env.E2E_TEST_USER_EMAIL || 'test@example.com', process.env.E2E_TEST_USER_PASSWORD || 'password123');
     console.log('[TEST] Performed login action');
-    
+
     // Explicit wait loop for login success
     try {
-        await expect(page).toHaveURL('/', { timeout: 10000 });
+      await expect(page).toHaveURL('/', { timeout: 10000 });
     } catch (e) {
-        console.log('[TEST ERROR] Login failed/timed out. Current URL:', page.url());
-        console.log('[TEST ERROR] Body text:', await page.textContent('body'));
-        
-        // Retry logic: maybe registration needed?
-        // For now, fail hard but with logs.
-        throw e;
+      console.log('[TEST ERROR] Login failed/timed out. Current URL:', page.url());
+      console.log('[TEST ERROR] Body text:', await page.textContent('body'));
+
+      // Retry logic: maybe registration needed?
+      // For now, fail hard but with logs.
+      throw e;
     }
-    
+
     // Verify Dashboard
-    await expect(page.getByTitle('Board View').first().or(page.getByTitle('Tree View').first())).toBeVisible({ timeout: 30000 });
+    // Use a CSS selector to match either button, and take the first one visible
+    await expect(page.locator('button[title="Board View"], button[title="Tree View"]').first()).toBeVisible({ timeout: 30000 });
     console.log('[TEST] Validated Dashboard loaded (beforeEach done)');
-    
+
     // Ensure everything is settled
     await page.waitForLoadState('networkidle');
   });
 
   test('should allow attaching a file to a new task', async ({ page }) => {
     test.setTimeout(90000); // Allow extra time for file upload and waiting
-    
+
     // 1. Open New Task Modal using AppPage helper
     console.log('[TEST] Opening Add Task Modal');
     await appPage.openAddTaskModal();
     console.log('[TEST] Clicked Add button');
-    
+
     // Validate modal using TaskPage helper
     await taskPage.verifyModalOpen();
 
@@ -77,11 +78,19 @@ test.describe('File Upload Service', () => {
     await expect(page.locator(`text=${validFileName} uploaded!`)).toBeVisible({ timeout: 30000 });
     console.log('[TEST] Upload success visible');
 
-    // 5. Verify Description update
-    // The description should now contain the attachment link
+    // 5. Verify Description update and Attachment List
+    // The description should NOT contain the attachment link anymore (it's separated)
     const description = await taskPage.descriptionInput.inputValue();
-    expect(description).toContain(`**Attachment:** [${validFileName}]`);
-    console.log('[TEST] Description verification passed');
+    expect(description).not.toContain(`**Attachment:**`);
+    console.log('[TEST] Description verification passed (no raw markdown)');
+
+    // Verify Attachment Item appears in the list
+    const attachmentItem = page.getByTestId('attachment-item');
+    await expect(attachmentItem).toBeVisible();
+    await expect(attachmentItem).toContainText(validFileName);
+    await expect(page.getByTestId('attachment-view-link')).toBeVisible();
+    await expect(page.getByTestId('attachment-delete-btn')).toBeVisible();
+    console.log('[TEST] Attachment list verification passed');
 
     // 6. Save Task using TaskPage helper
     await taskPage.createButton.click();
@@ -91,7 +100,29 @@ test.describe('File Upload Service', () => {
     // 7. Verify Task is created
     // We expect it to appear in the list
     await taskPage.page.waitForTimeout(1000); // Short wait for list update
-    await expect(appPage.page.getByText(uniqueTitle).first()).toBeVisible();
+    const taskLink = appPage.page.getByText(uniqueTitle).first();
+    await expect(taskLink).toBeVisible();
     console.log('[TEST] Task visible on dashboard');
+
+    // 8. Open Task Detail and Verify Attachment
+    await taskLink.click();
+    console.log('[TEST] Opened Task Detail');
+
+    // Explicitly wait for modal content
+    const detailModal = page.locator('div[role="dialog"]'); // Assuming modal has role dialog, or check class
+    // Or use text matching
+    await expect(page.getByText('Description')).toBeVisible();
+
+    // Verify Attachment Section
+    await expect(page.getByText('Attachments', { exact: true })).toBeVisible();
+    const detailAttachmentItem = page.getByTestId('attachment-item');
+    await expect(detailAttachmentItem).toBeVisible();
+    await expect(detailAttachmentItem).toContainText(validFileName);
+
+    // Check View and Download links
+    await expect(page.getByTestId('attachment-view-link')).toBeVisible();
+    await expect(page.getByTestId('attachment-download-btn')).toBeVisible();
+
+    console.log('[TEST] Task Detail attachment verification passed');
   });
 });

@@ -12,7 +12,7 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
     include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
     exclude: [
-      'e2e/**/*', 
+      'e2e/**/*',
       'playwright.config.ts',
       'node_modules/**/*',
       'dist/**/*'

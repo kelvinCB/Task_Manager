@@ -6,6 +6,8 @@ import { AIIcon } from './AIIcon';
 import { openaiService } from '../services/openaiService';
 import { FileUploader } from './FileUploader';
 import { UploadResult } from '../services/taskService';
+import { extractAttachments, formatDescriptionWithAttachments, Attachment } from '../utils/attachmentUtils';
+import { AttachmentList } from './AttachmentList';
 
 interface TaskFormProps {
   task?: Task;
@@ -27,6 +29,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     title: '',
     description: '',
     status: 'Open' as TaskStatus,
+    attachments: [] as Attachment[],
     dueDate: '',
     parentId: parentId || ''
   });
@@ -36,12 +39,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   useEffect(() => {
     if (task) {
+      const { text, attachments } = extractAttachments(task.description);
       setFormData({
         title: task.title,
-        description: task.description,
+        description: text,
         status: task.status,
         dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
-        parentId: task.parentId || ''
+        parentId: task.parentId || '',
+        attachments: attachments
       });
     } else {
       setFormData({
@@ -49,7 +54,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         description: '',
         status: 'Open',
         dueDate: '',
-        parentId: parentId || ''
+        parentId: parentId || '',
+        attachments: []
       });
     }
   }, [task, parentId]);
@@ -64,9 +70,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
     setValidationError('');
 
+    const finalDescription = formatDescriptionWithAttachments(formData.description, formData.attachments);
+
     onSubmit({
       title: formData.title.trim(),
-      description: formData.description.trim(),
+      description: finalDescription,
       status: formData.status,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       parentId: formData.parentId || undefined,
@@ -311,16 +319,31 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               </label>
               <FileUploader
                 onUploadComplete={(result: UploadResult) => {
-                  // For now, append the file URL to the description as we don't have an attachments column
-                  const startNewLine = formData.description ? '\n\n' : '';
-                  const attachmentText = `${startNewLine}**Attachment:** [${result.file.name}](${result.file.url})`;
+                  const newAttachment: Attachment = {
+                    name: result.file.name,
+                    url: result.file.url,
+                    type: result.file.mimetype.startsWith('image/') ? 'image' : result.file.mimetype.startsWith('video/') ? 'video' : 'file'
+                  };
+
                   setFormData(prev => ({
                     ...prev,
-                    description: prev.description + attachmentText
+                    attachments: [...prev.attachments, newAttachment]
                   }));
                 }}
                 onError={(msg) => setValidationError(msg)}
               />
+
+              <div className="mt-2">
+                <AttachmentList
+                  attachments={formData.attachments}
+                  onDelete={(index) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      attachments: prev.attachments.filter((_, i) => i !== index)
+                    }));
+                  }}
+                />
+              </div>
             </div>
 
 

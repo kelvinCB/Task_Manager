@@ -4,6 +4,8 @@ import { Task } from '../types/Task';
 import { useTheme } from '../contexts/ThemeContext';
 import { formatDate, getStatusColor, formatTime } from '../utils/taskUtils';
 import { X, Calendar, Clock, Edit2, AlertCircle, CheckCircle } from 'lucide-react';
+import { extractAttachments } from '../utils/attachmentUtils';
+import { AttachmentList } from './AttachmentList';
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -26,10 +28,9 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div 
-        className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl transition-all duration-200 ${
-          theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
-        }`}
+      <div
+        className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl transition-all duration-200 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+          }`}
         role="dialog"
         aria-modal="true"
       >
@@ -47,22 +48,20 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         onEdit(task);
                         onClose();
                       }}
-                      className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                        theme === 'dark'
+                      className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors duration-200 ${theme === 'dark'
                           ? 'bg-gray-700 text-indigo-400 hover:bg-gray-600'
                           : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                      }`}
+                        }`}
                     >
                       <Edit2 size={14} />
                       Edit
                     </button>
                     <button
                       onClick={onClose}
-                      className={`p-2 rounded-full transition-colors duration-200 ${
-                        theme === 'dark' 
-                          ? 'hover:bg-gray-700 text-gray-400 hover:text-gray-200' 
+                      className={`p-2 rounded-full transition-colors duration-200 ${theme === 'dark'
+                          ? 'hover:bg-gray-700 text-gray-400 hover:text-gray-200'
                           : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
-                      }`}
+                        }`}
                       aria-label="Close modal"
                     >
                       <X size={20} />
@@ -75,18 +74,16 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   <span className={`px-2.5 py-0.5 text-sm font-medium border rounded-full ${getStatusColor(task.status)}`}>
                     {task.status}
                   </span>
-                  
-                  <div className={`flex items-center gap-1.5 text-sm ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                  }`}>
+
+                  <div className={`flex items-center gap-1.5 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
                     <Calendar size={14} />
                     <span>Created {formatDate(task.createdAt)}</span>
                   </div>
 
                   {task.dueDate && (
-                    <div className={`flex items-center gap-1.5 text-sm ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                    }`}>
+                    <div className={`flex items-center gap-1.5 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
                       <AlertCircle size={14} className={new Date(task.dueDate) < new Date() && task.status !== 'Done' ? 'text-red-500' : ''} />
                       <span className={new Date(task.dueDate) < new Date() && task.status !== 'Done' ? 'text-red-500 font-medium' : ''}>
                         Due {formatDate(task.dueDate)}
@@ -98,54 +95,63 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
               <hr className={`${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`} />
 
-              {/* Description */}
               <div className="space-y-2">
-                <h3 className={`text-sm font-semibold uppercase tracking-wider ${
-                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                }`}>
+                <h3 className={`text-sm font-semibold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
                   Description
                 </h3>
-                <div className={`prose max-w-none ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                <div className={`prose max-w-none ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                   }`}>
-                  {task.description ? (
-                    <p className="whitespace-pre-wrap">{task.description}</p>
-                  ) : (
-                    <p className="italic text-gray-400">No description provided.</p>
-                  )}
+                  {(() => {
+                    const { text, attachments } = extractAttachments(task.description || '');
+                    return (
+                      <>
+                        {text ? (
+                          <p className="whitespace-pre-wrap">{text}</p>
+                        ) : (
+                          attachments.length === 0 && <p className="italic text-gray-400">No description provided.</p>
+                        )}
+
+                        {attachments.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                              }`}>
+                              Attachments
+                            </h4>
+                            <AttachmentList attachments={attachments} readonly={true} />
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
               {/* Stats / Metadata */}
-              <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg ${
-                theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'
-              }`}>
+              <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'
+                }`}>
                 {/* Time Tracking */}
                 <div className="space-y-1">
-                  <div className={`flex items-center gap-2 text-sm font-medium ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                  }`}>
+                  <div className={`flex items-center gap-2 text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                     <Clock size={16} className="text-indigo-500" />
                     Time Tracked
                   </div>
-                  <p className={`text-lg font-semibold ${
-                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                  }`}>
+                  <p className={`text-lg font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
                     {formatTime(getElapsedTime ? getElapsedTime(task.id) : task.timeTracking.totalTimeSpent)}
                   </p>
                 </div>
 
                 {/* Subtasks Count */}
                 <div className="space-y-1">
-                  <div className={`flex items-center gap-2 text-sm font-medium ${
-                    theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                  }`}>
+                  <div className={`flex items-center gap-2 text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                     <CheckCircle size={16} className="text-green-500" />
                     Subtasks
                   </div>
-                  <p className={`text-lg font-semibold ${
-                    theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
-                  }`}>
+                  <p className={`text-lg font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
                     {task.childIds.length}
                   </p>
                 </div>

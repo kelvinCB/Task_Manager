@@ -96,7 +96,7 @@ describe('OpenAIService', () => {
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.model).toBe('o4-mini');
-      expect(requestBody.max_completion_tokens).toBe(2500);
+      expect(requestBody.max_completion_tokens).toBe(4500);
       expect(requestBody.temperature).toBeUndefined();
       expect(requestBody.top_p).toBeUndefined();
     });

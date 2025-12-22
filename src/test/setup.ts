@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../../.env.development') });
 
 // Mock para localStorage
-const localStorageMock = (function() {
+const localStorageMock = (function () {
   let store: Record<string, string> = {};
 
   return {

@@ -1,5 +1,6 @@
-# Ejecutar tests
-npx vitest run
+#!/bin/sh
+# Ensure all tests pass
+CI=true npm run test
 
-# Verificar que el build funciona
+# Ensure build works
 npm run build

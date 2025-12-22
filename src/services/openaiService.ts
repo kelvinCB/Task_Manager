@@ -33,7 +33,7 @@ export class OpenAIService {
     this.apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     this.baseUrl = import.meta.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1';
     this.defaultModel = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
-    
+
     if (!this.apiKey || this.apiKey === 'your-openai-api-key-here') {
       throw new Error('OpenAI API key not configured. Please add your API key to the .env file.');
     }
@@ -82,8 +82,8 @@ Generate a description that would help someone understand exactly what needs to 
       // New models (O4, GPT-5) use different parameters
       if (isNewModel) {
         // Newer models use max_completion_tokens instead of max_tokens
-        // Increased to 2500 to account for reasoning tokens in newer models
-        requestBody.max_completion_tokens = 2500;
+        // Increased to 4500 to account for reasoning tokens in newer models
+        requestBody.max_completion_tokens = 4500;
       } else {
         // Standard GPT models
         requestBody.max_tokens = 300;
@@ -110,21 +110,21 @@ Generate a description that would help someone understand exactly what needs to 
       }
 
       const data: OpenAIResponse = await response.json();
-      
+
       if (!data.choices || data.choices.length === 0) {
         console.error('No choices in response:', data);
         throw new Error('No response received from OpenAI API');
       }
 
       const choice = data.choices[0];
-      
+
       // Try different response structures
       let content: string | null = null;
-      
+
       // Standard structure: choice.message.content (handle empty strings too)
       if (choice.message && choice.message.content !== undefined) {
         content = choice.message.content;
-        
+
         // If content is empty and finish_reason is 'length', try with more tokens
         if (!content.trim() && choice.finish_reason === 'length') {
           console.warn('Empty content with finish_reason=length, might need more tokens');
@@ -143,14 +143,14 @@ Generate a description that would help someone understand exactly what needs to 
       else if (choice.message && choice.message.text) {
         content = choice.message.text;
       }
-      
+
       if (!content) {
         console.error('No content found in any expected structure. Choice object:', JSON.stringify(choice, null, 2));
         throw new Error('Invalid response structure from OpenAI API - no content found');
       }
 
       const generatedDescription = content.trim();
-      
+
       if (!generatedDescription) {
         console.error('Empty content after trim:', content);
         throw new Error('Empty response received from OpenAI API');
@@ -202,14 +202,14 @@ Guidelines:
       // For DRYness, ideally we would refactor the common API call logic into a private method,
       // but to minimize changes we will duplicate the fetch logic here for now, or we can refactor.
       // Let's copy the logic to ensure stability first.
-      
+
       const requestBody: any = {
         model,
         messages
       };
 
       if (isNewModel) {
-        requestBody.max_completion_tokens = 2500;
+        requestBody.max_completion_tokens = 4500;
       } else {
         requestBody.max_tokens = 500;
         requestBody.temperature = 0.3; // Lower temperature for grammar correction
@@ -234,14 +234,14 @@ Guidelines:
       }
 
       const data: OpenAIResponse = await response.json();
-      
+
       if (!data.choices || data.choices.length === 0) {
         throw new Error('No response received from OpenAI API');
       }
 
       const choice = data.choices[0];
       let content: string | null = null;
-      
+
       if (choice.message && choice.message.content !== undefined) {
         content = choice.message.content;
       } else if (choice.text) {
@@ -251,7 +251,7 @@ Guidelines:
       } else if (choice.message && choice.message.text) {
         content = choice.message.text;
       }
-      
+
       if (!content) {
         throw new Error('Invalid response structure from OpenAI API - no content found');
       }
