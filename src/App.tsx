@@ -295,7 +295,7 @@ const MainApp = () => {
             <div className="flex flex-col sm:flex-row flex-1 gap-3 sm:gap-3">
               {/* Search area */}
               <div className="flex-1 flex justify-end items-center">
-                <div className="relative w-60 sm:w-80">
+                <div className="relative w-60 sm:w-80 lg:w-60 min-[1330px]:w-80">
                   <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-400'} w-4 h-4`} />
                   <input
                     type="text"
@@ -314,7 +314,7 @@ const MainApp = () => {
                   className={`flex items-center gap-2 px-5 py-2.5 ${theme === 'dark' ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg transition-colors duration-200 text-base font-medium shadow-sm`}
                 >
                   <Plus size={18} />
-                  <span className="hidden sm:inline">Add Task</span>
+                  <span className="hidden min-[1330px]:inline">Add Task</span>
                 </button>
                 {/* View Toggle */}
                 <div className={`flex items-center space-x-2 p-1 rounded-lg ${theme === 'dark' ? 'bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100'} shadow-sm`}>
@@ -329,7 +329,7 @@ const MainApp = () => {
                     `}
                   >
                     <TreePine size={18} />
-                    <span className="hidden sm:inline">Tree View</span>
+                    <span className="hidden min-[1330px]:inline">Tree View</span>
                   </button>
                   <button
                     onClick={() => setView('board')}
@@ -342,7 +342,7 @@ const MainApp = () => {
                     `}
                   >
                     <LayoutGrid size={18} />
-                    <span className="hidden sm:inline">Board View</span>
+                    <span className="hidden min-[1330px]:inline">Board View</span>
                   </button>
                   <button
                     onClick={() => setView('stats')}
@@ -355,7 +355,7 @@ const MainApp = () => {
                     `}
                   >
                     <Clock size={18} />
-                    <span className="hidden sm:inline">Time Stats</span>
+                    <span className="hidden min-[1330px]:inline">Time Stats</span>
                   </button>
                 </div>
               </div>
