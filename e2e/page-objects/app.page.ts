@@ -31,6 +31,10 @@ export class AppPage {
     await this.page.goto('/');
   }
 
+  async waitForLoadingComplete() {
+    await this.page.waitForSelector('[data-loading="false"]', { timeout: 30000 });
+  }
+
   async switchToView(view: 'board' | 'tree' | 'stats', force = false) {
     let buttonSelector: string;
     switch (view) {
@@ -44,30 +48,30 @@ export class AppPage {
         buttonSelector = 'button[title="Time Stats"]';
         break;
     }
-    
+
     // Find all buttons and try each one until one works
     const buttons = await this.page.locator(buttonSelector).all();
-    
+
     if (buttons.length === 0) {
       throw new Error(`No ${view} view button found`);
     }
-    
+
     let viewSwitched = false;
-    
+
     for (let i = 0; i < buttons.length; i++) {
       const button = buttons[i];
       const isVisible = await button.isVisible().catch(() => false);
-      
+
       if (isVisible || force) {
         try {
-          await button.click({ force });          viewSwitched = true;
+          await button.click({ force }); viewSwitched = true;
           break;
         } catch (e) {
           // Continue to next button
         }
       }
     }
-    
+
     if (!viewSwitched) {
       throw new Error(`Could not switch to ${view} view - no button was clickable`);
     }

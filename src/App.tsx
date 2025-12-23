@@ -8,11 +8,11 @@ import { TimeStatsView } from './components/TimeStatsView';
 import { taskService } from './services/taskService';
 import { ProgressIcon } from './components/ProgressIcon';
 import { Task, TaskNode } from './types/Task';
-import { 
-  TreePine, 
-  LayoutGrid, 
-  Plus, 
-  Search, 
+import {
+  TreePine,
+  LayoutGrid,
+  Plus,
+  Search,
   Filter,
   Clock,
   Sun,
@@ -49,7 +49,8 @@ const MainApp = () => {
     startTaskTimer,
     pauseTaskTimer,
     getElapsedTime,
-    getTimeStatistics
+    getTimeStatistics,
+    isLoading
   } = useTasks();
 
   const { theme, toggleTheme } = useTheme();
@@ -61,7 +62,7 @@ const MainApp = () => {
   const [parentId, setParentId] = useState<string | undefined>();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Task Detail Modal State
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -100,7 +101,7 @@ const MainApp = () => {
       alert('Cannot add a subtask because the parent task is already completed and marked as "Done"');
       return;
     }
-    
+
     setParentId(parentTaskId);
     setEditingTask(undefined);
     setIsFormOpen(true);
@@ -136,13 +137,13 @@ const MainApp = () => {
           // Parse time tracking data if available
           let timeEntries = [];
           let totalTimeSpent = 0;
-          
+
           if (row.timeEntries) {
             try {
               // Handle escaped quotes from CSV export
               const cleanedTimeEntries = row.timeEntries.replace(/""/g, '"');
               timeEntries = JSON.parse(cleanedTimeEntries);
-              
+
               // Ensure timeEntries is an array and has valid structure
               if (Array.isArray(timeEntries)) {
                 timeEntries = timeEntries.map(entry => {
@@ -173,11 +174,11 @@ const MainApp = () => {
               timeEntries = [];
             }
           }
-          
+
           if (row.totalTimeSpent && !isNaN(Number(row.totalTimeSpent))) {
             totalTimeSpent = Number(row.totalTimeSpent);
           }
-          
+
           return {
             title: row.title || 'Untitled Task',
             description: row.description || '',
@@ -212,12 +213,12 @@ const MainApp = () => {
       // Calculate total time including active sessions
       let totalTimeForExport = task.timeTracking.totalTimeSpent;
       const timeEntriesForExport = [...task.timeTracking.timeEntries];
-      
+
       // If task is currently active, calculate the current session time
       if (task.timeTracking.isActive && task.timeTracking.lastStarted) {
         const currentSessionTime = Date.now() - task.timeTracking.lastStarted;
         totalTimeForExport += currentSessionTime;
-        
+
         // Update the last entry to include the endTime and duration
         const lastEntryIndex = timeEntriesForExport.length - 1;
         if (lastEntryIndex >= 0 && !timeEntriesForExport[lastEntryIndex].endTime) {
@@ -228,7 +229,7 @@ const MainApp = () => {
           };
         }
       }
-      
+
       return {
         id: task.id,
         title: task.title,
@@ -264,7 +265,10 @@ const MainApp = () => {
 
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
+    <div
+      className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}
+      data-loading={isLoading}
+    >
       {/* Mobile Header - Three Level Design */}
       <header className={`bg-white border-b border-gray-200 shadow-sm ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-white dark:border-gray-700' : ''}`}>
         <div className="px-4 sm:px-6 lg:px-8">
@@ -272,9 +276,9 @@ const MainApp = () => {
           <div className="hidden lg:flex items-center justify-between h-16">
             <div className="flex shrink-0 items-center gap-3 mr-4">
               <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg mobile-icon-animation`}>
-                <ProgressIcon 
-                  size={24} 
-                  className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} 
+                <ProgressIcon
+                  size={24}
+                  className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`}
                   progress={75}
                 />
               </div>
@@ -302,7 +306,7 @@ const MainApp = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3 sm:gap-4">
                 <button
                   data-testid="add-task-button"
@@ -319,8 +323,8 @@ const MainApp = () => {
                     title="Tree View"
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
-                      ${view === 'tree' 
-                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
+                      ${view === 'tree'
+                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
                         : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')}
                     `}
                   >
@@ -332,8 +336,8 @@ const MainApp = () => {
                     title="Board View"
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
-                      ${view === 'board' 
-                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
+                      ${view === 'board'
+                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
                         : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')}
                     `}
                   >
@@ -345,8 +349,8 @@ const MainApp = () => {
                     title="Time Stats"
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
-                      ${view === 'stats' 
-                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
+                      ${view === 'stats'
+                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
                         : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')}
                     `}
                   >
@@ -355,10 +359,10 @@ const MainApp = () => {
                   </button>
                 </div>
               </div>
-              
+
               {/* Account Menu - At the far right */}
               <div className="flex items-center ml-3">
-                <AccountMenu 
+                <AccountMenu
                   onExport={handleExportTasks}
                   onImport={handleImportTasks}
                 />
@@ -372,9 +376,9 @@ const MainApp = () => {
             <div className="flex items-center justify-center py-3">
               <div className="flex items-center gap-3">
                 <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg mobile-icon-animation`}>
-                  <ProgressIcon 
-                    size={20} 
-                    className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`} 
+                  <ProgressIcon
+                    size={20}
+                    className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`}
                     progress={75}
                   />
                 </div>
@@ -401,7 +405,7 @@ const MainApp = () => {
               </div>
 
               {/* Account Menu removed from here - moved to burger menu area */}
-              
+
               {/* Add Task Button */}
               <button
                 onClick={openCreateForm}
@@ -416,33 +420,30 @@ const MainApp = () => {
                 <button
                   onClick={() => setView('tree')}
                   title="Tree View"
-                  className={`p-2 rounded-lg transition-colors duration-200 ${
-                    view === 'tree' 
-                      ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
-                      : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
-                  }`}
+                  className={`p-2 rounded-lg transition-colors duration-200 ${view === 'tree'
+                    ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
+                    : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
+                    }`}
                 >
                   <TreePine size={16} />
                 </button>
                 <button
                   onClick={() => setView('board')}
                   title="Board View"
-                  className={`p-2 rounded-lg transition-colors duration-200 ${
-                    view === 'board' 
-                      ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
-                      : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
-                  }`}
+                  className={`p-2 rounded-lg transition-colors duration-200 ${view === 'board'
+                    ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
+                    : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
+                    }`}
                 >
                   <LayoutGrid size={16} />
                 </button>
                 <button
                   onClick={() => setView('stats')}
                   title="Time Stats"
-                  className={`p-2 rounded-lg transition-colors duration-200 ${
-                    view === 'stats' 
-                      ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700') 
-                      : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
-                  }`}
+                  className={`p-2 rounded-lg transition-colors duration-200 ${view === 'stats'
+                    ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
+                    : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
+                    }`}
                 >
                   <Clock size={16} />
                 </button>
@@ -456,11 +457,10 @@ const MainApp = () => {
                   {/* Theme Toggle */}
                   <button
                     onClick={toggleTheme}
-                    className={`p-2 rounded-lg transition-colors duration-200 ${
-                      theme === 'dark' 
-                        ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' 
-                        : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                    }`}
+                    className={`p-2 rounded-lg transition-colors duration-200 ${theme === 'dark'
+                      ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400'
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                      }`}
                     title="Toggle Dark Mode"
                   >
                     {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
@@ -469,16 +469,15 @@ const MainApp = () => {
                   {/* Filters Button */}
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className={`p-2 rounded-lg transition-colors duration-200 ${
-                      showFilters
-                        ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
-                        : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-400 hover:bg-gray-200')
-                    }`}
+                    className={`p-2 rounded-lg transition-colors duration-200 ${showFilters
+                      ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
+                      : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-400 hover:bg-gray-200')
+                      }`}
                     title="Filters"
                   >
                     <Filter size={16} />
                   </button>
-                  
+
                   {/* Account Menu removed from here - moved to replace burger menu */}
 
                   {/* Inline Filters when active */}
@@ -518,7 +517,7 @@ const MainApp = () => {
                 </div>
 
                 {/* Account Menu - Replaced Burger Menu */}
-                <AccountMenu 
+                <AccountMenu
                   onExport={handleExportTasks}
                   onImport={handleImportTasks}
                   compact={true}

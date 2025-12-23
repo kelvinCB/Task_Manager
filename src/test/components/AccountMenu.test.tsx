@@ -81,7 +81,7 @@ describe('AccountMenu Component', () => {
   it('should render My Account button when authenticated (not show username in button)', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { id: 'test-user-id', email: 'test@example.com' },
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
       session: null,
       logout: vi.fn()
     });
@@ -103,7 +103,7 @@ describe('AccountMenu Component', () => {
   it('should show username in dropdown when authenticated and clicked', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { id: 'test-user-id', email: 'test@example.com' },
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
       session: null,
       logout: vi.fn()
     });
@@ -132,7 +132,7 @@ describe('AccountMenu Component', () => {
   it('should show logout button when authenticated', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { id: 'test-user-id', email: 'test@example.com' },
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
       session: null,
       logout: vi.fn()
     });
@@ -187,7 +187,7 @@ describe('AccountMenu Component', () => {
     const mockLogout = vi.fn().mockResolvedValue(undefined);
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { id: 'test-user-id', email: 'test@example.com' },
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
       session: null,
       logout: mockLogout
     });
@@ -215,7 +215,7 @@ describe('AccountMenu Component', () => {
     await waitFor(() => {
       expect(mockLogout).toHaveBeenCalled();
     });
-    
+
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 
@@ -252,7 +252,7 @@ describe('AccountMenu Component', () => {
   it('should show export and import options', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { id: 'test-user-id', email: 'test@example.com' },
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
       session: null,
       logout: vi.fn()
     });
@@ -275,11 +275,83 @@ describe('AccountMenu Component', () => {
     });
   });
 
+  it('should show AuthRequiredModal when export is clicked while unauthenticated', async () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      user: null,
+      session: null,
+      logout: vi.fn()
+    });
+
+    mockUseUserProfile.mockReturnValue({
+      profile: null,
+      loading: false,
+      error: null,
+      updateProfile: vi.fn()
+    });
+
+    const mockOnExport = vi.fn();
+    renderWithRouter(<AccountMenu {...defaultProps} onExport={mockOnExport} />);
+
+    // Click to open dropdown
+    fireEvent.click(screen.getByTestId('account-menu-button'));
+
+    // Click export
+    await waitFor(() => {
+      expect(screen.getByText('Export Tasks')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('Export Tasks'));
+
+    // Check that onExport was NOT called
+    expect(mockOnExport).not.toHaveBeenCalled();
+
+    // Check that AuthRequiredModal is shown
+    expect(screen.getByText('Unlock Full Potential')).toBeInTheDocument();
+    expect(screen.getByText(/Please sign in to export your tasks/)).toBeInTheDocument();
+  });
+
+  it('should show AuthRequiredModal when import is clicked while unauthenticated', async () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      user: null,
+      session: null,
+      logout: vi.fn()
+    });
+
+    mockUseUserProfile.mockReturnValue({
+      profile: null,
+      loading: false,
+      error: null,
+      updateProfile: vi.fn()
+    });
+
+    const mockOnImport = vi.fn();
+    renderWithRouter(<AccountMenu {...defaultProps} onImport={mockOnImport} />);
+
+    // Click to open dropdown
+    fireEvent.click(screen.getByTestId('account-menu-button'));
+
+    // Click import (the div wrapper)
+    await waitFor(() => {
+      expect(screen.getByText('Import Tasks')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('Import Tasks'));
+
+    // Check that onImport was NOT called
+    expect(mockOnImport).not.toHaveBeenCalled();
+
+    // Check that AuthRequiredModal is shown
+    expect(screen.getByText('Unlock Full Potential')).toBeInTheDocument();
+    expect(screen.getByText(/Please sign in to import your tasks/)).toBeInTheDocument();
+  });
+
   it('should call onExport when export button is clicked', async () => {
     const mockOnExport = vi.fn();
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { id: 'test-user-id', email: 'test@example.com' },
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
       session: null,
       logout: vi.fn()
     });
@@ -331,7 +403,7 @@ describe('AccountMenu Component', () => {
   it('should not show user info section when profile is loading', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
-      user: { id: 'test-user-id', email: 'test@example.com' },
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
       session: null,
       logout: vi.fn()
     });

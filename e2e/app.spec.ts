@@ -11,7 +11,8 @@ test.describe('Task Manager App', () => {
 
   test.afterEach(async ({ page }, testInfo) => {
     // Wait 1 second before ending test    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();  });
+    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  });
 
   test('should load the application successfully', async () => {
     await appPage.verifyPageLoaded();
@@ -27,7 +28,7 @@ test.describe('Task Manager App', () => {
     await expect(appPage.boardViewButton).toBeVisible();
     await expect(appPage.treeViewButton).toBeVisible();
     await expect(appPage.timeStatsButton).toBeVisible();
-    
+
     // Test switching functionality
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
@@ -62,16 +63,16 @@ test.describe('Task Manager App', () => {
   test('should have responsive design on mobile viewport', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
-    
+
     const mobileAppPage = new AppPage(page);
     await mobileAppPage.goto();
-    
+
     // On mobile, navigation buttons are in a different layout (hidden desktop version)
     // Instead of checking visibility of first(), check that mobile versions exist
     await expect(page.getByTitle('Board View').nth(1)).toBeVisible(); // Mobile version
     await expect(page.getByTitle('Tree View').nth(1)).toBeVisible(); // Mobile version
     await expect(page.getByTitle('Time Stats').nth(1)).toBeVisible(); // Mobile version
-    
+
     // Verify mobile-specific elements work
     await page.getByTitle('Board View').nth(1).click();
     await mobileAppPage.verifyCurrentView('board');
@@ -87,26 +88,34 @@ test.describe('Task Manager App', () => {
     await expect(appPage.accountMenu).toBeVisible();
   });
 
-  test('should show Export Tasks option in account menu', async () => {
+  test('should show Authentication Required modal when clicking Export Tasks while logged out', async () => {
     // Open the account menu
     await appPage.accountMenu.click();
-    
-    // Verify Export Tasks option exists
-    await expect(appPage.page.getByRole('menuitem').filter({ hasText: 'Export Tasks' })).toBeVisible();
-    
-    // Close menu by clicking elsewhere
-    await appPage.page.mouse.click(10, 10);
+
+    // Click Export Tasks
+    await appPage.page.getByRole('menuitem').filter({ hasText: 'Export Tasks' }).click();
+
+    // Verify AuthRequiredModal appears
+    await expect(appPage.page.getByText('Unlock Full Potential')).toBeVisible();
+    await expect(appPage.page.getByText('Please sign in to export your tasks')).toBeVisible();
+
+    // Close modal
+    await appPage.page.getByRole('button', { name: 'Close modal' }).click();
   });
 
-  test('should show Import Tasks option in account menu', async () => {
+  test('should show Authentication Required modal when clicking Import Tasks while logged out', async () => {
     // Open the account menu
     await appPage.accountMenu.click();
-    
-    // Verify Import Tasks option exists
-    await expect(appPage.page.getByRole('menuitem').filter({ hasText: 'Import Tasks' })).toBeVisible();
-    
-    // Close menu by clicking elsewhere
-    await appPage.page.mouse.click(10, 10);
+
+    // Click Import Tasks
+    await appPage.page.getByRole('menuitem').filter({ hasText: 'Import Tasks' }).click();
+
+    // Verify AuthRequiredModal appears
+    await expect(appPage.page.getByText('Unlock Full Potential')).toBeVisible();
+    await expect(appPage.page.getByText('Please sign in to import your tasks')).toBeVisible();
+
+    // Close modal
+    await appPage.page.getByRole('button', { name: 'Close modal' }).click();
   });
 
   test('should maintain view state when navigating between views', async () => {

@@ -10,9 +10,8 @@ export class TimerPage {
   // Get timer for a specific task by task title or index
   getTaskTimer(taskIdentifier: string | number) {
     if (typeof taskIdentifier === 'string') {
-      // Find the task by text content in the group container
-      // Use :visible to ensure we get the currently displayed timer (handling mobile/desktop duplicates)
-      return this.page.locator('.group').filter({ hasText: taskIdentifier }).locator('[data-testid="task-timer"]:visible').first();
+      // Find the task by precisely matching the data-task-title attribute
+      return this.page.locator(`[data-task-title="${taskIdentifier}"]`).locator('[data-testid="task-timer"]:visible').first();
     } else {
       // Find timer by index - use first() to handle dual mobile/desktop elements
       return this.page.locator('[data-testid="task-timer"]:visible').nth(taskIdentifier);
@@ -47,15 +46,15 @@ export class TimerPage {
   async verifyTimerRunning(taskIdentifier: string | number) {
     const pauseButton = this.getPauseButton(taskIdentifier);
     await expect(pauseButton).toBeVisible();
-    
+
     // Verify that the timer is actively updating
     const elapsedTime = this.getElapsedTime(taskIdentifier);
     const initialTime = await elapsedTime.textContent();
-    
+
     // Wait longer to ensure timer updates (responsive layout may affect timing)
     await this.page.waitForTimeout(2000);
     const updatedTime = await elapsedTime.textContent();
-    
+
     // If times are equal, wait a bit more and try again (sometimes the timer needs more time)
     if (initialTime === updatedTime) {
       await this.page.waitForTimeout(3000);
@@ -79,24 +78,24 @@ export class TimerPage {
   async getElapsedTimeText(taskIdentifier: string | number): Promise<string> {
     const elapsedTime = this.getElapsedTime(taskIdentifier);
     const fullText = await elapsedTime.textContent() || '00:00:00';
-    
+
     // Handle dual mobile/desktop format - the element contains both hidden mobile and visible desktop spans
     // We need to get the visible time text only
-    
+
     // Try to get desktop format first (hidden on mobile)
     const desktopSpan = elapsedTime.locator('span.hidden.sm\\:inline');
     const mobileSpan = elapsedTime.locator('span.sm\\:hidden');
-    
+
     // Check which one is visible and get its text
     const desktopVisible = await desktopSpan.isVisible().catch(() => false);
     const mobileVisible = await mobileSpan.isVisible().catch(() => false);
-    
+
     if (desktopVisible) {
       return await desktopSpan.textContent() || '00:00:00';
     } else if (mobileVisible) {
       return await mobileSpan.textContent() || '0:00';
     }
-    
+
     // Fallback: try to parse the concatenated text
     // Pattern: desktop format followed by mobile format
     // e.g., "00:00:070:07" = "00:00:07" + "0:07"
@@ -107,7 +106,7 @@ export class TimerPage {
         return `${parts[0]}:${parts[1]}:${parts[2]}`;
       }
     }
-    
+
     return fullText;
   }
 
@@ -129,7 +128,7 @@ export class TimerPage {
     const currentTime = await this.getElapsedTimeText(taskIdentifier);
     const initialSeconds = this.timeToSeconds(initialTime);
     const currentSeconds = this.timeToSeconds(currentTime);
-    
+
     expect(currentSeconds).toBeGreaterThan(initialSeconds);
   }
 
