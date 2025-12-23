@@ -30,6 +30,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
   const { theme } = useTheme();
   const { isAuthenticated, logout } = useAuth();
   const { profile } = useUserProfile();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -202,6 +203,9 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
                   setAuthActionType('import');
                   setIsAuthModalOpen(true);
                   setIsOpen(false);
+                } else {
+                  // Programmatically trigger the file input
+                  fileInputRef.current?.click();
                 }
               }}
             >
@@ -216,6 +220,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
                   onImport(e);
                   setIsOpen(false);
                 }}
+                ref={fileInputRef}
                 className="hidden"
               />
             </div>
