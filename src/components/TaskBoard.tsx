@@ -35,7 +35,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onTaskClick
 }) => {
   const { theme } = useTheme();
-  
+
   const getTasksByStatus = (status: TaskStatus) => {
     return tasks.filter(task => task.status === status);
   };
@@ -59,7 +59,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const renderTitle = (task: Task) => {
     const maxLength = 40;
     const isLong = task.title.length > maxLength;
-    
+
     if (isLong) {
       const truncated = task.title.substring(0, maxLength);
       return (
@@ -74,7 +74,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
         </h4>
       );
     }
-    
+
     return (
       <h4 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} truncate mb-1`}>
         {task.title}
@@ -84,10 +84,10 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
   const renderDescription = (task: Task) => {
     if (!task.description) return null;
-    
+
     const maxLength = 80;
     const isLong = task.description.length > maxLength;
-    
+
     if (isLong) {
       const truncated = task.description.substring(0, maxLength);
       return (
@@ -102,7 +102,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
         </p>
       );
     }
-    
+
     return (
       <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2 mb-2`}>
         {task.description}
@@ -124,7 +124,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             }
           };
           const StatusIcon = getIconComponent(column.status);
-          
+
           return (
             <div key={column.status} className={`flex flex-col h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
               {/* Column Header */}
@@ -151,20 +151,21 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
               >
                 <div className="space-y-3">
                   {columnTasks.map(task => (
-                      <div
-                        key={task.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, task.id)}
-                        onClick={() => onTaskClick?.(task.id)}
-                        className={`group mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
-                      >
+                    <div
+                      key={task.id}
+                      draggable
+                      data-task-title={task.title}
+                      onDragStart={(e) => handleDragStart(e, task.id)}
+                      onClick={() => onTaskClick?.(task.id)}
+                      className={`group mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className={theme === 'dark' ? 'text-gray-100' : ''}>
                             {renderTitle(task)}
                             {renderDescription(task)}
                           </div>
-                          
+
                           {/* Desktop layout */}
                           <div className={`hidden md:flex items-center gap-2 text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
                             <span>Depth: {task.depth}</span>
@@ -189,7 +190,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                               />
                             )}
                           </div>
-                          
+
                           {/* Mobile layout - Optimized */}
                           <div className={`md:hidden text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
                             {/* Task info row */}
@@ -199,7 +200,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                                 <span>• {task.childIds.length} subtask{task.childIds.length !== 1 ? 's' : ''}</span>
                               )}
                             </div>
-                            
+
                             {/* Due date and timer in one row */}
                             <div className="flex items-center justify-between">
                               {/* Due date with overdue indicator or Created date */}
@@ -214,7 +215,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                                   <span>Created {formatDate(task.createdAt)}</span>
                                 </div>
                               )}
-                              
+
                               {/* Task Timer */}
                               {onStartTimer && onPauseTimer && getElapsedTime && (
                                 <TaskTimer

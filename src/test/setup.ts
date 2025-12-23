@@ -1,5 +1,15 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { webcrypto } from 'node:crypto';
+
+// Polyfill for crypto.getRandomValues (needed for some Vitest/JSDOM environments)
+if (typeof window !== 'undefined' && !window.crypto) {
+  Object.defineProperty(window, 'crypto', {
+    value: webcrypto,
+    writable: true,
+    configurable: true
+  });
+}
 
 // Load environment variables from .env.development for tests
 import dotenv from 'dotenv';

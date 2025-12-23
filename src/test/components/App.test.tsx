@@ -6,44 +6,44 @@ import { AuthProvider } from '../../contexts/AuthContext';
 
 // Mock sample task data
 const mockTasks = [
-  { 
-    id: '1', 
-    title: 'Task 1', 
-    description: '', 
-    status: 'Open', 
-    createdAt: new Date().toISOString(), 
-    updatedAt: new Date().toISOString(), 
-    timeTracking: { 
-      totalTimeSpent: 0, 
-      isActive: false, 
+  {
+    id: '1',
+    title: 'Task 1',
+    description: '',
+    status: 'Open',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    timeTracking: {
+      totalTimeSpent: 0,
+      isActive: false,
       lastStarted: null,
       timeEntries: []
     }
   },
-  { 
-    id: '2', 
-    title: 'Task 2', 
-    description: '', 
-    status: 'In Progress', 
-    createdAt: new Date().toISOString(), 
-    updatedAt: new Date().toISOString(), 
-    timeTracking: { 
-      totalTimeSpent: 0, 
-      isActive: false, 
+  {
+    id: '2',
+    title: 'Task 2',
+    description: '',
+    status: 'In Progress',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    timeTracking: {
+      totalTimeSpent: 0,
+      isActive: false,
       lastStarted: null,
       timeEntries: []
     }
   },
-  { 
-    id: '3', 
-    title: 'Task 3', 
-    description: '', 
-    status: 'Done', 
-    createdAt: new Date().toISOString(), 
-    updatedAt: new Date().toISOString(), 
-    timeTracking: { 
-      totalTimeSpent: 0, 
-      isActive: false, 
+  {
+    id: '3',
+    title: 'Task 3',
+    description: '',
+    status: 'Done',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    timeTracking: {
+      totalTimeSpent: 0,
+      isActive: false,
       lastStarted: null,
       timeEntries: []
     }
@@ -75,8 +75,8 @@ const getTimeStatisticsMock = vi.fn().mockReturnValue({
 vi.mock('../../lib/supabaseClient', () => ({
   auth: {
     getSession: () => ({ data: { session: null } }),
-    onAuthStateChange: () => ({ 
-      data: { subscription: { unsubscribe: vi.fn() } } 
+    onAuthStateChange: () => ({
+      data: { subscription: { unsubscribe: vi.fn() } }
     }),
     signOut: vi.fn(),
     signInWithPassword: vi.fn()
@@ -196,11 +196,11 @@ describe('App Component', () => {
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
-    
+
     // Clear mocks
     vi.clearAllMocks();
   });
-  
+
   it('should render the app with navigation buttons', () => {
     // Act
     render(
@@ -210,13 +210,13 @@ describe('App Component', () => {
         </ThemeProvider>
       </AuthProvider>
     );
-    
+
     // Assert - verify navigation buttons are displayed (check for all instances)
     expect(screen.getAllByTitle('Board View')).toHaveLength(2); // Desktop and mobile
     expect(screen.getAllByTitle('Tree View')).toHaveLength(2); // Desktop and mobile
     expect(screen.getAllByTitle('Time Stats')).toHaveLength(2); // Desktop and mobile
   });
-  
+
   it('should show Board view by default', () => {
     // Act
     render(
@@ -226,16 +226,16 @@ describe('App Component', () => {
         </ThemeProvider>
       </AuthProvider>
     );
-    
+
     // Assert - verify Board view is shown by default
     // Check for characteristic Board view elements
     expect(screen.getAllByText(/add task/i).length).toBeGreaterThan(0);
-    
+
     // Verify Board button is active (has the active class) - check first instance
     const boardViewButtons = screen.getAllByTitle('Board View');
     expect(boardViewButtons[0].className).toContain('bg-indigo-100');
   });
-  
+
   it('should switch to Tree view when Tree button is clicked', () => {
     // Act
     render(
@@ -245,20 +245,20 @@ describe('App Component', () => {
         </ThemeProvider>
       </AuthProvider>
     );
-    
+
     // Click Tree view button (use first instance - desktop)
     const treeButtons = screen.getAllByTitle('Tree View');
     fireEvent.click(treeButtons[0]);
-    
+
     // Assert - verify switch to Tree view
     // Verify Tree button is active
     expect(treeButtons[0].className).toContain('bg-indigo-100');
-    
+
     // Verify Tree mock is displayed
     const treeContainer = screen.getByTestId('tree-view-mock');
     expect(treeContainer).toBeInTheDocument();
   });
-  
+
   it('should switch to Time Stats view when Stats button is clicked', () => {
     // Act
     render(
@@ -268,20 +268,20 @@ describe('App Component', () => {
         </ThemeProvider>
       </AuthProvider>
     );
-    
+
     // Click Time Stats button (use first instance - desktop)
     const statsButtons = screen.getAllByTitle('Time Stats');
     fireEvent.click(statsButtons[0]);
-    
+
     // Assert - verify switch to Time Stats view
     // Verify Stats button is active
     expect(statsButtons[0].className).toContain('bg-indigo-100');
-    
+
     // Verify Time Stats mock is displayed
     const statsContainer = screen.getByTestId('time-stats-view');
     expect(statsContainer).toBeInTheDocument();
   });
-  
+
   it('should create a new task when using the TaskForm', () => {
     // Act
     render(
@@ -291,23 +291,23 @@ describe('App Component', () => {
         </ThemeProvider>
       </AuthProvider>
     );
-    
+
     // Open form
     const addTaskButton = screen.getAllByText(/add task/i)[0];
     fireEvent.click(addTaskButton);
-    
+
     // Fill form
     const titleInput = screen.getByLabelText(/title/i);
     fireEvent.change(titleInput, { target: { value: 'New Task' } });
-    
+
     // Submit form
-    const submitButton = screen.getByRole('button', { name: /save/i });
+    const submitButton = screen.getByRole('button', { name: /create task/i });
     fireEvent.click(submitButton);
-    
+
     // Assert - verify createTask was called
     expect(createTaskMock).toHaveBeenCalled();
   });
-  
+
   it('should import/export tasks using CSV functionality', () => {
     render(
       <AuthProvider>
@@ -316,12 +316,12 @@ describe('App Component', () => {
         </ThemeProvider>
       </AuthProvider>
     );
-    
+
     // Verify My Account buttons exist (now contains export/import functionality)
     const accountButtons = screen.getAllByTitle('My Account');
     expect(accountButtons.length).toBeGreaterThan(0);
   });
-  
+
   it('should handle task timer controls across views', () => {
     render(
       <AuthProvider>
@@ -330,7 +330,7 @@ describe('App Component', () => {
         </ThemeProvider>
       </AuthProvider>
     );
-    
+
     // For this test we just verify task items are present
     // Actual timer functionality would be tested in TaskTimer component tests
     expect(mockTasks.length).toBeGreaterThan(0);

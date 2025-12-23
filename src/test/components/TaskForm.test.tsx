@@ -71,7 +71,7 @@ describe('TaskForm', () => {
       expect(screen.getByText('Create New Task')).toBeInTheDocument();
       expect(screen.getByRole('textbox', { name: /title/i })).toBeInTheDocument();
       expect(screen.getByRole('textbox', { name: /description/i })).toBeInTheDocument();
-      expect(screen.getByRole('combobox', { name: /status/i })).toBeInTheDocument();
+      expect(screen.getByLabelText(/status/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/due date/i)).toBeInTheDocument();
     });
 
@@ -119,7 +119,8 @@ describe('TaskForm', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText('This task will be created as a subtask.')).toBeInTheDocument();
+      expect(screen.getByText('Subtask Mode')).toBeInTheDocument();
+      expect(screen.getByText(/This task will be nested under its parent./i)).toBeInTheDocument();
     });
   });
 
@@ -137,7 +138,7 @@ describe('TaskForm', () => {
 
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       const descriptionInput = screen.getByRole('textbox', { name: /description/i });
-      const statusSelect = screen.getByRole('combobox', { name: /status/i });
+      const statusSelect = screen.getByLabelText(/status/i);
 
       fireEvent.change(titleInput, { target: { value: 'New Task Title' } });
       fireEvent.change(descriptionInput, { target: { value: 'New Description' } });
@@ -174,7 +175,7 @@ describe('TaskForm', () => {
         </TestWrapper>
       );
 
-      const closeButton = screen.getByRole('button', { name: '' }); // X button has no accessible name
+      const closeButton = screen.getByRole('button', { name: /close modal/i });
       fireEvent.click(closeButton);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
@@ -200,7 +201,7 @@ describe('TaskForm', () => {
       fireEvent.change(statusSelect, { target: { value: 'In Progress' } });
       fireEvent.change(dueDateInput, { target: { value: '2024-12-25' } });
 
-      fireEvent.click(screen.getByText('Save'));
+      fireEvent.click(screen.getByText('Create Task'));
 
       expect(mockOnSubmit).toHaveBeenCalledWith({
         title: 'New Task',
@@ -228,7 +229,7 @@ describe('TaskForm', () => {
         </TestWrapper>
       );
 
-      fireEvent.click(screen.getByText('Save'));
+      fireEvent.click(screen.getByText('Create Task'));
 
       expect(mockOnSubmit).not.toHaveBeenCalled();
       expect(mockOnClose).not.toHaveBeenCalled();
@@ -251,7 +252,7 @@ describe('TaskForm', () => {
       fireEvent.change(titleInput, { target: { value: '  Trimmed Title  ' } });
       fireEvent.change(descriptionInput, { target: { value: '  Trimmed Description  ' } });
 
-      fireEvent.click(screen.getByText('Save'));
+      fireEvent.click(screen.getByText('Create Task'));
 
       expect(mockOnSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -296,7 +297,7 @@ describe('TaskForm', () => {
       fireEvent.change(titleInput, { target: { value: 'Updated Task Title' } });
       fireEvent.change(descriptionInput, { target: { value: 'Updated Description' } });
 
-      fireEvent.click(screen.getByText('Save'));
+      fireEvent.click(screen.getByText('Update Task'));
 
       expect(mockOnSubmit).toHaveBeenCalledWith({
         title: 'Updated Task Title',
@@ -332,7 +333,7 @@ describe('TaskForm', () => {
 
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       fireEvent.change(titleInput, { target: { value: 'New Task' } });
-      fireEvent.click(screen.getByText('Save'));
+      fireEvent.click(screen.getByText('Create Task'));
 
       expect(mockOnSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -358,13 +359,13 @@ describe('TaskForm', () => {
         </TestWrapper>
       );
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       expect(aiButton).toBeInTheDocument();
     });
 
     it('should show alert when clicking AI without title', () => {
       // Mock window.alert
-      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
 
       render(
         <TestWrapper>
@@ -376,11 +377,11 @@ describe('TaskForm', () => {
         </TestWrapper>
       );
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
       expect(alertSpy).toHaveBeenCalledWith('Please enter a task title first to use AI assistance.');
-      
+
       alertSpy.mockRestore();
     });
 
@@ -398,12 +399,11 @@ describe('TaskForm', () => {
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       fireEvent.change(titleInput, { target: { value: 'Test Title' } });
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      expect(screen.getByText('AI Assistant')).toBeInTheDocument();
-      expect(screen.getByText('Choose an AI action to enhance your task:')).toBeInTheDocument();
-      expect(screen.getByText('Add Description')).toBeInTheDocument();
+      expect(screen.getByText('AI POWERED MAGIC')).toBeInTheDocument();
+      expect(screen.getByText('Generate Description')).toBeInTheDocument();
     });
 
     it('should hide AI options when cancel is clicked', () => {
@@ -420,19 +420,16 @@ describe('TaskForm', () => {
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       fireEvent.change(titleInput, { target: { value: 'Test Title' } });
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      expect(screen.getByText('AI Assistant')).toBeInTheDocument();
+      expect(screen.getByText('AI POWERED MAGIC')).toBeInTheDocument();
 
-      // Get the cancel button inside the AI options panel
-      const aiCancelButtons = screen.getAllByText('Cancel');
-      const aiCancelButton = aiCancelButtons.find(button => 
-        button.className.includes('px-2.5 py-1.5 text-xs')
-      );
-      fireEvent.click(aiCancelButton!);
+      // Get the dismiss button inside the AI options panel
+      const dismissButton = screen.getByText('Dismiss');
+      fireEvent.click(dismissButton);
 
-      expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument();
+      expect(screen.queryByText('AI POWERED MAGIC')).not.toBeInTheDocument();
     });
 
     it('should generate description using AI service', async () => {
@@ -452,10 +449,10 @@ describe('TaskForm', () => {
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       fireEvent.change(titleInput, { target: { value: 'Test Task Title' } });
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      const generateButton = screen.getByText('Add Description');
+      const generateButton = screen.getByText('Generate Description');
       fireEvent.click(generateButton);
 
       // Should show generating state
@@ -478,7 +475,7 @@ describe('TaskForm', () => {
       (openaiService.openaiService.generateTaskDescription as any).mockRejectedValue(new Error(errorMessage));
 
       // Mock window.alert
-      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
 
       render(
         <TestWrapper>
@@ -493,17 +490,17 @@ describe('TaskForm', () => {
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       fireEvent.change(titleInput, { target: { value: 'Test Task Title' } });
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      const generateButton = screen.getByText('Add Description');
+      const generateButton = screen.getByText('Generate Description');
       fireEvent.click(generateButton);
 
       await waitFor(() => {
         expect(alertSpy).toHaveBeenCalledWith(`Failed to generate description: ${errorMessage}`);
       });
 
-      expect(screen.getByText('Add Description')).toBeInTheDocument(); // Button should be back to normal state
+      expect(screen.getByText('Generate Description')).toBeInTheDocument(); // Button should be back to normal state
 
       alertSpy.mockRestore();
     });
@@ -528,10 +525,10 @@ describe('TaskForm', () => {
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       fireEvent.change(titleInput, { target: { value: 'Test Task Title' } });
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      const generateButton = screen.getByText('Add Description');
+      const generateButton = screen.getByText('Generate Description');
       fireEvent.click(generateButton);
 
       // Check that the button is disabled by looking for the button element, not the span
@@ -540,11 +537,11 @@ describe('TaskForm', () => {
 
       // Ensure Improve Grammar button is NOT showing processing state
       expect(screen.queryByText('Processing...')).not.toBeInTheDocument();
-      expect(screen.getByText('Improve Grammar')).toBeInTheDocument();
+      expect(screen.getByText('Refine Text')).toBeInTheDocument();
 
       // Resolve the promise
       resolvePromise!('Generated description');
-      
+
       await waitFor(() => {
         expect(screen.queryByText('Generating...')).not.toBeInTheDocument();
       });
@@ -570,14 +567,14 @@ describe('TaskForm', () => {
       const descriptionInput = screen.getByRole('textbox', { name: /description/i });
       fireEvent.change(descriptionInput, { target: { value: 'Bad grammar text' } });
 
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      const improveButton = screen.getByText('Improve Grammar');
+      const improveButton = screen.getByText('Refine Text');
       fireEvent.click(improveButton);
 
       // Should show processing state
-      expect(screen.getByText('Processing...')).toBeInTheDocument();
+      expect(screen.getByText('Improving...')).toBeInTheDocument();
 
       await waitFor(() => {
         expect(openaiService.openaiService.improveGrammar).toHaveBeenCalledWith('Bad grammar text', expect.any(String));
@@ -586,15 +583,15 @@ describe('TaskForm', () => {
       await waitFor(() => {
         expect(descriptionInput).toHaveValue(mockImproved);
       });
-      
+
       expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument();
     });
 
     it('should require description for grammar improvement', async () => {
-       /* Mock alert */
-       const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      /* Mock alert */
+      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
 
-       render(
+      render(
         <TestWrapper>
           <TaskForm
             isOpen={true}
@@ -606,18 +603,18 @@ describe('TaskForm', () => {
 
       const titleInput = screen.getByRole('textbox', { name: /title/i });
       fireEvent.change(titleInput, { target: { value: 'Test Title' } });
-      
+
       // Empty description
-      
-      const aiButton = screen.getByTitle('AI Assistant - Generate description');
+
+      const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      const improveButton = screen.getByText('Improve Grammar');
+      const improveButton = screen.getByText('Refine Text');
       fireEvent.click(improveButton);
-      
-      expect(alertSpy).toHaveBeenCalledWith('Please enter a description first to improve its grammar.');
+
+      expect(alertSpy).toHaveBeenCalledWith('Please enter a description first.');
       expect(openaiService.openaiService.improveGrammar).not.toHaveBeenCalled();
-      
+
       alertSpy.mockRestore();
     });
   });

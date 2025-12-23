@@ -24,14 +24,14 @@ export class TaskPage {
     this.descriptionInput = page.locator('#task-description');
     this.dueDateInput = page.locator('#task-due-date');
     this.statusSelect = page.locator('#task-status');
-    // The actual buttons are "Save" and "Cancel"
-    this.createButton = page.getByRole('button', { name: 'Save' });
-    this.updateButton = page.getByRole('button', { name: 'Save' });
-    this.cancelButton = page.getByRole('button', { name: 'Cancel' });
-    this.closeButton = page.getByRole('button').filter({ hasText: '' }); // X button has no text
-    this.aiButton = page.getByTitle('AI Assistant - Generate description');
-    this.aiGenerateButton = page.getByText('Add Description');
-    this.aiCancelButton = page.locator('button').filter({ hasText: 'Cancel' }).last(); // AI panel cancel button
+    // The actual buttons are "Create Task", "Update Task", "Cancel", and "Dismiss" (inside AI)
+    this.createButton = page.getByRole('button', { name: /create task/i });
+    this.updateButton = page.getByRole('button', { name: /update task/i });
+    this.cancelButton = page.getByRole('button', { name: /cancel/i }).first();
+    this.closeButton = page.getByRole('button', { name: /close modal/i });
+    this.aiButton = page.getByTitle('AI Assistant');
+    this.aiGenerateButton = page.getByText('Generate Description');
+    this.aiCancelButton = page.getByText('Dismiss');
   }
 
   async verifyModalOpen() {
@@ -49,15 +49,15 @@ export class TaskPage {
     status?: string;
   }) {
     await this.titleInput.fill(data.title);
-    
+
     if (data.description) {
       await this.descriptionInput.fill(data.description);
     }
-    
+
     if (data.dueDate) {
       await this.dueDateInput.fill(data.dueDate);
     }
-    
+
     if (data.status) {
       await this.statusSelect.selectOption(data.status);
     }
@@ -83,21 +83,21 @@ export class TaskPage {
       await this.titleInput.clear();
       await this.titleInput.fill(data.title);
     }
-    
+
     if (data.description !== undefined) {
       await this.descriptionInput.clear();
       await this.descriptionInput.fill(data.description);
     }
-    
+
     if (data.dueDate !== undefined) {
       await this.dueDateInput.clear();
       await this.dueDateInput.fill(data.dueDate);
     }
-    
+
     if (data.status) {
       await this.statusSelect.selectOption(data.status);
     }
-    
+
     await this.updateButton.click();
   }
 
@@ -129,15 +129,15 @@ export class TaskPage {
     if (data.title !== undefined) {
       await expect(this.titleInput).toHaveValue(data.title);
     }
-    
+
     if (data.description !== undefined) {
       await expect(this.descriptionInput).toHaveValue(data.description);
     }
-    
+
     if (data.dueDate !== undefined) {
       await expect(this.dueDateInput).toHaveValue(data.dueDate);
     }
-    
+
     if (data.status !== undefined) {
       await expect(this.statusSelect).toHaveValue(data.status);
     }

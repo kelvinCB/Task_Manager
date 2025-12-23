@@ -92,15 +92,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl w-full max-w-md max-h-[90vh] flex flex-col`}>
+      <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl w-full max-w-md md:max-w-4xl max-h-[90vh] flex flex-col transition-all duration-300`}>
         {/* Header */}
-        <div className={`flex items-center justify-between p-6 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className={`text-lg font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-            {task ? 'Edit Task' : 'Create New Task'}
-          </h2>
+        <div className={`relative flex items-center justify-center p-6 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-indigo-900/50 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+              <Tag size={20} />
+            </div>
+            <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+              {task ? 'Edit Task' : 'Create New Task'}
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            className={`p-1 rounded transition-colors duration-200 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+            className={`absolute right-6 p-2 rounded-full transition-all duration-200 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+            aria-label="Close modal"
           >
             <X size={20} />
           </button>
@@ -108,273 +114,249 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className={`flex flex-col overflow-hidden ${theme === 'dark' ? 'text-gray-200' : ''}`}>
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {/* Title */}
-            <div>
-              <label htmlFor="task-title" className={`flex items-center gap-2 text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                <FileText size={16} />
-                Title
-              </label>
-              <input
-                id="task-title"
-                type="text"
-                value={formData.title}
-                onChange={(e) => {
-                  setFormData(prev => ({ ...prev, title: e.target.value }));
-                  if (validationError) setValidationError(''); // Clear error when user types
-                }}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${validationError ? 'border-red-500' : theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} ${theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-white'}`}
-                placeholder="Enter task title..."
-                required
-              />
-              {validationError && (
-                <p className="mt-1 text-sm text-red-500" role="alert">{validationError}</p>
-              )}
-            </div>
-
-            {/* Description */}
-            <div>
-              <label htmlFor="task-description" className={`flex items-center gap-2 text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                <FileText size={16} />
-                Description
-              </label>
-              <div className="relative">
-                <textarea
-                  id="task-description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className={`w-full px-3 py-2 pr-16 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 min-h-[100px] resize-none ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white'}`}
-                  placeholder="Enter task description..."
-                ></textarea>
-                {/* AI Icon */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (formData.title.trim()) {
-                      setShowAIOptions(!showAIOptions);
-                    } else {
-                      // Optionally show a tooltip or alert that title is required
-                      alert('Please enter a task title first to use AI assistance.');
-                    }
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="space-y-6">
+              {/* Title */}
+              <div>
+                <label htmlFor="task-title" className={`flex items-center gap-2 text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <FileText size={16} className="text-indigo-500" />
+                  Title
+                </label>
+                <input
+                  id="task-title"
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, title: e.target.value }));
+                    if (validationError) setValidationError('');
                   }}
-                  className={`absolute bottom-2 right-2 p-1.5 rounded-lg transition-all duration-200 hover:scale-110 ${theme === 'dark' ? 'hover:bg-gray-600 hover:bg-opacity-50' : 'hover:bg-gray-100 hover:bg-opacity-50'}`}
-                  title="AI Assistant - Generate description"
-                >
-                  <AIIcon size={24} animated={true} />
-                </button>
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-lg font-medium ${validationError ? 'border-red-500 bg-red-50/10' : theme === 'dark' ? 'border-gray-600 bg-gray-700/50 hover:bg-gray-700' : 'border-gray-300 bg-gray-50/50 hover:bg-white focus:bg-white'}`}
+                  placeholder="What needs to be done?"
+                  required
+                />
+                {validationError && (
+                  <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1" role="alert">
+                    <span className="w-1 h-1 bg-red-500 rounded-full"></span>
+                    {validationError}
+                  </p>
+                )}
               </div>
 
-              {/* AI Options UI */}
-              {showAIOptions && formData.title.trim() && (
-                <div className={`mt-3 p-4 rounded-lg border transition-all duration-300 ${theme === 'dark' ? 'bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200'}`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center gap-2">
-                      <AIIcon size={20} animated={true} />
-                      <h3 className={`text-sm font-semibold ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-700'}`}>
-                        AI Assistant
+              {/* Description */}
+              <div>
+                <label htmlFor="task-description" className={`flex items-center gap-2 text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <FileText size={16} className="text-indigo-500" />
+                  Description
+                </label>
+                <div className="relative group">
+                  <textarea
+                    id="task-description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 min-h-[320px] resize-none ${theme === 'dark' ? 'border-gray-600 bg-gray-700/50 text-gray-100 hover:bg-gray-700' : 'border-gray-300 bg-gray-50/50 hover:bg-white focus:bg-white'}`}
+                    placeholder="Add more details about this task..."
+                  ></textarea>
+
+                  {/* AI Icon - Better positioning and style */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (formData.title.trim()) {
+                        setShowAIOptions(!showAIOptions);
+                      } else {
+                        alert('Please enter a task title first to use AI assistance.');
+                      }
+                    }}
+                    className={`absolute bottom-4 right-4 p-2 rounded-xl transition-all duration-300 shadow-lg hover:scale-110 active:scale-95 ${theme === 'dark' ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                    title="AI Assistant"
+                  >
+                    <AIIcon size={20} animated={true} />
+                  </button>
+                </div>
+
+                {/* AI Options UI - More integrated look */}
+                {showAIOptions && formData.title.trim() && (
+                  <div className={`mt-4 p-5 rounded-xl border-2 animate-in fade-in slide-in-from-top-2 duration-300 ${theme === 'dark' ? 'bg-gray-700/50 border-indigo-500/30' : 'bg-indigo-50/50 border-indigo-200'}`}>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`p-1.5 rounded-lg ${theme === 'dark' ? 'bg-indigo-900/50' : 'bg-white shadow-sm'}`}>
+                        <AIIcon size={18} animated={true} />
+                      </div>
+                      <h3 className={`text-sm font-bold tracking-tight ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-800'}`}>
+                        AI POWERED MAGIC
                       </h3>
+                      <div className={`flex-1 h-px ${theme === 'dark' ? 'bg-indigo-500/20' : 'bg-indigo-200'}`}></div>
                     </div>
-                    <div className={`flex-1 h-px ${theme === 'dark' ? 'bg-indigo-700' : 'bg-indigo-200'}`}></div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setAiProcessingState('generating');
+                          try {
+                            const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+                            const generatedDescription = await openaiService.generateTaskDescription(formData.title, model);
+                            setFormData(prev => ({ ...prev, description: generatedDescription }));
+                            setShowAIOptions(false);
+                          } catch (error) {
+                            console.error('Error generating AI description:', error);
+                            alert(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                          } finally {
+                            setAiProcessingState('idle');
+                          }
+                        }}
+                        disabled={aiProcessingState !== 'idle'}
+                        className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        {aiProcessingState === 'generating' ? (
+                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Generating...</>
+                        ) : (
+                          <><AIIcon size={14} />Generate Description</>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!formData.description.trim()) {
+                            alert('Please enter a description first.');
+                            return;
+                          }
+                          setAiProcessingState('improving');
+                          try {
+                            const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+                            const improvedDescription = await openaiService.improveGrammar(formData.description, model);
+                            setFormData(prev => ({ ...prev, description: improvedDescription }));
+                            setShowAIOptions(false);
+                          } catch (error) {
+                            console.error('Error improving grammar:', error);
+                            alert(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                          } finally {
+                            setAiProcessingState('idle');
+                          }
+                        }}
+                        disabled={aiProcessingState !== 'idle'}
+                        className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        {aiProcessingState === 'improving' ? (
+                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Improving...</>
+                        ) : (
+                          <><AIIcon size={14} />Refine Text</>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowAIOptions(false)}
+                        className={`text-xs font-semibold px-3 py-2 rounded-lg transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-600' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'}`}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
                   </div>
+                )}
+              </div>
 
-                  <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Choose an AI action to enhance your task:
-                  </p>
+              {/* Attachments */}
+              <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-900/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                <label className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <Tag size={16} className="text-indigo-500" />
+                  Attachments
+                </label>
+                <FileUploader
+                  onUploadComplete={(result: UploadResult) => {
+                    const newAttachment: Attachment = {
+                      name: result.file.name,
+                      url: result.file.url,
+                      type: result.file.mimetype.startsWith('image/') ? 'image' : result.file.mimetype.startsWith('video/') ? 'video' : 'file'
+                    };
+                    setFormData(prev => ({ ...prev, attachments: [...prev.attachments, newAttachment] }));
+                  }}
+                  onError={(msg) => setValidationError(msg)}
+                />
+                <div className="mt-4">
+                  <AttachmentList
+                    attachments={formData.attachments}
+                    onDelete={(index) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        attachments: prev.attachments.filter((_, i) => i !== index)
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setAiProcessingState('generating');
-                        try {
-                          const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
-                          const generatedDescription = await openaiService.generateTaskDescription(formData.title, model);
-                          setFormData(prev => ({
-                            ...prev,
-                            description: generatedDescription
-                          }));
-                          setShowAIOptions(false);
-                        } catch (error) {
-                          console.error('Error generating AI description:', error);
-                          alert(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                        } finally {
-                          setAiProcessingState('idle');
-                        }
-                      }}
-                      disabled={aiProcessingState !== 'idle'}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg font-medium transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:opacity-70 ${theme === 'dark'
-                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-md'
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-md'
-                        }`}
-                    >
-                      {aiProcessingState === 'generating' ? (
-                        <>
-                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Generating...</span>
-                        </>
-                      ) : (
-                        <>
-                          <AIIcon size={14} />
-                          <span>Add Description</span>
-                        </>
-                      )}
-                    </button>
+              {/* Status and Due Date Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Status Section */}
+                <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
+                  <label htmlFor="task-status" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Tag size={16} className="text-indigo-500" />
+                    Status
+                  </label>
+                  <select
+                    id="task-status"
+                    value={formData.status}
+                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as TaskStatus }))}
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
+                  >
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                  </select>
+                </div>
 
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        if (!formData.description.trim()) {
-                          alert('Please enter a description first to improve its grammar.');
-                          return;
-                        }
+                {/* Due Date Section */}
+                <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
+                  <label htmlFor="task-due-date" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Calendar size={16} className="text-indigo-500" />
+                    Due Date
+                  </label>
+                  <input
+                    id="task-due-date"
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
+                  />
+                </div>
+              </div>
 
-                        setAiProcessingState('improving');
-                        try {
-                          const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
-                          const improvedDescription = await openaiService.improveGrammar(formData.description, model);
-                          setFormData(prev => ({
-                            ...prev,
-                            description: improvedDescription
-                          }));
-                          setShowAIOptions(false);
-                        } catch (error) {
-                          console.error('Error improving grammar:', error);
-                          alert(`Failed to improve grammar: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                        } finally {
-                          setAiProcessingState('idle');
-                        }
-                      }}
-                      disabled={aiProcessingState !== 'idle'}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg font-medium transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:opacity-70 ${theme === 'dark'
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md'
-                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-md'
-                        }`}
-                    >
-                      {aiProcessingState === 'improving' ? (
-                        <>
-                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Processing...</span>
-                        </>
-                      ) : (
-                        <>
-                          <AIIcon size={14} />
-                          <span>Improve Grammar</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setShowAIOptions(false)}
-                      className={`px-2.5 py-1.5 text-xs rounded-lg transition-colors duration-200 ${theme === 'dark'
-                        ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                        }`}
-                    >
-                      Cancel
-                    </button>
+              {/* Info / Subtask Panel */}
+              {parentId && (
+                <div className={`p-5 rounded-xl border animate-pulse-slow ${theme === 'dark' ? 'bg-indigo-900/20 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'}`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`p-1.5 rounded-lg mt-0.5 ${theme === 'dark' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white text-indigo-600'}`}>
+                      <Tag size={14} />
+                    </div>
+                    <div>
+                      <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-800'}`}>
+                        Subtask Mode
+                      </p>
+                      <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-indigo-300/80' : 'text-indigo-700/80'}`}>
+                        This task will be nested under its parent.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
-
-            {/* Status */}
-            <div>
-              <label htmlFor="task-status" className={`flex items-center gap-2 text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                <Tag size={16} />
-                Status
-              </label>
-              <select
-                id="task-status"
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as TaskStatus }))}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white'}`}
-              >
-                <option value="Open" className={theme === 'dark' ? 'bg-gray-700 text-gray-100' : ''}>Open</option>
-                <option value="In Progress" className={theme === 'dark' ? 'bg-gray-700 text-gray-100' : ''}>In Progress</option>
-                <option value="Done" className={theme === 'dark' ? 'bg-gray-700 text-gray-100' : ''}>Done</option>
-              </select>
-            </div>
-
-            {/* Due Date */}
-            <div>
-              <label htmlFor="task-due-date" className={`flex items-center gap-2 text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                <Calendar size={16} />
-                Due Date (Optional)
-              </label>
-              <input
-                id="task-due-date"
-                type="date"
-                value={formData.dueDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white'}`}
-              />
-            </div>
-
-            {/* Attachments (File Upload) */}
-            <div>
-              <label className={`flex items-center gap-2 text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                <Tag size={16} /> {/* Reusing Tag icon for now or better Paperclip if available in imports */}
-                Attachments
-              </label>
-              <FileUploader
-                onUploadComplete={(result: UploadResult) => {
-                  const newAttachment: Attachment = {
-                    name: result.file.name,
-                    url: result.file.url,
-                    type: result.file.mimetype.startsWith('image/') ? 'image' : result.file.mimetype.startsWith('video/') ? 'video' : 'file'
-                  };
-
-                  setFormData(prev => ({
-                    ...prev,
-                    attachments: [...prev.attachments, newAttachment]
-                  }));
-                }}
-                onError={(msg) => setValidationError(msg)}
-              />
-
-              <div className="mt-2">
-                <AttachmentList
-                  attachments={formData.attachments}
-                  onDelete={(index) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      attachments: prev.attachments.filter((_, i) => i !== index)
-                    }));
-                  }}
-                />
-              </div>
-            </div>
-
-
-
-            {/* Parent Info - Moved inside scrollable area if desired, or keep outside. 
-              Based on plan, we wrap inputs. Parent Info is part of inputs effectively.
-          */}
-            {parentId && (
-              <div className={`mx-6 mb-4 rounded-lg p-3 ${theme === 'dark' ? 'bg-blue-900 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
-                <p className={`text-sm ${theme === 'dark' ? 'text-blue-300' : 'text-blue-800'}`}>
-                  This task will be created as a subtask.
-                </p>
-              </div>
-            )}
-
           </div>
 
           {/* Actions */}
-          <div className={`p-6 bg-inherit flex justify-end gap-3 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className={`p-6 flex justify-end gap-3 border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] ${theme === 'dark' ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50/50'}`}>
             <button
               type="button"
               onClick={onClose}
-              className={`px-4 py-2 rounded-lg transition-colors duration-200 ${theme === 'dark' ? 'text-gray-300 bg-gray-700 hover:bg-gray-600' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'}`}
+              className={`px-6 py-2.5 rounded-xl font-bold transition-all active:scale-95 ${theme === 'dark' ? 'text-gray-300 bg-gray-700 hover:bg-gray-600 hover:text-white' : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 hover:border-gray-300 shadow-sm'}`}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className={`px-4 py-2 text-white rounded-lg transition-colors duration-200 ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+              className={`px-8 py-2.5 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition-all active:translate-y-0.5 active:shadow-none ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-600 hover:bg-indigo-700'}`}
             >
-              Save
+              {task ? 'Update Task' : 'Create Task'}
             </button>
           </div>
         </form>
