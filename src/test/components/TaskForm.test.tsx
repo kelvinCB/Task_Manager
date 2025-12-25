@@ -5,6 +5,13 @@ import { TaskForm } from '../../components/TaskForm';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import { Task, TaskStatus } from '../../types/Task';
 import * as openaiService from '../../services/openaiService';
+import { useAuth } from '../../contexts/AuthContext';
+import { BrowserRouter } from 'react-router-dom';
+
+// Mock the contexts
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
+}));
 
 // Mock the OpenAI service
 vi.mock('../../services/openaiService', () => ({
@@ -43,9 +50,11 @@ const mockTask: Task = {
 };
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ThemeProvider>
-    {children}
-  </ThemeProvider>
+  <BrowserRouter>
+    <ThemeProvider>
+      {children}
+    </ThemeProvider>
+  </BrowserRouter>
 );
 
 describe('TaskForm', () => {
@@ -54,6 +63,7 @@ describe('TaskForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    (useAuth as any).mockReturnValue({ isAuthenticated: true });
   });
 
   describe('Rendering', () => {
@@ -363,10 +373,7 @@ describe('TaskForm', () => {
       expect(aiButton).toBeInTheDocument();
     });
 
-    it('should show alert when clicking AI without title', () => {
-      // Mock window.alert
-      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
-
+    it('should show validation error when clicking AI without title', () => {
       render(
         <TestWrapper>
           <TaskForm
@@ -380,9 +387,7 @@ describe('TaskForm', () => {
       const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      expect(alertSpy).toHaveBeenCalledWith('Please enter a task title first to use AI assistance.');
-
-      alertSpy.mockRestore();
+      expect(screen.getByText('Please enter a task title first to use AI assistance.')).toBeInTheDocument();
     });
 
     it('should show AI options when title is provided and AI button is clicked', () => {
@@ -537,7 +542,7 @@ describe('TaskForm', () => {
 
       // Ensure Improve Grammar button is NOT showing processing state
       expect(screen.queryByText('Processing...')).not.toBeInTheDocument();
-      expect(screen.getByText('Refine Text')).toBeInTheDocument();
+      expect(screen.getByText('Improve Grammar')).toBeInTheDocument();
 
       // Resolve the promise
       resolvePromise!('Generated description');
@@ -570,7 +575,7 @@ describe('TaskForm', () => {
       const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      const improveButton = screen.getByText('Refine Text');
+      const improveButton = screen.getByText('Improve Grammar');
       fireEvent.click(improveButton);
 
       // Should show processing state
@@ -609,13 +614,71 @@ describe('TaskForm', () => {
       const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      const improveButton = screen.getByText('Refine Text');
+      const improveButton = screen.getByText('Improve Grammar');
       fireEvent.click(improveButton);
 
       expect(alertSpy).toHaveBeenCalledWith('Please enter a description first.');
       expect(openaiService.openaiService.improveGrammar).not.toHaveBeenCalled();
 
       alertSpy.mockRestore();
+    });
+
+    it('should show AuthRequiredModal when generating description while unauthenticated', async () => {
+      // Set unauthenticated state
+      (useAuth as any).mockReturnValue({ isAuthenticated: false });
+
+      render(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const titleInput = screen.getByRole('textbox', { name: /title/i });
+      fireEvent.change(titleInput, { target: { value: 'Test Task Title' } });
+
+      const aiButton = screen.getByTitle('AI Assistant');
+      fireEvent.click(aiButton);
+
+      // Should show AuthRequiredModal immediately
+      expect(screen.getByText('Unlock AI Power')).toBeInTheDocument();
+      expect(screen.getByText(/Unlock the power of AI to supercharge your productivity/)).toBeInTheDocument();
+
+      // OpenAI service should NOT have been called
+      expect(openaiService.openaiService.generateTaskDescription).not.toHaveBeenCalled();
+    });
+
+    it('should show AuthRequiredModal when improving grammar while unauthenticated', async () => {
+      // Set unauthenticated state
+      (useAuth as any).mockReturnValue({ isAuthenticated: false });
+
+      render(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const titleInput = screen.getByRole('textbox', { name: /title/i });
+      fireEvent.change(titleInput, { target: { value: 'Test Title' } });
+
+      const descriptionInput = screen.getByRole('textbox', { name: /description/i });
+      fireEvent.change(descriptionInput, { target: { value: 'Some text' } });
+
+      const aiButton = screen.getByTitle('AI Assistant');
+      fireEvent.click(aiButton);
+
+      // Should show AuthRequiredModal immediately
+      expect(screen.getByText('Unlock AI Power')).toBeInTheDocument();
+
+      // OpenAI service should NOT have been called
+      expect(openaiService.openaiService.improveGrammar).not.toHaveBeenCalled();
     });
   });
 
@@ -679,6 +742,46 @@ describe('TaskForm', () => {
       );
 
       expect(titleInput).toHaveValue('');
+    });
+
+    it('should clear validation error when modal is reopened', () => {
+      const { rerender } = render(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const aiButton = screen.getByTitle('AI Assistant');
+      fireEvent.click(aiButton);
+      expect(screen.getByText('Please enter a task title first to use AI assistance.')).toBeInTheDocument();
+
+      // Close modal
+      rerender(
+        <TestWrapper>
+          <TaskForm
+            isOpen={false}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      // Reopen modal
+      rerender(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      expect(screen.queryByText('Please enter a task title first to use AI assistance.')).not.toBeInTheDocument();
     });
   });
 });

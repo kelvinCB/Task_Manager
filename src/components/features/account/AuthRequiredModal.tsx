@@ -6,7 +6,7 @@ import { X, LogIn, UserPlus, Sparkles } from 'lucide-react';
 interface AuthRequiredModalProps {
     isOpen: boolean;
     onClose: () => void;
-    actionType: 'export' | 'import';
+    actionType: 'export' | 'import' | 'ai';
 }
 
 export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
@@ -36,8 +36,15 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
         onClose();
     };
 
+    const getMessage = () => {
+        if (actionType === 'ai') {
+            return "Unlock the power of AI to supercharge your productivity. Please sign in to use AI features.";
+        }
+        return `Please sign in to ${actionType} your tasks and keep everything in sync.`;
+    };
+
     return (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
             <div
                 className={`relative w-full max-w-sm rounded-2xl shadow-2xl transform transition-all duration-300 ${isAnimating ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
                     } ${theme === 'dark'
@@ -72,9 +79,11 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
                         </div>
 
                         <div className="space-y-2">
-                            <h2 className="text-2xl font-extrabold tracking-tight">Unlock Full Potential</h2>
+                            <h2 className="text-2xl font-extrabold tracking-tight">
+                                {actionType === 'ai' ? 'Unlock AI Power' : 'Unlock Full Potential'}
+                            </h2>
                             <p className={`text-base font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                                Please sign in to {actionType} your tasks and keep everything in sync.
+                                {getMessage()}
                             </p>
                         </div>
                     </div>

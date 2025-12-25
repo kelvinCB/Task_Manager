@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Task, TaskStatus } from '../types/Task';
 import { X, Calendar, FileText, Tag } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { AIIcon } from './AIIcon';
 import { openaiService } from '../services/openaiService';
 import { FileUploader } from './FileUploader';
 import { UploadResult } from '../services/taskService';
 import { extractAttachments, formatDescriptionWithAttachments, Attachment } from '../utils/attachmentUtils';
 import { AttachmentList } from './AttachmentList';
+import { AuthRequiredModal } from './features/account/AuthRequiredModal';
 
 interface TaskFormProps {
   task?: Task;
@@ -25,6 +27,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onSubmit
 }) => {
   const { theme } = useTheme();
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -34,10 +37,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     parentId: parentId || ''
   });
   const [showAIOptions, setShowAIOptions] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [aiProcessingState, setAiProcessingState] = useState<'idle' | 'generating' | 'improving'>('idle');
   const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
+    setValidationError('');
+    setShowAIOptions(false);
     if (task) {
       const { text, attachments } = extractAttachments(task.description);
       setFormData({
@@ -58,7 +64,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         attachments: []
       });
     }
-  }, [task, parentId]);
+  }, [task, parentId, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,14 +166,20 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   {/* AI Icon - Better positioning and style */}
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isAuthenticated) {
+                        setIsAuthModalOpen(true);
+                        return;
+                      }
                       if (formData.title.trim()) {
                         setShowAIOptions(!showAIOptions);
                       } else {
-                        alert('Please enter a task title first to use AI assistance.');
+                        setValidationError('Please enter a task title first to use AI assistance.');
+                        document.getElementById('task-title')?.focus();
                       }
                     }}
-                    className={`absolute bottom-4 right-4 p-2 rounded-xl transition-all duration-300 shadow-lg hover:scale-110 active:scale-95 ${theme === 'dark' ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                    className={`absolute bottom-4 right-4 p-2 rounded-xl transition-all duration-300 shadow-lg hover:scale-110 active:scale-95 z-20 cursor-pointer ${theme === 'dark' ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
                     title="AI Assistant"
                   >
                     <AIIcon size={20} animated={true} />
@@ -175,8 +187,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 </div>
 
                 {/* AI Options UI - More integrated look */}
-                {showAIOptions && formData.title.trim() && (
-                  <div className={`mt-4 p-5 rounded-xl border-2 animate-in fade-in slide-in-from-top-2 duration-300 ${theme === 'dark' ? 'bg-gray-700/50 border-indigo-500/30' : 'bg-indigo-50/50 border-indigo-200'}`}>
+                {showAIOptions && (
+                  <div className={`mt-4 p-5 rounded-xl border-2 animate-in fade-in slide-in-from-top-2 duration-300 relative z-30 ${theme === 'dark' ? 'bg-gray-700/50 border-indigo-500/30' : 'bg-indigo-50/50 border-indigo-200'}`}>
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`p-1.5 rounded-lg ${theme === 'dark' ? 'bg-indigo-900/50' : 'bg-white shadow-sm'}`}>
                         <AIIcon size={18} animated={true} />
@@ -191,6 +203,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       <button
                         type="button"
                         onClick={async () => {
+                          if (!isAuthenticated) {
+                            setIsAuthModalOpen(true);
+                            return;
+                          }
                           setAiProcessingState('generating');
                           try {
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
@@ -217,6 +233,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       <button
                         type="button"
                         onClick={async () => {
+                          if (!isAuthenticated) {
+                            setIsAuthModalOpen(true);
+                            return;
+                          }
                           if (!formData.description.trim()) {
                             alert('Please enter a description first.');
                             return;
@@ -240,7 +260,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         {aiProcessingState === 'improving' ? (
                           <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Improving...</>
                         ) : (
-                          <><AIIcon size={14} />Refine Text</>
+                          <><AIIcon size={14} />Improve Grammar</>
                         )}
                       </button>
 
@@ -255,6 +275,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   </div>
                 )}
               </div>
+
+
 
               {/* Attachments */}
               <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-900/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
@@ -360,6 +382,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </button>
           </div>
         </form>
+
+        {/* Auth Required Modal for AI - Moved outside form for better stacking */}
+        <AuthRequiredModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          actionType="ai"
+        />
       </div>
     </div>
   );
