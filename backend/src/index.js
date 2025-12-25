@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Request logging for debugging
 app.use((req, res, next) => {
-  console.log('Incoming request:', req.method, req.url); 
+  console.log('Incoming request:', req.method, req.url);
   next();
 });
 
@@ -26,11 +26,13 @@ const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const timeEntryRoutes = require('./routes/timeEntries');
 const uploadRoutes = require('./routes/upload');
+const profileRoutes = require('./routes/profile');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/time-entries', timeEntryRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.get('/', (req, res) => {
   res.send('Task Manager Backend is running!');
@@ -49,5 +51,5 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   // Keep process alive
-  setInterval(() => {}, 60000);
+  setInterval(() => { }, 60000);
 });

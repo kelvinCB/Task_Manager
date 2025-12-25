@@ -80,10 +80,82 @@ export const useUserProfile = () => {
     }
   };
 
+  const uploadAvatar = async (file: File) => {
+    if (!isAuthenticated || !user) {
+      throw new Error('User must be authenticated to upload an avatar');
+    }
+
+    try {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/profile/avatar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload avatar');
+      }
+
+      const result = await response.json();
+      setProfile(result.profile);
+      return result.profile;
+    } catch (err: any) {
+      console.error('Error uploading avatar:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteAvatar = async () => {
+    if (!isAuthenticated || !user) {
+      throw new Error('User must be authenticated to delete an avatar');
+    }
+
+    try {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/profile/avatar`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete avatar');
+      }
+
+      const result = await response.json();
+      setProfile(result.profile);
+      return result.profile;
+    } catch (err: any) {
+      console.error('Error deleting avatar:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     profile,
     loading,
     error,
-    updateProfile
+    updateProfile,
+    uploadAvatar,
+    deleteAvatar
   };
 };

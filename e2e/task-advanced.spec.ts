@@ -103,8 +103,11 @@ test.describe('Task Advanced Features', () => {
     await appPage.openAddTaskModal();
     await taskPage.verifyModalOpen();
 
+    const timestamp = Date.now();
+    const uniqueTitle = `Test AI timeout handling ${timestamp}`;
+
     // Fill title
-    await taskPage.titleInput.fill('Test AI timeout handling');
+    await taskPage.titleInput.fill(uniqueTitle);
 
     // Click AI assistant button
     await taskPage.aiButton.click();
@@ -122,20 +125,22 @@ test.describe('Task Advanced Features', () => {
 
     // Verify we're still in the main task form
     await expect(taskPage.titleInput).toBeVisible();
-    await expect(taskPage.titleInput).toHaveValue('Test AI timeout handling');
+    await expect(taskPage.titleInput).toHaveValue(uniqueTitle);
 
     // Description field should be visible and ready
     await expect(taskPage.descriptionInput).toBeVisible();
 
+    const uniqueDescription = 'Manual description after AI cancel ' + timestamp;
+
     // Manually add description
-    await taskPage.descriptionInput.fill('Manual description after AI cancel');
+    await taskPage.descriptionInput.fill(uniqueDescription);
 
     // Save the task
     await taskPage.createButton.click();
     await taskPage.verifyModalClosed();
 
     // Verify task was created with manual description
-    await expect(appPage.page.getByText('Test AI timeout handling')).toBeVisible();
-    await expect(appPage.page.getByText('Manual description after AI cancel')).toBeVisible();
+    await expect(appPage.page.getByText(uniqueTitle)).toBeVisible();
+    await expect(appPage.page.getByText(uniqueDescription)).toBeVisible();
   });
 });

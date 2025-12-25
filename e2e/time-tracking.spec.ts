@@ -89,20 +89,23 @@ test.describe('Time Tracking', () => {
     await appPage.page.waitForTimeout(2000); // Give it a bit more time for the UI to settle
 
     // Create a task and record time
+    const timestamp = Date.now();
+    const uniqueTitle = `Export Test Task Unique ${timestamp}`;
+
     await appPage.openAddTaskModal();
     await taskPage.createTask({
-      title: 'Export Test Task Unique',
+      title: uniqueTitle,
       description: 'Task for testing data export'
     });
 
     // Wait for the task to be visible and stable
-    const taskCard = appPage.page.locator('.group').filter({ hasText: 'Export Test Task Unique' });
+    const taskCard = appPage.page.locator('.group').filter({ hasText: uniqueTitle }).first();
     await expect(taskCard).toBeVisible();
     await appPage.page.waitForTimeout(1000);
 
-    await timerPage.startTimer('Export Test Task Unique');
+    await timerPage.startTimer(uniqueTitle);
     await appPage.page.waitForTimeout(5000);
-    await timerPage.pauseTimer('Export Test Task Unique');
+    await timerPage.pauseTimer(uniqueTitle);
 
     // Brief wait to ensure session/state is stable
     await appPage.page.waitForTimeout(2000);
