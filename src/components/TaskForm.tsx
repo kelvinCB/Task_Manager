@@ -39,6 +39,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [showAIOptions, setShowAIOptions] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [aiProcessingState, setAiProcessingState] = useState<'idle' | 'generating' | 'improving'>('idle');
+  const [thinkingProcess, setThinkingProcess] = useState('');
+  const [isThinkingExpanded, setIsThinkingExpanded] = useState(true);
   const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
@@ -199,6 +201,24 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       <div className={`flex-1 h-px ${theme === 'dark' ? 'bg-indigo-500/20' : 'bg-indigo-200'}`}></div>
                     </div>
 
+                    {/* Thinking Process Accordion */}
+                    {aiProcessingState === 'generating' && (
+                      <div className="mb-4">
+                        <button
+                          type="button"
+                          onClick={() => setIsThinkingExpanded(!isThinkingExpanded)}
+                          className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider mb-2 ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-700'}`}
+                        >
+                          {isThinkingExpanded ? '▼' : '▶'} Thinking Process
+                        </button>
+                         {isThinkingExpanded && (
+                          <div className={`p-3 rounded-lg text-sm font-mono max-h-40 overflow-y-auto ${theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border border-gray-600' : 'bg-white text-gray-600 border border-gray-200'}`}>
+                            {thinkingProcess ? thinkingProcess : <span className="animate-pulse">Thinking...</span>}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap items-center gap-3">
                       <button
                         type="button"
@@ -208,10 +228,58 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             return;
                           }
                           setAiProcessingState('generating');
+                          setThinkingProcess('');
+                          setIsThinkingExpanded(true);
+                          
+                          let fullResponse = '';
+                          
                           try {
-                            const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
-                            const generatedDescription = await openaiService.generateTaskDescription(formData.title, model);
-                            setFormData(prev => ({ ...prev, description: generatedDescription }));
+                            // Reset description if we are generating a new one? 
+                            // Or append? Usually "Generate" implies replacing or filling empty.
+                            // Let's clear it if the user explicitely asked to generate.
+                            // But usually we might want to keep what they wrote. 
+                            // The current flow replaces it at the end. For streaming, we should probably clear strictly if we stream directly into it.
+                            // However, let's keep it safe: We will populate formData.description as we receive the "final" part.
+                            
+                            // Strategy: parsing on the fly
+                            
+                            const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
+                            
+                            // We need to clear description to show the stream effect clearly
+                            setFormData(prev => ({ ...prev, description: '' }));
+
+                            let hasFoundStartTag = false;
+                            
+                            await openaiService.generateTaskDescription(formData.title, model, (token) => {
+                              fullResponse += token;
+                              
+                              const thinkingStartIdx = fullResponse.indexOf('<thinking>');
+                              const thinkingEndIdx = fullResponse.indexOf('</thinking>');
+
+                              if (thinkingStartIdx !== -1) {
+                                hasFoundStartTag = true;
+                                const contentStart = thinkingStartIdx + '<thinking>'.length;
+                                if (thinkingEndIdx !== -1) {
+                                  setThinkingProcess(fullResponse.substring(contentStart, thinkingEndIdx));
+                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + '</thinking>'.length);
+                                  setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                                } else {
+                                  setThinkingProcess(fullResponse.substring(contentStart));
+                                }
+                              } else {
+                                // If no start tag found yet, show raw response in thinking area to see what's happening
+                                if (!hasFoundStartTag) {
+                                  setThinkingProcess(fullResponse);
+                                }
+                                
+                                if (fullResponse.length > 50 && !fullResponse.includes('<thinking>')) {
+                                  setFormData(prev => ({ ...prev, description: fullResponse }));
+                                }
+                              }
+                            });
+                            
+                            // Final cleanup/formatting after stream ends
+                            // (Handled by the fact that promise resolves with full string, but we rely on callback)
                             setShowAIOptions(false);
                           } catch (error) {
                             console.error('Error generating AI description:', error);
@@ -243,7 +311,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           }
                           setAiProcessingState('improving');
                           try {
-                            const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
+                            const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
                             const improvedDescription = await openaiService.improveGrammar(formData.description, model);
                             setFormData(prev => ({ ...prev, description: improvedDescription }));
                             setShowAIOptions(false);

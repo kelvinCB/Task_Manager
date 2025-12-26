@@ -42,7 +42,15 @@ export class OpenAIService {
   /**
    * Generate a task description based on the task title
    */
-  async generateTaskDescription(taskTitle: string, model: string = 'gpt-4o'): Promise<string> {
+  /**
+   * Generate a task description based on the task title
+   * Supports streaming if onToken callback is provided
+   */
+  async generateTaskDescription(
+    taskTitle: string, 
+    model: string = 'gpt-4o',
+    onToken?: (token: string) => void
+  ): Promise<string> {
     if (!taskTitle.trim()) {
       throw new Error('Task title is required to generate description');
     }
@@ -64,7 +72,11 @@ Guidelines:
 - If the task is technical, include relevant technical details
 - If the task is creative, suggest approaches or considerations
 
-Generate a description that would help someone understand exactly what needs to be done to complete this task.`
+IMPORTANT:
+- First, outline your step-by-step approach or plan for this task.
+- Wrap this initial approach in <thinking>...</thinking> tags.
+- After the closing tag, provide the final detailed task description.
+- This approach helps ensure accuracy and structured output.`
       },
       {
         role: 'user',
@@ -76,7 +88,8 @@ Generate a description that would help someone understand exactly what needs to 
       // Build request body based on model type
       const requestBody: any = {
         model,
-        messages
+        messages,
+        stream: !!onToken
       };
 
       // New models (O4, GPT-5) use different parameters
@@ -86,12 +99,12 @@ Generate a description that would help someone understand exactly what needs to 
         requestBody.max_completion_tokens = 4500;
       } else {
         // Standard GPT models
-        requestBody.max_tokens = 300;
+        requestBody.max_tokens = 500; // Increased for thinking tags
         requestBody.temperature = 0.7;
         requestBody.top_p = 1;
         requestBody.frequency_penalty = 0;
         requestBody.presence_penalty = 0;
-        requestBody.stop = ["\n\n", "\n"];
+        // removed stop sequences to allow full generation including tags
       }
 
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
@@ -109,6 +122,41 @@ Generate a description that would help someone understand exactly what needs to 
         throw new Error(`OpenAI API Error: ${errorData.error.message}`);
       }
 
+      // Handle Streaming Response
+      if (onToken && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let fullContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine === 'data: [DONE]') continue;
+            if (trimmedLine.startsWith('data: ')) {
+              try {
+                const json = JSON.parse(trimmedLine.slice(6));
+                const deltaContent = json.choices[0]?.delta?.content || json.choices[0]?.text || '';
+                
+                if (deltaContent) {
+                  fullContent += deltaContent;
+                  onToken(deltaContent);
+                }
+              } catch (e) {
+                console.warn('Error parsing stream chunk:', e);
+              }
+            }
+          }
+        }
+        return fullContent;
+      }
+
+      // Handle Non-Streaming Response (Legacy/Fallback)
       const data: OpenAIResponse = await response.json();
 
       if (!data.choices || data.choices.length === 0) {

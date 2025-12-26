@@ -13,6 +13,8 @@ The OpenAI integration is implemented as a service class that handles:
 - Request/response formatting
 - Error handling and retries
 - Model-specific parameter configuration
+- **Real-time streaming** via Server-Sent Events (SSE)
+- **Chain of Thought** parsing using `<thinking>` tags
 
 ### Key Components
 
@@ -22,7 +24,8 @@ class OpenAIService {
   private baseUrl: string;
   private defaultModel: string;
   
-  generateTaskDescription(taskTitle: string, model?: string): Promise<string>
+  generateTaskDescription(taskTitle: string, model?: string, onToken?: (token: string) => void): Promise<string>
+  improveGrammar(text: string, model?: string): Promise<string>
   isConfigured(): boolean
 }
 ```
@@ -110,10 +113,11 @@ The AI functionality is integrated into the task form with:
 1. User enters task title
 2. Clicks AI assistant icon
 3. AI options panel appears
-4. User clicks "Add Description"
-5. Loading state shows while generating
-6. Generated description populates the field
-7. User can edit or regenerate as needed
+4. User clicks "Generate Description"
+5. **Real-time Streaming**:
+    - "Thinking Process" accordion appears and populates with AI reasoning.
+    - Description field populates incrementally after the thinking process.
+6. User can edit or regenerate as needed
 
 ## Testing
 
@@ -158,8 +162,11 @@ npm run test:coverage
 
 ## Future Enhancements
 
+### Completed Features
+- [x] AI Description Generation (with Streaming & CoT)
+- [x] AI Grammar Improvement
+
 ### Planned Features
-- [ ] Grammar and style improvements for existing descriptions
 - [ ] Task title suggestions based on description
 - [ ] Multi-language support
 - [ ] Custom prompt templates
