@@ -439,7 +439,17 @@ describe('TaskForm', () => {
 
     it('should generate description using AI service', async () => {
       const mockGeneratedDescription = 'AI generated description for the task';
-      (openaiService.openaiService.generateTaskDescription as any).mockResolvedValue(mockGeneratedDescription);
+      
+      // Update mock to handle callback
+      (openaiService.openaiService.generateTaskDescription as any).mockImplementation(
+        async (title: string, model: string, onToken?: (token: string) => void) => {
+          if (onToken) {
+            onToken('<thinking>Thinking...</thinking>');
+            onToken(mockGeneratedDescription);
+          }
+          return `<thinking>Thinking...</thinking>${mockGeneratedDescription}`;
+        }
+      );
 
       render(
         <TestWrapper>
@@ -464,7 +474,11 @@ describe('TaskForm', () => {
       expect(screen.getByText('Generating...')).toBeInTheDocument();
 
       await waitFor(() => {
-        expect(openaiService.openaiService.generateTaskDescription).toHaveBeenCalledWith('Test Task Title', expect.any(String));
+        expect(openaiService.openaiService.generateTaskDescription).toHaveBeenCalledWith(
+          'Test Task Title', 
+          expect.any(String),
+          expect.any(Function)
+        );
       });
 
       await waitFor(() => {
@@ -472,7 +486,7 @@ describe('TaskForm', () => {
         expect(descriptionInput).toHaveValue(mockGeneratedDescription);
       });
 
-      expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument();
+      expect(screen.queryByText('AI POWERED MAGIC')).not.toBeInTheDocument();
     });
 
     it('should handle AI generation errors', async () => {

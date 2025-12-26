@@ -123,7 +123,7 @@ describe('OpenAIService', () => {
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.model).toBe('gpt-4');
-      expect(requestBody.max_tokens).toBe(300);
+      expect(requestBody.max_tokens).toBe(500);
       expect(requestBody.temperature).toBe(0.7);
       expect(requestBody.top_p).toBe(1);
       expect(requestBody.frequency_penalty).toBe(0);
@@ -281,6 +281,39 @@ describe('OpenAIService', () => {
       await expect(service.generateTaskDescription('Test task')).rejects.toThrow(
         'Invalid response structure from OpenAI API - no content found'
       );
+    });
+
+    it('should support streaming response', async () => {
+      const streamChunks = [
+        'data: ' + JSON.stringify({ choices: [{ delta: { content: '<thinking>' } }] }) + '\n',
+        'data: ' + JSON.stringify({ choices: [{ delta: { content: 'Thinking process...' } }] }) + '\n',
+        'data: ' + JSON.stringify({ choices: [{ delta: { content: '</thinking>' } }] }) + '\n',
+        'data: ' + JSON.stringify({ choices: [{ delta: { content: 'Final description' } }] }) + '\n',
+        'data: [DONE]\n'
+      ];
+
+      const mockStream = new ReadableStream({
+        start(controller) {
+          streamChunks.forEach(chunk => controller.enqueue(new TextEncoder().encode(chunk)));
+          controller.close();
+        }
+      });
+
+      (fetch as any).mockResolvedValueOnce({
+        ok: true,
+        body: mockStream,
+        json: () => Promise.reject('Should not call json() on stream')
+      });
+
+      const onToken = vi.fn();
+      const result = await service.generateTaskDescription('Test task', 'gpt-4o', onToken);
+
+      expect(result).toBe('<thinking>Thinking process...</thinking>Final description');
+      expect(onToken).toHaveBeenCalledTimes(4);
+      expect(onToken).toHaveBeenCalledWith('<thinking>');
+      expect(onToken).toHaveBeenCalledWith('Thinking process...');
+      expect(onToken).toHaveBeenCalledWith('</thinking>');
+      expect(onToken).toHaveBeenCalledWith('Final description');
     });
   });
 
