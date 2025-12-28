@@ -10,7 +10,9 @@ Todos los archivos CSV generados para importación se almacenan en la siguiente 
 
 Ejemplos de archivos que puedes encontrar allí:
 - `auth.csv` (Tests de Autenticación)
-- `tasks.csv` (Tests de Gestión de Tareas - Futuro)
+- `tasks.csv` (Tests de Gestión de Tareas - Search, Filter, AI)
+- `time_tracking.csv` (Tests de Control de Tiempo y Estadísticas)
+- `ui_ux.csv` (Tests de Interfaz, Navegación y Visibilidad de Contraseñas)
 
 ## 2. Preparación en BrowserStack
 
