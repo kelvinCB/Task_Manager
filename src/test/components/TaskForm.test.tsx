@@ -37,7 +37,7 @@ const mockTask: Task = {
   title: 'Test Task',
   description: 'Test Description',
   status: 'Open' as TaskStatus,
-  dueDate: new Date('2024-12-31'),
+  dueDate: new Date('2030-12-31'),
   createdAt: new Date('2024-01-01'),
   parentId: undefined,
   childIds: [],
@@ -83,6 +83,22 @@ describe('TaskForm', () => {
       expect(screen.getByRole('textbox', { name: /description/i })).toBeInTheDocument();
       expect(screen.getByLabelText(/status/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/due date/i)).toBeInTheDocument();
+    });
+
+    it('should have min attribute set to today on due date input', () => {
+      render(
+        <TestWrapper>
+          <TaskForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const today = new Date().toISOString().split('T')[0];
+      const dueDateInput = screen.getByLabelText(/due date/i);
+      expect(dueDateInput).toHaveAttribute('min', today);
     });
 
     it('should render edit form when task is provided', () => {
@@ -209,7 +225,7 @@ describe('TaskForm', () => {
       fireEvent.change(titleInput, { target: { value: 'New Task' } });
       fireEvent.change(descriptionInput, { target: { value: 'New Description' } });
       fireEvent.change(statusSelect, { target: { value: 'In Progress' } });
-      fireEvent.change(dueDateInput, { target: { value: '2024-12-25' } });
+      fireEvent.change(dueDateInput, { target: { value: '2030-12-25' } });
 
       fireEvent.click(screen.getByText('Create Task'));
 
@@ -217,7 +233,7 @@ describe('TaskForm', () => {
         title: 'New Task',
         description: 'New Description',
         status: 'In Progress',
-        dueDate: new Date('2024-12-25'),
+        dueDate: new Date('2030-12-25'),
         parentId: undefined,
         timeTracking: {
           totalTimeSpent: 0,
@@ -313,7 +329,7 @@ describe('TaskForm', () => {
         title: 'Updated Task Title',
         description: 'Updated Description',
         status: 'Open',
-        dueDate: new Date('2024-12-31'),
+        dueDate: new Date('2030-12-31'),
         parentId: undefined,
         timeTracking: {
           totalTimeSpent: 3000,
@@ -442,7 +458,7 @@ describe('TaskForm', () => {
       
       // Update mock to handle callback
       (openaiService.openaiService.generateTaskDescription as any).mockImplementation(
-        async (title: string, model: string, onToken?: (token: string) => void) => {
+        async (_title: string, _model: string, onToken?: (token: string) => void) => {
           if (onToken) {
             onToken('<thinking>Thinking...</thinking>');
             onToken(mockGeneratedDescription);

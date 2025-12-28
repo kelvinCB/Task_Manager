@@ -32,7 +32,7 @@ test.describe('Task Management', () => {
     const taskData = {
       title: 'E2E Test Task',
       description: 'This is a test task created by E2E tests',
-      dueDate: '2024-12-31'
+      dueDate: '2030-12-31'
     };
 
     await taskPage.createTask(taskData);
