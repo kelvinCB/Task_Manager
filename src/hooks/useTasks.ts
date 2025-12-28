@@ -544,7 +544,11 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
             delete map[id];
             localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
           } catch {}
-          // Do not persist partial times to backend
+          
+          // Persist this session duration to backend
+          if (useApi) {
+            taskService.recordTimeSummary(id, duration).catch(() => {});
+          }
         } else {
           // Fallback: synthesize entry from lastStarted so completion/open always closes timer
           const effectiveStart = taskToUpdate.timeTracking.lastStarted || now;
@@ -563,11 +567,16 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
             delete map[id];
             localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
           } catch {}
+
+          // Persist this synthesized session duration to backend
+          if (useApi) {
+            taskService.recordTimeSummary(id, duration).catch(() => {});
+          }
         }
       }
     }
 
-    // If moving to Done, persist the final total time to backend in the task row
+    // If moving to Done, persist the final total time to backend in the task row (only total_time_ms field, not time_entries)
     if (newStatus === 'Done') {
       const current = tasks.find(t => t.id === id);
       let finalTotal = current?.timeTracking.totalTimeSpent || 0;
@@ -577,10 +586,6 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
         finalTotal = current!.timeTracking.totalTimeSpent; // already included
       }
       updateTask(id, { status: newStatus, ...( { total_time_ms: finalTotal } as any) });
-      // Also record a single summary row in backend time_entries
-      if (useApi) {
-        taskService.recordTimeSummary(id, finalTotal).catch(() => {});
-      }
     } else {
       updateTask(id, { status: newStatus });
     }
@@ -706,7 +711,10 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
         localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
       } catch {}
 
-      // Do not persist to backend on pause; we only persist on Done
+      // NEW: Persist this specific session duration to backend
+      if (useApi) {
+        taskService.recordTimeSummary(taskId, duration).catch(() => {});
+      }
     } else {
       // Fallback: synthesize an entry using lastStarted so pause always works
       const effectiveStart = task.timeTracking.lastStarted || now;
@@ -720,6 +728,11 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           timeEntries: newTimeEntries
         }
       });
+
+      // NEW: Persist this specific synthesized session duration to backend
+      if (useApi) {
+        taskService.recordTimeSummary(taskId, duration).catch(() => {});
+      }
     }
   }, [tasks, updateTask]);
 

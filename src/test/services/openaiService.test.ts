@@ -69,9 +69,18 @@ describe('OpenAIService', () => {
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
             'Authorization': expect.stringContaining('Bearer')
-          })
+          }),
+          body: expect.stringContaining('FORMATTING RULES')
         })
       );
+
+      // Verify the prompt content specifically
+      const fetchCall = (fetch as any).mock.calls[0];
+      const requestBody = JSON.parse(fetchCall[1].body);
+      const systemMessage = requestBody.messages.find((m: any) => m.role === 'system');
+      
+      expect(systemMessage.content).toContain('Use Markdown for formatting');
+      expect(systemMessage.content).toContain('Use "##" for section headers');
     });
 
     it('should handle O4 model parameters', async () => {
