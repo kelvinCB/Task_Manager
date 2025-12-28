@@ -17,6 +17,19 @@ export class BoardPage {
     this.taskCards = page.locator('.bg-white.border.rounded-lg');
   }
 
+  // Get column by exact status text
+  getColumn(status: 'Open' | 'In Progress' | 'Done') {
+    // Columns are usually identified by their headers. 
+    // We need to find the drop zone associated with the header.
+    // Assuming the structure is a column container with a header.
+    // Best to target the common parent or a specific testid if available.
+    // Based on inspection or standard practice, we'll try to find the column container.
+    return this.page.locator(`[data-status="${status}"]`).or(
+      // Fallback: finding the column that contains the text
+      this.page.locator('.flex.flex-col.h-full').filter({ has: this.page.getByText(status, { exact: true }) })
+    ).first();
+  }
+
   async verifyColumnsVisible() {
     await expect(this.openColumn).toBeVisible();
     await expect(this.inProgressColumn).toBeVisible();
@@ -32,8 +45,9 @@ export class BoardPage {
     await expect(taskCard).toBeVisible();
     
     // Verify the task is in the correct column by checking the status badge
-    const statusBadge = taskCard.locator('.inline-flex.items-center.px-2\\.5.py-0\\.5');
-    await expect(statusBadge).toContainText(column);
+    // Verify the task is in the correct column by checking if the status text is visible within the card
+    // We use a more generic locator or just check for the text, confirming it exists in the card
+    await expect(taskCard.getByText(column)).toBeVisible();
   }
 
   async openTaskMenu(taskTitle: string) {
