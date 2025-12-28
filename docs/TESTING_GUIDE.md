@@ -345,6 +345,16 @@ e2e/
     └── tree.page.ts                # Interacciones con TaskTree
 ```
 
+### Protocolo de Nuevos Tests E2E
+
+Para cada nuevo test automatizado que se agregue a la suite E2E, es **OBLIGATORIO** crear su contraparte manual en un archivo CSV.
+
+1.  **Ubicación**: Los archivos CSV deben guardarse en `e2e/manual-test-cases-browserstack`.
+2.  **Formato**: Debes seguir estrictamente la regla de "multisteps" detallada en la guía de importación.
+3.  **Referencia**: Consulta `docs/BROWSERSTACK_IMPORT_GUIDE.md` para ver las reglas de formato, columnas requeridas y ejemplos.
+
+> **Regla de Oro**: 1 Test Automatizado = 1 Test Manual en CSV (Mapeo 1:1).
+
 ### Casos de prueba E2E por categoría
 
 #### Funcionalidad Básica (9 tests)
