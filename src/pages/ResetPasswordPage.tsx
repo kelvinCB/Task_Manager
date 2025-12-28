@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import loginIllustrationLight from '../assets/images/login-illustration-light.png';
+import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
 
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -125,12 +127,12 @@ const ResetPasswordPage: React.FC = () => {
 
         {/* Illustrations - object-cover/left for consistency */}
         <img 
-          src="/src/assets/images/login-illustration-light.png" 
+          src={loginIllustrationLight} 
           alt="Task Management Illustration" 
           className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
         />
         <img 
-          src="/src/assets/images/login-illustration-dark.png" 
+          src={loginIllustrationDark} 
           alt="Task Management Illustration" 
           className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
         />

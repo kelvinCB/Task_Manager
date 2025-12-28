@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { AuthForm } from '../components/features/auth/AuthForm';
+import loginIllustrationLight from '../assets/images/login-illustration-light.png';
+import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
 
 const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -83,12 +85,12 @@ const RegisterPage: React.FC = () => {
 
         {/* Illustrations - object-cover to fill space, object-left to pin the rocket/content */}
         <img 
-          src="/src/assets/images/login-illustration-light.png" 
+          src={loginIllustrationLight} 
           alt="Task Management Illustration" 
           className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
         />
         <img 
-          src="/src/assets/images/login-illustration-dark.png" 
+          src={loginIllustrationDark} 
           alt="Task Management Illustration" 
           className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
         />
