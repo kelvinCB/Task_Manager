@@ -112,24 +112,53 @@ const ResetPasswordPage: React.FC = () => {
     }
   };
 
-  // Show loading screen while validating session
-  if (isValidatingSession) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
-        {/* Header with logo on the left */}
-        <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
-          <div className="flex justify-start mb-8 px-4 sm:px-10 lg:px-20">
-            <div data-testid="app-logo" className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
-              {'TaskLite'.split('').map((letter, index) => (
-                <span key={index}>{letter}</span>
-              ))}
-            </div>
+  const LeftSideImage = () => (
+    <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
+        {/* Logo context in the image side - Top Left over image */}
+        <div className="absolute top-10 left-12 z-20">
+          <div data-testid="app-logo-desktop" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
+            {'TaskLite'.split('').map((letter, index) => (
+              <span key={index} className="drop-shadow-md">{letter}</span>
+            ))}
           </div>
         </div>
 
-        {/* Main content */}
-        <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        {/* Illustrations - object-cover/left for consistency */}
+        <img 
+          src="/src/assets/images/login-illustration-light.png" 
+          alt="Task Management Illustration" 
+          className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
+        />
+        <img 
+          src="/src/assets/images/login-illustration-dark.png" 
+          alt="Task Management Illustration" 
+          className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
+        />
+        
+        {/* Subtle overlay */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
+    </div>
+  );
+
+  const MobileLogo = () => (
+    <div className="flex justify-center mb-8 lg:hidden">
+      <div data-testid="app-logo-mobile" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
+        {'TaskLite'.split('').map((letter, index) => (
+          <span key={index}>{letter}</span>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Show loading screen while validating session
+  if (isValidatingSession) {
+    return (
+      <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+        <LeftSideImage />
+
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-y-auto">
           <div className="max-w-md w-full space-y-8">
+            <MobileLogo />
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 dark:bg-indigo-900 mb-4">
                 <div className="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full"></div>
@@ -147,21 +176,12 @@ const ResetPasswordPage: React.FC = () => {
 
   if (isPasswordReset) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
-        {/* Header with logo on the left */}
-        <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
-          <div className="flex justify-start mb-8 px-4 sm:px-10 lg:px-20">
-            <div data-testid="app-logo" className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
-              {'TaskLite'.split('').map((letter, index) => (
-                <span key={index}>{letter}</span>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+        <LeftSideImage />
 
-        {/* Main content */}
-        <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-y-auto">
           <div className="max-w-md w-full space-y-8">
+            <MobileLogo />
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900 mb-4">
                 <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -187,23 +207,14 @@ const ResetPasswordPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
-      {/* Header with logo on the left */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="flex justify-start mb-8 px-4 sm:px-10 lg:px-20">
-          <div data-testid="app-logo" className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark">
-            {'TaskLite'.split('').map((letter, index) => (
-              <span key={index}>{letter}</span>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+      <LeftSideImage />
 
-      {/* Main content */}
-      <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-y-auto">
         <div className="max-w-md w-full space-y-8">
-          <div>
-            <h1 className="text-center text-2xl font-bold text-gray-900 dark:text-white">
+          <MobileLogo />
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Set new password
             </h1>
             <p className="mt-2 text-center text-gray-600 dark:text-gray-300">

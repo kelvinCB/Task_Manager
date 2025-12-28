@@ -63,7 +63,7 @@ describe('ForgotPasswordPage', () => {
     const logoLetters = screen.getAllByText((content, element) => {
       return element?.tagName.toLowerCase() === 'span' && 'TaskLite'.includes(content);
     });
-    expect(logoLetters.length).toBe(8); // Each letter of TaskLite
+    expect(logoLetters.length).toBe(16); // Each letter of TaskLite (rendered twice: mobile + desktop)
     
     // Check form elements
     expect(screen.getByTestId('email-input')).toBeInTheDocument();
