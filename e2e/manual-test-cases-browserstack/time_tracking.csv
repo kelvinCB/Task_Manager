@@ -1,0 +1,12 @@
+Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automation Status
+"Timer - Operations","Verify start/stop functionality and elapsed time","User is logged in and has a task","Click Start Timer button on a task.","Timer starts running.","High","Functional","TimeTracking,Timer","Automated"
+"Timer - Operations","","","Wait for a few seconds.","Time increments.","High","Functional","TimeTracking,Timer","Automated"
+"Timer - Operations","","","Click Stop Timer button.","Timer stops.","High","Functional","TimeTracking,Timer","Automated"
+"Timer - Operations","","","Verify elapsed time.","Time recorded is > 0.","High","Functional","TimeTracking,Timer","Automated"
+"Timer - Precision","Verify timer records time accurately","User has a task","Record initial time.","Time captured.","Medium","Functional","TimeTracking,Accuracy","Automated"
+"Timer - Precision","","","Run timer for 3 seconds.","Timer runs.","Medium","Functional","TimeTracking,Accuracy","Automated"
+"Timer - Precision","","","Stop timer.","Timer stops.","Medium","Functional","TimeTracking,Accuracy","Automated"
+"Timer - Precision","","","Verify time increase.","Time increased by ~3 seconds.","Medium","Functional","TimeTracking,Accuracy","Automated"
+"Export - CSV Download","Verify time tracking data export functionality","User is logged in and has recorded time","Create task and record time.","Data ready.","High","Functional","TimeTracking,Export","Automated"
+"Export - CSV Download","","","Click 'Export' button (if available).","Download starts.","High","Functional","TimeTracking,Export","Automated"
+"Export - CSV Download","","","Check downloaded file.","File is a CSV.","High","Functional","TimeTracking,Export","Automated"

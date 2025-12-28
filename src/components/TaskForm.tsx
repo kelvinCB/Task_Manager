@@ -406,6 +406,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     id="task-due-date"
                     type="date"
                     value={formData.dueDate}
+                    min={new Date().toISOString().split('T')[0]}
                     onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
                     className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
                   />
