@@ -72,6 +72,13 @@ Guidelines:
 - If the task is technical, include relevant technical details
 - If the task is creative, suggest approaches or considerations
 
+FORMATTING RULES:
+- Use Markdown for formatting
+- Use "##" for section headers
+- Use "-" for bullet points
+- excessive usage of bolding or italics should be avoided, but use them when necessary
+- Ensure clear separation between sections with newlines
+
 IMPORTANT:
 - First, outline your step-by-step approach or plan for this task.
 - Wrap this initial approach in <thinking>...</thinking> tags.
