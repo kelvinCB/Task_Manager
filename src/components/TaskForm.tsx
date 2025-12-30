@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Task, TaskStatus } from '../types/Task';
-import { X, Calendar, FileText, Tag } from 'lucide-react';
+import { X, Calendar, FileText, Tag, AlertCircle } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { AIIcon } from './AIIcon';
@@ -42,6 +42,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [thinkingProcess, setThinkingProcess] = useState('');
   const [isThinkingExpanded, setIsThinkingExpanded] = useState(true);
   const [validationError, setValidationError] = useState('');
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     setValidationError('');
@@ -174,6 +175,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         setIsAuthModalOpen(true);
                         return;
                       }
+                      setAiError(null);
                       if (formData.title.trim()) {
                         setShowAIOptions(!showAIOptions);
                       } else {
@@ -201,8 +203,26 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       <div className={`flex-1 h-px ${theme === 'dark' ? 'bg-indigo-500/20' : 'bg-indigo-200'}`}></div>
                     </div>
 
+                    {aiError && (
+                      <div
+                        data-testid="ai-error-container"
+                        className={`mb-4 p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-200 ${theme === 'dark' ? 'bg-red-500/10 border border-red-500/30 text-red-400' : 'bg-red-50 border border-red-200 text-red-600'}`}
+                      >
+                        <AlertCircle size={16} />
+                        <span className="text-sm font-semibold flex-1">{aiError}</span>
+                        <button
+                          type="button"
+                          onClick={() => setAiError(null)}
+                          aria-label="Close error"
+                          className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    )}
+
                     {/* Thinking Process Accordion */}
-                    {aiProcessingState === 'generating' && (
+                    {(aiProcessingState === 'generating' || aiProcessingState === 'improving') && (
                       <div className="mb-4">
                         <button
                           type="button"
@@ -211,9 +231,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         >
                           {isThinkingExpanded ? '▼' : '▶'} Thinking Process
                         </button>
-                         {isThinkingExpanded && (
+                        {isThinkingExpanded && (
                           <div className={`p-3 rounded-lg text-sm font-mono max-h-40 overflow-y-auto ${theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border border-gray-600' : 'bg-white text-gray-600 border border-gray-200'}`}>
-                            {thinkingProcess ? thinkingProcess : <span className="animate-pulse">Thinking...</span>}
+                            {thinkingProcess ? thinkingProcess : (
+                              <span>
+                                Thinking
+                                <span className="dot-1">.</span>
+                                <span className="dot-2">.</span>
+                                <span className="dot-3">.</span>
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>
@@ -229,10 +256,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           }
                           setAiProcessingState('generating');
                           setThinkingProcess('');
+                          setAiError(null);
                           setIsThinkingExpanded(true);
-                          
+
                           let fullResponse = '';
-                          
+
                           try {
                             // Reset description if we are generating a new one? 
                             // Or append? Usually "Generate" implies replacing or filling empty.
@@ -240,19 +268,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             // But usually we might want to keep what they wrote. 
                             // The current flow replaces it at the end. For streaming, we should probably clear strictly if we stream directly into it.
                             // However, let's keep it safe: We will populate formData.description as we receive the "final" part.
-                            
+
                             // Strategy: parsing on the fly
-                            
+
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
-                            
+
                             // We need to clear description to show the stream effect clearly
                             setFormData(prev => ({ ...prev, description: '' }));
 
                             let hasFoundStartTag = false;
-                            
+
                             await openaiService.generateTaskDescription(formData.title, model, (token) => {
                               fullResponse += token;
-                              
+
                               const thinkingStartIdx = fullResponse.indexOf('<thinking>');
                               const thinkingEndIdx = fullResponse.indexOf('</thinking>');
 
@@ -271,19 +299,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                                 if (!hasFoundStartTag) {
                                   setThinkingProcess(fullResponse);
                                 }
-                                
+
                                 if (fullResponse.length > 50 && !fullResponse.includes('<thinking>')) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
                                 }
                               }
                             });
-                            
+
                             // Final cleanup/formatting after stream ends
                             // (Handled by the fact that promise resolves with full string, but we rely on callback)
                             setShowAIOptions(false);
                           } catch (error) {
                             console.error('Error generating AI description:', error);
-                            alert(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                            setAiError(error instanceof Error ? error.message : 'Unknown error');
                           } finally {
                             setAiProcessingState('idle');
                           }
@@ -306,18 +334,56 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             return;
                           }
                           if (!formData.description.trim()) {
-                            alert('Please enter a description first.');
+                            setAiError('Please enter a description first.');
                             return;
                           }
                           setAiProcessingState('improving');
+                          setThinkingProcess('');
+                          setAiError(null);
+                          setIsThinkingExpanded(true);
+
+                          let fullResponse = '';
+
                           try {
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
-                            const improvedDescription = await openaiService.improveGrammar(formData.description, model);
-                            setFormData(prev => ({ ...prev, description: improvedDescription }));
+                            const originalDescription = formData.description;
+
+                            // For improving, we might want to clear or keep? 
+                            // The user wants "in real time", so let's clear it if they click improve.
+                            setFormData(prev => ({ ...prev, description: '' }));
+
+                            let hasFoundStartTag = false;
+
+                            await openaiService.improveGrammar(originalDescription, model, (token) => {
+                              fullResponse += token;
+
+                              const thinkingStartIdx = fullResponse.indexOf('<thinking>');
+                              const thinkingEndIdx = fullResponse.indexOf('</thinking>');
+
+                              if (thinkingStartIdx !== -1) {
+                                hasFoundStartTag = true;
+                                const contentStart = thinkingStartIdx + '<thinking>'.length;
+                                if (thinkingEndIdx !== -1) {
+                                  setThinkingProcess(fullResponse.substring(contentStart, thinkingEndIdx));
+                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + '</thinking>'.length);
+                                  setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                                } else {
+                                  setThinkingProcess(fullResponse.substring(contentStart));
+                                }
+                              } else {
+                                if (!hasFoundStartTag) {
+                                  setThinkingProcess(fullResponse);
+                                }
+
+                                if (fullResponse.length > 30 && !fullResponse.includes('<thinking>')) {
+                                  setFormData(prev => ({ ...prev, description: fullResponse }));
+                                }
+                              }
+                            });
                             setShowAIOptions(false);
                           } catch (error) {
                             console.error('Error improving grammar:', error);
-                            alert(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                            setAiError(error instanceof Error ? error.message : 'Unknown error');
                           } finally {
                             setAiProcessingState('idle');
                           }
