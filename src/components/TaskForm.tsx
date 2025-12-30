@@ -202,7 +202,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     </div>
 
                     {/* Thinking Process Accordion */}
-                    {aiProcessingState === 'generating' && (
+                    {(aiProcessingState === 'generating' || aiProcessingState === 'improving') && (
                       <div className="mb-4">
                         <button
                           type="button"
@@ -317,10 +317,47 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             return;
                           }
                           setAiProcessingState('improving');
+                          setThinkingProcess('');
+                          setIsThinkingExpanded(true);
+
+                          let fullResponse = '';
+
                           try {
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
-                            const improvedDescription = await openaiService.improveGrammar(formData.description, model);
-                            setFormData(prev => ({ ...prev, description: improvedDescription }));
+                            const originalDescription = formData.description;
+
+                            // For improving, we might want to clear or keep? 
+                            // The user wants "in real time", so let's clear it if they click improve.
+                            setFormData(prev => ({ ...prev, description: '' }));
+
+                            let hasFoundStartTag = false;
+
+                            await openaiService.improveGrammar(originalDescription, model, (token) => {
+                              fullResponse += token;
+
+                              const thinkingStartIdx = fullResponse.indexOf('<thinking>');
+                              const thinkingEndIdx = fullResponse.indexOf('</thinking>');
+
+                              if (thinkingStartIdx !== -1) {
+                                hasFoundStartTag = true;
+                                const contentStart = thinkingStartIdx + '<thinking>'.length;
+                                if (thinkingEndIdx !== -1) {
+                                  setThinkingProcess(fullResponse.substring(contentStart, thinkingEndIdx));
+                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + '</thinking>'.length);
+                                  setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                                } else {
+                                  setThinkingProcess(fullResponse.substring(contentStart));
+                                }
+                              } else {
+                                if (!hasFoundStartTag) {
+                                  setThinkingProcess(fullResponse);
+                                }
+
+                                if (fullResponse.length > 30 && !fullResponse.includes('<thinking>')) {
+                                  setFormData(prev => ({ ...prev, description: fullResponse }));
+                                }
+                              }
+                            });
                             setShowAIOptions(false);
                           } catch (error) {
                             console.error('Error improving grammar:', error);
