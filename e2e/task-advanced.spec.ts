@@ -168,23 +168,25 @@ test.describe('Task Advanced Features', () => {
     await taskPage.createButton.click();
     await taskPage.verifyModalClosed();
 
-    // Reload to ensure clean state and avoid modal animation issues
-    await appPage.page.reload();
-    // Wait for list to load
+    // Wait for task to appear without reloading (avoids AI auto-trigger)
     await expect(appPage.page.getByText(uniqueTitle).first()).toBeVisible({ timeout: 30000 });
 
-    // Re-open for editing
-    const taskCard = appPage.page.getByText(uniqueTitle).first();
-    await expect(taskCard).toBeVisible({ timeout: 10000 });
-    await taskCard.click({ force: true }); // Sometimes backdrop interferes
-    await taskPage.verifyModalOpen();
+    // Switch to board view and edit the task  
+    await appPage.switchToView('board');
+    await expect(appPage.page.getByText(uniqueTitle).first()).toBeVisible();
+    
+    // Use BoardPage to properly edit the task
+    await boardPage.editTask(uniqueTitle);
 
     // Click AI assistant button
     await taskPage.aiButton.click();
 
     // Wait for AI options and click Improve Grammar
-    await expect(taskPage.aiImproveButton).toBeVisible();
+    await expect(taskPage.aiImproveButton).toBeVisible({ timeout: 10000 });
     await taskPage.aiImproveButton.click();
+    
+    // Wait for AI to process grammar improvement (~12-15 seconds observed)
+    await appPage.page.waitForTimeout(20000);
 
     // Wait for AI to improve description (check simple logic: text changed)
     // We pass poorGrammarText as an argument to the function
