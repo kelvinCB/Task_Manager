@@ -211,9 +211,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         >
                           {isThinkingExpanded ? '▼' : '▶'} Thinking Process
                         </button>
-                         {isThinkingExpanded && (
+                        {isThinkingExpanded && (
                           <div className={`p-3 rounded-lg text-sm font-mono max-h-40 overflow-y-auto ${theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border border-gray-600' : 'bg-white text-gray-600 border border-gray-200'}`}>
-                            {thinkingProcess ? thinkingProcess : <span className="animate-pulse">Thinking...</span>}
+                            {thinkingProcess ? thinkingProcess : (
+                              <span>
+                                Thinking
+                                <span className="dot-1">.</span>
+                                <span className="dot-2">.</span>
+                                <span className="dot-3">.</span>
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>
@@ -230,9 +237,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           setAiProcessingState('generating');
                           setThinkingProcess('');
                           setIsThinkingExpanded(true);
-                          
+
                           let fullResponse = '';
-                          
+
                           try {
                             // Reset description if we are generating a new one? 
                             // Or append? Usually "Generate" implies replacing or filling empty.
@@ -240,19 +247,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             // But usually we might want to keep what they wrote. 
                             // The current flow replaces it at the end. For streaming, we should probably clear strictly if we stream directly into it.
                             // However, let's keep it safe: We will populate formData.description as we receive the "final" part.
-                            
+
                             // Strategy: parsing on the fly
-                            
+
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
-                            
+
                             // We need to clear description to show the stream effect clearly
                             setFormData(prev => ({ ...prev, description: '' }));
 
                             let hasFoundStartTag = false;
-                            
+
                             await openaiService.generateTaskDescription(formData.title, model, (token) => {
                               fullResponse += token;
-                              
+
                               const thinkingStartIdx = fullResponse.indexOf('<thinking>');
                               const thinkingEndIdx = fullResponse.indexOf('</thinking>');
 
@@ -271,13 +278,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                                 if (!hasFoundStartTag) {
                                   setThinkingProcess(fullResponse);
                                 }
-                                
+
                                 if (fullResponse.length > 50 && !fullResponse.includes('<thinking>')) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
                                 }
                               }
                             });
-                            
+
                             // Final cleanup/formatting after stream ends
                             // (Handled by the fact that promise resolves with full string, but we rely on callback)
                             setShowAIOptions(false);
