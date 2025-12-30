@@ -86,7 +86,7 @@ const parseTasksFromStorage = (storedTasks: string, useDefaultTasks: boolean = t
           timeEntries: []
         };
       }
-      
+
       return {
         ...task,
         createdAt: new Date(task.createdAt),
@@ -120,8 +120,8 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   // Load expanded nodes from localStorage
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => {
     const storedExpandedNodes = localStorage.getItem(EXPANDED_NODES_STORAGE_KEY);
-    return storedExpandedNodes 
-      ? new Set(JSON.parse(storedExpandedNodes)) 
+    return storedExpandedNodes
+      ? new Set(JSON.parse(storedExpandedNodes))
       : new Set(['1', '2']);
   });
 
@@ -131,7 +131,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     return tasks.filter(task => {
       // Filter by status
       if (filter.status && task.status !== filter.status) return false;
-      
+
       // Filter by search term
       if (filter.searchTerm && filter.searchTerm.trim() !== '') {
         const searchLower = filter.searchTerm.toLowerCase().trim();
@@ -141,7 +141,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           return false;
         }
       }
-      
+
       return true;
     });
   }, [tasks, filter]);
@@ -155,7 +155,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
     // Get IDs of filtered tasks
     const filteredTaskIds = new Set(filteredTasks.map(task => task.id));
-    
+
     // Function to include ancestors of tasks that match the filter
     const includeAncestors = (taskId: string, includedIds: Set<string>) => {
       const task = tasks.find(t => t.id === taskId);
@@ -173,7 +173,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
     // Create a list of tasks that includes the filtered ones and their ancestors
     const tasksForTree = tasks.filter(task => tasksToInclude.has(task.id));
-    
+
     return buildTaskTree(tasksForTree);
   }, [tasks, taskTree, filteredTasks, filter]);
 
@@ -182,15 +182,19 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   const getActiveTimers = (): Record<string, number> => {
     try { return JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}'); } catch { return {}; }
   };
-  const setActiveTimer = (taskId: string, startedAt: number) => {
+  const setActiveTimer = useCallback((taskId: string, startedAt: number) => {
     const map = getActiveTimers();
     map[taskId] = startedAt;
-    try { localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map)); } catch {}
-  };
-  const clearActiveTimer = (taskId: string) => {
+    try { localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map)); } catch { }
+  }, []);
+
+  const clearActiveTimer = useCallback((taskId: string) => {
     const map = getActiveTimers();
-    if (map[taskId]) { delete map[taskId]; try { localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map)); } catch {} }
-  };
+    if (map[taskId]) {
+      delete map[taskId];
+      try { localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map)); } catch { }
+    }
+  }, []);
 
   // Load tasks from API on mount if authenticated
   useEffect(() => {
@@ -202,7 +206,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
       try {
         const isAuthenticated = await taskService.isAuthenticated();
-        
+
         if (!isAuthenticated) {
           // User not authenticated, switch to localStorage & (re)load defaults
           setUseApi(false);
@@ -214,7 +218,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
         // Try to fetch tasks from API
         const response = await taskService.getTasks();
-        
+
         if (response.error) {
           console.error('Failed to load tasks from API:', response.error);
           setApiError(response.error);
@@ -296,7 +300,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           // Successfully created on API, update local state
           setTasks(prev => {
             const updated = [...prev, response.data!];
-            
+
             if (taskData.parentId) {
               const parentIndex = updated.findIndex(t => t.id === taskData.parentId);
               if (parentIndex !== -1) {
@@ -306,7 +310,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
                 };
               }
             }
-            
+
             return updated;
           });
           return response.data.id;
@@ -334,7 +338,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
     setTasks(prev => {
       const updated = [...prev, newTask];
-      
+
       if (taskData.parentId) {
         const parentIndex = updated.findIndex(t => t.id === taskData.parentId);
         if (parentIndex !== -1) {
@@ -344,7 +348,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           };
         }
       }
-      
+
       return updated;
     });
 
@@ -368,7 +372,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
     setTasks(prev => {
       const updated = [...prev, newTask];
-      
+
       if (taskData.parentId) {
         const parentIndex = updated.findIndex(t => t.id === taskData.parentId);
         if (parentIndex !== -1) {
@@ -378,7 +382,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           };
         }
       }
-      
+
       return updated;
     });
 
@@ -399,7 +403,12 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           // Successfully updated on API, merge fields but preserve local-only timeTracking
           setTasks(prev => prev.map(task => 
             task.id === id 
-              ? { ...task, ...response.data as any, timeTracking: task.timeTracking }
+              ? { 
+                  ...task, 
+                  ...response.data as any, 
+                  // Preserve local timeTracking updates if they exist, otherwise keep existing
+                  timeTracking: updates.timeTracking || task.timeTracking 
+                }
               : task
           ));
           return;
@@ -412,7 +421,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     }
 
     // localStorage fallback
-    setTasks(prev => prev.map(task => 
+    setTasks(prev => prev.map(task =>
       task.id === id ? { ...task, ...updates } : task
     ));
   }, [useApi]);
@@ -434,7 +443,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           // Successfully deleted on API, update local state
           setTasks(prev => {
             let updated = [...prev];
-            
+
             // Remove from parent's childIds
             if (taskToDelete.parentId) {
               const parentIndex = updated.findIndex(t => t.id === taskToDelete.parentId);
@@ -470,7 +479,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     // localStorage fallback
     setTasks(prev => {
       let updated = [...prev];
-      
+
       // Remove from parent's childIds
       if (taskToDelete.parentId) {
         const parentIndex = updated.findIndex(t => t.id === taskToDelete.parentId);
@@ -497,7 +506,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   }, [tasks, useApi]);
 
   // We will move this function after defining pauseTaskTimer
-  const moveTaskImpl = (id: string, newStatus: TaskStatus) => {
+  const moveTaskImpl = async (id: string, newStatus: TaskStatus) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return false;
 
@@ -506,93 +515,62 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       return false;
     }
 
+    let updates: Partial<Task> & { total_time_ms?: number } = { status: newStatus };
+    let durationToRecord = 0;
+
     // If the task is being marked as completed or moved back to Open and the timer is active,
     // we must pause it first
     if ((newStatus === 'Done' || newStatus === 'Open') && task.timeTracking.isActive) {
-      const taskToUpdate = tasks.find(t => t.id === id);
-      if (taskToUpdate && taskToUpdate.timeTracking.isActive) {
-        // We pause the timer directly here instead of using pauseTaskTimer
-        const now = Date.now();
-        const lastEntryIndex = taskToUpdate.timeTracking.timeEntries.length - 1;
-        const lastEntry = taskToUpdate.timeTracking.timeEntries[lastEntryIndex];
-        
-        if (lastEntry && !lastEntry.endTime) {
-          // Calculate duration for this entry
-          const duration = now - lastEntry.startTime;
-          const updatedEntry: TimeEntry = {
-            ...lastEntry,
-            endTime: now,
-            duration
-          };
+      const now = Date.now();
+      const lastEntryIndex = task.timeTracking.timeEntries.length - 1;
+      const lastEntry = task.timeTracking.timeEntries[lastEntryIndex];
 
-          // Update the time entries array with the completed entry
-          const newTimeEntries = [...taskToUpdate.timeTracking.timeEntries];
-          newTimeEntries[lastEntryIndex] = updatedEntry;
+      let duration = 0;
+      let newTimeEntries = [...task.timeTracking.timeEntries];
 
-          // Update task with new total time and the completed entry
-          updateTask(id, {
-            timeTracking: {
-              ...taskToUpdate.timeTracking,
-              isActive: false,
-              totalTimeSpent: taskToUpdate.timeTracking.totalTimeSpent + duration,
-              timeEntries: newTimeEntries
-            }
-          });
-          // Clear persisted running state
-          try {
-            const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
-            delete map[id];
-            localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
-          } catch {}
-          
-          // Persist this session duration to backend
-          if (useApi) {
-            taskService.recordTimeSummary(id, duration).catch(() => {});
-          }
-        } else {
-          // Fallback: synthesize entry from lastStarted so completion/open always closes timer
-          const effectiveStart = taskToUpdate.timeTracking.lastStarted || now;
-          const duration = Math.max(0, now - effectiveStart);
-          const newTimeEntries = [...taskToUpdate.timeTracking.timeEntries, { startTime: effectiveStart, endTime: now, duration } as TimeEntry];
-          updateTask(id, {
-            timeTracking: {
-              ...taskToUpdate.timeTracking,
-              isActive: false,
-              totalTimeSpent: taskToUpdate.timeTracking.totalTimeSpent + duration,
-              timeEntries: newTimeEntries
-            }
-          });
-          try {
-            const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
-            delete map[id];
-            localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
-          } catch {}
-
-          // Persist this synthesized session duration to backend
-          if (useApi) {
-            taskService.recordTimeSummary(id, duration).catch(() => {});
-          }
-        }
+      if (lastEntry && !lastEntry.endTime) {
+        duration = now - lastEntry.startTime;
+        newTimeEntries[lastEntryIndex] = {
+          ...lastEntry,
+          endTime: now,
+          duration
+        };
+      } else {
+        const effectiveStart = task.timeTracking.lastStarted || now;
+        duration = Math.max(0, now - effectiveStart);
+        newTimeEntries.push({ startTime: effectiveStart, endTime: now, duration } as TimeEntry);
       }
+
+      durationToRecord = duration;
+      updates.timeTracking = {
+        ...task.timeTracking,
+        isActive: false,
+        totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
+        timeEntries: newTimeEntries
+      };
+
+      // Clear persisted running state
+      clearActiveTimer(id);
     }
 
-    // If moving to Done, persist the final total time to backend in the task row (only total_time_ms field, not time_entries)
+    // If moving to Done, ensure we send the total_time_ms to backend
     if (newStatus === 'Done') {
-      const current = tasks.find(t => t.id === id);
-      let finalTotal = current?.timeTracking.totalTimeSpent || 0;
-      // If there is an open entry, include it (should already be closed above)
-      const last = current?.timeTracking.timeEntries.slice(-1)[0];
-      if (last && last.endTime && last.duration) {
-        finalTotal = current!.timeTracking.totalTimeSpent; // already included
-      }
-      updateTask(id, { status: newStatus, ...( { total_time_ms: finalTotal } as any) });
-    } else {
-      updateTask(id, { status: newStatus });
+      const finalTotal = (updates.timeTracking?.totalTimeSpent) ?? task.timeTracking.totalTimeSpent;
+      updates.total_time_ms = finalTotal;
     }
+
+    // Perform a single update to avoid race conditions and multiple state renders
+    await updateTask(id, updates);
+
+    // Persist session to backend if needed
+    if (useApi && durationToRecord > 0) {
+      taskService.recordTimeSummary(id, durationToRecord).catch(() => { });
+    }
+
     return true;
   };
 
-  const moveTask = useCallback(moveTaskImpl, [tasks, updateTask]);
+  const moveTask = useCallback(moveTaskImpl, [tasks, updateTask, useApi]);
 
 
   const toggleNodeExpansion = useCallback((nodeId: string) => {
@@ -630,7 +608,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   useEffect(() => {
     try {
       localStorage.setItem(
-        EXPANDED_NODES_STORAGE_KEY, 
+        EXPANDED_NODES_STORAGE_KEY,
         JSON.stringify(Array.from(expandedNodes))
       );
     } catch (error) {
@@ -639,115 +617,92 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   }, [expandedNodes]);
 
   // Time tracking functions
-  const startTaskTimer = useCallback((taskId: string) => {
+  const startTaskTimer = useCallback(async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
+    const now = Date.now();
+    let updates: Partial<Task> = {};
+
     // If task is not in progress, change its status
     if (task.status !== 'In Progress') {
-      moveTask(taskId, 'In Progress');
+      updates.status = 'In Progress';
     }
 
     // Start the timer if it's not already running
     if (!task.timeTracking.isActive) {
-      const now = Date.now();
       const newEntry: TimeEntry = {
         startTime: now
       };
-      
-      updateTask(taskId, {
-        timeTracking: {
-          ...task.timeTracking,
-          isActive: true,
-          lastStarted: now,
-          timeEntries: [...task.timeTracking.timeEntries, newEntry]
-        }
-      });
+
+      updates.timeTracking = {
+        ...task.timeTracking,
+        isActive: true,
+        lastStarted: now,
+        timeEntries: [...task.timeTracking.timeEntries, newEntry]
+      };
+
       // Persist running state locally to resist tab changes/reloads
-      try { 
-        const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
-        map[taskId] = now;
-        localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
-      } catch {}
-
-      // Do not persist to backend on start; only persist when task is completed
+      setActiveTimer(taskId, now);
     }
-  }, [tasks, updateTask, moveTask]);
 
-  const pauseTaskTimer = useCallback((taskId: string) => {
+    if (Object.keys(updates).length > 0) {
+      await updateTask(taskId, updates);
+    }
+  }, [tasks, updateTask, setActiveTimer]);
+
+  const pauseTaskTimer = useCallback(async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task || !task.timeTracking.isActive) return;
 
     const now = Date.now();
     const lastEntryIndex = task.timeTracking.timeEntries.length - 1;
     const lastEntry = task.timeTracking.timeEntries[lastEntryIndex];
-    
+
+    let duration = 0;
+    let newTimeEntries = [...task.timeTracking.timeEntries];
+
     if (lastEntry && !lastEntry.endTime) {
-      // Calculate duration for this entry
-      const duration = now - lastEntry.startTime;
-      const updatedEntry: TimeEntry = {
+      duration = now - lastEntry.startTime;
+      newTimeEntries[lastEntryIndex] = {
         ...lastEntry,
         endTime: now,
         duration
       };
-
-      // Update the time entries array with the completed entry
-      const newTimeEntries = [...task.timeTracking.timeEntries];
-      newTimeEntries[lastEntryIndex] = updatedEntry;
-
-      // Update task with new total time and the completed entry
-      updateTask(taskId, {
-        timeTracking: {
-          ...task.timeTracking,
-          isActive: false,
-          totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
-          timeEntries: newTimeEntries
-        }
-      });
-      // Clear persisted running state
-      try {
-        const map = JSON.parse(localStorage.getItem(ACTIVE_TIMERS_KEY) || '{}');
-        delete map[taskId];
-        localStorage.setItem(ACTIVE_TIMERS_KEY, JSON.stringify(map));
-      } catch {}
-
-      // NEW: Persist this specific session duration to backend
-      if (useApi) {
-        taskService.recordTimeSummary(taskId, duration).catch(() => {});
-      }
     } else {
-      // Fallback: synthesize an entry using lastStarted so pause always works
       const effectiveStart = task.timeTracking.lastStarted || now;
-      const duration = Math.max(0, now - effectiveStart);
-      const newTimeEntries = [...task.timeTracking.timeEntries, { startTime: effectiveStart, endTime: now, duration } as TimeEntry];
-      updateTask(taskId, {
-        timeTracking: {
-          ...task.timeTracking,
-          isActive: false,
-          totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
-          timeEntries: newTimeEntries
-        }
-      });
-
-      // NEW: Persist this specific synthesized session duration to backend
-      if (useApi) {
-        taskService.recordTimeSummary(taskId, duration).catch(() => {});
-      }
+      duration = Math.max(0, now - effectiveStart);
+      newTimeEntries.push({ startTime: effectiveStart, endTime: now, duration } as TimeEntry);
     }
-  }, [tasks, updateTask]);
+
+    await updateTask(taskId, {
+      timeTracking: {
+        ...task.timeTracking,
+        isActive: false,
+        totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
+        timeEntries: newTimeEntries
+      }
+    });
+
+    clearActiveTimer(taskId);
+
+    if (useApi && duration > 0) {
+      taskService.recordTimeSummary(taskId, duration).catch(() => { });
+    }
+  }, [tasks, updateTask, useApi, clearActiveTimer]);
 
   const getElapsedTime = useCallback((taskId: string): number => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return 0;
-    
+
     let totalTime = task.timeTracking.totalTimeSpent;
-    
+
     // If the timer is active, add the current session time
     if (task.timeTracking.isActive && task.timeTracking.lastStarted) {
       const currentSession = Date.now() - task.timeTracking.lastStarted;
       totalTime += currentSession;
     }
-    
+
     return totalTime;
   }, [tasks]);
 
@@ -782,7 +737,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     }
 
     // Local computation fallback (works both for API and local-only modes)
-    const stats = { totalTime: 0, taskStats: [] as {taskId: string, title: string, timeSpent: number}[] };
+    const stats = { totalTime: 0, taskStats: [] as { taskId: string, title: string, timeSpent: number }[] };
 
     tasks.forEach(task => {
       let taskTime = 0;

@@ -518,9 +518,6 @@ describe('TaskForm', () => {
       const errorMessage = 'API key not configured';
       (openaiService.openaiService.generateTaskDescription as any).mockRejectedValue(new Error(errorMessage));
 
-      // Mock window.alert
-      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
-
       render(
         <TestWrapper>
           <TaskForm
@@ -541,12 +538,10 @@ describe('TaskForm', () => {
       fireEvent.click(generateButton);
 
       await waitFor(() => {
-        expect(alertSpy).toHaveBeenCalledWith(`Failed to generate description: ${errorMessage}`);
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();
       });
 
       expect(screen.getByText('Generate Description')).toBeInTheDocument(); // Button should be back to normal state
-
-      alertSpy.mockRestore();
     });
 
     it('should disable generate button while generating', async () => {
@@ -593,7 +588,15 @@ describe('TaskForm', () => {
 
     it('should improve grammar using AI service', async () => {
       const mockImproved = 'Improved description.';
-      (openaiService.openaiService.improveGrammar as any).mockResolvedValue(mockImproved);
+      (openaiService.openaiService.improveGrammar as any).mockImplementation(
+        async (_text: string, _model: string, onToken?: (token: string) => void) => {
+          if (onToken) {
+            onToken('<thinking>Improvement plan...</thinking>');
+            onToken(mockImproved);
+          }
+          return `<thinking>Improvement plan...</thinking>${mockImproved}`;
+        }
+      );
 
       render(
         <TestWrapper>
@@ -621,7 +624,11 @@ describe('TaskForm', () => {
       expect(screen.getByText('Improving...')).toBeInTheDocument();
 
       await waitFor(() => {
-        expect(openaiService.openaiService.improveGrammar).toHaveBeenCalledWith('Bad grammar text', expect.any(String));
+        expect(openaiService.openaiService.improveGrammar).toHaveBeenCalledWith(
+          'Bad grammar text',
+          expect.any(String),
+          expect.any(Function)
+        );
       });
 
       await waitFor(() => {
@@ -635,9 +642,6 @@ describe('TaskForm', () => {
     });
 
     it('should require description for grammar improvement', async () => {
-      /* Mock alert */
-      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
-
       render(
         <TestWrapper>
           <TaskForm
@@ -659,10 +663,10 @@ describe('TaskForm', () => {
       const improveButton = screen.getByText('Improve Grammar');
       fireEvent.click(improveButton);
 
-      expect(alertSpy).toHaveBeenCalledWith('Please enter a description first.');
+      await waitFor(() => {
+        expect(screen.getByText('Please enter a description first.')).toBeInTheDocument();
+      });
       expect(openaiService.openaiService.improveGrammar).not.toHaveBeenCalled();
-
-      alertSpy.mockRestore();
     });
 
     it('should show AuthRequiredModal when generating description while unauthenticated', async () => {

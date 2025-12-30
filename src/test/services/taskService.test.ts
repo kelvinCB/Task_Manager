@@ -17,15 +17,26 @@ describe('taskService.updateTask', () => {
     vi.clearAllMocks();
   });
 
-  it('should NOT call backend when updates have no mappable fields (timeTracking-only)', async () => {
+  it('should call backend when updates include timeTracking data', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({})
+      json: async () => ({
+        task: {
+          id: 123,
+          user_id: 'u-1',
+          title: 'T',
+          description: '',
+          status: 'In Progress',
+          parent_id: null,
+          created_at: new Date().toISOString(),
+          due_date: null,
+          total_time_ms: 1000
+        }
+      })
     } as any);
     (globalThis as any).fetch = fetchMock;
 
     const res = await taskService.updateTask('123', {
-      // timeTracking is not persisted in backend; should be skipped
       timeTracking: {
         totalTimeSpent: 1000,
         isActive: true,
@@ -34,8 +45,13 @@ describe('taskService.updateTask', () => {
       }
     } as any);
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(res).toHaveProperty('message');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(String(url)).toMatch(/\/api\/tasks\/123$/);
+    expect((init as RequestInit).method).toBe('PUT');
+    // Expect total_time_ms to be mapped from timeTracking.totalTimeSpent
+    expect((init as RequestInit).body as string).toContain('"total_time_ms":1000');
+    expect(res).toHaveProperty('data');
   });
 
   it('should call backend when updating mappable fields (e.g., status)', async () => {
