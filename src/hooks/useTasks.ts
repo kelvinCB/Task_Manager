@@ -399,7 +399,12 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           // Successfully updated on API, merge fields but preserve local-only timeTracking
           setTasks(prev => prev.map(task => 
             task.id === id 
-              ? { ...task, ...response.data as any, timeTracking: task.timeTracking }
+              ? { 
+                  ...task, 
+                  ...response.data as any, 
+                  // Preserve local timeTracking updates if they exist, otherwise keep existing
+                  timeTracking: updates.timeTracking || task.timeTracking 
+                }
               : task
           ));
           return;

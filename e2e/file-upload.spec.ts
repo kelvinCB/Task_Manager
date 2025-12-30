@@ -75,7 +75,9 @@ test.describe('File Upload Service', () => {
 
     // 4. Verify upload success indicator
     // Component shows "Checking..." then "uploaded!"
-    await expect(page.locator(`text=${validFileName} uploaded!`)).toBeVisible({ timeout: 30000 });
+    // Using loose matching in case backend sanitizes filename
+    await expect(page.getByText(/uploaded!/)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText(/uploaded!/)).toContainText(validFileName);
     console.log('[TEST] Upload success visible');
 
     // 5. Verify Description update and Attachment List
