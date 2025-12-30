@@ -13,6 +13,7 @@ export class TaskPage {
   readonly closeButton: Locator;
   readonly aiButton: Locator;
   readonly aiGenerateButton: Locator;
+  readonly aiImproveButton: Locator;
   readonly aiCancelButton: Locator;
 
   constructor(page: Page) {
@@ -31,6 +32,7 @@ export class TaskPage {
     this.closeButton = page.getByRole('button', { name: /close modal/i });
     this.aiButton = page.getByTitle('AI Assistant');
     this.aiGenerateButton = page.getByText('Generate Description');
+    this.aiImproveButton = page.getByText('Improve Grammar');
     this.aiCancelButton = page.getByText('Dismiss');
   }
 
