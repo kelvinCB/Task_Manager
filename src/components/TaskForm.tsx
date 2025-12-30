@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Task, TaskStatus } from '../types/Task';
-import { X, Calendar, FileText, Tag } from 'lucide-react';
+import { X, Calendar, FileText, Tag, AlertCircle } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { AIIcon } from './AIIcon';
@@ -42,6 +42,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [thinkingProcess, setThinkingProcess] = useState('');
   const [isThinkingExpanded, setIsThinkingExpanded] = useState(true);
   const [validationError, setValidationError] = useState('');
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     setValidationError('');
@@ -174,6 +175,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         setIsAuthModalOpen(true);
                         return;
                       }
+                      setAiError(null);
                       if (formData.title.trim()) {
                         setShowAIOptions(!showAIOptions);
                       } else {
@@ -200,6 +202,24 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       </h3>
                       <div className={`flex-1 h-px ${theme === 'dark' ? 'bg-indigo-500/20' : 'bg-indigo-200'}`}></div>
                     </div>
+
+                    {aiError && (
+                      <div
+                        data-testid="ai-error-container"
+                        className={`mb-4 p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-200 ${theme === 'dark' ? 'bg-red-500/10 border border-red-500/30 text-red-400' : 'bg-red-50 border border-red-200 text-red-600'}`}
+                      >
+                        <AlertCircle size={16} />
+                        <span className="text-sm font-semibold flex-1">{aiError}</span>
+                        <button
+                          type="button"
+                          onClick={() => setAiError(null)}
+                          aria-label="Close error"
+                          className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    )}
 
                     {/* Thinking Process Accordion */}
                     {(aiProcessingState === 'generating' || aiProcessingState === 'improving') && (
@@ -236,6 +256,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           }
                           setAiProcessingState('generating');
                           setThinkingProcess('');
+                          setAiError(null);
                           setIsThinkingExpanded(true);
 
                           let fullResponse = '';
@@ -290,7 +311,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             setShowAIOptions(false);
                           } catch (error) {
                             console.error('Error generating AI description:', error);
-                            alert(`Failed to generate description: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                            setAiError(error instanceof Error ? error.message : 'Unknown error');
                           } finally {
                             setAiProcessingState('idle');
                           }
@@ -313,11 +334,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             return;
                           }
                           if (!formData.description.trim()) {
-                            alert('Please enter a description first.');
+                            setAiError('Please enter a description first.');
                             return;
                           }
                           setAiProcessingState('improving');
                           setThinkingProcess('');
+                          setAiError(null);
                           setIsThinkingExpanded(true);
 
                           let fullResponse = '';
@@ -361,7 +383,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             setShowAIOptions(false);
                           } catch (error) {
                             console.error('Error improving grammar:', error);
-                            alert(`Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                            setAiError(error instanceof Error ? error.message : 'Unknown error');
                           } finally {
                             setAiProcessingState('idle');
                           }
