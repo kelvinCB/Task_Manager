@@ -14,7 +14,7 @@ interface TimeStatsViewProps {
 
 export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics }) => {
   const { theme } = useTheme();
-  const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year'>('day');
+  const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
   const [stats, setStats] = useState<TaskTimeStats[]>([]);
   const [customStart, setCustomStart] = useState<string>('');
   const [customEnd, setCustomEnd] = useState<string>('');
