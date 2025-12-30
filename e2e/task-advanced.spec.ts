@@ -113,15 +113,17 @@ test.describe('Task Advanced Features', () => {
     await taskPage.aiButton.click();
 
     // Wait for AI options panel to appear
-    await expect(appPage.page.getByText('AI POWERED MAGIC')).toBeVisible();
-    await expect(appPage.page.getByText('Generate Description')).toBeVisible();
+    await expect(appPage.page.getByText('AI POWERED')).toBeVisible({ timeout: 30000 });
+    await expect(appPage.page.getByText('Generate Description')).toBeVisible({ timeout: 30000 });
 
     // Click the specific AI dismiss button
-    await expect(taskPage.aiCancelButton).toBeVisible();
+    await expect(taskPage.aiCancelButton).toBeVisible({ timeout: 30000 });
+    // Add small delay to ensure button is interactable
+    await appPage.page.waitForTimeout(1000);
     await taskPage.aiCancelButton.click();
 
     // Wait for AI panel to close
-    await expect(appPage.page.getByText('AI POWERED MAGIC')).not.toBeVisible();
+    await expect(appPage.page.getByText('AI POWERED')).not.toBeVisible();
 
     // Verify we're still in the main task form
     await expect(taskPage.titleInput).toBeVisible();
@@ -142,5 +144,61 @@ test.describe('Task Advanced Features', () => {
     // Verify task was created with manual description
     await expect(appPage.page.getByText(uniqueTitle)).toBeVisible();
     await expect(appPage.page.getByText(uniqueDescription)).toBeVisible();
+  });
+
+  test('should improve grammar using AI', async () => {
+    test.setTimeout(90000);
+
+    // Login first
+    await authPage.goToLogin();
+    await authPage.login(TEST_EMAIL, TEST_PASSWORD);
+    await authPage.expectLoggedIn();
+
+    // Create a task first with poor grammar
+    await appPage.openAddTaskModal();
+    const uniqueTitle = `Grammar Test ${Date.now()}`;
+    const poorGrammarText = 'me want fix grammar now good';
+
+    await taskPage.fillTaskForm({
+      title: uniqueTitle,
+      description: poorGrammarText
+    });
+
+    // Save initial task
+    await taskPage.createButton.click();
+    await taskPage.verifyModalClosed();
+
+    // Reload to ensure clean state and avoid modal animation issues
+    await appPage.page.reload();
+    // Wait for list to load
+    await expect(appPage.page.getByText(uniqueTitle).first()).toBeVisible({ timeout: 30000 });
+
+    // Re-open for editing
+    const taskCard = appPage.page.getByText(uniqueTitle).first();
+    await expect(taskCard).toBeVisible({ timeout: 10000 });
+    await taskCard.click({ force: true }); // Sometimes backdrop interferes
+    await taskPage.verifyModalOpen();
+
+    // Click AI assistant button
+    await taskPage.aiButton.click();
+
+    // Wait for AI options and click Improve Grammar
+    await expect(taskPage.aiImproveButton).toBeVisible();
+    await taskPage.aiImproveButton.click();
+
+    // Wait for AI to improve description (check simple logic: text changed)
+    // We pass poorGrammarText as an argument to the function
+    await appPage.page.waitForFunction((originalText) => {
+      const descInput = document.querySelector('#task-description') as HTMLTextAreaElement;
+      return descInput && descInput.value !== originalText;
+    }, poorGrammarText, { timeout: 90000 });
+
+    const newDescription = await taskPage.descriptionInput.inputValue();
+    expect(newDescription).not.toBe(poorGrammarText);
+    expect(newDescription.length).toBeGreaterThan(0);
+
+    // Close/Save
+    await taskPage.updateButton.click();
+    await taskPage.verifyModalClosed();
   });
 });

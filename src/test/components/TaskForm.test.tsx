@@ -5,6 +5,7 @@ import { TaskForm } from '../../components/TaskForm';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import { Task, TaskStatus } from '../../types/Task';
 import * as openaiService from '../../services/openaiService';
+import { playNotificationSound } from '../../utils/audioUtils';
 import { useAuth } from '../../contexts/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -20,6 +21,11 @@ vi.mock('../../services/openaiService', () => ({
     improveGrammar: vi.fn(),
     isConfigured: vi.fn(() => true)
   }
+}));
+
+// Mock the audio utility
+vi.mock('../../utils/audioUtils', () => ({
+  playNotificationSound: vi.fn(),
 }));
 
 // Mock environment variables
@@ -423,7 +429,7 @@ describe('TaskForm', () => {
       const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      expect(screen.getByText('AI POWERED MAGIC')).toBeInTheDocument();
+      expect(screen.getByText('AI POWERED')).toBeInTheDocument();
       expect(screen.getByText('Generate Description')).toBeInTheDocument();
     });
 
@@ -444,13 +450,13 @@ describe('TaskForm', () => {
       const aiButton = screen.getByTitle('AI Assistant');
       fireEvent.click(aiButton);
 
-      expect(screen.getByText('AI POWERED MAGIC')).toBeInTheDocument();
+      expect(screen.getByText('AI POWERED')).toBeInTheDocument();
 
       // Get the dismiss button inside the AI options panel
       const dismissButton = screen.getByText('Dismiss');
       fireEvent.click(dismissButton);
 
-      expect(screen.queryByText('AI POWERED MAGIC')).not.toBeInTheDocument();
+      expect(screen.queryByText('AI POWERED')).not.toBeInTheDocument();
     });
 
     it('should generate description using AI service', async () => {
@@ -502,7 +508,10 @@ describe('TaskForm', () => {
         expect(descriptionInput).toHaveValue(mockGeneratedDescription);
       });
 
-      expect(screen.queryByText('AI POWERED MAGIC')).not.toBeInTheDocument();
+      expect(screen.queryByText('AI POWERED')).not.toBeInTheDocument();
+
+      // Verify sound was played
+      expect(playNotificationSound).toHaveBeenCalled();
     });
 
     it('should handle AI generation errors', async () => {
@@ -627,6 +636,9 @@ describe('TaskForm', () => {
       });
 
       expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument();
+
+      // Verify sound was played
+      expect(playNotificationSound).toHaveBeenCalled();
     });
 
     it('should require description for grammar improvement', async () => {

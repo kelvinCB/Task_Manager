@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { AIIcon } from './AIIcon';
 import { openaiService } from '../services/openaiService';
+import { playNotificationSound } from '../utils/audioUtils';
 import { FileUploader } from './FileUploader';
 import { UploadResult } from '../services/taskService';
 import { extractAttachments, formatDescriptionWithAttachments, Attachment } from '../utils/attachmentUtils';
@@ -198,7 +199,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         <AIIcon size={18} animated={true} />
                       </div>
                       <h3 className={`text-sm font-bold tracking-tight ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-800'}`}>
-                        AI POWERED MAGIC
+                        AI POWERED
                       </h3>
                       <div className={`flex-1 h-px ${theme === 'dark' ? 'bg-indigo-500/20' : 'bg-indigo-200'}`}></div>
                     </div>
@@ -309,6 +310,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             // Final cleanup/formatting after stream ends
                             // (Handled by the fact that promise resolves with full string, but we rely on callback)
                             setShowAIOptions(false);
+                            playNotificationSound(1000, 0.5, 0.3); // AI generation completion sound
                           } catch (error) {
                             console.error('Error generating AI description:', error);
                             setAiError(error instanceof Error ? error.message : 'Unknown error');
@@ -381,6 +383,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                               }
                             });
                             setShowAIOptions(false);
+                            playNotificationSound(1000, 0.5, 0.3); // AI improvement completion sound
                           } catch (error) {
                             console.error('Error improving grammar:', error);
                             setAiError(error instanceof Error ? error.message : 'Unknown error');
