@@ -27,12 +27,10 @@ interface OpenAIError {
 export class OpenAIService {
   private apiKey: string;
   private baseUrl: string;
-  private defaultModel: string;
 
   constructor() {
     this.apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     this.baseUrl = import.meta.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1';
-    this.defaultModel = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
 
     if (!this.apiKey || this.apiKey === 'your-openai-api-key-here') {
       throw new Error('OpenAI API key not configured. Please add your API key to the .env file.');
@@ -47,7 +45,7 @@ export class OpenAIService {
    * Supports streaming if onToken callback is provided
    */
   async generateTaskDescription(
-    taskTitle: string, 
+    taskTitle: string,
     model: string = 'gpt-4o',
     onToken?: (token: string) => void
   ): Promise<string> {
@@ -149,7 +147,7 @@ IMPORTANT:
               try {
                 const json = JSON.parse(trimmedLine.slice(6));
                 const deltaContent = json.choices[0]?.delta?.content || json.choices[0]?.text || '';
-                
+
                 if (deltaContent) {
                   fullContent += deltaContent;
                   onToken(deltaContent);
@@ -226,8 +224,13 @@ IMPORTANT:
 
   /**
    * Improve the grammar and flow of a text
+   * Supports streaming if onToken callback is provided
    */
-  async improveGrammar(text: string, model: string = 'gpt-4o'): Promise<string> {
+  async improveGrammar(
+    text: string,
+    model: string = 'gpt-4o',
+    onToken?: (token: string) => void
+  ): Promise<string> {
     if (!text.trim()) {
       throw new Error('Text is required to improve grammar');
     }
@@ -244,7 +247,12 @@ Guidelines:
 - Fix grammar and spelling errors
 - Improve sentence flow and clarity
 - Maintain the original meaning and tone
-- Return ONLY the corrected text, no explanations or conversational filler`
+- Use Markdown for formatting if appropriate
+
+IMPORTANT:
+- First, outline your step-by-step approach or plan for improving this text.
+- Wrap this initial approach in <thinking>...</thinking> tags.
+- After the closing tag, provide ONLY the corrected text, no explanations or conversational filler`
       },
       {
         role: 'user',
@@ -253,20 +261,16 @@ Guidelines:
     ];
 
     try {
-      // Reuse the same fetch logic / request body construction as generateTaskDescription
-      // For DRYness, ideally we would refactor the common API call logic into a private method,
-      // but to minimize changes we will duplicate the fetch logic here for now, or we can refactor.
-      // Let's copy the logic to ensure stability first.
-
       const requestBody: any = {
         model,
-        messages
+        messages,
+        stream: !!onToken
       };
 
       if (isNewModel) {
         requestBody.max_completion_tokens = 4500;
       } else {
-        requestBody.max_tokens = 500;
+        requestBody.max_tokens = 2000; // Increased for thinking tags and potential text length
         requestBody.temperature = 0.3; // Lower temperature for grammar correction
         requestBody.top_p = 1;
         requestBody.frequency_penalty = 0;
@@ -288,6 +292,41 @@ Guidelines:
         throw new Error(`OpenAI API Error: ${errorData.error.message}`);
       }
 
+      // Handle Streaming Response
+      if (onToken && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let fullContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine === 'data: [DONE]') continue;
+            if (trimmedLine.startsWith('data: ')) {
+              try {
+                const json = JSON.parse(trimmedLine.slice(6));
+                const deltaContent = json.choices[0]?.delta?.content || json.choices[0]?.text || '';
+
+                if (deltaContent) {
+                  fullContent += deltaContent;
+                  onToken(deltaContent);
+                }
+              } catch (e) {
+                console.warn('Error parsing stream chunk:', e);
+              }
+            }
+          }
+        }
+        return fullContent;
+      }
+
+      // Handle Non-Streaming Response
       const data: OpenAIResponse = await response.json();
 
       if (!data.choices || data.choices.length === 0) {

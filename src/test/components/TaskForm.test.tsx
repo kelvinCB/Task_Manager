@@ -455,7 +455,7 @@ describe('TaskForm', () => {
 
     it('should generate description using AI service', async () => {
       const mockGeneratedDescription = 'AI generated description for the task';
-      
+
       // Update mock to handle callback
       (openaiService.openaiService.generateTaskDescription as any).mockImplementation(
         async (_title: string, _model: string, onToken?: (token: string) => void) => {
@@ -491,7 +491,7 @@ describe('TaskForm', () => {
 
       await waitFor(() => {
         expect(openaiService.openaiService.generateTaskDescription).toHaveBeenCalledWith(
-          'Test Task Title', 
+          'Test Task Title',
           expect.any(String),
           expect.any(Function)
         );
@@ -584,7 +584,15 @@ describe('TaskForm', () => {
 
     it('should improve grammar using AI service', async () => {
       const mockImproved = 'Improved description.';
-      (openaiService.openaiService.improveGrammar as any).mockResolvedValue(mockImproved);
+      (openaiService.openaiService.improveGrammar as any).mockImplementation(
+        async (_text: string, _model: string, onToken?: (token: string) => void) => {
+          if (onToken) {
+            onToken('<thinking>Improvement plan...</thinking>');
+            onToken(mockImproved);
+          }
+          return `<thinking>Improvement plan...</thinking>${mockImproved}`;
+        }
+      );
 
       render(
         <TestWrapper>
@@ -612,7 +620,11 @@ describe('TaskForm', () => {
       expect(screen.getByText('Improving...')).toBeInTheDocument();
 
       await waitFor(() => {
-        expect(openaiService.openaiService.improveGrammar).toHaveBeenCalledWith('Bad grammar text', expect.any(String));
+        expect(openaiService.openaiService.improveGrammar).toHaveBeenCalledWith(
+          'Bad grammar text',
+          expect.any(String),
+          expect.any(Function)
+        );
       });
 
       await waitFor(() => {
