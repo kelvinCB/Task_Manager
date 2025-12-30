@@ -37,6 +37,18 @@ describe('TimeStatsView Component', () => {
     // Configurar getTimeStatistics para devolver los datos mock
     mockGetTimeStatistics.mockReturnValue(mockTimeStats);
   });
+
+  it('should call getTimeStatistics with "month" by default on mount', () => {
+    // Act
+    render(
+      <ThemeProvider>
+        <TimeStatsView getTimeStatistics={mockGetTimeStatistics} />
+      </ThemeProvider>
+    );
+
+    // Assert
+    expect(mockGetTimeStatistics).toHaveBeenCalledWith('month');
+  });
   
   it('should render the time statistics view with period selector', () => {
     // Act

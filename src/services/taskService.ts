@@ -142,7 +142,12 @@ export class TaskService {
       backendTask.due_date = task.dueDate ? task.dueDate.toISOString().split('T')[0] : null;
     }
     // pass-through for backend-specific fields (e.g., total_time_ms)
-    if ((task as any).total_time_ms !== undefined) backendTask.total_time_ms = (task as any).total_time_ms;
+    if ((task as any).total_time_ms !== undefined) {
+      backendTask.total_time_ms = (task as any).total_time_ms;
+    } else if (task.timeTracking?.totalTimeSpent !== undefined) {
+      // Map frontend totalTimeSpent to backend total_time_ms
+      backendTask.total_time_ms = task.timeTracking.totalTimeSpent;
+    }
 
     return backendTask;
   }
