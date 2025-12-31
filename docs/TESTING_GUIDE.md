@@ -17,8 +17,8 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ### Estado Actual
 
 ✅ **300 pruebas unitarias** (100% pasando)
-✅ **83 pruebas E2E** (100% pasando)
-✅ **82 pruebas de backend** (100% pasando)
+✅ **91 pruebas E2E** (100% pasando)
+✅ **127 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
