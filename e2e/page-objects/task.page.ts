@@ -19,7 +19,7 @@ export class TaskPage {
   constructor(page: Page) {
     this.page = page;
     // Look for modal dialog content (the actual modal div)
-    this.taskModal = page.locator('div').filter({ hasText: 'Create New Task' }).or(page.locator('div').filter({ hasText: 'Edit Task' })).first();
+    this.taskModal = page.getByRole('dialog').first();
     // Use specific IDs from the actual implementation
     this.titleInput = page.locator('#task-title');
     this.descriptionInput = page.locator('#task-description');
