@@ -16,9 +16,9 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 
-✅ **173 pruebas unitarias** (100% pasando)
-✅ **83 pruebas E2E** (100% pasando)
-✅ **82 pruebas de backend** (100% pasando)
+✅ **300 pruebas unitarias** (100% pasando)
+✅ **91 pruebas E2E** (100% pasando)
+✅ **127 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
@@ -72,6 +72,10 @@ src/test/
 - **openaiService**: Integración IA (16 tests)
 - **AccountMenu**: Menú de cuenta con username display (11 tests)
 - **useUserProfile**: Hook para gestión de perfiles de usuario (6 tests)
+- **Contexts**: ThemeContext (7 tests), AuthContext (8 tests)
+- **Modals**: AuthRequiredModal (9 tests), ImageCropModal (8 tests), RegistrationSuccessModal (7 tests)
+- **UI Components**: LoginButton (7 tests), AttachmentList (9 tests), BurgerMenu (8 tests), TaskStats (7 tests)
+- **Icons**: AIIcon (7 tests), ProgressIcon (8 tests), FlagIcons (4 tests)
 - **Otros componentes**: TaskBoard, TaskTree, TimeStatsView, etc.
 
 ### Mocks configurados

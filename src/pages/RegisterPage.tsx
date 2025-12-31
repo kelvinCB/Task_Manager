@@ -4,12 +4,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { AuthForm } from '../components/features/auth/AuthForm';
 import { LanguageToggle } from '../components/ui/LanguageToggle';
+import { RegistrationSuccessModal } from '../components/features/auth/RegistrationSuccessModal';
 import loginIllustrationLight from '../assets/images/login-illustration-light.png';
 import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
 
 const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -20,6 +23,16 @@ const RegisterPage: React.FC = () => {
   const handleRegister = async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
+    // Strict email validation
+    // Prevent consecutive dots, start/end with dot, etc.
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,6}$/;
+    
+    if (!emailRegex.test(email) || email.includes('..')) {
+      setError(t('auth.invalid_email'));
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signUp({
         email,
@@ -30,12 +43,18 @@ const RegisterPage: React.FC = () => {
         throw error;
       }
 
-      // Registration successful, inform the user to check their email
-      alert(t('auth.registration_success'));
-      navigate('/login'); // Redirect to the login page
+      // Registration successful, show modal
+      setRegisteredEmail(email);
+      setShowSuccessModal(true);
 
     } catch (err: any) {
-      setError(err.message || t('common.error'));
+      if (err.message === 'Email not confirmed') {
+        setError(t('auth.email_not_confirmed'));
+      } else if (err.message === 'Unable to validate email address: invalid format') {
+        setError(t('auth.invalid_email'));
+      } else {
+        setError(err.message || t('common.error'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -82,6 +101,13 @@ const RegisterPage: React.FC = () => {
       <div className="absolute top-4 right-4 z-50">
         <LanguageToggle />
       </div>
+      
+      <RegistrationSuccessModal 
+        isOpen={showSuccessModal} 
+        onClose={() => navigate('/login')} 
+        email={registeredEmail}
+      />
+
       {/* Left side - Decorative Image (Desktop only) - 50% width */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
         {/* Logo context in the image side - Top Left over image */}
@@ -151,5 +177,6 @@ const RegisterPage: React.FC = () => {
     </div>
   );
 };
+
 
 export default RegisterPage;

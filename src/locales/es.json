@@ -24,10 +24,16 @@
         "login_github": "INICIAR CON GITHUB",
         "signup_github": "REGISTRARSE CON GITHUB",
         "or": "o",
+        "back_to_login": "Volver a iniciar sesión",
         "reset_password_h1": "Restablece tu contraseña",
         "reset_password_desc": "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
         "send_reset_link": "Enviar enlace",
-        "back_to_login": "Volver al inicio de sesión"
+        "registration_success_title": "Verifica tu correo",
+        "registration_success_desc": "Tu cuenta ha sido creada. Por favor revisa tu correo para confirmar el registro.",
+        "go_to_login": "Ir a Iniciar Sesión",
+        "github_error": "Error al iniciar sesión con GitHub",
+        "invalid_email": "Formato de correo inválido",
+        "email_not_confirmed": "Correo electrónico no confirmado"
     },
     "stats_view": {
         "title": "Estadísticas de Tiempo",

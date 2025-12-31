@@ -173,21 +173,15 @@ test.describe('Authentication E2E Tests', () => {
       const hasError = await errorLocator.isVisible().catch(() => false);
       
       if (hasError) {
-        // If error is shown, verify it mentions the user already exists
-        await authPage.expectRegistrationError('User already registered');
+        // If error is shown, verify it mentions the user already exists or email is not confirmed (common Supabase response)
+        const errorMessage = page.locator('[data-testid="error-message"]');
+        await expect(errorMessage).toContainText(/User already registered|Email not confirmed/);
       } else {
         // If no error shown, Supabase is configured for security (no email enumeration)
-        // It will show success message and redirect to login
-        // This is acceptable behavior - just verify we're at login or got success
-        const currentUrl = page.url();
-        const isAtLogin = currentUrl.includes('/login');
+        // It will show the success modal (same as new registration)
         
-        if (!isAtLogin) {
-          // Wait for alert and URL change
-          await page.waitForURL('/login', { timeout: 5000 });
-        }
-        
-        expect(currentUrl.includes('/login') || page.url().includes('/login')).toBeTruthy();
+        // Use the shared method to handle modal interaction
+        await authPage.expectRegistrationSuccess();
       }
     });
 

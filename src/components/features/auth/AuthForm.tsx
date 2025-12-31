@@ -71,7 +71,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
         <div className="flex-grow border-t border-gray-300"></div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

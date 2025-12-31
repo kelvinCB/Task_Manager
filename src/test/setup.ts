@@ -86,6 +86,7 @@ vi.mock('react-i18next', () => ({
         'auth.reset_password_h1': 'Reset your password',
         'auth.reset_password_desc': "Enter your email address and we'll send you a link to reset your password.",
         'auth.send_reset_link': 'Send reset link',
+        'auth.send_reset_link': 'Send reset link',
         'auth.back_to_login': 'Back to login',
         'stats_view.title': 'Time Tracking Statistics',
         'stats_view.today': 'Today',
@@ -101,6 +102,15 @@ vi.mock('react-i18next', () => ({
         'tasks.upload_hint': 'Documents, Images, Audio, Video (max 10MB)',
         'ai.thinking_status': 'Thinking...',
         'tasks.see_more': '...See more',
+        'auth.registration_success_title': 'Verify your email',
+        'auth.registration_success_desc': 'Your account has been created. Please check your email to confirm your registration.',
+        'auth.go_to_login': 'Go to Login',
+        'auth.email_not_confirmed': 'Email not confirmed',
+        'auth.create_account_title': 'Create your account',
+        'auth.have_account': 'Already have an account?',
+        'auth.google_error': 'Google login failed',
+        'auth.github_error': 'GitHub login failed',
+        'auth.invalid_email': 'Invalid email format',
         // Add more mapping as needed by tests
       };
       return translations[key] || key;

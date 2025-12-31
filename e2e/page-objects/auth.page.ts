@@ -312,70 +312,19 @@ export class AuthPage {
   }
 
   async expectRegistrationSuccess() {
-    // Check for success dialogs
-    const hasDialog = await this.page.evaluate(() => {
-      return document.querySelectorAll('dialog[open], [role="dialog"], .modal, .dialog').length > 0;
-    });
-    
-    if (hasDialog) {
-      // Close dialog
-      await this.page.keyboard.press('Escape');
-    } else {
-      // Look for success messages
-      const successIndicators = [
-        '[data-testid="success-message"]',
-        '.success',
-        '.alert-success',
-        '[role="alert"]'
-      ];
-      
-      let successFound = false;
-      
-      for (const selector of successIndicators) {
-        const elements = this.page.locator(selector);
-        const count = await elements.count();
-        
-        if (count > 0) {
-          successFound = true;
-          break;
-        }
-      }
-      
-      // If no indicator found, search by text
-      if (!successFound) {
-        const successTexts = [
-          'Registration successful',
-          'Success',
-          'Account created',
-          'Registered',
-          'Welcome'
-        ];
-        
-        for (const text of successTexts) {
-          const element = this.page.getByText(new RegExp(text, 'i'));
-          const isVisible = await element.isVisible().catch(() => false);
-          
-          if (isVisible) {
-            successFound = true;
-            break;
-          }
-        }
-      }
-    }
-    
-    // Check if we were redirected to login
-    const currentUrl = this.page.url();
-    const shouldBeAtLogin = currentUrl.includes('/login');
-    
-    if (!shouldBeAtLogin) {
-      // Wait for possible late redirection
-      await this.page.waitForTimeout(3000);
-      const newUrl = this.page.url();
-      
-      if (!newUrl.includes('/login')) {
-        // Registration might be successful without redirection
-      }
-    }
+    // Wait for Success Modal
+    const modalTitle = this.page.getByText('Verify your email');
+    await expect(modalTitle).toBeVisible({ timeout: 10000 });
+
+    // Verify description
+    await expect(this.page.getByText('Your account has been created')).toBeVisible();
+
+    // Click Go to Login
+    const goToLoginBtn = this.page.getByText('Go to Login');
+    await goToLoginBtn.click();
+
+    // Verify redirection to login
+    await expect(this.page).toHaveURL('/login');
   }
 
   async expectRegistrationError(errorMessage: string) {
