@@ -21,13 +21,19 @@
         "reset_password_h1": "Reset your password",
         "reset_password_desc": "Enter your email address and we'll send you a link to reset your password.",
         "send_reset_link": "Send reset link",
-        "back_to_login": "Back to login",
+        "registration_success_title": "Verify your email",
+        "registration_success_desc": "Your account has been created. Please check your email to confirm your registration.",
+        "github_error": "GitHub login failed",
+        "invalid_email": "Invalid email format",
+        "go_to_login": "Go to Login",
+        "email_not_confirmed": "Email not confirmed",
         "join_us": "Join us to manage your tasks efficiently",
         "login_google": "LOG IN WITH GOOGLE",
         "signup_google": "SIGN UP WITH GOOGLE",
         "login_github": "LOG IN WITH GITHUB",
         "signup_github": "SIGN UP WITH GITHUB",
-        "or": "or"
+        "or": "or",
+        "back_to_login": "Back to login"
     },
     "stats_view": {
         "title": "Time Tracking Statistics",
