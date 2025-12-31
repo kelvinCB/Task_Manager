@@ -66,18 +66,48 @@ backend/
 
 ### API Endpoints
 
-#### Authentication Endpoints
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
+#### Key Endpoints (REST)
 
-#### Task Management Endpoints
-All task endpoints require JWT authentication via Bearer token.
+| Method | Route | Description |
+| :--- | :--- | :--- |
+| **Auth** | | |
+| POST | `/api/auth/register` | User registration |
+| POST | `/api/auth/login` | User login |
+| POST | `/api/auth/forgot-password` | Request password reset |
+| POST | `/api/auth/reset-password` | Reset password |
+| **Tasks** | | |
+| GET | `/api/tasks` | Get all user tasks |
+| POST | `/api/tasks` | Create a new task |
+| GET | `/api/tasks/:id` | Get specific task by ID |
+| PUT | `/api/tasks/:id` | Update an existing task |
+| DELETE | `/api/tasks/:id` | Delete a task |
+| **Time Entries** | | |
+| POST | `/api/time-entries/start` | Start task timer |
+| POST | `/api/time-entries/stop` | Stop task timer |
+| GET | `/api/time-entries/summary` | Get time summary (query: start, end) |
+| POST | `/api/time-entries/complete` | Log time on task completion |
+| **Profile** | | |
+| POST | `/api/profile/avatar` | Upload profile avatar |
+| DELETE | `/api/profile/avatar` | Delete profile avatar |
+| **Upload** | | |
+| POST | `/api/upload` | Upload generic file (Docs, Images, Media) |
+| GET | `/api/upload/test` | Upload test endpoint |
+| **System** | | |
+| GET | `/` | Server welcome message |
+| GET | `/health` | System status check (Health Check) |
 
-- `GET /api/tasks` - Get all tasks for authenticated user
-- `GET /api/tasks/:id` - Get specific task by ID
-- `POST /api/tasks` - Create a new task
-- `PUT /api/tasks/:id` - Update an existing task
-- `DELETE /api/tasks/:id` - Delete a task
+### Instructions for AI Agents
+> [!IMPORTANT]
+> **API Documentation Maintenance**
+> 
+> If you add, modify, or delete a backend endpoint, you **MUST** update the 'Key Endpoints (REST)' table in this document (@docs/BACKEND_GUIDE.md).
+> 
+> 1. Ensure you include the correct HTTP method (GET, POST, PUT, PATCH, DELETE).
+> 2. Specify the full relative route (e.g., `/api/tasks/:id`).
+> 3. Provide a concise but clear description of the endpoint's function.
+> 4. Keep the table organized by modules (Auth, Tasks, etc.).
+>
+> This table is the source of truth for manual testing and frontend development. Keep it updated!
 
 #### Request/Response Format
 **Register:**
