@@ -172,7 +172,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
                           {/* Desktop layout */}
                           <div className={`hidden md:flex items-center gap-2 text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
-                            <span>{t('tasks.depth')}: {task.depth}</span>
+                            {task.depth > 0 && <span>{t('tasks.depth')}: {task.depth}</span>}
                             {task.childIds.length > 0 && (
                               <span>• {task.childIds.length} {t('tasks.subtasks')}</span>
                             )}
@@ -199,7 +199,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                           <div className={`md:hidden text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
                             {/* Task info row */}
                             <div className="flex items-center gap-2 mb-1">
-                              <span>{t('tasks.depth')}: {task.depth}</span>
+                              {task.depth > 0 && <span>{t('tasks.depth')}: {task.depth}</span>}
                               {task.childIds.length > 0 && (
                                 <span>• {task.childIds.length} {t('tasks.subtasks')}</span>
                               )}

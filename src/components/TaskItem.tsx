@@ -238,10 +238,12 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                       {isOverdue && <span className="text-red-600">• {t('tasks.overdue')}</span>}
                     </div>
                   )}
-                  <div className="flex items-center gap-1">
-                    <User size={12} />
-                    <span>{t('tasks.depth')} {task.depth}</span>
-                  </div>
+                  {task.depth > 0 && (
+                    <div className="flex items-center gap-1">
+                      <User size={12} />
+                      <span>{t('tasks.depth')} {task.depth}</span>
+                    </div>
+                  )}
                   {/* Task Timer */}
                   {onStartTimer && onPauseTimer && getElapsedTime && (
                     <TaskTimer

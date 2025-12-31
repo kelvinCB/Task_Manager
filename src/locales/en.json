@@ -86,7 +86,7 @@
         "validation_title": "Title is required",
         "validation_ai_title": "Please enter a task title first to use AI assistance.",
         "validation_ai_desc": "Please enter a description first.",
-        "depth": "Depth",
+        "depth": "Subtasks",
         "subtasks": "subtask(s)",
         "overdue": "Overdue",
         "due": "Due",

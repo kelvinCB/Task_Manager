@@ -41,6 +41,14 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 - Zero-configuration setup with existing Vercel deployment
 - Production-ready implementation with successful build verification
 
+**Feature TM-032: Multi-language Support (i18n)** (✅ Completed - Ready for Merge)
+- Full English (en) and Spanish (es) support
+- `react-i18next` integration for seamless translation management
+- Dynamic `LanguageToggle` component for instant language switching
+- Localized UI components (Auth, Tasks, Stats, Account)
+- Persisted language preference
+- Comprehensive test coverage for localized components
+
 **Status:** All tests passing, documentation updated, ready for production deployment.
 
 ---
@@ -67,6 +75,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Drag & Drop** | ✅ Complete | 100% | Move tasks between statuses |
 | **Responsive Design** | ✅ Complete | 100% | Mobile and desktop compatibility |
 | **Local Storage** | ✅ Complete | 100% | Persist data locally |
+| **Multi-language Support** | ✅ Complete | 100% | English and Spanish support with instant switching |
 
 ### 🤖 AI Features (Partially Complete - 50%)
 

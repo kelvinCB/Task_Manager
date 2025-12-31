@@ -54,12 +54,12 @@
         "filter": "Filtrar",
         "actions": "Acciones",
         "confirm": "Confirmar",
-        "back": "Atrás",
-        "see_more": "...Ver más"
+        "back": "Atrás"
     },
     "tasks": {
         "new_task": "Nueva Tarea",
         "edit_task": "Editar Tarea",
+        "see_more": "...Ver más",
         "all_status": "Todas",
         "title": "Título",
         "description": "Descripción",
@@ -86,7 +86,7 @@
         "validation_title": "El título es obligatorio",
         "validation_ai_title": "Por favor ingresa un título de tarea primero para usar la asistencia de IA.",
         "validation_ai_desc": "Por favor ingresa una descripción primero.",
-        "depth": "Profundidad",
+        "depth": "Subtareas",
         "subtasks": "subtarea(s)",
         "overdue": "Vencida",
         "due": "Vence",
