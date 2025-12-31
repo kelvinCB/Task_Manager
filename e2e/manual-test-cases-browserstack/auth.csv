@@ -19,7 +19,7 @@ Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automat
 "Logout - Successful","","","Click 'Log out'.","1. User is logged out. 2. Redirected to home/login state. 3. Account menu updates to show public options.","High","Functional","Auth,Logout","Automated"
 "Register - Valid Registration","Verify user can register with valid details","User is on Register page","Enter a unique email address.","Email entered.","High","Functional","Auth,Register","Automated"
 "Register - Valid Registration","","","Enter valid password (min 6 chars).","Password entered.","High","Functional","Auth,Register","Automated"
-"Register - Valid Registration","","","Click 'Sign up' button.","1. Registration successful. 2. Redirected to Dashboard or Login.","High","Functional","Auth,Register","Automated"
+"Register - Valid Registration","","","Click 'Sign up' button.","1. Success Modal appears with message 'Registration Successful!'. 2. Clicking 'Go to Login' redirects to Login page.","High","Functional","Auth,Register","Automated"
 "Register - Form Validation","Verify required field validation on Register page","User is on Register page","Leave fields empty.","Fields empty.","Medium","Functional","Auth,Register,Validation","Automated"
 "Register - Form Validation","","","Click 'Sign up' button.","Validation error indicating fields are required.","Medium","Functional","Auth,Register,Validation","Automated"
 "Register - Password Length","Verify minimum password length validation","User is on Register page","Enter valid email.","Email entered.","Medium","Functional","Auth,Register,Validation","Automated"
