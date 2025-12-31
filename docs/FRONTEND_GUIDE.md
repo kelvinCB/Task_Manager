@@ -16,8 +16,9 @@ This guide provides comprehensive documentation for frontend development in the 
 8. [Accessibility Standards](#accessibility-standards)
 9. [Error Handling](#error-handling)
 10. [API Integration](#api-integration)
-11. [Testing Guidelines](#testing-guidelines)
-12. [Build and Deployment](#build-and-deployment)
+11. [Internationalization (i18n)](#internationalization-i18n)
+12. [Testing Guidelines](#testing-guidelines)
+13. [Build and Deployment](#build-and-deployment)
 
 ---
 
@@ -561,6 +562,36 @@ act(() => {
   result.current.createTask({ title: 'Test Task' });
 });
 ```
+
+
+---
+
+## Internationalization (i18n)
+
+### Overview
+The application uses `react-i18next` for internationalization, supporting English (en) and Spanish (es). Code-splitting is supported, but currently, standard JSON files are laid out for simplicity.
+
+### Structure
+Translations are stored in `src/locales/`:
+- `en.json`: English strings
+- `es.json`: Spanish strings
+
+Configuration is located in `src/i18n.ts`.
+
+### Usage
+Use the `useTranslation` hook in components:
+
+```typescript
+import { useTranslation } from 'react-i18next';
+
+export const MyComponent = () => {
+  const { t } = useTranslation();
+  return <h1>{t('app.title')}</h1>;
+};
+```
+
+### Components
+- **LanguageToggle**: A UI component (`src/components/ui/LanguageToggle.tsx`) allows users to switch languages instantly. It persists the preference using `i18next` language detection or storage.
 
 ---
 

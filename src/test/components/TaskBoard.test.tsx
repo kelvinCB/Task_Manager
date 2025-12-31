@@ -15,11 +15,11 @@ const mockGetElapsedTime = vi.fn().mockReturnValue(3600000); // 1h por defecto
 
 describe('TaskBoard Component', () => {
   let mockTasks: Task[];
-  
+
   beforeEach(() => {
     // Reiniciar mocks
     vi.clearAllMocks();
-    
+
     // Crear tareas mock para las pruebas
     mockTasks = [
       {
@@ -79,12 +79,12 @@ describe('TaskBoard Component', () => {
       }
     ];
   });
-  
+
   it('should render the board with correct columns and tasks', () => {
     // Act
     render(
       <ThemeProvider>
-        <TaskBoard 
+        <TaskBoard
           tasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
@@ -96,23 +96,23 @@ describe('TaskBoard Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert - verificar que se muestran las columnas
     expect(screen.getByText('Open')).toBeInTheDocument();
     expect(screen.getByText('In Progress')).toBeInTheDocument();
     expect(screen.getByText('Done')).toBeInTheDocument();
-    
+
     // Verificar que se muestran las tareas
     expect(screen.getByText('Open Task')).toBeInTheDocument();
     expect(screen.getByText('In Progress Task')).toBeInTheDocument();
     expect(screen.getByText('Done Task')).toBeInTheDocument();
   });
-  
+
   it('should render "Add New Task" button in Open column', () => {
     // Act
     render(
       <ThemeProvider>
-        <TaskBoard 
+        <TaskBoard
           tasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
@@ -124,17 +124,17 @@ describe('TaskBoard Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert - verificar que hay un botón para añadir tareas en la columna Open
-    const addButton = screen.getByText(/add new task/i);
+    const addButton = screen.getByText(/new task/i);
     expect(addButton).toBeInTheDocument();
   });
-  
+
   it('should call onCreateTask when "Add New Task" button is clicked', () => {
     // Act
     render(
       <ThemeProvider>
-        <TaskBoard 
+        <TaskBoard
           tasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
@@ -146,20 +146,20 @@ describe('TaskBoard Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Clic en el botón de añadir tarea (columna Open)
-    const addButton = screen.getByText(/add new task/i);
+    const addButton = screen.getByText(/new task/i);
     fireEvent.click(addButton);
-    
+
     // Assert
     expect(mockOnCreateTask).toHaveBeenCalled();
   });
-  
+
   it('should render task timer component for tasks', () => {
     // Act
     render(
       <ThemeProvider>
-        <TaskBoard 
+        <TaskBoard
           tasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
@@ -171,20 +171,20 @@ describe('TaskBoard Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert - verificar que se muestra el componente TaskTimer
     // La tarea en progreso debería mostrar un botón de pausa
     expect(screen.getAllByTitle('Pause timer').length).toBeGreaterThan(0);
-    
+
     // La tarea abierta debería mostrar un botón de inicio
     expect(screen.getAllByTitle('Start timer').length).toBeGreaterThan(0);
   });
-  
+
   it('should show task details when a task is clicked', () => {
     // Act
     render(
       <ThemeProvider>
-        <TaskBoard 
+        <TaskBoard
           tasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
@@ -196,13 +196,13 @@ describe('TaskBoard Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Clic en la primera tarea
     const taskElement = screen.getByText('Open Task');
     // Encontrar el contenedor más cercano que sea un div
     const taskCard = taskElement.closest('div') || taskElement;
     fireEvent.click(taskCard);
-    
+
     // Assert - verificar que se muestra la descripción
     expect(screen.getByText('This is an open task')).toBeInTheDocument();
   });

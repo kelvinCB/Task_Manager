@@ -16,7 +16,7 @@ test.describe('Task Manager App', () => {
 
   test('should load the application successfully', async () => {
     await appPage.verifyPageLoaded();
-    await expect(appPage.page).toHaveTitle(/Task Manager/i);
+    await expect(appPage.page).toHaveTitle(/TaskLite/i);
   });
 
   test('should display board view by default', async () => {

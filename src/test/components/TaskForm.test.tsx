@@ -84,7 +84,7 @@ describe('TaskForm', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText('Create New Task')).toBeInTheDocument();
+      expect(screen.getByText('New Task')).toBeInTheDocument();
       expect(screen.getByRole('textbox', { name: /title/i })).toBeInTheDocument();
       expect(screen.getByRole('textbox', { name: /description/i })).toBeInTheDocument();
       expect(screen.getByLabelText(/status/i)).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('TaskForm', () => {
         </TestWrapper>
       );
 
-      expect(screen.queryByText('Create New Task')).not.toBeInTheDocument();
+      expect(screen.queryByText('New Task')).not.toBeInTheDocument();
     });
 
     it('should show subtask info when parentId is provided', () => {
@@ -508,7 +508,9 @@ describe('TaskForm', () => {
         expect(descriptionInput).toHaveValue(mockGeneratedDescription);
       });
 
-      expect(screen.queryByText('AI POWERED')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText('AI POWERED')).not.toBeInTheDocument();
+      });
 
       // Verify sound was played
       expect(playNotificationSound).toHaveBeenCalled();

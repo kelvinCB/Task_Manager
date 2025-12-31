@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Download,
   Upload,
@@ -36,6 +37,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authActionType, setAuthActionType] = useState<'export' | 'import'>('export');
@@ -81,7 +83,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
     if (file) {
       // 10MB limit
       if (file.size > 10 * 1024 * 1024) {
-        toast.error('La imagen es demasiado grande. Máximo 10MB.');
+        toast.error(t('account.image_too_large'));
         return;
       }
 
@@ -109,12 +111,12 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
 
       setIsCropModalOpen(false);
       setSelectedImage(null);
-      toast.success('Foto de perfil actualizada con éxito');
+      toast.success(t('account.upload_success'));
     } catch (err: any) {
       console.error('Failed to upload avatar:', err);
-      const errorMessage = err.message || 'Error al subir la imagen. Por favor, inténtelo de nuevo.';
+      const errorMessage = err.message || t('account.upload_error');
       setUploadError(errorMessage);
-      toast.error('Error al subir la imagen', {
+      toast.error(t('common.error'), {
         description: errorMessage,
         duration: 5000
       });
@@ -138,7 +140,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
         `}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        title="My Account"
+        title={t('account.my_account')}
       >
         {isAuthenticated && profile ? (
           <Avatar
@@ -158,7 +160,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
         )}
         {!compact && (
           <>
-            <span className="hidden sm:inline">My Account</span>
+            <span className="hidden sm:inline">{t('account.my_account')}</span>
             <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} />
           </>
         )}
@@ -234,7 +236,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
                 role="menuitem"
               >
                 <LogOut size={16} />
-                <span>Logout</span>
+                <span>{t('auth.logout')}</span>
               </button>
             ) : (
               <button
@@ -250,7 +252,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
                 role="menuitem"
               >
                 <LogIn size={16} />
-                <span>Login</span>
+                <span>{t('auth.login')}</span>
               </button>
             )}
 
@@ -278,7 +280,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
               role="menuitem"
             >
               <Download size={16} />
-              <span>Export Tasks</span>
+              <span>{t('account.export_tasks')}</span>
             </button>
 
             {/* Import option */}
@@ -304,7 +306,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
               }}
             >
               <Upload size={16} />
-              <span>Import Tasks</span>
+              <span>{t('account.import_tasks')}</span>
               <input
                 type="file"
                 id="import-csv"

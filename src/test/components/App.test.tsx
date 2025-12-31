@@ -230,7 +230,7 @@ describe('App Component', () => {
 
     // Assert - verify Board view is shown by default
     // Check for characteristic Board view elements
-    expect(screen.getAllByText(/add task/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/new task/i).length).toBeGreaterThan(0);
 
     // Verify Board button is active (has the active class) - check first instance
     const boardViewButtons = screen.getAllByTitle('Board View');
@@ -294,7 +294,7 @@ describe('App Component', () => {
     );
 
     // Open form
-    const addTaskButton = screen.getAllByText(/add task/i)[0];
+    const addTaskButton = screen.getAllByText(/new task/i)[0];
     fireEvent.click(addTaskButton);
 
     // Fill form

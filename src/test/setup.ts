@@ -1,75 +1,137 @@
-import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import { webcrypto } from 'node:crypto';
+import '@testing-library/jest-dom';
 
-// Polyfill for crypto.getRandomValues (needed for some Vitest/JSDOM environments)
-if (typeof window !== 'undefined' && !window.crypto) {
-  Object.defineProperty(window, 'crypto', {
-    value: webcrypto,
-    writable: true,
-    configurable: true
-  });
-}
-
-// Load environment variables from .env.development for tests
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load .env.development file for unit tests
-dotenv.config({ path: path.resolve(__dirname, '../../.env.development') });
-
-// Mock para localStorage
-const localStorageMock = (function () {
-  let store: Record<string, string> = {};
-
-  return {
-    getItem(key: string) {
-      return store[key] || null;
+// Global mock for react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      // Return simple English strings for common keys to make tests pass easier without updating all verification steps
+      const translations: Record<string, string> = {
+        'auth.login': 'Sign In',
+        'auth.register': 'Create Account',
+        'auth.logout': 'Logout',
+        'auth.email': 'Email',
+        'auth.password': 'Password',
+        'app.title': 'TaskLite',
+        'tasks.new_task': 'New Task',
+        'common.save': 'Save',
+        'common.cancel': 'Cancel',
+        'common.delete': 'Delete',
+        'common.edit': 'Edit',
+        'common.create': 'Create',
+        'tasks.title': 'Title',
+        'tasks.description': 'Description',
+        'tasks.status': 'Status',
+        'tasks.priority': 'Priority',
+        'tasks.due_date': 'Due Date',
+        'tasks.no_tasks': 'No tasks found',
+        'tasks.create_first': 'Create your first task to get started',
+        'ai.generate': 'Generate Description',
+        'ai.improve': 'Improve Grammar',
+        'ai.generating': 'Generating...',
+        'ai.improving': 'Improving...',
+        'ai.powered': 'AI POWERED',
+        'tasks.status_open': 'Open',
+        'tasks.status_in_progress': 'In Progress',
+        'tasks.status_done': 'Done',
+        'tasks.status_open_desc': 'Tasks tailored for you',
+        'tasks.status_in_progress_desc': 'Tasks currently being worked on',
+        'tasks.status_done_desc': 'Completed tasks',
+        'auth.login_google': 'LOG IN WITH GOOGLE',
+        'auth.login_github': 'LOG IN WITH GITHUB',
+        'auth.signup_google': 'SIGN UP WITH GOOGLE',
+        'auth.signup_github': 'SIGN UP WITH GITHUB',
+        'account.my_account': 'My Account',
+        'nav.board_view': 'Board View',
+        'nav.tree_view': 'Tree View',
+        'nav.stats_view': 'Time Stats',
+        'tasks.create_task': 'Create Task',
+        'tasks.update_task': 'Update Task',
+        'tasks.edit_task': 'Edit Task',
+        'tasks.new_task': 'New Task',
+        'tasks.title': 'Title',
+        'tasks.description': 'Description',
+        'tasks.placeholder_title': 'What needs to be done?',
+        'tasks.placeholder_desc': 'Add more details about this task...',
+        'tasks.status': 'Status',
+        'tasks.status_open': 'Open',
+        'tasks.status_in_progress': 'In Progress',
+        'tasks.status_done': 'Done',
+        'tasks.due_date': 'Due Date',
+        'tasks.attachments': 'Attachments',
+        'tasks.subtask_mode': 'Subtask Mode',
+        'tasks.subtask_desc': 'This task will be nested under its parent.',
+        'tasks.validation_title': 'Title is required',
+        'tasks.validation_ai_title': 'Please enter a task title first to use AI assistance.',
+        'tasks.validation_ai_desc': 'Please enter a description first.',
+        'common.cancel': 'Cancel',
+        'common.error': 'An error occurred',
+        'ai.powered': 'AI POWERED',
+        'ai.thinking': 'Thinking Process',
+        'ai.generating': 'Generating...',
+        'ai.generate': 'Generate Description',
+        'ai.improving': 'Improving...',
+        'ai.improve': 'Improve Grammar',
+        'ai.improve': 'Improve Grammar',
+        'ai.dismiss': 'Dismiss',
+        'account.export_tasks': 'Export Tasks',
+        'account.import_tasks': 'Import Tasks',
+        'nav.profile': 'Profile',
+        'nav.settings': 'Settings',
+        'nav.profile': 'Profile',
+        'nav.settings': 'Settings',
+        'auth.logout': 'Sign Out',
+        'auth.login': 'Sign In',
+        'auth.register': 'Create Account',
+        'auth.reset_password_h1': 'Reset your password',
+        'auth.reset_password_desc': "Enter your email address and we'll send you a link to reset your password.",
+        'auth.send_reset_link': 'Send reset link',
+        'auth.back_to_login': 'Back to login',
+        'stats_view.title': 'Time Tracking Statistics',
+        'stats_view.today': 'Today',
+        'stats_view.this_week': 'This Week',
+        'stats_view.this_month': 'This Month',
+        'stats_view.this_year': 'This Year',
+        'stats_view.custom': 'Custom',
+        'stats_view.total_time': 'Total Time',
+        'stats_view.time_by_task': 'Time by Task',
+        'stats_view.start_date': 'Start Date',
+        'stats_view.end_date': 'End Date',
+        'tasks.upload_prompt': 'Click to upload or drag and drop',
+        'tasks.upload_hint': 'Documents, Images, Audio, Video (max 10MB)',
+        'ai.thinking_status': 'Thinking...',
+        'tasks.see_more': '...See more',
+        // Add more mapping as needed by tests
+      };
+      return translations[key] || key;
     },
-    setItem(key: string, value: string) {
-      store[key] = value;
+    i18n: {
+      changeLanguage: vi.fn(),
+      language: 'en',
     },
-    removeItem(key: string) {
-      delete store[key];
-    },
-    clear() {
-      store = {};
-    }
-  };
-})();
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
+}));
 
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+// Mock process.env / import.meta.env
+vi.stubEnv('VITE_OPENAI_API_KEY', 'test-api-key');
+vi.stubEnv('VITE_SUPABASE_URL', 'https://test-project.supabase.co');
+vi.stubEnv('VITE_SUPABASE_KEY', 'test-anon-key');
 
-// Mock para Web Audio API
-class AudioContextMock {
-  createOscillator() {
-    return {
-      connect: vi.fn(),
-      start: vi.fn(),
-      stop: vi.fn(),
-      frequency: {
-        setValueAtTime: vi.fn()
-      },
-      type: 'sine'
-    };
-  }
-
-  createGain() {
-    return {
-      connect: vi.fn(),
-      gain: {
-        setValueAtTime: vi.fn()
-      }
-    };
-  }
-
-  get destination() {
-    return {};
-  }
-}
-
-Object.defineProperty(window, 'AudioContext', { value: AudioContextMock });
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});

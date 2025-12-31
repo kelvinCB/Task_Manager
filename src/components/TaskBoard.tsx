@@ -1,7 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { Task, TaskStatus } from '../types/Task';
-import { getStatusColor, getStatusIcon, formatDate, isTaskOverdue } from '../utils/taskUtils';
+import { getStatusColor, formatDate, isTaskOverdue } from '../utils/taskUtils';
 import { Plus, Calendar, Circle, Clock, CheckCircle, Edit2, Trash2 } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 
@@ -17,11 +18,7 @@ interface TaskBoardProps {
   onTaskClick?: (taskId: string) => void;
 }
 
-const statusColumns: { status: TaskStatus; title: string; description: string }[] = [
-  { status: 'Open', title: 'Open', description: 'Tasks ready to be started' },
-  { status: 'In Progress', title: 'In Progress', description: 'Tasks currently being worked on' },
-  { status: 'Done', title: 'Done', description: 'Completed tasks' }
-];
+
 
 export const TaskBoard: React.FC<TaskBoardProps> = ({
   tasks,
@@ -35,6 +32,13 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onTaskClick
 }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
+
+  const statusColumns: { status: TaskStatus; title: string; description: string }[] = [
+    { status: 'Open', title: t('tasks.status_open'), description: t('tasks.status_open_desc') || 'Tasks ready to be started' },
+    { status: 'In Progress', title: t('tasks.status_in_progress'), description: t('tasks.status_in_progress_desc') || 'Tasks currently being worked on' },
+    { status: 'Done', title: t('tasks.status_done'), description: t('tasks.status_done_desc') || 'Completed tasks' }
+  ];
 
   const getTasksByStatus = (status: TaskStatus) => {
     return tasks.filter(task => task.status === status);
@@ -97,7 +101,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             onClick={() => onEdit(task)}
             className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
           >
-            ...See more
+            {t('tasks.see_more')}
           </button>
         </p>
       );
@@ -168,15 +172,15 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
                           {/* Desktop layout */}
                           <div className={`hidden md:flex items-center gap-2 text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
-                            <span>Depth: {task.depth}</span>
+                            {task.depth > 0 && <span>{t('tasks.depth')}: {task.depth}</span>}
                             {task.childIds.length > 0 && (
-                              <span>• {task.childIds.length} subtask{task.childIds.length !== 1 ? 's' : ''}</span>
+                              <span>• {task.childIds.length} {t('tasks.subtasks')}</span>
                             )}
                             {task.dueDate && (
                               <div className={`flex items-center gap-1 ${isTaskOverdue(task) ? 'text-red-600 font-medium' : ''}`}>
                                 <Calendar size={12} />
-                                <span>Due {formatDate(task.dueDate)}</span>
-                                {isTaskOverdue(task) && <span className="text-red-600">• Overdue</span>}
+                                <span>{t('tasks.due')} {formatDate(task.dueDate)}</span>
+                                {isTaskOverdue(task) && <span className="text-red-600">• {t('tasks.overdue')}</span>}
                               </div>
                             )}
                             {/* Task Timer */}
@@ -195,9 +199,9 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                           <div className={`md:hidden text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
                             {/* Task info row */}
                             <div className="flex items-center gap-2 mb-1">
-                              <span>Depth: {task.depth}</span>
+                              {task.depth > 0 && <span>{t('tasks.depth')}: {task.depth}</span>}
                               {task.childIds.length > 0 && (
-                                <span>• {task.childIds.length} subtask{task.childIds.length !== 1 ? 's' : ''}</span>
+                                <span>• {task.childIds.length} {t('tasks.subtasks')}</span>
                               )}
                             </div>
 
@@ -207,12 +211,12 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                               {task.dueDate ? (
                                 <div className={`flex items-center gap-1 ${isTaskOverdue(task) ? 'text-red-600 font-medium' : ''}`}>
                                   <Calendar size={12} />
-                                  <span>Due {formatDate(task.dueDate)}{isTaskOverdue(task) ? ' • Overdue' : ''}</span>
+                                  <span>{t('tasks.due')} {formatDate(task.dueDate)}{isTaskOverdue(task) ? ` • ${t('tasks.overdue')}` : ''}</span>
                                 </div>
                               ) : (
                                 <div className={`flex items-center gap-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                                   <Calendar size={12} />
-                                  <span>Created {formatDate(task.createdAt)}</span>
+                                  <span>{t('tasks.created')} {formatDate(task.createdAt)}</span>
                                 </div>
                               )}
 
@@ -263,7 +267,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                       className={`w-full p-4 border-2 border-dashed ${theme === 'dark' ? 'border-gray-600 text-gray-300 hover:text-gray-100 hover:border-gray-500' : 'border-gray-300 text-gray-500 hover:text-gray-700 hover:border-gray-400'} rounded-lg transition-colors duration-200 flex items-center justify-center gap-2`}
                     >
                       <Plus size={16} />
-                      Add New Task
+                      {t('tasks.new_task')}
                     </button>
                   )}
                 </div>

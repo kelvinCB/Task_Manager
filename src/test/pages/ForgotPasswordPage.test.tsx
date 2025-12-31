@@ -36,7 +36,7 @@ const ThemeProvider = ({ children }: { children: React.ReactNode }) => (
 
 describe('ForgotPasswordPage', () => {
   let mockResetPasswordForEmail: any;
-  
+
   beforeEach(async () => {
     vi.clearAllMocks();
     const supabase = await import('../../lib/supabaseClient');
@@ -55,21 +55,21 @@ describe('ForgotPasswordPage', () => {
 
     // Check page title
     expect(screen.getByText('Reset your password')).toBeInTheDocument();
-    
+
     // Check description
     expect(screen.getByText(/Enter your email address and we'll send you a link to reset your password/)).toBeInTheDocument();
-    
+
     // Check animated logo presence
     const logoLetters = screen.getAllByText((content, element) => {
       return element?.tagName.toLowerCase() === 'span' && 'TaskLite'.includes(content);
     });
     expect(logoLetters.length).toBe(16); // Each letter of TaskLite (rendered twice: mobile + desktop)
-    
+
     // Check form elements
     expect(screen.getByTestId('email-input')).toBeInTheDocument();
     expect(screen.getByTestId('reset-password-button')).toBeInTheDocument();
     expect(screen.getByTestId('back-to-login')).toBeInTheDocument();
-    
+
     // Check mail icon
     expect(screen.getByTestId('mail-icon')).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe('ForgotPasswordPage', () => {
         </ThemeProvider>
       </MemoryRouter>
     );
-    
+
     // Check for gradient background class
     const root = container.querySelector('.bg-gradient-to-br');
     expect(root).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('ForgotPasswordPage', () => {
 
     // Fill in email
     fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-    
+
     // Submit form
     fireEvent.click(submitButton);
 
@@ -142,7 +142,7 @@ describe('ForgotPasswordPage', () => {
 
     // Fill in email
     fireEvent.change(emailInput, { target: { value: 'nonexistent@example.com' } });
-    
+
     // Submit form
     fireEvent.click(submitButton);
 
@@ -173,7 +173,7 @@ describe('ForgotPasswordPage', () => {
 
     // Fill in email
     fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-    
+
     // Submit form
     fireEvent.click(submitButton);
 
@@ -294,7 +294,7 @@ describe('ForgotPasswordPage', () => {
 
     // Fill in email
     fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-    
+
     // Submit form
     fireEvent.click(submitButton);
 
@@ -320,7 +320,7 @@ describe('ForgotPasswordPage', () => {
 
     // Fill in email
     fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-    
+
     // Submit form
     fireEvent.click(submitButton);
 

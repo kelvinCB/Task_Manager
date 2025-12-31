@@ -13,7 +13,7 @@ test.describe('Task Filtering', () => {
     taskPage = new TaskPage(page);
     boardPage = new BoardPage(page);
     await appPage.goto();
-    
+
     // Clear local storage to start fresh
     await page.evaluate(() => localStorage.clear());
     await appPage.page.reload();
@@ -27,39 +27,39 @@ test.describe('Task Filtering', () => {
   async function showFilters() {
     const selectLocator = appPage.page.locator('select');
     let initialSelectCount = await selectLocator.count();
-    
+
     // Check if any existing select has the GLOBAL filter options we need
     if (initialSelectCount > 0) {
       for (let i = 0; i < initialSelectCount; i++) {
         const select = selectLocator.nth(i);
         const isVisible = await select.isVisible().catch(() => false);
         const options = await select.locator('option').allTextContents().catch(() => []);
-        
+
         // Only consider it a working filter if it has "All Status" option (global filter)
-        if (isVisible && (options.includes('All Status') || (options.includes('All') && options.includes('Open')))) {
+        if (isVisible && (options.includes('All Status') || options.includes('Filter') || (options.includes('All') && options.includes('Open')))) {
           return;
         }
       }
     }
 
     // First, check if we can find the desktop filter section
-    const desktopFilterSection = appPage.page.locator('.hidden.lg\\:block').filter({ hasText: 'Filters' });
+    const desktopFilterSection = appPage.page.locator('.hidden.lg\\:block').filter({ hasText: /^Filters?$/i });
     const desktopSectionExists = await desktopFilterSection.count() > 0;
-    
+
     if (desktopSectionExists) {
       const isDesktopSectionVisible = await desktopFilterSection.isVisible().catch(() => false);
-      
+
       if (isDesktopSectionVisible) {
         const desktopFilterButtons = await desktopFilterSection.locator('button').all();
-        
+
         for (let j = 0; j < desktopFilterButtons.length; j++) {
           const btn = desktopFilterButtons[j];
           const isVisible = await btn.isVisible().catch(() => false);
-          
+
           if (isVisible) {
             await btn.click();
             const newSelectCount = await selectLocator.count();
-            
+
             if (newSelectCount > initialSelectCount) {
               return;
             }
@@ -69,19 +69,19 @@ test.describe('Task Filtering', () => {
     }
 
     // Fallback: Find all filter buttons (mobile + desktop) and try each one
-    const filterButtons = await appPage.page.locator('button[title="Filters"]').all();
-    
+    const filterButtons = await appPage.page.locator('button[title="Filter"], button[title="Filters"]').all();
+
     let filterActivated = false;
-    
+
     for (let i = 0; i < filterButtons.length; i++) {
       const button = filterButtons[i];
       const isVisible = await button.isVisible().catch(() => false);
-      
+
       if (isVisible) {
         try {
           await button.click();
           const newSelectCount = await selectLocator.count();
-          
+
           if (newSelectCount > initialSelectCount) {
             filterActivated = true;
             break;
@@ -91,14 +91,14 @@ test.describe('Task Filtering', () => {
         }
       }
     }
-    
+
     if (!filterActivated) {
       const finalSelectCount = await selectLocator.count();
-      
+
       if (finalSelectCount > initialSelectCount) {
         return;
       }
-      
+
       throw new Error('Could not activate filters - no working filter button found');
     }
   }
@@ -106,34 +106,34 @@ test.describe('Task Filtering', () => {
   // Helper function to apply status filter - ROBUST VERSION  
   async function applyStatusFilter(status: string) {
     await showFilters();
-    
+
     // Find all select elements and try to use the GLOBAL filter, not task-specific ones
     const allSelects = appPage.page.locator('select');
     const selectCount = await allSelects.count();
-    
+
     let workingSelect = null;
-    
+
     // First, look for a global filter (has "All Status" option)
     for (let i = 0; i < selectCount; i++) {
       const select = allSelects.nth(i);
       const isVisible = await select.isVisible().catch(() => false);
-      
+
       if (isVisible) {
         const options = await select.locator('option').allTextContents();
         // Global filter should have "All Status" or "All" option
-        if (options.includes('All Status') || (options.includes('All') && options.includes('Open'))) {
+        if (options.includes('All Status') || options.includes('Filter') || (options.includes('All') && options.includes('Open'))) {
           workingSelect = select;
           break;
         }
       }
     }
-    
+
     // If no global filter found, fall back to any status filter (for backward compatibility)
     if (!workingSelect) {
       for (let i = 0; i < selectCount; i++) {
         const select = allSelects.nth(i);
         const isVisible = await select.isVisible().catch(() => false);
-        
+
         if (isVisible) {
           const options = await select.locator('option').allTextContents();
           if (options.includes('Open') || options.includes('In Progress') || options.includes('Done')) {
@@ -143,13 +143,13 @@ test.describe('Task Filtering', () => {
         }
       }
     }
-    
+
     if (!workingSelect) {
       throw new Error('No visible select element found for status filter');
     }
-    
+
     await expect(workingSelect).toBeVisible({ timeout: 5000 });
-    
+
     // Select the desired status - handle empty string for "All Status"
     if (status === '') {
       // Try to select the first option (usually "All" or "All Status")
@@ -159,7 +159,7 @@ test.describe('Task Filtering', () => {
     } else {
       await workingSelect.selectOption(status);
     }
-    
+
     // Wait for filtering to take effect
   }
 
@@ -192,7 +192,7 @@ test.describe('Task Filtering', () => {
 
   test('should filter tasks by "Open" status in Board View', async () => {
     await createTestTasks();
-    
+
     // Ensure we're in Board View
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
@@ -208,7 +208,7 @@ test.describe('Task Filtering', () => {
 
   test('should filter tasks by "In Progress" status in Board View', async () => {
     await createTestTasks();
-    
+
     // Ensure we're in Board View
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
@@ -224,7 +224,7 @@ test.describe('Task Filtering', () => {
 
   test('should filter tasks by "Done" status in Board View', async () => {
     await createTestTasks();
-    
+
     // Ensure we're in Board View
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
@@ -240,7 +240,7 @@ test.describe('Task Filtering', () => {
 
   test('should show all tasks when "All Status" filter is selected in Board View', async () => {
     await createTestTasks();
-    
+
     // Ensure we're in Board View
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
@@ -257,7 +257,7 @@ test.describe('Task Filtering', () => {
 
   test('should filter tasks by "Open" status in Tree View with hierarchical context', async () => {
     await createTestTasks();
-    
+
     // Switch to Tree View
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
@@ -267,7 +267,7 @@ test.describe('Task Filtering', () => {
 
     // In Tree View, Open tasks should be visible
     await expect(appPage.page.getByText('Open Task')).toBeVisible();
-    
+
     // Note: Parent tasks may be visible even if they don't match the filter,
     // as long as they have children that match. This maintains tree structure.
     // This is the intended behavior for hierarchical context.
@@ -275,7 +275,7 @@ test.describe('Task Filtering', () => {
 
   test('should filter tasks by "In Progress" status in Tree View with hierarchical context', async () => {
     await createTestTasks();
-    
+
     // Switch to Tree View
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
@@ -285,14 +285,14 @@ test.describe('Task Filtering', () => {
 
     // In Tree View, In Progress tasks should be visible
     await expect(appPage.page.getByText('In Progress Task')).toBeVisible();
-    
+
     // Note: Parent tasks may be visible even if they don't match the filter,
     // as long as they have children that match. This maintains tree structure.
   });
 
   test('should filter tasks by "Done" status in Tree View with hierarchical context', async () => {
     await createTestTasks();
-    
+
     // Switch to Tree View
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
@@ -302,14 +302,14 @@ test.describe('Task Filtering', () => {
 
     // In Tree View, Done tasks should be visible
     await expect(appPage.page.getByText('Done Task')).toBeVisible();
-    
+
     // Note: Parent tasks may be visible even if they don't match the filter,
     // as long as they have children that match. This maintains tree structure.
   });
 
   test('should show all tasks when "All Status" filter is selected in Tree View', async () => {
     await createTestTasks();
-    
+
     // Switch to Tree View
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');

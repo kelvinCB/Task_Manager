@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { TaskNode, TaskStatus, Task } from '../types/Task';
 import { TaskItem } from './TaskItem';
 import { canCompleteTask } from '../utils/taskUtils';
@@ -33,10 +34,13 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
   getElapsedTime,
   onTaskClick
 }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
+
+
   const flattenTasks = (nodes: TaskNode[]): TaskNode[] => {
     const result: TaskNode[] = [];
-    
+
     const traverse = (nodeList: TaskNode[]) => {
       nodeList.forEach(node => {
         result.push(node);
@@ -45,7 +49,7 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
         }
       });
     };
-    
+
     traverse(nodes);
     return result;
   };
@@ -60,9 +64,9 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} mb-2`}>No tasks found</h3>
+        <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-900'} mb-2`}>{t('tasks.no_tasks')}</h3>
         <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} max-w-sm`}>
-          Create your first task to get started with organizing your work hierarchically.
+          {t('tasks.create_first')}
         </p>
       </div>
     );

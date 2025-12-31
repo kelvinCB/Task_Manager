@@ -20,8 +20,8 @@ export class AppPage {
     this.themeToggle = page.getByTitle('Toggle Dark Mode').first();
     // Search input - Mobile uses 'Search...', Desktop uses 'Search tasks...'
     this.searchInput = page.getByPlaceholder('Search tasks...').or(page.getByPlaceholder('Search...')).first();
-    // Add task button - Mobile shows 'Add', Desktop shows 'Add Task'
-    this.addTaskButton = page.getByRole('button', { name: /Add/i }).first();
+    // Add task button - Use data-testid for reliability
+    this.addTaskButton = page.getByTestId('add-task-button').first();
     // My Account menu
     this.accountMenu = page.getByTitle('My Account').first();
     this.importInput = page.locator('input[type="file"]');
@@ -110,9 +110,10 @@ export class AppPage {
 
   async verifyPageLoaded() {
     // Use first() to handle desktop/mobile duplicates
-    await expect(this.page.getByTitle('Board View').first()).toBeVisible();
-    await expect(this.page.getByTitle('Tree View').first()).toBeVisible();
-    await expect(this.page.getByTitle('Time Stats').first()).toBeVisible();
+    // Using visible locator to avoid hidden elements confusion
+    await expect(this.page.locator('button[title="Board View"]:visible').first()).toBeVisible();
+    await expect(this.page.locator('button[title="Tree View"]:visible').first()).toBeVisible();
+    await expect(this.page.locator('button[title="Time Stats"]:visible').first()).toBeVisible();
   }
 
   async verifyCurrentView(view: 'board' | 'tree' | 'stats') {

@@ -153,7 +153,7 @@ describe('AccountMenu Component', () => {
       expect(screen.getByTestId('logout-button')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Logout')).toBeInTheDocument();
+    expect(screen.getByText('Sign Out')).toBeInTheDocument();
   });
 
   it('should show login button when not authenticated', async () => {
@@ -180,7 +180,7 @@ describe('AccountMenu Component', () => {
       expect(screen.getByTestId('login-button-menu')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.getByText('Sign In')).toBeInTheDocument();
   });
 
   it('should call logout function when logout button is clicked', async () => {

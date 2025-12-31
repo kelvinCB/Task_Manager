@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { AuthForm } from '../components/features/auth/AuthForm';
+import { LanguageToggle } from '../components/ui/LanguageToggle';
 import loginIllustrationLight from '../assets/images/login-illustration-light.png';
 import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
 
@@ -9,6 +11,11 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  React.useEffect(() => {
+    document.title = `${t('auth.login')} | ${t('app.title')}`;
+  }, [t]);
 
   const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
@@ -28,7 +35,7 @@ const LoginPage: React.FC = () => {
       navigate('/');
 
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+      setError(err.message || t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +55,7 @@ const LoginPage: React.FC = () => {
       if (error) throw error;
       // Redirect is handled by Supabase/Provider
     } catch (err: any) {
-      setError(err.message || 'Error connecting to Google.');
+      setError(err.message || t('auth.google_error'));
       setIsLoading(false);
     }
   };
@@ -66,13 +73,16 @@ const LoginPage: React.FC = () => {
 
       if (error) throw error;
     } catch (err: any) {
-      setError(err.message || 'Error connecting to GitHub.');
+      setError(err.message || t('auth.github_error'));
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden relative">
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageToggle />
+      </div>
       {/* Left side - Decorative Image (Desktop only) - 50% width */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
         {/* Logo context in the image side - Top Left over image */}
@@ -85,17 +95,17 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Illustrations - object-cover to fill space, object-left to pin the rocket/content */}
-        <img 
-          src={loginIllustrationLight} 
-          alt="Task Management Illustration" 
+        <img
+          src={loginIllustrationLight}
+          alt="Task Management Illustration"
           className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
         />
-        <img 
-          src={loginIllustrationDark} 
-          alt="Task Management Illustration" 
+        <img
+          src={loginIllustrationDark}
+          alt="Task Management Illustration"
           className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
         />
-        
+
         {/* Subtle overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
       </div>
@@ -114,29 +124,29 @@ const LoginPage: React.FC = () => {
 
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Log in to your account
+              {t('auth.login_title')}
             </h1>
           </div>
-          
+
           {error && (
             <div data-testid="error-message" className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 text-sm">
               {error}
             </div>
           )}
-          
-          <AuthForm 
-            onSubmit={handleLogin} 
-            buttonText="Log in" 
-            isLoading={isLoading} 
+
+          <AuthForm
+            onSubmit={handleLogin}
+            buttonText={t('auth.login')}
+            isLoading={isLoading}
             onGoogleLogin={handleGoogleLogin}
             onGithubLogin={handleGithubLogin}
           />
-          
+
           {/* Option to register */}
           <div className="text-base text-center mt-8">
-            <span className="text-gray-600 dark:text-gray-300 mr-2">Don't have an account?</span>
+            <span className="text-gray-600 dark:text-gray-300 mr-2">{t('auth.no_account')}</span>
             <Link to="/register" data-testid="signup-link" className="text-indigo-600 dark:text-indigo-400 font-semibold">
-              Sign up →
+              {t('auth.sign_up')} →
             </Link>
           </div>
         </div>
