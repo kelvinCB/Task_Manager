@@ -1,15 +1,17 @@
 const request = require('supertest');
 const express = require('express');
 const authRoutes = require('../../routes/auth');
-const supabase = require('../../config/supabaseClient');
+const { supabase } = require('../../config/supabaseClient');
 
 // Mock the supabase client
 jest.mock('../../config/supabaseClient', () => ({
-  auth: {
-    signUp: jest.fn(),
-    signInWithPassword: jest.fn(),
-    resetPasswordForEmail: jest.fn(),
-    updateUser: jest.fn()
+  supabase: {
+    auth: {
+      signUp: jest.fn(),
+      signInWithPassword: jest.fn(),
+      resetPasswordForEmail: jest.fn(),
+      updateUser: jest.fn()
+    }
   }
 }));
 
