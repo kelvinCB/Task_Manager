@@ -35,7 +35,12 @@ const LoginPage: React.FC = () => {
       navigate('/');
 
     } catch (err: any) {
-      setError(err.message || t('common.error'));
+      // Check for specific Supabase error messages to translate
+      if (err.message === 'Email not confirmed') {
+        setError(t('auth.email_not_confirmed'));
+      } else {
+        setError(err.message || t('common.error'));
+      }
     } finally {
       setIsLoading(false);
     }
