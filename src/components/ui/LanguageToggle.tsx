@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../contexts/ThemeContext';
+import { USFlag, ESFlag } from './FlagIcons';
 
 export const LanguageToggle: React.FC = () => {
     const { i18n } = useTranslation();
@@ -28,8 +29,8 @@ export const LanguageToggle: React.FC = () => {
             aria-label="Toggle language"
             title={isEnglish ? "Switch to Spanish" : "Switch to English"}
         >
-            <span className="text-lg leading-none" role="img" aria-label={isEnglish ? "USA Flag" : "Spain Flag"}>
-                {isEnglish ? '🇺🇸' : '🇪🇸'}
+            <span className="w-6 h-4 flex items-center justify-center overflow-hidden rounded shadow-sm">
+                {isEnglish ? <USFlag className="w-full h-full object-cover" /> : <ESFlag className="w-full h-full object-cover" />}
             </span>
             <span className="text-sm font-medium">
                 {isEnglish ? 'EN' : 'ES'}

@@ -40,7 +40,7 @@ describe('LanguageToggle', () => {
         );
 
         expect(screen.getByRole('button')).toBeInTheDocument();
-        expect(screen.getByText('🇺🇸')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: "United States Flag" })).toBeInTheDocument();
         expect(screen.getByText('EN')).toBeInTheDocument();
         expect(screen.getByTitle('Switch to Spanish')).toBeInTheDocument();
     });
@@ -61,7 +61,7 @@ describe('LanguageToggle', () => {
         );
 
         expect(screen.getByRole('button')).toBeInTheDocument();
-        expect(screen.getByText('🇪🇸')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: "Spain Flag" })).toBeInTheDocument();
         expect(screen.getByText('ES')).toBeInTheDocument();
         expect(screen.getByTitle('Switch to English')).toBeInTheDocument();
     });
