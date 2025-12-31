@@ -22,13 +22,18 @@ app.use((req, res, next) => {
   next();
 });
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./config/swagger');
+
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const timeEntryRoutes = require('./routes/timeEntries');
 const uploadRoutes = require('./routes/upload');
 const profileRoutes = require('./routes/profile');
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/api/auth', authRoutes);
+
 app.use('/api/tasks', taskRoutes);
 app.use('/api/time-entries', timeEntryRoutes);
 app.use('/api/upload', uploadRoutes);
@@ -50,6 +55,7 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log('SERVER_ID: DEBUG_SESSION_123'); // Unique ID for debugging
   // Keep process alive
   setInterval(() => { }, 60000);
 });

@@ -13,43 +13,141 @@ const {
 router.use(authenticateUser);
 
 /**
- * @route   POST /api/tasks
- * @desc    Create a new task
- * @access  Private (requires authentication)
- * @body    { title, description?, status?, due_date?, parent_id? }
+ * @swagger
+ * tags:
+ *   name: Tasks
+ *   description: Task management
+ */
+
+/**
+ * @swagger
+ * /tasks:
+ *   post:
+ *     summary: Create a new task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [Open, In Progress, Done]
+ *               due_date:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: Task created
+ *       401:
+ *         description: Unauthorized
  */
 router.post('/', createTask);
 
 /**
- * @route   GET /api/tasks
- * @desc    Get all tasks for authenticated user
- * @access  Private (requires authentication)
- * @query   status? - Filter tasks by status (Open | In Progress | Done)
-*/
+ * @swagger
+ * /tasks:
+ *   get:
+ *     summary: Get all tasks
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [Open, In Progress, Done]
+ *         description: Filter by status
+ *     responses:
+ *       200:
+ *         description: List of tasks
+ */
 router.get('/', getTasks);
 
 /**
- * @route   GET /api/tasks/:id
- * @desc    Get a specific task by ID
- * @access  Private (requires authentication, user must own the task)
- * @params  id - Task ID
+ * @swagger
+ * /tasks/{id}:
+ *   get:
+ *     summary: Get a task by ID
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     responses:
+ *       200:
+ *         description: Task details
+ *       404:
+ *         description: Task not found
  */
 router.get('/:id', getTaskById);
 
 /**
- * @route   PUT /api/tasks/:id
- * @desc    Update a task
- * @access  Private (requires authentication, user must own the task)
- * @params  id - Task ID
- * @body    { title?, description?, status?, due_date?, parent_id? }
+ * @swagger
+ * /tasks/{id}:
+ *   put:
+ *     summary: Update a task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Task updated
  */
 router.put('/:id', updateTask);
 
 /**
- * @route   DELETE /api/tasks/:id
- * @desc    Delete a task
- * @access  Private (requires authentication, user must own the task)
- * @params  id - Task ID
+ * @swagger
+ * /tasks/{id}:
+ *   delete:
+ *     summary: Delete a task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     responses:
+ *       200:
+ *         description: Task deleted
  */
 router.delete('/:id', deleteTask);
 
