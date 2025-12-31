@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TaskTimeStats } from '../types/Task';
 import { BarChart } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -13,6 +14,7 @@ interface TimeStatsViewProps {
 }
 
 export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics }) => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
   const [stats, setStats] = useState<TaskTimeStats[]>([]);
@@ -80,8 +82,8 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
       <div className={`rounded-lg shadow-sm p-4 md:p-6 m-4 md:m-6 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}>
         {/* Header - Desktop */}
         <div className="hidden md:block mb-6">
-          <h2 className={`text-xl font-bold text-center mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
-          
+          <h2 className={`text-xl font-bold text-center mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{t('stats_view.title')}</h2>
+
           <div className="flex justify-center items-center">
             <div className="flex items-center gap-4">
               <div className="flex">
@@ -89,25 +91,25 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                   onClick={() => { setPeriod('day'); setIsCustom(false); }}
                   className={`px-3 py-1 text-sm border-t border-b border-l rounded-l-lg ${period === 'day' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
                 >
-                  Today
+                  {t('stats_view.today')}
                 </button>
                 <button
                   onClick={() => { setPeriod('week'); setIsCustom(false); }}
                   className={`px-3 py-1 text-sm border-t border-b ${period === 'week' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
                 >
-                  This Week
+                  {t('stats_view.this_week')}
                 </button>
                 <button
                   onClick={() => { setPeriod('month'); setIsCustom(false); }}
                   className={`px-3 py-1 text-sm border-t border-b ${period === 'month' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
                 >
-                  This Month
+                  {t('stats_view.this_month')}
                 </button>
                 <button
                   onClick={() => { setPeriod('year'); setIsCustom(false); }}
                   className={`px-3 py-1 text-sm border-t border-b border-r rounded-r-lg ${period === 'year' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
                 >
-                  This Year
+                  {t('stats_view.this_year')}
                 </button>
               </div>
 
@@ -115,7 +117,7 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                 onClick={() => setIsCustom(!isCustom)}
                 className={`px-3 py-1 text-sm rounded-lg border ${isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
               >
-                Custom
+                {t('stats_view.custom')}
               </button>
             </div>
           </div>
@@ -123,8 +125,8 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
 
         {/* Header - Mobile */}
         <div className="md:hidden mb-6">
-<h2 className={`text-lg font-bold mb-4 text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time Tracking Statistics</h2>
-          
+          <h2 className={`text-lg font-bold mb-4 text-center ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{t('stats_view.title')}</h2>
+
           {/* Mobile Period Buttons - Two rows */}
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
@@ -132,13 +134,13 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                 onClick={() => { setPeriod('day'); setIsCustom(false); }}
                 className={`px-3 py-2 text-sm rounded-lg border ${period === 'day' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
               >
-                Today
+                {t('stats_view.today')}
               </button>
               <button
                 onClick={() => { setPeriod('week'); setIsCustom(false); }}
                 className={`px-3 py-2 text-sm rounded-lg border ${period === 'week' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
               >
-                This Week
+                {t('stats_view.this_week')}
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -146,20 +148,20 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                 onClick={() => { setPeriod('month'); setIsCustom(false); }}
                 className={`px-3 py-2 text-sm rounded-lg border ${period === 'month' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
               >
-                This Month
+                {t('stats_view.this_month')}
               </button>
               <button
                 onClick={() => { setPeriod('year'); setIsCustom(false); }}
                 className={`px-3 py-2 text-sm rounded-lg border ${period === 'year' && !isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
               >
-                This Year
+                {t('stats_view.this_year')}
               </button>
             </div>
             <button
               onClick={() => setIsCustom(!isCustom)}
               className={`w-full px-3 py-2 text-sm rounded-lg border ${isCustom ? 'bg-indigo-100 text-indigo-700 border-indigo-300' : theme === 'dark' ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}
             >
-              Custom Range
+              {t('stats_view.custom')} Range
             </button>
           </div>
         </div>
@@ -169,7 +171,7 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
             {/* Desktop - Side by side */}
             <div className="hidden md:flex gap-4">
               <div>
-                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>Start Date</label>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>{t('stats_view.start_date')}</label>
                 <input
                   type="date"
                   value={customStart}
@@ -178,7 +180,7 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                 />
               </div>
               <div>
-                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>End Date</label>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>{t('stats_view.end_date')}</label>
                 <input
                   type="date"
                   value={customEnd}
@@ -187,11 +189,11 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                 />
               </div>
             </div>
-            
+
             {/* Mobile - Side by side if screen is wide enough, otherwise stacked */}
             <div className="md:hidden flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
-                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>Start Date</label>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>{t('stats_view.start_date')}</label>
                 <input
                   type="date"
                   value={customStart}
@@ -200,7 +202,7 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                 />
               </div>
               <div className="flex-1">
-                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>End Date</label>
+                <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-1`}>{t('stats_view.end_date')}</label>
                 <input
                   type="date"
                   value={customEnd}
@@ -215,20 +217,20 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
         <div className="mb-6">
           {/* Desktop - Side by side */}
           <div className="hidden md:flex items-center justify-between">
-            <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Total Time Spent</h3>
+            <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{t('stats_view.total_time')}</h3>
             <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{formatTime(stats.reduce((acc, curr) => acc + curr.timeSpent, 0))}</span>
           </div>
-          
+
           {/* Mobile - Stacked */}
           <div className="md:hidden text-center">
-            <h3 className={`text-lg font-medium mb-2 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Total Time Spent</h3>
+            <h3 className={`text-lg font-medium mb-2 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{t('stats_view.total_time')}</h3>
             <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{formatTime(stats.reduce((acc, curr) => acc + curr.timeSpent, 0))}</span>
           </div>
         </div>
 
         {stats.length > 0 ? (
           <div>
-            <h3 className={`text-lg font-medium mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>Time by Task</h3>
+            <h3 className={`text-lg font-medium mb-4 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>{t('stats_view.time_by_task')}</h3>
             <div className="space-y-3 md:space-y-4">
               {stats.map(task => (
                 <div key={task.id} className={`p-3 md:p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-50'}`}>
@@ -237,13 +239,13 @@ export const TimeStatsView: React.FC<TimeStatsViewProps> = ({ getTimeStatistics 
                     <h4 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{task.title}</h4>
                     <span className={theme === 'dark' ? 'text-gray-200' : ''}>{formatTime(task.timeSpent)}</span>
                   </div>
-                  
+
                   {/* Mobile - Stacked */}
                   <div className="md:hidden mb-2">
                     <h4 className={`font-medium mb-1 ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{task.title}</h4>
                     <span className={`text-sm ${theme === 'dark' ? 'text-gray-200' : 'text-gray-600'}`}>{formatTime(task.timeSpent)}</span>
                   </div>
-                  
+
                   <div className={`w-full rounded-full h-2.5 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                     <div
                       className="bg-indigo-600 h-2.5 rounded-full"

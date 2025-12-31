@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus } from '../types/Task';
 import { X, Calendar, FileText, Tag, AlertCircle } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -28,6 +29,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onSubmit
 }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
@@ -74,7 +76,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      setValidationError('Title is required');
+      setValidationError(t('tasks.validation_title'));
       return;
     }
 
@@ -102,7 +104,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl w-full max-w-md md:max-w-4xl max-h-[90vh] flex flex-col transition-all duration-300`}>
+      <div role="dialog" aria-modal="true" className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl w-full max-w-md md:max-w-4xl max-h-[90vh] flex flex-col transition-all duration-300`}>
         {/* Header */}
         <div className={`relative flex items-center justify-center p-6 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex items-center gap-3">
@@ -110,7 +112,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               <Tag size={20} />
             </div>
             <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-              {task ? 'Edit Task' : 'Create New Task'}
+              {task ? t('tasks.edit_task') : t('tasks.new_task')}
             </h2>
           </div>
           <button
@@ -130,7 +132,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               <div>
                 <label htmlFor="task-title" className={`flex items-center gap-2 text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   <FileText size={16} className="text-indigo-500" />
-                  Title
+                  {t('tasks.title')}
                 </label>
                 <input
                   id="task-title"
@@ -141,7 +143,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     if (validationError) setValidationError('');
                   }}
                   className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-lg font-medium ${validationError ? 'border-red-500 bg-red-50/10' : theme === 'dark' ? 'border-gray-600 bg-gray-700/50 hover:bg-gray-700' : 'border-gray-300 bg-gray-50/50 hover:bg-white focus:bg-white'}`}
-                  placeholder="What needs to be done?"
+                  placeholder={t('tasks.placeholder_title')}
                   required
                 />
                 {validationError && (
@@ -156,7 +158,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               <div>
                 <label htmlFor="task-description" className={`flex items-center gap-2 text-sm font-semibold mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   <FileText size={16} className="text-indigo-500" />
-                  Description
+                  {t('tasks.description')}
                 </label>
                 <div className="relative group">
                   <textarea
@@ -164,7 +166,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 min-h-[320px] resize-none ${theme === 'dark' ? 'border-gray-600 bg-gray-700/50 text-gray-100 hover:bg-gray-700' : 'border-gray-300 bg-gray-50/50 hover:bg-white focus:bg-white'}`}
-                    placeholder="Add more details about this task..."
+                    placeholder={t('tasks.placeholder_desc')}
                   ></textarea>
 
                   {/* AI Icon - Better positioning and style */}
@@ -180,7 +182,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                       if (formData.title.trim()) {
                         setShowAIOptions(!showAIOptions);
                       } else {
-                        setValidationError('Please enter a task title first to use AI assistance.');
+                        setValidationError(t('tasks.validation_ai_title'));
                         document.getElementById('task-title')?.focus();
                       }
                     }}
@@ -199,7 +201,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         <AIIcon size={18} animated={true} />
                       </div>
                       <h3 className={`text-sm font-bold tracking-tight ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-800'}`}>
-                        AI POWERED
+                        {t('ai.powered')}
                       </h3>
                       <div className={`flex-1 h-px ${theme === 'dark' ? 'bg-indigo-500/20' : 'bg-indigo-200'}`}></div>
                     </div>
@@ -230,13 +232,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           onClick={() => setIsThinkingExpanded(!isThinkingExpanded)}
                           className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-wider mb-2 ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-700'}`}
                         >
-                          {isThinkingExpanded ? '▼' : '▶'} Thinking Process
+                          {isThinkingExpanded ? '▼' : '▶'} {t('ai.thinking')}
                         </button>
                         {isThinkingExpanded && (
                           <div className={`p-3 rounded-lg text-sm font-mono max-h-40 overflow-y-auto ${theme === 'dark' ? 'bg-gray-800/50 text-gray-300 border border-gray-600' : 'bg-white text-gray-600 border border-gray-200'}`}>
                             {thinkingProcess ? thinkingProcess : (
                               <span>
-                                Thinking
+                                {t('ai.thinking_status')}
                                 <span className="dot-1">.</span>
                                 <span className="dot-2">.</span>
                                 <span className="dot-3">.</span>
@@ -313,7 +315,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             playNotificationSound(1000, 0.5, 0.3); // AI generation completion sound
                           } catch (error) {
                             console.error('Error generating AI description:', error);
-                            setAiError(error instanceof Error ? error.message : 'Unknown error');
+                            setAiError(error instanceof Error ? error.message : t('common.error'));
                           } finally {
                             setAiProcessingState('idle');
                           }
@@ -322,9 +324,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md transition-all active:scale-95 disabled:opacity-50"
                       >
                         {aiProcessingState === 'generating' ? (
-                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Generating...</>
+                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>{t('ai.generating')}</>
                         ) : (
-                          <><AIIcon size={14} />Generate Description</>
+                          <><AIIcon size={14} />{t('ai.generate')}</>
                         )}
                       </button>
 
@@ -336,7 +338,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             return;
                           }
                           if (!formData.description.trim()) {
-                            setAiError('Please enter a description first.');
+                            setAiError(t('tasks.validation_ai_desc'));
                             return;
                           }
                           setAiProcessingState('improving');
@@ -395,9 +397,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition-all active:scale-95 disabled:opacity-50"
                       >
                         {aiProcessingState === 'improving' ? (
-                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Improving...</>
+                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>{t('ai.improving')}</>
                         ) : (
-                          <><AIIcon size={14} />Improve Grammar</>
+                          <><AIIcon size={14} />{t('ai.improve')}</>
                         )}
                       </button>
 
@@ -406,7 +408,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         onClick={() => setShowAIOptions(false)}
                         className={`text-xs font-semibold px-3 py-2 rounded-lg transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-600' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'}`}
                       >
-                        Dismiss
+                        {t('ai.dismiss')}
                       </button>
                     </div>
                   </div>
@@ -419,7 +421,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-900/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                 <label className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   <Tag size={16} className="text-indigo-500" />
-                  Attachments
+                  {t('tasks.attachments')}
                 </label>
                 <FileUploader
                   onUploadComplete={(result: UploadResult) => {
@@ -451,7 +453,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
                   <label htmlFor="task-status" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     <Tag size={16} className="text-indigo-500" />
-                    Status
+                    {t('tasks.status')}
                   </label>
                   <select
                     id="task-status"
@@ -459,9 +461,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as TaskStatus }))}
                     className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
                   >
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Done">Done</option>
+                    <option value="Open">{t('tasks.status_open')}</option>
+                    <option value="In Progress">{t('tasks.status_in_progress')}</option>
+                    <option value="Done">{t('tasks.status_done')}</option>
                   </select>
                 </div>
 
@@ -469,7 +471,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
                   <label htmlFor="task-due-date" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     <Calendar size={16} className="text-indigo-500" />
-                    Due Date
+                    {t('tasks.due_date')}
                   </label>
                   <input
                     id="task-due-date"
@@ -491,10 +493,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     </div>
                     <div>
                       <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${theme === 'dark' ? 'text-indigo-300' : 'text-indigo-800'}`}>
-                        Subtask Mode
+                        {t('tasks.subtask_mode')}
                       </p>
                       <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-indigo-300/80' : 'text-indigo-700/80'}`}>
-                        This task will be nested under its parent.
+                        {t('tasks.subtask_desc')}
                       </p>
                     </div>
                   </div>
@@ -510,24 +512,25 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               onClick={onClose}
               className={`px-6 py-2.5 rounded-xl font-bold transition-all active:scale-95 ${theme === 'dark' ? 'text-gray-300 bg-gray-700 hover:bg-gray-600 hover:text-white' : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 hover:border-gray-300 shadow-sm'}`}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
               className={`px-8 py-2.5 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition-all active:translate-y-0.5 active:shadow-none ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-600 hover:bg-indigo-700'}`}
             >
-              {task ? 'Update Task' : 'Create Task'}
+              {task ? t('tasks.update_task') : t('tasks.create_task')}
             </button>
           </div>
         </form>
 
-        {/* Auth Required Modal for AI - Moved outside form for better stacking */}
-        <AuthRequiredModal
-          isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
-          actionType="ai"
-        />
       </div>
+
+      {/* Auth Required Modal for AI - Moved outside form for better stacking */}
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        actionType="ai"
+      />
     </div>
   );
 };
