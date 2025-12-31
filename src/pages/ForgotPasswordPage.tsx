@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import supabase from '../lib/supabaseClient';
 import { ArrowLeft, Mail } from 'lucide-react';
 import loginIllustrationLight from '../assets/images/login-illustration-light.png';
 import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
 
 const ForgotPasswordPage: React.FC = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,17 +51,17 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
 
           {/* Illustrations - object-cover to fill space, object-left to pin the rocket/content */}
-          <img 
-            src={loginIllustrationLight} 
-            alt="Task Management Illustration" 
+          <img
+            src={loginIllustrationLight}
+            alt="Task Management Illustration"
             className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
           />
-          <img 
-            src={loginIllustrationDark} 
-            alt="Task Management Illustration" 
+          <img
+            src={loginIllustrationDark}
+            alt="Task Management Illustration"
             className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
           />
-          
+
           {/* Subtle overlay */}
           <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
         </div>
@@ -90,7 +92,7 @@ const ForgotPasswordPage: React.FC = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                 Didn't receive the email? Check your spam folder or try again.
               </p>
-              
+
               <button
                 onClick={() => {
                   setIsEmailSent(false);
@@ -130,17 +132,17 @@ const ForgotPasswordPage: React.FC = () => {
         </div>
 
         {/* Illustrations - object-cover to fill space, object-left to pin the rocket/content */}
-        <img 
-          src={loginIllustrationLight} 
-          alt="Task Management Illustration" 
+        <img
+          src={loginIllustrationLight}
+          alt="Task Management Illustration"
           className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
         />
-        <img 
-          src={loginIllustrationDark} 
-          alt="Task Management Illustration" 
+        <img
+          src={loginIllustrationDark}
+          alt="Task Management Illustration"
           className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
         />
-        
+
         {/* Subtle overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
       </div>
@@ -159,10 +161,10 @@ const ForgotPasswordPage: React.FC = () => {
 
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Reset your password
+              {t('auth.reset_password_h1')}
             </h1>
             <p className="mt-2 text-center text-gray-600 dark:text-gray-300">
-              Enter your email address and we'll send you a link to reset your password.
+              {t('auth.reset_password_desc')}
             </p>
           </div>
 
@@ -184,7 +186,7 @@ const ForgotPasswordPage: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="Email"
+                  placeholder={t('auth.email')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   data-testid="email-input"
@@ -200,7 +202,7 @@ const ForgotPasswordPage: React.FC = () => {
                 data-testid="reset-password-button"
                 className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
-                {isLoading ? 'Sending...' : 'Send reset link'}
+                {isLoading ? 'Sending...' : t('auth.send_reset_link')}
               </button>
             </div>
           </form>
@@ -213,7 +215,7 @@ const ForgotPasswordPage: React.FC = () => {
               className="flex items-center justify-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-500 dark:hover:text-indigo-300"
             >
               <ArrowLeft size={16} />
-              Back to login
+              {t('auth.back_to_login')}
             </Link>
           </div>
         </div>

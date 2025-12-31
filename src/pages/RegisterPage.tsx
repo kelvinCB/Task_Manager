@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { AuthForm } from '../components/features/auth/AuthForm';
+import { LanguageToggle } from '../components/ui/LanguageToggle';
 import loginIllustrationLight from '../assets/images/login-illustration-light.png';
 import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
 
@@ -9,6 +11,11 @@ const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  React.useEffect(() => {
+    document.title = `${t('auth.register')} | ${t('app.title')}`;
+  }, [t]);
 
   const handleRegister = async (email: string, password: string) => {
     setIsLoading(true);
@@ -24,11 +31,11 @@ const RegisterPage: React.FC = () => {
       }
 
       // Registration successful, inform the user to check their email
-      alert('Registration successful! Please check your email to confirm your account.');
+      alert(t('auth.registration_success'));
       navigate('/login'); // Redirect to the login page
 
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+      setError(err.message || t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +54,7 @@ const RegisterPage: React.FC = () => {
 
       if (error) throw error;
     } catch (err: any) {
-      setError(err.message || 'Error connecting to Google.');
+      setError(err.message || t('auth.google_error'));
       setIsLoading(false);
     }
   };
@@ -65,13 +72,16 @@ const RegisterPage: React.FC = () => {
 
       if (error) throw error;
     } catch (err: any) {
-      setError(err.message || 'Error connecting to GitHub.');
+      setError(err.message || t('auth.github_error'));
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden relative">
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageToggle />
+      </div>
       {/* Left side - Decorative Image (Desktop only) - 50% width */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
         {/* Logo context in the image side - Top Left over image */}
@@ -84,17 +94,17 @@ const RegisterPage: React.FC = () => {
         </div>
 
         {/* Illustrations - object-cover to fill space, object-left to pin the rocket/content */}
-        <img 
-          src={loginIllustrationLight} 
-          alt="Task Management Illustration" 
+        <img
+          src={loginIllustrationLight}
+          alt="Task Management Illustration"
           className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
         />
-        <img 
-          src={loginIllustrationDark} 
-          alt="Task Management Illustration" 
+        <img
+          src={loginIllustrationDark}
+          alt="Task Management Illustration"
           className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
         />
-        
+
         {/* Subtle overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
       </div>
@@ -110,30 +120,30 @@ const RegisterPage: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create your account</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('auth.create_account_title')}</h1>
           </div>
-          
+
           {error && (
             <div data-testid="error-message" className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 text-sm">
               {error}
             </div>
           )}
-          
-          <AuthForm 
-            onSubmit={handleRegister} 
-            buttonText="Register" 
-            isLoading={isLoading} 
+
+          <AuthForm
+            onSubmit={handleRegister}
+            buttonText={t('auth.register')}
+            isLoading={isLoading}
             isSignUp={true}
             onGoogleLogin={handleGoogleLogin}
             onGithubLogin={handleGithubLogin}
           />
-          
+
           <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?{' '}
+            {t('auth.have_account')}{' '}
             <Link to="/login" data-testid="signin-link" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-              Sign in
+              {t('auth.login')}
             </Link>
           </p>
         </div>
