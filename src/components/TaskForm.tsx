@@ -20,6 +20,7 @@ interface TaskFormProps {
   onClose: () => void;
   onSubmit: (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>) => void;
   canComplete?: boolean;
+  showError?: (message: string) => void;
 }
 
 export const TaskForm: React.FC<TaskFormProps> = ({
@@ -28,7 +29,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  canComplete
+  canComplete,
+  showError
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -468,7 +470,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     onChange={(e) => {
                       const newStatus = e.target.value as TaskStatus;
                       if (newStatus === 'Done' && canComplete === false) {
-                        alert(t('tasks.cannot_complete_subtasks') || 'Cannot complete a task that has incomplete subtasks');
+                        if (showError) {
+                          showError(t('tasks.cannot_complete_subtasks'));
+                        }
                         return;
                       }
                       setFormData(prev => ({ ...prev, status: newStatus }));

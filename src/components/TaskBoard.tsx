@@ -16,6 +16,7 @@ interface TaskBoardProps {
   onPauseTimer?: (taskId: string) => void;
   getElapsedTime?: (taskId: string) => number;
   onTaskClick?: (taskId: string) => void;
+  showError?: (message: string) => void;
 }
 
 
@@ -29,7 +30,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onStartTimer,
   onPauseTimer,
   getElapsedTime,
-  onTaskClick
+  onTaskClick,
+  showError
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -58,10 +60,11 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     if (taskId) {
       const task = tasks.find(t => t.id === taskId);
       if (targetStatus === 'Done' && task && !canCompleteTask(task, tasks)) {
-        // Show alert after a brief delay to allow the drag animation to complete
-        // and avoid the "fleeting" behavior reported by the user.
+        // Show error modal after a brief delay to allow the drag animation to complete
         setTimeout(() => {
-          alert(t('tasks.cannot_complete_subtasks' || 'Cannot complete a task that has incomplete subtasks'));
+          if (showError) {
+            showError(t('tasks.cannot_complete_subtasks'));
+          }
         }, 100);
         return;
       }

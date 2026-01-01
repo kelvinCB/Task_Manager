@@ -21,6 +21,7 @@ interface TaskItemProps {
   getElapsedTime?: (taskId: string) => number;
   onTaskClick?: (taskId: string) => void;
   allTasks: Task[];
+  showError?: (message: string) => void;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -37,7 +38,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onPauseTimer,
   getElapsedTime,
   onTaskClick,
-  allTasks
+  allTasks,
+  showError
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -73,7 +75,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value as TaskStatus;
     if (newStatus === 'Done' && !canComplete) {
-      alert('Cannot complete a task that has incomplete subtasks');
+      if (showError) {
+        showError(t('tasks.cannot_complete_subtasks'));
+      }
       return;
     }
     onStatusChange(task.id, newStatus);

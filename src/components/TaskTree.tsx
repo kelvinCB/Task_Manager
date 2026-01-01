@@ -18,6 +18,7 @@ interface TaskTreeProps {
   onPauseTimer?: (taskId: string) => void;
   getElapsedTime?: (taskId: string) => number;
   onTaskClick?: (taskId: string) => void;
+  showError?: (message: string) => void;
 }
 
 export const TaskTree: React.FC<TaskTreeProps> = ({
@@ -32,7 +33,8 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
   onStartTimer,
   onPauseTimer,
   getElapsedTime,
-  onTaskClick
+  onTaskClick,
+  showError
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -91,6 +93,7 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
           getElapsedTime={getElapsedTime}
           onTaskClick={onTaskClick}
           allTasks={allTasks}
+          showError={showError}
         />
       ))}
     </div>
