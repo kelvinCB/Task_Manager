@@ -14,7 +14,7 @@ export class BoardPage {
     this.inProgressColumn = page.getByText('In Progress');
     this.doneColumn = page.getByText('Done');
     // Task cards
-    this.taskCards = page.locator('[data-testid="task-item"]');
+    this.taskCards = page.locator('[data-testid="board-task-item"]');
   }
 
   // Get column by exact status text
@@ -30,12 +30,12 @@ export class BoardPage {
   }
 
   getTaskCard(taskTitle: string) {
-    return this.page.locator(`[data-testid="task-item"][data-task-title="${taskTitle}"]`);
+    return this.page.locator(`[data-testid="board-task-item"][data-task-title="${taskTitle}"]`);
   }
 
   async verifyTaskInColumn(taskTitle: string, columnTitle: string) {
     const column = this.getColumn(columnTitle);
-    const taskCard = column.locator(`[data-testid="task-item"][data-task-title="${taskTitle}"]`);
+    const taskCard = column.locator(`[data-testid="board-task-item"][data-task-title="${taskTitle}"]`);
     await expect(taskCard).toBeVisible();
   }
 
@@ -59,7 +59,7 @@ export class BoardPage {
     // Hover over the task card to make the edit/delete buttons visible
     await taskCard.hover();
     // Click the edit button directly
-    const editButton = taskCard.getByTitle('Edit task');
+    const editButton = taskCard.getByTestId('edit-task-button');
     await editButton.click();
   }
 
@@ -68,7 +68,7 @@ export class BoardPage {
     // Hover over the task card to make the edit/delete buttons visible
     await taskCard.hover();
     // Click the delete button directly
-    const deleteButton = taskCard.getByTitle('Delete task');
+    const deleteButton = taskCard.getByTestId('delete-task-button');
     await deleteButton.click();
   }
 
@@ -109,5 +109,13 @@ export class BoardPage {
       const statusBadge = taskCard.locator('.inline-flex.items-center.px-2\\.5.py-0\\.5');
       await expect(statusBadge).toContainText(details.status);
     }
+  }
+
+  async isTimerActive(taskTitle: string): Promise<boolean> {
+    const taskCard = this.getTaskCard(taskTitle);
+    // The timer is active if the TaskTimer component has the 'active' state 
+    // or if we see the 'Pause' button instead of 'Start'
+    const pauseButton = taskCard.locator('[data-testid="pause-timer"]');
+    return await pauseButton.isVisible();
   }
 }

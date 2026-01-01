@@ -19,7 +19,7 @@ export class TaskPage {
   constructor(page: Page) {
     this.page = page;
     // Look for modal dialog content (the actual modal div)
-    this.taskModal = page.getByRole('dialog').first();
+    this.taskModal = page.getByTestId('task-form-modal');
     // Use specific IDs from the actual implementation
     this.titleInput = page.locator('#task-title');
     this.descriptionInput = page.locator('#task-description');

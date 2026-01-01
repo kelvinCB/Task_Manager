@@ -16,11 +16,11 @@ const mockGetElapsedTime = vi.fn().mockReturnValue(3600000); // 1h por defecto
 
 describe('TaskTree Component', () => {
   let mockTaskTree: TaskNode[];
-  
+
   beforeEach(() => {
     // Reiniciar mocks
     vi.clearAllMocks();
-    
+
     // Crear árbol de tareas mock para las pruebas
     mockTaskTree = [
       {
@@ -97,16 +97,16 @@ describe('TaskTree Component', () => {
       }
     ];
   });
-  
+
   it('should render the task tree with parent and child tasks', () => {
     // Act - expandimos todos los nodos para que se muestren los hijos
     const expandedNodeSet = new Set(['parent-1', 'child-2']);
-    
+
     render(
       <ThemeProvider>
-        <TaskTree 
-          nodes={mockTaskTree} 
-          expandedNodes={expandedNodeSet} 
+        <TaskTree
+          nodes={mockTaskTree}
+          expandedNodes={expandedNodeSet}
           allTasks={mockTaskTree}
           onToggleExpand={mockOnToggleExpand}
           onStatusChange={mockOnStatusChange}
@@ -119,23 +119,23 @@ describe('TaskTree Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert - verificar que se muestran las tareas
-    expect(screen.getByText('Parent Task')).toBeInTheDocument();
-    expect(screen.getByText('Child Task 1')).toBeInTheDocument();
-    expect(screen.getByText('Child Task 2')).toBeInTheDocument();
-    expect(screen.getByText('Grandchild Task')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Parent Task' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Child Task 1' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Child Task 2' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Grandchild Task' })).toBeInTheDocument();
   });
-  
+
   it('should apply correct indentation for nested tasks', () => {
     // Act - expandimos todos los nodos para que se muestren los hijos
     const expandedNodeSet = new Set(['parent-1', 'child-2']);
-    
+
     render(
       <ThemeProvider>
-        <TaskTree 
-          nodes={mockTaskTree} 
-          expandedNodes={expandedNodeSet} 
+        <TaskTree
+          nodes={mockTaskTree}
+          expandedNodes={expandedNodeSet}
           allTasks={mockTaskTree}
           onToggleExpand={mockOnToggleExpand}
           onStatusChange={mockOnStatusChange}
@@ -148,25 +148,25 @@ describe('TaskTree Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Nota: La indentación específica depende de la implementación
     // Pero podemos verificar que los elementos de TaskItem se renderizan correctamente
-    
+
     // Assert - verificar que hay 4 tareas en total
-    const taskItems = screen.getAllByText(/Task/);
+    const taskItems = screen.getAllByTestId('task-item');
     expect(taskItems.length).toBe(4);
   });
-  
+
   it('should render task timer components for each task', () => {
     // Act - expandimos todos los nodos y aseguramos que la tarea Child Task 2 tenga timeTracking activo
     const expandedNodeSet = new Set(['parent-1', 'child-2']);
     mockTaskTree[0].children[1].timeTracking.isActive = true; // Child Task 2 activa
-    
+
     render(
       <ThemeProvider>
-        <TaskTree 
-          nodes={mockTaskTree} 
-          expandedNodes={expandedNodeSet} 
+        <TaskTree
+          nodes={mockTaskTree}
+          expandedNodes={expandedNodeSet}
           allTasks={mockTaskTree}
           onToggleExpand={mockOnToggleExpand}
           onStatusChange={mockOnStatusChange}
@@ -179,23 +179,23 @@ describe('TaskTree Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert - verificamos que hay botones de inicio para todas las tareas
     // Buscamos botones que contengan el icono de play en su estructura interna
     const playButtons = screen.getAllByRole('button');
-    const playButtonsFiltered = playButtons.filter(button => 
+    const playButtonsFiltered = playButtons.filter(button =>
       button.innerHTML.includes('lucide-play')
     );
     expect(playButtonsFiltered.length).toBeGreaterThan(0);
   });
-  
+
   it('should propagate timer events to parent component', () => {
     // Act
     render(
       <ThemeProvider>
-        <TaskTree 
-          nodes={mockTaskTree} 
-          expandedNodes={new Set()} 
+        <TaskTree
+          nodes={mockTaskTree}
+          expandedNodes={new Set()}
           allTasks={mockTaskTree}
           onToggleExpand={mockOnToggleExpand}
           onStatusChange={mockOnStatusChange}
@@ -208,15 +208,15 @@ describe('TaskTree Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Encontrar un botón de inicio de temporizador y hacer clic en él
     const playButtons = screen.getAllByTitle('Start timer');
     fireEvent.click(playButtons[0]);
-    
+
     // Assert - verificar que se llamó a la función onStartTimer
     expect(mockOnStartTimer).toHaveBeenCalled();
   });
-  
+
   it('should pass elapsed time to child components correctly', () => {
     // Configurar el mock getElapsedTime para devolver valores diferentes según el id de tarea
     mockGetElapsedTime.mockImplementation((taskId) => {
@@ -224,15 +224,15 @@ describe('TaskTree Component', () => {
       if (taskId === 'child-2') return 1800000; // 30min
       return 0;
     });
-    
+
     // Act - expandimos todos los nodos para que se renderice la estructura completa
     const expandedNodeSet = new Set(['parent-1', 'child-2']);
-    
+
     render(
       <ThemeProvider>
-        <TaskTree 
-          nodes={mockTaskTree} 
-          expandedNodes={expandedNodeSet} 
+        <TaskTree
+          nodes={mockTaskTree}
+          expandedNodes={expandedNodeSet}
           allTasks={mockTaskTree}
           onToggleExpand={mockOnToggleExpand}
           onStatusChange={mockOnStatusChange}
@@ -245,7 +245,7 @@ describe('TaskTree Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert
     // Verificar que se llamó a getElapsedTime para cada tarea
     expect(mockGetElapsedTime).toHaveBeenCalledWith('parent-1');

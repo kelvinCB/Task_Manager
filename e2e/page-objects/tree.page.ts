@@ -24,11 +24,12 @@ export class TreePage {
     // Hover over the task item to make buttons visible
     await taskItem.hover();
 
-    // Look for edit button in tree view
-    const editButton = taskItem.getByTitle('Edit task').or(
-      taskItem.locator('button').filter({ hasText: 'Edit' })
-    );
-    await editButton.click();
+    // Open the menu
+    const moreButton = taskItem.locator('button').filter({ has: this.page.locator('svg') }).last();
+    await moreButton.click();
+
+    // Click edit button
+    await this.page.getByTestId('edit-task-button').click();
   }
 
   async deleteTask(taskTitle: string) {
@@ -36,11 +37,12 @@ export class TreePage {
     // Hover over the task item to make buttons visible
     await taskItem.hover();
 
-    // Look for delete button in tree view
-    const deleteButton = taskItem.getByTitle('Delete task').or(
-      taskItem.locator('button').filter({ hasText: 'Delete' })
-    );
-    await deleteButton.click();
+    // Open the menu
+    const moreButton = taskItem.locator('button').filter({ has: this.page.locator('svg') }).last();
+    await moreButton.click();
+
+    // Click delete button
+    await this.page.getByTestId('delete-task-button').click();
   }
 
   async toggleExpand(taskTitle: string) {
@@ -59,8 +61,7 @@ export class TreePage {
     await moreButton.click();
 
     // Click "Add Subtask"
-    const addSubtaskOption = this.page.getByText('Add Subtask');
-    await addSubtaskOption.click();
+    await this.page.getByTestId('add-subtask-button').click();
   }
 
   async verifyTaskExists(taskTitle: string) {
