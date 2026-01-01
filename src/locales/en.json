@@ -93,7 +93,7 @@
         "validation_ai_title": "Please enter a task title first to use AI assistance.",
         "validation_ai_desc": "Please enter a description first.",
         "depth": "Subtasks",
-        "subtasks": "subtask(s)",
+        "subtasks": "Subtasks",
         "overdue": "Overdue",
         "due": "Due",
         "created": "Created",
@@ -103,7 +103,10 @@
         "upload_hint": "Documents, Images, Audio, Video (max 10MB)",
         "level": "Level",
         "has_subtasks": "Has subtasks",
-        "add_subtask": "Add Subtask"
+        "add_subtask": "Add Subtask",
+        "cannot_complete_subtasks": "Cannot complete a task that has incomplete subtasks",
+        "subtask_of": "Subtask of",
+        "parents": "Parents"
     },
     "nav": {
         "dashboard": "Dashboard",

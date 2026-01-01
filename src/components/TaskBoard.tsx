@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { Task, TaskStatus } from '../types/Task';
-import { getStatusColor, formatDate, isTaskOverdue } from '../utils/taskUtils';
+import { getStatusColor, formatDate, isTaskOverdue, canCompleteTask, getTaskAncestry } from '../utils/taskUtils';
 import { Plus, Calendar, Circle, Clock, CheckCircle, Edit2, Trash2 } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 
@@ -56,6 +56,15 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     e.preventDefault();
     const taskId = e.dataTransfer.getData('text/plain');
     if (taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (targetStatus === 'Done' && task && !canCompleteTask(task, tasks)) {
+        // Show alert after a brief delay to allow the drag animation to complete
+        // and avoid the "fleeting" behavior reported by the user.
+        setTimeout(() => {
+          alert(t('tasks.cannot_complete_subtasks' || 'Cannot complete a task that has incomplete subtasks'));
+        }, 100);
+        return;
+      }
       onStatusChange(taskId, targetStatus);
     }
   };
@@ -158,7 +167,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                     <div
                       key={task.id}
                       draggable
-                      data-testid="task-item"
+                      data-testid="board-task-item"
                       data-task-title={task.title}
                       onDragStart={(e) => handleDragStart(e, task.id)}
                       onClick={() => onTaskClick?.(task.id)}
@@ -167,15 +176,23 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className={theme === 'dark' ? 'text-gray-100' : ''}>
+                            {task.parentId && (
+                              <div className={`text-[10px] mb-1 font-medium ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'} flex flex-wrap items-center gap-1`}>
+                                <span>{t('tasks.subtask_of')}: </span>
+                                <span className="opacity-80">
+                                  {getTaskAncestry(task, tasks).map(p => p.title).join(' > ')}
+                                </span>
+                              </div>
+                            )}
                             {renderTitle(task)}
                             {renderDescription(task)}
                           </div>
 
                           {/* Desktop layout */}
                           <div className={`hidden md:flex items-center gap-2 text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
-                            {task.depth > 0 && <span>{t('tasks.depth')}: {task.depth}</span>}
+                            {task.depth > 0 && <span>{t('tasks.level')}: {task.depth}</span>}
                             {task.childIds.length > 0 && (
-                              <span>• {task.childIds.length} {t('tasks.subtasks')}</span>
+                              <span>• {t('tasks.subtasks')}: {task.childIds.length}</span>
                             )}
                             {task.dueDate && (
                               <div className={`flex items-center gap-1 ${isTaskOverdue(task) ? 'text-red-600 font-medium' : ''}`}>
@@ -200,9 +217,9 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                           <div className={`md:hidden text-xs ${theme === 'dark' ? 'text-gray-200' : 'text-gray-500'}`}>
                             {/* Task info row */}
                             <div className="flex items-center gap-2 mb-1">
-                              {task.depth > 0 && <span>{t('tasks.depth')}: {task.depth}</span>}
+                              {task.depth > 0 && <span>{t('tasks.level')}: {task.depth}</span>}
                               {task.childIds.length > 0 && (
-                                <span>• {task.childIds.length} {t('tasks.subtasks')}</span>
+                                <span>• {t('tasks.subtasks')}: {task.childIds.length}</span>
                               )}
                             </div>
 
@@ -235,7 +252,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -243,6 +260,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             }}
                             className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-600' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded transition-colors duration-200`}
                             title="Edit task"
+                            data-testid="edit-task-button"
                           >
                             <Edit2 size={14} />
                           </button>
@@ -253,6 +271,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             }}
                             className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-red-400 hover:bg-gray-600' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'} rounded transition-colors duration-200`}
                             title="Delete task"
+                            data-testid="delete-task-button"
                           >
                             <Trash2 size={14} />
                           </button>

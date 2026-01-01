@@ -93,7 +93,7 @@
         "validation_ai_title": "Por favor ingresa un título de tarea primero para usar la asistencia de IA.",
         "validation_ai_desc": "Por favor ingresa una descripción primero.",
         "depth": "Subtareas",
-        "subtasks": "subtarea(s)",
+        "subtasks": "Subtareas",
         "overdue": "Vencida",
         "due": "Vence",
         "created": "Creada",
@@ -103,7 +103,10 @@
         "upload_hint": "Documentos, Imágenes, Audio, Video (máx 10MB)",
         "level": "Nivel",
         "has_subtasks": "Tiene subtareas",
-        "add_subtask": "Añadir Subtarea"
+        "add_subtask": "Añadir Subtarea",
+        "cannot_complete_subtasks": "No se puede completar una tarea que tiene subtareas incompletas",
+        "subtask_of": "Subtarea de",
+        "parents": "Padres"
     },
     "nav": {
         "dashboard": "Tablero",

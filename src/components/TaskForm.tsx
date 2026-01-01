@@ -19,6 +19,7 @@ interface TaskFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>) => void;
+  canComplete?: boolean;
 }
 
 export const TaskForm: React.FC<TaskFormProps> = ({
@@ -26,7 +27,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   parentId,
   isOpen,
   onClose,
-  onSubmit
+  onSubmit,
+  canComplete
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -104,7 +106,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div role="dialog" aria-modal="true" className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl w-full max-w-md md:max-w-4xl max-h-[90vh] flex flex-col transition-all duration-300`}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        data-testid="task-form-modal"
+        className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl w-full max-w-md md:max-w-4xl max-h-[90vh] flex flex-col transition-all duration-300`}
+      >
         {/* Header */}
         <div className={`relative flex items-center justify-center p-6 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex items-center gap-3">
@@ -458,12 +465,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   <select
                     id="task-status"
                     value={formData.status}
-                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as TaskStatus }))}
+                    onChange={(e) => {
+                      const newStatus = e.target.value as TaskStatus;
+                      if (newStatus === 'Done' && canComplete === false) {
+                        alert(t('tasks.cannot_complete_subtasks') || 'Cannot complete a task that has incomplete subtasks');
+                        return;
+                      }
+                      setFormData(prev => ({ ...prev, status: newStatus }));
+                    }}
                     className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
                   >
                     <option value="Open">{t('tasks.status_open')}</option>
                     <option value="In Progress">{t('tasks.status_in_progress')}</option>
-                    <option value="Done">{t('tasks.status_done')}</option>
+                    <option value="Done" disabled={canComplete === false}>
+                      {t('tasks.status_done')}{canComplete === false ? ` (${t('tasks.has_subtasks')})` : ''}
+                    </option>
                   </select>
                 </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus } from '../types/Task';
-import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon } from '../utils/taskUtils';
+import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon, getTaskAncestry } from '../utils/taskUtils';
 import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, CheckCircle } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
@@ -20,6 +20,7 @@ interface TaskItemProps {
   onPauseTimer?: (taskId: string) => void;
   getElapsedTime?: (taskId: string) => number;
   onTaskClick?: (taskId: string) => void;
+  allTasks: Task[];
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -35,7 +36,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onStartTimer,
   onPauseTimer,
   getElapsedTime,
-  onTaskClick
+  onTaskClick,
+  allTasks
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -162,6 +164,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             }
           `}
           disabled={!hasChildren}
+          data-testid="expand-button"
         >
           {hasChildren && (isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
         </button>
@@ -178,6 +181,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         >
           <div className="flex items-start justify-between space-x-2">
             <div className="flex-1 min-w-0">
+              {task.parentId && (
+                <div className={`text-[10px] mb-1 font-medium ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'} flex flex-wrap items-center gap-1`}>
+                  <span>{t('tasks.subtask_of')}: </span>
+                  <span className="opacity-80">
+                    {getTaskAncestry(task, allTasks).map(p => p.title).join(' > ')}
+                  </span>
+                </div>
+              )}
               {renderTitle()}
               {renderDescription()}
 
@@ -243,7 +254,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                   {task.depth > 0 && (
                     <div className="flex items-center gap-1">
                       <User size={12} />
-                      <span>{t('tasks.depth')} {task.depth}</span>
+                      <span>{t('tasks.level')} {task.depth}</span>
                     </div>
                   )}
                   {/* Task Timer */}
@@ -302,6 +313,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                         onEdit(task);
                         setIsMenuOpen(false);
                       }}
+                      data-testid="edit-task-button"
                     >
                       {t('common.edit')}
                     </button>
@@ -312,6 +324,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                         onAddChild(task.id);
                         setIsMenuOpen(false);
                       }}
+                      data-testid="add-subtask-button"
                     >
                       {t('tasks.add_subtask')}
                     </button>
@@ -322,6 +335,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                         onDelete(task.id);
                         setIsMenuOpen(false);
                       }}
+                      data-testid="delete-task-button"
                     >
                       {t('common.delete')}
                     </button>
