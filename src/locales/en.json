@@ -144,5 +144,11 @@
         "generating": "Generating...",
         "improving": "Improving...",
         "thinking_status": "Thinking"
+    },
+    "errors": {
+        "cannot_add_subtask_to_done": "Cannot add a subtask because the parent task is already completed and marked as \"Done\"",
+        "error_title": "Oops!",
+        "ok": "OK",
+        "do_not_show_again": "Do not show this message again"
     }
 }
