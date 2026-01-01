@@ -34,6 +34,7 @@ import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import { TaskDetailModal } from './components/TaskDetailModal';
+import { ErrorModal } from './components/features/ErrorModal';
 
 const MainApp = () => {
   const {
@@ -78,6 +79,10 @@ const MainApp = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
+  // Error Modal State
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleTaskClick = (taskId: string) => {
     setSelectedTaskId(taskId);
     setIsDetailModalOpen(true);
@@ -86,6 +91,11 @@ const MainApp = () => {
   const handleCloseDetailModal = () => {
     setIsDetailModalOpen(false);
     setSelectedTaskId(null);
+  };
+
+  const showError = (message: string) => {
+    setErrorMessage(message);
+    setIsErrorModalOpen(true);
   };
 
 
@@ -122,7 +132,7 @@ const MainApp = () => {
     // Check if the parent task is completed
     const parentTask = getTaskById(parentTaskId);
     if (parentTask && parentTask.status === 'Done') {
-      alert('Cannot add a subtask because the parent task is already completed and marked as "Done"');
+      showError(t('errors.cannot_add_subtask_to_done'));
       return;
     }
 
@@ -134,7 +144,7 @@ const MainApp = () => {
   const handleStatusChange = async (id: string, status: Task['status']) => {
     const updatedTask = await moveTask(id, status);
     if (!updatedTask) {
-      alert(t('tasks.cannot_complete_subtasks'));
+      showError(t('tasks.cannot_complete_subtasks'));
       return;
     }
 
@@ -651,6 +661,7 @@ const MainApp = () => {
                 onPauseTimer={pauseTaskTimer}
                 getElapsedTime={getElapsedTime}
                 onTaskClick={handleTaskClick}
+                showError={showError}
               />
             </div>
           ) : view === 'board' ? (
@@ -665,6 +676,7 @@ const MainApp = () => {
                 onPauseTimer={pauseTaskTimer}
                 getElapsedTime={getElapsedTime}
                 onTaskClick={handleTaskClick}
+                showError={showError}
               />
             </div>
           ) : (
@@ -736,6 +748,7 @@ const MainApp = () => {
           setParentId(undefined);
         }}
         onSubmit={handleCreateTask}
+        showError={showError}
       />
 
       {/* Task Detail Modal */}
@@ -748,6 +761,14 @@ const MainApp = () => {
           handleEditTask(task);
         }}
         getElapsedTime={getElapsedTime}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        title={t('errors.error_title')}
+        message={errorMessage}
       />
     </div>
   );
