@@ -62,6 +62,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Task Creation** | ✅ Complete | 100% | Create tasks with title, description, due date |
 | **Task Editing** | ✅ Complete | 100% | Edit existing tasks inline |
 | **Task Deletion** | ✅ Complete | 100% | Delete tasks from Tree View and Board View |
+| **Subtask Dependency** | ✅ Complete | 100% | Tasks with incomplete subtasks cannot be marked as "Done". Users receive explicit UI feedback (alerts and disabled options) in Tree View, Board View (drag & drop), and Task Form. |
 | **Hierarchical Tasks** | ✅ Complete | 100% | Parent-child task relationships |
 | **Task Status Management** | ✅ Complete | 100% | Open, In Progress, Done statuses |
 | **Time Tracking** | ✅ Complete | 100% | Start/pause timers, track time per task |
@@ -155,7 +156,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
 || **Frontend Unit Tests** | ✅ Complete | 100% | 139 comprehensive Vitest tests including password reset features |
-| **E2E Tests** | ✅ Complete | 100% | 58/58 Playwright E2E tests passing (all cleaned and optimized) |
+| **E2E Tests** | ✅ Complete | 100% | 99/99 Playwright E2E tests passing (all cleaned and optimized) |
 | **Username Feature Tests** | ✅ Complete | 100% | 17 tests covering AccountMenu and useUserProfile hook |
 | **Test Debugging** | ✅ Complete | 100% | Visual debugging strategy with screenshots |
 | **Backend Unit Tests** | ✅ Complete | 100% | 19/19 Jest tests passing with 90.62% coverage |

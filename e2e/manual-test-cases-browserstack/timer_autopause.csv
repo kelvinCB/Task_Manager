@@ -1,5 +1,5 @@
 Title,Steps,Expected Result,Description,Priority,Type,Tags,Automation Status
-"Timer Auto-pause","Step 1: Create Task A and Task B","Tasks are ready","Verify that starting a new timer pauses others","High","Functional","Timer","Automated"
-"Timer Auto-pause","Step 2: Start timer on Task A","Timer starts counting for Task A","","","","",""
-"Timer Auto-pause","Step 3: Start timer on Task B","Timer for Task A pauses automatically; Task B starts","","","","",""
-"Timer Auto-pause","Step 4: Stop timer on Task B","All timers are paused","","","","",""
+"Concurrent Timers","Step 1: Create Task A and Task B","Tasks are ready","Verify that multiple timers can run simultaneously","High","Functional","Timer","Automated"
+"Concurrent Timers","Step 2: Start timer on Task A","Timer starts counting for Task A","","","","",""
+"Concurrent Timers","Step 3: Start timer on Task B","Both timers for Task A and Task B are running","","","","",""
+"Concurrent Timers","Step 4: Stop all timers","All timers are paused","","","","",""

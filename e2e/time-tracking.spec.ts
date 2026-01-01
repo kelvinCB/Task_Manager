@@ -119,7 +119,7 @@ test.describe('Time Tracking', () => {
     expect(download.suggestedFilename()).toMatch(/\.csv$/);
   });
 
-  test('should pause other timers when a new one is started', async () => {
+  test('should allow multiple concurrent timers', async () => {
     // Create two tasks
     await appPage.openAddTaskModal();
     await taskPage.createTask({ title: 'Task A' });
@@ -133,8 +133,8 @@ test.describe('Time Tracking', () => {
     // Start timer for Task B
     await timerPage.startTimer('Task B');
 
-    // Verify Task B timer is running and Task A timer is paused
+    // Verify both timers are running
     await timerPage.verifyTimerRunning('Task B');
-    await timerPage.verifyTimerStopped('Task A');
+    await timerPage.verifyTimerRunning('Task A');
   });
 });
