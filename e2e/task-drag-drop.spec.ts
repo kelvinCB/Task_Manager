@@ -77,20 +77,20 @@ test.describe('Task Drag and Drop', () => {
         // 3. Try to drag parent to Done in Board
         await appPage.switchToView('board');
 
-        // Setup dialog handler and wait for it
-        const dialogPromise = page.waitForEvent('dialog');
-
         const parentCard = boardPage.getTaskCard(parentTitle);
         const doneColumn = boardPage.getColumn('Done');
 
         // Drag and drop
         await parentCard.dragTo(doneColumn);
 
-        // 4. Verify restriction
-        const dialog = await dialogPromise;
-        expect(dialog.message().toLowerCase()).toContain('subtasks');
-        await dialog.accept();
+        // 4. Verify error modal appears instead of dialog
+        await expect(page.getByTestId('error-modal')).toBeVisible({ timeout: 2000 });
+        await expect(page.getByTestId('error-modal-message')).toContainText('subtasks');
 
+        // Close the modal
+        await page.getByTestId('error-modal-ok-button').click();
+
+        // Verify task stayed in In Progress
         await boardPage.verifyTaskInColumn(parentTitle, 'In Progress');
     });
 
