@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Task, TaskStatus, TaskFilter, TimeEntry } from '../types/Task';
 import { generateId, buildTaskTree, canCompleteTask } from '../utils/taskUtils';
 import { taskService } from '../services/taskService';
@@ -279,7 +279,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     };
   }, [useApi, options.useDefaultTasks]);
 
-  const createTask = useCallback(async (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth' | 'timeTracking'>) => {
+  const createTask = useCallback(async (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth' | 'timeTracking'>): Promise<Task | null> => {
     // If using API, try to create task on backend
     if (useApi) {
       try {
@@ -313,7 +313,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
             return updated;
           });
-          return response.data.id;
+          return response.data;
         }
       } catch (error) {
         console.error('Error creating task:', error);
@@ -352,7 +352,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       return updated;
     });
 
-    return newTask.id;
+    return newTask;
   }, [tasks, useApi]);
 
   // Special createTask function for imports that preserves timeTracking data
@@ -506,13 +506,13 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   }, [tasks, useApi]);
 
   // We will move this function after defining pauseTaskTimer
-  const moveTaskImpl = async (id: string, newStatus: TaskStatus) => {
+  const moveTaskImpl = async (id: string, newStatus: TaskStatus): Promise<Task | null> => {
     const task = tasks.find(t => t.id === id);
-    if (!task) return false;
+    if (!task) return null;
 
     // Check if it can be completed (all subtasks must be completed)
     if (newStatus === 'Done' && !canCompleteTask(task, tasks)) {
-      return false;
+      return null;
     }
 
     let updates: Partial<Task> & { total_time_ms?: number } = { status: newStatus };
@@ -567,7 +567,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       taskService.recordTimeSummary(id, durationToRecord).catch(() => { });
     }
 
-    return true;
+    return { ...task, ...updates } as Task;
   };
 
   const moveTask = useCallback(moveTaskImpl, [tasks, updateTask, useApi]);
@@ -617,18 +617,18 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   }, [expandedNodes]);
 
   // Time tracking functions
-  const startTaskTimer = useCallback(async (taskId: string) => {
-    const task = tasks.find(t => t.id === taskId);
+  // Keep a ref to tasks for async operations to avoid stale closures
+  const tasksRef = useRef(tasks);
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
+
+  const startTaskTimer = useCallback(async (taskId: string, currentTask?: Task) => {
+    const task = currentTask || tasksRef.current.find(t => t.id === taskId);
     if (!task) return;
 
     const now = Date.now();
     let updates: Partial<Task> = {};
-
-    // Pause any other active timers
-    const activeTasks = tasks.filter(t => t.timeTracking.isActive && t.id !== taskId);
-    for (const activeTask of activeTasks) {
-      await pauseTaskTimer(activeTask.id);
-    }
 
     // If task is not in progress, change its status
     if (task.status !== 'In Progress') {
@@ -655,10 +655,10 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     if (Object.keys(updates).length > 0) {
       await updateTask(taskId, updates);
     }
-  }, [tasks, updateTask, setActiveTimer]);
+  }, [updateTask, setActiveTimer]);
 
   const pauseTaskTimer = useCallback(async (taskId: string) => {
-    const task = tasks.find(t => t.id === taskId);
+    const task = tasksRef.current.find(t => t.id === taskId);
     if (!task || !task.timeTracking.isActive) return;
 
     const now = Date.now();

@@ -90,6 +90,7 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
           onPauseTimer={onPauseTimer}
           getElapsedTime={getElapsedTime}
           onTaskClick={onTaskClick}
+          allTasks={allTasks}
         />
       ))}
     </div>

@@ -20,7 +20,7 @@ export const buildTaskTree = (tasks: Task[]): TaskNode[] => {
   // Build relationships
   tasks.forEach(task => {
     const taskNode = taskMap.get(task.id)!;
-    
+
     if (task.parentId) {
       const parent = taskMap.get(task.parentId);
       if (parent) {
@@ -38,7 +38,7 @@ export const buildTaskTree = (tasks: Task[]): TaskNode[] => {
 export const canCompleteTask = (task: Task, allTasks: Task[]): boolean => {
   // If it has no children, it can be completed
   if (task.childIds.length === 0) return true;
-  
+
   // If it has children, all must be completed
   return task.childIds.every(childId => {
     const childTask = allTasks.find(t => t.id === childId);
@@ -48,11 +48,25 @@ export const canCompleteTask = (task: Task, allTasks: Task[]): boolean => {
 
 export const getTaskDepth = (task: Task, allTasks: Task[]): number => {
   if (!task.parentId) return 0;
-  
+
   const parent = allTasks.find(t => t.id === task.parentId);
   if (!parent) return 0;
-  
+
   return getTaskDepth(parent, allTasks) + 1;
+};
+
+export const getTaskAncestry = (task: Task, allTasks: Task[]): Task[] => {
+  const ancestry: Task[] = [];
+  let currentTask = task;
+
+  while (currentTask.parentId) {
+    const parent = allTasks.find(t => t.id === currentTask.parentId);
+    if (!parent) break;
+    ancestry.unshift(parent);
+    currentTask = parent;
+  }
+
+  return ancestry;
 };
 
 export const formatDate = (date: Date): string => {

@@ -27,6 +27,7 @@ import { useTheme } from './contexts/ThemeContext';
 import { AccountMenu } from './components/features/account/AccountMenu';
 import { Analytics } from '@vercel/analytics/react';
 
+import { canCompleteTask } from './utils/taskUtils';
 import './styles/logoAnimation.css';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -36,6 +37,7 @@ import { TaskDetailModal } from './components/TaskDetailModal';
 
 const MainApp = () => {
   const {
+    tasks,
     filteredTasks,
     filteredTaskTree,
     filter,
@@ -87,12 +89,25 @@ const MainApp = () => {
   };
 
 
-  const handleCreateTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>) => {
+  const handleCreateTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>) => {
+    let targetTask: Task | undefined;
+
     if (editingTask) {
-      updateTask(editingTask.id, taskData);
+      await updateTask(editingTask.id, taskData);
+      // Construct optimistic update correctly for startTaskTimer
+      targetTask = { ...editingTask, ...taskData } as Task;
     } else {
-      createTask(taskData);
+      const newTask = await createTask(taskData);
+      if (newTask) {
+        targetTask = newTask;
+      }
     }
+
+    // Auto-start timer if status is 'In Progress'
+    if (targetTask && taskData.status === 'In Progress') {
+      startTaskTimer(targetTask.id, targetTask);
+    }
+
     setEditingTask(undefined);
     setParentId(undefined);
     setIsFormOpen(false);
@@ -116,10 +131,16 @@ const MainApp = () => {
     setIsFormOpen(true);
   };
 
-  const handleStatusChange = (id: string, status: Task['status']) => {
-    const success = moveTask(id, status);
-    if (!success) {
-      alert('Cannot complete a task that has incomplete subtasks');
+  const handleStatusChange = async (id: string, status: Task['status']) => {
+    const updatedTask = await moveTask(id, status);
+    if (!updatedTask) {
+      alert(t('tasks.cannot_complete_subtasks'));
+      return;
+    }
+
+    // Auto-start timer if status is changed to 'In Progress'
+    if (status === 'In Progress') {
+      startTaskTimer(id, updatedTask);
     }
   };
 
@@ -706,6 +727,7 @@ const MainApp = () => {
       {/* Task Form Modal */}
       <TaskForm
         task={editingTask}
+        canComplete={editingTask ? canCompleteTask(editingTask, tasks) : true}
         parentId={parentId}
         isOpen={isFormOpen}
         onClose={() => {
