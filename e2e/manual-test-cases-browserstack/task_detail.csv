@@ -1,0 +1,5 @@
+Title,Steps,Expected Result,Description,Priority,Type,Tags,Automation Status
+"Task Detail View","Step 1: Create a task with title and description","Task exists in view","Verify opening and reading task details","Medium","Functional","DetailView","Automated"
+"Task Detail View","Step 2: Click on the task title","Task Detail modal/panel opens","","","","",""
+"Task Detail View","Step 3: Verify title and description match","Data is consistent with input","","","","",""
+"Task Detail View","Step 4: Close the detail view","Modal closes, returning to previous view","","","","",""

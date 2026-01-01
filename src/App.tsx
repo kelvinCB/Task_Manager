@@ -329,6 +329,7 @@ const MainApp = () => {
                 <div className={`flex items-center space-x-2 p-1 rounded-lg ${theme === 'dark' ? 'bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100'} shadow-sm`}>
                   <button
                     onClick={() => setView('tree')}
+                    data-testid="tree-view-toggle"
                     title={t('nav.tree_view')}
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
@@ -342,6 +343,7 @@ const MainApp = () => {
                   </button>
                   <button
                     onClick={() => setView('board')}
+                    data-testid="board-view-toggle"
                     title={t('nav.board_view')}
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
@@ -355,6 +357,7 @@ const MainApp = () => {
                   </button>
                   <button
                     onClick={() => setView('stats')}
+                    data-testid="stats-view-toggle"
                     title={t('nav.stats_view')}
                     className={`
                       flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200
@@ -428,7 +431,8 @@ const MainApp = () => {
               <div className={`flex items-center gap-0.5 p-1 rounded-lg ${theme === 'dark' ? 'bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100'} shadow-sm`}>
                 <button
                   onClick={() => setView('tree')}
-                  title="Tree View"
+                  data-testid="tree-view-toggle"
+                  title={t('nav.tree_view')}
                   className={`p-2 rounded-lg transition-colors duration-200 ${view === 'tree'
                     ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
                     : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
@@ -438,7 +442,8 @@ const MainApp = () => {
                 </button>
                 <button
                   onClick={() => setView('board')}
-                  title="Board View"
+                  data-testid="board-view-toggle"
+                  title={t('nav.board_view')}
                   className={`p-2 rounded-lg transition-colors duration-200 ${view === 'board'
                     ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
                     : (theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-200')
@@ -448,6 +453,7 @@ const MainApp = () => {
                 </button>
                 <button
                   onClick={() => setView('stats')}
+                  data-testid="stats-view-toggle"
                   title={t('nav.stats_view')}
                   className={`p-2 rounded-lg transition-colors duration-200 ${view === 'stats'
                     ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
@@ -627,68 +633,72 @@ const MainApp = () => {
               />
             </div>
           ) : view === 'board' ? (
-            <TaskBoard
-              tasks={filteredTasks}
-              onStatusChange={handleStatusChange}
-              onEdit={handleEditTask}
-              onDelete={deleteTask}
-              onCreateTask={openCreateForm}
-              onStartTimer={startTaskTimer}
-              onPauseTimer={pauseTaskTimer}
-              getElapsedTime={getElapsedTime}
-              onTaskClick={handleTaskClick}
-            />
+            <div data-testid="board-view-container" className="h-full overflow-auto">
+              <TaskBoard
+                tasks={filteredTasks}
+                onStatusChange={handleStatusChange}
+                onEdit={handleEditTask}
+                onDelete={deleteTask}
+                onCreateTask={openCreateForm}
+                onStartTimer={startTaskTimer}
+                onPauseTimer={pauseTaskTimer}
+                getElapsedTime={getElapsedTime}
+                onTaskClick={handleTaskClick}
+              />
+            </div>
           ) : (
-            <TimeStatsView
-              getTimeStatistics={async (period, startDate, endDate) => {
-                // Compute date range
-                const now = new Date();
-                let start: Date;
-                let end: Date = now;
+            <div data-testid="stats-view-container" className="h-full overflow-auto p-6">
+              <TimeStatsView
+                getTimeStatistics={async (period, startDate, endDate) => {
+                  // Compute date range
+                  const now = new Date();
+                  let start: Date;
+                  let end: Date = now;
 
-                if (period === 'custom' && startDate && endDate) {
-                  start = startDate;
-                  end = endDate;
-                } else if (period === 'day') {
-                  start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-                } else if (period === 'week') {
-                  const dayOfWeek = now.getDay();
-                  start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek, 0, 0, 0, 0);
-                } else if (period === 'month') {
-                  start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-                } else {
-                  // year
-                  start = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
-                }
+                  if (period === 'custom' && startDate && endDate) {
+                    start = startDate;
+                    end = endDate;
+                  } else if (period === 'day') {
+                    start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+                  } else if (period === 'week') {
+                    const dayOfWeek = now.getDay();
+                    start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek, 0, 0, 0, 0);
+                  } else if (period === 'month') {
+                    start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+                  } else {
+                    // year
+                    start = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+                  }
 
-                // Try backend summary first
-                const resp = await taskService.getTimeSummary(start, end);
-                if (resp.data && Array.isArray(resp.data)) {
-                  return resp.data.map((item) => ({
-                    id: item.id,
+                  // Try backend summary first
+                  const resp = await taskService.getTimeSummary(start, end);
+                  if (resp.data && Array.isArray(resp.data)) {
+                    return resp.data.map((item) => ({
+                      id: item.id,
+                      title: item.title,
+                      timeSpent: item.timeSpent,
+                      status: item.status,
+                      startDate: start.getTime(),
+                      endDate: end.getTime()
+                    }));
+                  }
+
+                  // Fallback to local computation from useTasks (offline or error)
+                  const local = period === 'custom' && startDate && endDate
+                    ? getTimeStatistics('custom', startDate, endDate)
+                    : getTimeStatistics(period as 'day' | 'week' | 'month' | 'year');
+
+                  return local.taskStats.map(item => ({
+                    id: item.taskId,
                     title: item.title,
                     timeSpent: item.timeSpent,
-                    status: item.status,
-                    startDate: start.getTime(),
-                    endDate: end.getTime()
+                    status: 'Open', // Not relevant for charting here
+                    startDate: (period === 'custom' && startDate) ? startDate.getTime() : start.getTime(),
+                    endDate: (period === 'custom' && endDate) ? endDate.getTime() : end.getTime()
                   }));
-                }
-
-                // Fallback to local computation from useTasks (offline or error)
-                const local = period === 'custom' && startDate && endDate
-                  ? getTimeStatistics('custom', startDate, endDate)
-                  : getTimeStatistics(period as 'day' | 'week' | 'month' | 'year');
-
-                return local.taskStats.map(item => ({
-                  id: item.taskId,
-                  title: item.title,
-                  timeSpent: item.timeSpent,
-                  status: 'Open', // Not relevant for charting here
-                  startDate: (period === 'custom' && startDate) ? startDate.getTime() : start.getTime(),
-                  endDate: (period === 'custom' && endDate) ? endDate.getTime() : end.getTime()
-                }));
-              }}
-            />
+                }}
+              />
+            </div>
           )}
         </div>
       </main>

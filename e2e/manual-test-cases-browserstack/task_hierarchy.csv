@@ -1,0 +1,8 @@
+Title,Steps,Expected Result,Description,Priority,Type,Tags,Automation Status
+"Create Subtask","Step 1: Open Tree View","Tree View is displayed","Verify creation of a subtask","Medium","Functional","Hierarchy, Tree","Automated"
+"Create Subtask","Step 2: Create a parent task","Parent task appears in tree","","","","",""
+"Create Subtask","Step 3: Click 'Add Subtask' from parent's menu","Subtask modal/form appears","","","","",""
+"Create Subtask","Step 4: Enter subtask title and save","Subtask appears indented under parent","","","","",""
+"Subtask Independence","Step 1: Create a parent task with a subtask","Hierarchy exists","Verify subtask status updates independently","Medium","Functional","Hierarchy","Automated"
+"Subtask Independence","Step 2: Change subtask status to 'Done'","Subtask moves to 'Done' state","","","","",""
+"Subtask Independence","Step 3: Check parent task status","Parent remains in its original status","","","","",""

@@ -17,7 +17,7 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ### Estado Actual
 
 ✅ **300 pruebas unitarias** (100% pasando)
-✅ **91 pruebas E2E** (100% pasando)
+✅ **98 pruebas E2E** (100% pasando)
 ✅ **127 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
@@ -335,7 +335,11 @@ e2e/
 ├── task-management.spec.ts         # Gestión de tareas (5 tests)
 ├── task-advanced.spec.ts           # IA y fechas (4 tests)
 ├── task-isolation.spec.ts          # Aislamiento de usuarios (6 tests)
-├── time-tracking.spec.ts           # Seguimiento de tiempo (3 tests)
+├── task-hierarchy.spec.ts          # Jerarquía y subtareas (2 tests)
+├── task-drag-drop.spec.ts          # Drag and drop en Board (2 tests)
+├── task-detail.spec.ts             # Vista de detalle (2 tests)
+├── i18n.spec.ts                   # Multi-idioma (3 tests)
+├── time-tracking.spec.ts           # Seguimiento de tiempo (4 tests)
 ├── time-stats.spec.ts              # Estadísticas (8 tests)
 ├── username-display.spec.ts         # Display de username (8 tests)
 ├── global-setup.ts                 # Configuración global para tests
@@ -398,12 +402,34 @@ Para cada nuevo test automatizado que se agregue a la suite E2E, es **OBLIGATORI
 - Iniciar/detener timers
 - Precisión de medición
 - Exportación de datos CSV
+- **Auto-pausa de timers** ⏱️ (al iniciar uno nuevo)
 
 #### Estadísticas de Tiempo (8 tests)
 
 - Filtros temporales (Today, Week, Month, Year)
 - **Filtro de fecha personalizada** 📅 (fix de zona horaria)
 - Cambio entre filtros y visualización de datos
+
+#### Task Hierarchy (2 tests)
+
+- Creación de subtareas desde Tree View
+- Verificación de sangría y jerarquía visual
+
+#### Drag and Drop (2 tests)
+
+- Movimiento de tareas entre columnas 'Open' e 'In Progress'
+- Verificación de persistencia de estado post-drop
+
+#### Task Detail View (2 tests)
+
+- Apertura de modal de detalle al hacer click en el título
+- Verificación de integridad de datos en el detalle
+
+#### Internationalization (3 tests)
+
+- Cambio de idioma a Español en Login y Dashboard
+- Verificación de persistencia tras recarga de página
+- Verificación de traducciones en cabeceras y vistas principales
 
 #### Authentication (15 tests)
 
@@ -462,7 +488,7 @@ Para cada nuevo test automatizado que se agregue a la suite E2E, es **OBLIGATORI
 
 ### Resultados E2E actuales
 
-✅ **83/83 tests pasando** (100% de éxito)
+✅ **98/98 tests pasando** (100% de éxito)
 ✅ **Todos los tests funcionando** (incluido username-display)⏱️ **~1.6 minutos** con 4 workers🧹 **Tests limpios y optimizados**🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
 🔒 **User Isolation** - Tests de seguridad multi-usuario
@@ -700,4 +726,4 @@ render(
 
 ---
 
-**Última actualización**: Diciembre 2025 - Suite de testing completamente funcional, robusta y optimizada con **335 tests** (173 Frontend + 82 Backend + 83 E2E).
+**Última actualización**: Diciembre 2025 - Suite de testing completamente funcional, robusta y optimizada con **500 tests** (300 Frontend + 99 Backend + 98 E2E).

@@ -1,0 +1,5 @@
+Title,Steps,Expected Result,Description,Priority,Type,Tags,Automation Status
+"Task Drag and Drop","Step 1: Open Board View","Board View is displayed","Verify dragging tasks between columns","High","Functional","Board, DragDrop","Automated"
+"Task Drag and Drop","Step 2: Drag a task from 'Open' to 'In Progress'","Task card moves to 'In Progress' column","","","","",""
+"Task Drag and Drop","Step 3: Refresh page","Task remains in 'In Progress' column","","","","",""
+"Task Drag and Drop","Step 4: Drag the task from 'In Progress' to 'Done'","Task card moves to 'Done' column","","","","",""

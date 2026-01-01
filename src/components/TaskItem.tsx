@@ -148,6 +148,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             : isOverdue ? 'border-gray-200 bg-white border-l-red-500 border-l-4' : 'border-gray-200 bg-white'}
         `}
         style={{ marginLeft: `${task.depth * 24}px` }}
+        data-testid="task-item"
+        data-task-title={task.title}
       >
         {/* Expand/Collapse Button */}
         <button

@@ -118,4 +118,23 @@ test.describe('Time Tracking', () => {
     // Verify download occurred
     expect(download.suggestedFilename()).toMatch(/\.csv$/);
   });
+
+  test('should pause other timers when a new one is started', async () => {
+    // Create two tasks
+    await appPage.openAddTaskModal();
+    await taskPage.createTask({ title: 'Task A' });
+    await appPage.openAddTaskModal();
+    await taskPage.createTask({ title: 'Task B' });
+
+    // Start timer for Task A
+    await timerPage.startTimer('Task A');
+    await timerPage.verifyTimerRunning('Task A');
+
+    // Start timer for Task B
+    await timerPage.startTimer('Task B');
+
+    // Verify Task B timer is running and Task A timer is paused
+    await timerPage.verifyTimerRunning('Task B');
+    await timerPage.verifyTimerStopped('Task A');
+  });
 });

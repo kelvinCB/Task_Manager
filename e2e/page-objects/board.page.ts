@@ -14,20 +14,13 @@ export class BoardPage {
     this.inProgressColumn = page.getByText('In Progress');
     this.doneColumn = page.getByText('Done');
     // Task cards
-    this.taskCards = page.locator('.bg-white.border.rounded-lg');
+    this.taskCards = page.locator('[data-testid="task-item"]');
   }
 
   // Get column by exact status text
   getColumn(status: 'Open' | 'In Progress' | 'Done') {
-    // Columns are usually identified by their headers. 
-    // We need to find the drop zone associated with the header.
-    // Assuming the structure is a column container with a header.
-    // Best to target the common parent or a specific testid if available.
-    // Based on inspection or standard practice, we'll try to find the column container.
-    return this.page.locator(`[data-status="${status}"]`).or(
-      // Fallback: finding the column that contains the text
-      this.page.locator('.flex.flex-col.h-full').filter({ has: this.page.getByText(status, { exact: true }) })
-    ).first();
+    // The drop zone is the dashed border div inside the status column
+    return this.page.locator('.flex.flex-col.h-full').filter({ has: this.page.getByText(status, { exact: true }) }).locator('div.flex-1.rounded-lg.border-2.border-dashed');
   }
 
   async verifyColumnsVisible() {
@@ -37,17 +30,13 @@ export class BoardPage {
   }
 
   getTaskCard(taskTitle: string) {
-    return this.taskCards.filter({ hasText: taskTitle });
+    return this.page.locator(`[data-testid="task-item"][data-task-title="${taskTitle}"]`);
   }
 
-  async verifyTaskInColumn(taskTitle: string, column: 'Open' | 'In Progress' | 'Done') {
-    const taskCard = this.getTaskCard(taskTitle);
+  async verifyTaskInColumn(taskTitle: string, columnTitle: string) {
+    const column = this.getColumn(columnTitle);
+    const taskCard = column.locator(`[data-testid="task-item"][data-task-title="${taskTitle}"]`);
     await expect(taskCard).toBeVisible();
-    
-    // Verify the task is in the correct column by checking the status badge
-    // Verify the task is in the correct column by checking if the status text is visible within the card
-    // We use a more generic locator or just check for the text, confirming it exists in the card
-    await expect(taskCard.getByText(column)).toBeVisible();
   }
 
   async openTaskMenu(taskTitle: string) {
@@ -107,15 +96,15 @@ export class BoardPage {
     status?: string;
   }) {
     const taskCard = this.getTaskCard(taskTitle);
-    
+
     if (details.description) {
       await expect(taskCard.getByText(details.description)).toBeVisible();
     }
-    
+
     if (details.dueDate) {
       await expect(taskCard.getByText(details.dueDate)).toBeVisible();
     }
-    
+
     if (details.status) {
       const statusBadge = taskCard.locator('.inline-flex.items-center.px-2\\.5.py-0\\.5');
       await expect(statusBadge).toContainText(details.status);

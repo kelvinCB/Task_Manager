@@ -158,6 +158,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                     <div
                       key={task.id}
                       draggable
+                      data-testid="task-item"
                       data-task-title={task.title}
                       onDragStart={(e) => handleDragStart(e, task.id)}
                       onClick={() => onTaskClick?.(task.id)}

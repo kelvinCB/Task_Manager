@@ -1,0 +1,6 @@
+Title,Steps,Expected Result,Description,Priority,Type,Tags,Automation Status
+"Language Switching","Step 1: Open Login page","App defaults to English","Verify i18n switching and main app coverage","High","Functional","i18n","Automated"
+"Language Switching","Step 2: Toggle language to Spanish","Text changes to Spanish (e.g., 'Iniciar Sesión')","","","","",""
+"Language Switching","Step 3: Login and go to Dashboard","Dashboard view is displayed","","","","",""
+"Language Switching","Step 4: Verify Dashboard headers in Spanish","Headers like 'Pendiente' are visible","","","","",""
+"Language Switching","Step 5: Toggle language back to English","Text reverts to English","","","","",""

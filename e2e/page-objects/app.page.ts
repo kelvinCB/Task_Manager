@@ -14,9 +14,9 @@ export class AppPage {
   constructor(page: Page) {
     this.page = page;
     // Navigation buttons use specific titles - use first() to handle desktop/mobile duplicates
-    this.boardViewButton = page.getByTitle('Board View').first();
-    this.treeViewButton = page.getByTitle('Tree View').first();
-    this.timeStatsButton = page.getByTitle('Time Stats').first();
+    this.boardViewButton = page.getByTestId('board-view-toggle').filter({ visible: true }).first();
+    this.treeViewButton = page.getByTestId('tree-view-toggle').filter({ visible: true }).first();
+    this.timeStatsButton = page.getByTestId('stats-view-toggle').filter({ visible: true }).first();
     this.themeToggle = page.getByTitle('Toggle Dark Mode').first();
     // Search input - Mobile uses 'Search...', Desktop uses 'Search tasks...'
     this.searchInput = page.getByPlaceholder('Search tasks...').or(page.getByPlaceholder('Search...')).first();
@@ -36,21 +36,20 @@ export class AppPage {
   }
 
   async switchToView(view: 'board' | 'tree' | 'stats', force = false) {
-    let buttonSelector: string;
+    let testId: string;
     switch (view) {
       case 'board':
-        buttonSelector = 'button[title="Board View"]';
+        testId = 'board-view-toggle';
         break;
       case 'tree':
-        buttonSelector = 'button[title="Tree View"]';
+        testId = 'tree-view-toggle';
         break;
       case 'stats':
-        buttonSelector = 'button[title="Time Stats"]';
+        testId = 'stats-view-toggle';
         break;
     }
 
-    // Find all buttons and try each one until one works
-    const buttons = await this.page.locator(buttonSelector).all();
+    const buttons = await this.page.getByTestId(testId).filter({ visible: true }).all();
 
     if (buttons.length === 0) {
       throw new Error(`No ${view} view button found`);
@@ -109,28 +108,21 @@ export class AppPage {
   }
 
   async verifyPageLoaded() {
-    // Use first() to handle desktop/mobile duplicates
-    // Using visible locator to avoid hidden elements confusion
-    await expect(this.page.locator('button[title="Board View"]:visible').first()).toBeVisible();
-    await expect(this.page.locator('button[title="Tree View"]:visible').first()).toBeVisible();
-    await expect(this.page.locator('button[title="Time Stats"]:visible').first()).toBeVisible();
+    await expect(this.page.getByTestId('board-view-toggle').filter({ visible: true }).first()).toBeVisible();
+    await expect(this.page.getByTestId('tree-view-toggle').filter({ visible: true }).first()).toBeVisible();
+    await expect(this.page.getByTestId('stats-view-toggle').filter({ visible: true }).first()).toBeVisible();
   }
 
   async verifyCurrentView(view: 'board' | 'tree' | 'stats') {
     switch (view) {
       case 'board':
-        // Verify board view by looking for board grid structure
-        await expect(this.page.locator('.grid-cols-1.md\\:grid-cols-3')).toBeVisible();
-        // Also verify column structure
-        await expect(this.page.getByRole('heading', { name: 'Open', exact: true }).first()).toBeVisible();
+        await expect(this.page.getByTestId('board-view-container')).toBeVisible();
         break;
       case 'tree':
-        // Verify tree view by looking for container with tree-view-container data-testid
         await expect(this.page.getByTestId('tree-view-container')).toBeVisible();
         break;
       case 'stats':
-        // Verify stats view by looking for characteristic elements - use first() for duplicates
-        await expect(this.page.getByText(/Time Tracking Statistics/i).first()).toBeVisible();
+        await expect(this.page.getByTestId('stats-view-container')).toBeVisible();
         break;
     }
   }

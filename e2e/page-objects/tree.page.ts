@@ -8,7 +8,7 @@ export class TreePage {
   constructor(page: Page) {
     this.page = page;
     this.treeContainer = page.getByTestId('tree-view-container');
-    this.taskItems = this.treeContainer.locator('.task-item, [data-testid*="task"]');
+    this.taskItems = this.treeContainer.locator('[data-testid="task-item"]');
   }
 
   async verifyTreeViewVisible() {
@@ -16,14 +16,14 @@ export class TreePage {
   }
 
   getTaskItem(taskTitle: string) {
-    return this.taskItems.filter({ hasText: taskTitle });
+    return this.page.locator(`[data-testid="task-item"][data-task-title="${taskTitle}"]`);
   }
 
   async editTask(taskTitle: string) {
     const taskItem = this.getTaskItem(taskTitle);
     // Hover over the task item to make buttons visible
     await taskItem.hover();
-    
+
     // Look for edit button in tree view
     const editButton = taskItem.getByTitle('Edit task').or(
       taskItem.locator('button').filter({ hasText: 'Edit' })
@@ -35,12 +35,32 @@ export class TreePage {
     const taskItem = this.getTaskItem(taskTitle);
     // Hover over the task item to make buttons visible
     await taskItem.hover();
-    
+
     // Look for delete button in tree view
     const deleteButton = taskItem.getByTitle('Delete task').or(
       taskItem.locator('button').filter({ hasText: 'Delete' })
     );
     await deleteButton.click();
+  }
+
+  async toggleExpand(taskTitle: string) {
+    const taskItem = this.getTaskItem(taskTitle);
+    const expandButton = taskItem.locator('button').first();
+    await expandButton.click();
+  }
+
+  async addSubtask(parentTaskTitle: string) {
+    const taskItem = this.getTaskItem(parentTaskTitle);
+    // Hover over the task item to make buttons visible
+    await taskItem.hover();
+
+    // Open the menu
+    const moreButton = taskItem.locator('button').filter({ has: this.page.locator('svg') }).last();
+    await moreButton.click();
+
+    // Click "Add Subtask"
+    const addSubtaskOption = this.page.getByText('Add Subtask');
+    await addSubtaskOption.click();
   }
 
   async verifyTaskExists(taskTitle: string) {
@@ -59,15 +79,15 @@ export class TreePage {
     status?: string;
   }) {
     const taskItem = this.getTaskItem(taskTitle);
-    
+
     if (details.description) {
       await expect(taskItem.getByText(details.description)).toBeVisible();
     }
-    
+
     if (details.dueDate) {
       await expect(taskItem.getByText(details.dueDate)).toBeVisible();
     }
-    
+
     if (details.status) {
       const statusElement = taskItem.locator('.status, .badge, [data-testid*="status"]');
       await expect(statusElement).toContainText(details.status);
@@ -87,7 +107,7 @@ export class TreePage {
   async expandTask(taskTitle: string) {
     const taskItem = this.getTaskItem(taskTitle);
     const expandButton = taskItem.locator('.expand-button, [data-testid*="expand"]').first();
-    
+
     if (await expandButton.isVisible()) {
       await expandButton.click();
     }
@@ -96,7 +116,7 @@ export class TreePage {
   async collapseTask(taskTitle: string) {
     const taskItem = this.getTaskItem(taskTitle);
     const collapseButton = taskItem.locator('.collapse-button, [data-testid*="collapse"]').first();
-    
+
     if (await collapseButton.isVisible()) {
       await collapseButton.click();
     }
@@ -105,15 +125,15 @@ export class TreePage {
   async verifyTaskHierarchy(parentTask: string, childTask: string) {
     const parentItem = this.getTaskItem(parentTask);
     const childItem = this.getTaskItem(childTask);
-    
+
     // Verify both tasks exist
     await expect(parentItem).toBeVisible();
     await expect(childItem).toBeVisible();
-    
+
     // Verify child is nested under parent (this might need adjustment based on actual implementation)
     const parentBounds = await parentItem.boundingBox();
     const childBounds = await childItem.boundingBox();
-    
+
     if (parentBounds && childBounds) {
       // Child should be indented (more to the right) than parent
       expect(childBounds.x).toBeGreaterThan(parentBounds.x);

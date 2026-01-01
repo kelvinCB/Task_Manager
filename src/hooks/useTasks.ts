@@ -401,14 +401,14 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           // Fallback to localStorage update
         } else if (response.data) {
           // Successfully updated on API, merge fields but preserve local-only timeTracking
-          setTasks(prev => prev.map(task => 
-            task.id === id 
-              ? { 
-                  ...task, 
-                  ...response.data as any, 
-                  // Preserve local timeTracking updates if they exist, otherwise keep existing
-                  timeTracking: updates.timeTracking || task.timeTracking 
-                }
+          setTasks(prev => prev.map(task =>
+            task.id === id
+              ? {
+                ...task,
+                ...response.data as any,
+                // Preserve local timeTracking updates if they exist, otherwise keep existing
+                timeTracking: updates.timeTracking || task.timeTracking
+              }
               : task
           ));
           return;
@@ -623,6 +623,12 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
     const now = Date.now();
     let updates: Partial<Task> = {};
+
+    // Pause any other active timers
+    const activeTasks = tasks.filter(t => t.timeTracking.isActive && t.id !== taskId);
+    for (const activeTask of activeTasks) {
+      await pauseTaskTimer(activeTask.id);
+    }
 
     // If task is not in progress, change its status
     if (task.status !== 'In Progress') {

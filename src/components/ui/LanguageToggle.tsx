@@ -28,6 +28,7 @@ export const LanguageToggle: React.FC = () => {
       `}
             aria-label="Toggle language"
             title={isEnglish ? "Switch to Spanish" : "Switch to English"}
+            data-testid="language-toggle"
         >
             <span className="w-6 h-4 flex items-center justify-center overflow-hidden rounded shadow-sm">
                 {isEnglish ? <USFlag className="w-full h-full object-cover" /> : <ESFlag className="w-full h-full object-cover" />}

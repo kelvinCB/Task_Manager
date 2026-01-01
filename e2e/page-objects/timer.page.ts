@@ -20,12 +20,12 @@ export class TimerPage {
 
   getStartButton(taskIdentifier: string | number) {
     const timer = this.getTaskTimer(taskIdentifier);
-    return timer.getByTitle('Start timer');
+    return timer.getByTestId('start-timer');
   }
 
   getPauseButton(taskIdentifier: string | number) {
     const timer = this.getTaskTimer(taskIdentifier);
-    return timer.getByTitle('Pause timer');
+    return timer.getByTestId('pause-timer');
   }
 
   getElapsedTime(taskIdentifier: string | number) {
