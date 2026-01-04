@@ -14,7 +14,7 @@
 
 ## 🎯 Project Overview
 
-**Project Name:** TaskLite
+**Project Name:** Kolium
 **Purpose:** Hierarchical task management application for professionals  
 **Target Users:** Developers, QAs, Designers, Product Managers, Team Leads  
 **Current Version:** 1.0.0  

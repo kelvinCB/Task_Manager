@@ -17,7 +17,7 @@ Ejemplos de archivos que puedes encontrar allí:
 ## 2. Preparación en BrowserStack
 
 1. Inicia sesión en [BrowserStack Test Management](https://test-management.browserstack.com/).
-2. Selecciona tu proyecto (ej. **TaskLite**).
+2. Selecciona tu proyecto (ej. **Kolium**).
 3. Navega a la sección **Test Cases**.
 4. (Recomendado) Crea una carpeta específica para el módulo que vas a importar (ej. "Auth", "Tasks", "Billing") para mantener el orden.
 
