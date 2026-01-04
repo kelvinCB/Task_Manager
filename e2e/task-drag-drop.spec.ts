@@ -137,12 +137,14 @@ test.describe('Task Drag and Drop', () => {
         // Note: We avoid reloading here because backend persistence might be flaky (500 errors),
         // relying on client-side state which is valid for this session.
         await appPage.switchToView('tree');
-        await treePage.expandTask(parentTitle);
+        // Auto-expansion handles this now. calling expandTask toggles it closed if open.
+        // await treePage.expandTask(parentTitle);
 
         // Use data-testid selector which is more reliable than text filtering on whole items
         const treeTask = page.locator(`[data-testid="task-item"][data-task-title="${subtaskTitle}"]`);
         await expect(treeTask).toBeVisible();
-        await expect(treeTask).toContainText(`Subtask of: ${parentTitle}`);
+        // Updated to match new breadcrumb format which just shows the parent title with an icon
+        await expect(treeTask).toContainText(parentTitle);
     });
 
 });

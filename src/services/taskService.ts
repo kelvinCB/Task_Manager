@@ -71,7 +71,7 @@ export class TaskService {
   ): Promise<ApiResponse<T>> {
     try {
       const token = await this.getAuthToken();
-      
+
       if (!token) {
         return { error: 'Not authenticated. Please log in.' };
       }
@@ -97,8 +97,8 @@ export class TaskService {
     } catch (error) {
       console.error('API request error:', error);
       return {
-        error: error instanceof Error 
-          ? error.message 
+        error: error instanceof Error
+          ? error.message
           : 'Failed to connect to server. Please check your connection.',
       };
     }
@@ -137,7 +137,20 @@ export class TaskService {
     if (task.title !== undefined) backendTask.title = task.title;
     if (task.description !== undefined) backendTask.description = task.description;
     if (task.status !== undefined) backendTask.status = task.status;
-    if (task.parentId !== undefined) backendTask.parent_id = task.parentId ? Number(task.parentId) : null;
+    if (task.parentId !== undefined) {
+      if (task.parentId) {
+        const pid = Number(task.parentId);
+        if (isNaN(pid)) {
+          // If parentId is a non-numeric string (e.g. valid UUID or temp ID), 
+          // and backend expects number, we must not send 'null' (which makes it root).
+          // Throwing ensures we fall back to localStorage/offline logic logic in useTasks.
+          throw new Error('Invalid parent ID: cannot convert non-numeric ID to number for backend.');
+        }
+        backendTask.parent_id = pid;
+      } else {
+        backendTask.parent_id = null;
+      }
+    }
     if (task.dueDate !== undefined) {
       backendTask.due_date = task.dueDate ? task.dueDate.toISOString().split('T')[0] : null;
     }
@@ -156,8 +169,8 @@ export class TaskService {
    * Get all tasks for the authenticated user
    */
   async getTasks(status?: TaskStatus): Promise<ApiResponse<Task[]>> {
-    const endpoint = status 
-      ? `/api/tasks?status=${encodeURIComponent(status)}` 
+    const endpoint = status
+      ? `/api/tasks?status=${encodeURIComponent(status)}`
       : '/api/tasks';
 
     const response = await this.makeRequest<{ tasks: BackendTask[] }>(endpoint);
@@ -197,7 +210,7 @@ export class TaskService {
    */
   async createTask(task: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth'>): Promise<ApiResponse<Task>> {
     const backendTask = this.convertFrontendToBackend(task);
-    
+
     const response = await this.makeRequest<{ task: BackendTask }>('/api/tasks', {
       method: 'POST',
       body: JSON.stringify(backendTask),
@@ -226,7 +239,7 @@ export class TaskService {
     if (!backendUpdates || Object.keys(backendUpdates).length === 0) {
       return { message: 'No-op: nothing to sync to backend' };
     }
-    
+
     const response = await this.makeRequest<{ task: BackendTask }>(`/api/tasks/${id}`, {
       method: 'PUT',
       body: JSON.stringify(backendUpdates),
@@ -264,7 +277,7 @@ export class TaskService {
 
     const token = await this.getAuthToken();
     console.log('[TaskService] Uploading file...', { fileName: file.name, fileSize: file.size, hasToken: !!token, baseUrl: this.baseUrl });
-    
+
     if (!token) {
       console.error('[TaskService] No auth token found!');
       return { error: 'Not authenticated' };
@@ -289,9 +302,9 @@ export class TaskService {
       return { data: data };
     } catch (error) {
       console.error('Upload request error:', error);
-       return {
-        error: error instanceof Error 
-          ? error.message 
+      return {
+        error: error instanceof Error
+          ? error.message
           : 'Failed to upload file',
       };
     }

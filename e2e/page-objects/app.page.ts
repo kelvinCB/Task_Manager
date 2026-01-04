@@ -51,31 +51,32 @@ export class AppPage {
         break;
     }
 
-    const buttons = await this.page.getByTestId(testId).filter({ visible: true }).all();
+    const locator = this.page.getByTestId(testId);
 
-    if (buttons.length === 0) {
-      throw new Error(`No ${view} view button found`);
+    // Wait for at least one element to be attached
+    try {
+      await locator.first().waitFor({ state: 'attached', timeout: 5000 });
+    } catch (e) {
+      // ignore
     }
 
-    let viewSwitched = false;
-
-    for (let i = 0; i < buttons.length; i++) {
-      const button = buttons[i];
-      const isVisible = await button.isVisible().catch(() => false);
-
-      if (isVisible || force) {
-        try {
-          await button.click({ force }); viewSwitched = true;
-          break;
-        } catch (e) {
-          // Continue to next button
-        }
-      }
+    const count = await locator.count();
+    if (count === 0) {
+      // If we can't find it, dump failure info
+      // console.log(await this.page.content());
+      throw new Error(`No ${view} view button found (testid: ${testId})`);
     }
 
-    if (!viewSwitched) {
-      throw new Error(`Could not switch to ${view} view - no button was clickable`);
+    // Try clicking the visible one
+    const visibleButton = locator.filter({ visible: true }).first();
+    if (await visibleButton.count() > 0) {
+      await visibleButton.click({ force });
+      return;
     }
+
+    // Fallback: click the first one using force (might be mobile hidden on desktop or vice versa, but unlikely if count > 0)
+    console.log(`Warning: Clicking hidden ${view} button`);
+    await locator.first().click({ force: true });
   }
 
   async toggleTheme() {

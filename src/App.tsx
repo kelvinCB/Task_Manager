@@ -68,8 +68,18 @@ const MainApp = () => {
   }, [t]);
 
 
-  const [view, setView] = useState<'tree' | 'board' | 'stats'>('board');
+  // Load view from localStorage or default to 'board'
+  const [view, setView] = useState<'tree' | 'board' | 'stats'>(() => {
+    const savedView = localStorage.getItem('taskflow_view');
+    return (savedView === 'tree' || savedView === 'board' || savedView === 'stats') ? savedView : 'board';
+  });
+
+  // Save view to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('taskflow_view', view);
+  }, [view]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+
   const [editingTask, setEditingTask] = useState<Task | undefined>();
   const [parentId, setParentId] = useState<string | undefined>();
   const [searchTerm, setSearchTerm] = useState('');

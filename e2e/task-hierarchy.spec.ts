@@ -45,7 +45,8 @@ test.describe('Task Hierarchy', () => {
         });
 
         // Expand parent to see the subtask if it's not already
-        await treePage.toggleExpand(parentTitle);
+        // Auto-expansion handles this now.
+        // await treePage.toggleExpand(parentTitle);
 
         // Wait for subtask to appear and state to update
         await page.waitForTimeout(500);
@@ -70,7 +71,8 @@ test.describe('Task Hierarchy', () => {
         await taskPage.createTask({ title: subtaskTitle });
 
         // Expand parent to see the subtask
-        await treePage.toggleExpand(parentTitle);
+        // Auto-expansion handles this now.
+        // await treePage.toggleExpand(parentTitle);
 
         // Wait for subtask to appear and state to update
         await page.waitForTimeout(500);
