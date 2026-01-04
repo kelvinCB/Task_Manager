@@ -10,6 +10,7 @@ export class AppPage {
   readonly addTaskButton: Locator;
   readonly accountMenu: Locator;
   readonly importInput: Locator;
+  readonly languageToggle: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -25,6 +26,7 @@ export class AppPage {
     // My Account menu
     this.accountMenu = page.getByTitle('My Account').first();
     this.importInput = page.locator('input[type="file"]');
+    this.languageToggle = page.getByTestId('language-toggle').filter({ visible: true }).first();
   }
 
   async goto() {
@@ -105,6 +107,10 @@ export class AppPage {
     // Click on the Import Tasks option which is associated with a hidden file input
     await this.page.getByRole('menuitem').filter({ hasText: 'Import Tasks' }).click();
     await this.importInput.setInputFiles(filePath);
+  }
+
+  async toggleLanguage() {
+    await this.languageToggle.click();
   }
 
   async verifyPageLoaded() {
