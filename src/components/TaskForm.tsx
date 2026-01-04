@@ -530,12 +530,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             <button
               type="button"
               onClick={onClose}
+              data-testid="task-form-cancel-button"
               className={`px-6 py-2.5 rounded-xl font-bold transition-all active:scale-95 ${theme === 'dark' ? 'text-gray-300 bg-gray-700 hover:bg-gray-600 hover:text-white' : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 hover:border-gray-300 shadow-sm'}`}
             >
               {t('common.cancel')}
             </button>
             <button
               type="submit"
+              data-testid="task-form-submit-button"
               className={`px-8 py-2.5 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition-all active:translate-y-0.5 active:shadow-none ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-600 hover:bg-indigo-700'}`}
             >
               {task ? t('tasks.update_task') : t('tasks.create_task')}

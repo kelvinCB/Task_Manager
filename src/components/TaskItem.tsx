@@ -5,6 +5,7 @@ import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon, getTaskAncest
 import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, CheckCircle } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
+import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
 interface TaskItemProps {
   task: Task;
@@ -44,6 +45,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const getIconComponent = (status: TaskStatus) => {
     switch (status) {
@@ -81,6 +83,19 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       return;
     }
     onStatusChange(task.id, newStatus);
+  };
+
+  const handleDeleteClick = () => {
+    setIsMenuOpen(false);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(task.id);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
   };
 
   const renderTitle = () => {
@@ -336,8 +351,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                       className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-red-400 hover:bg-red-900' : 'text-red-600 hover:bg-red-50'}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDelete(task.id);
-                        setIsMenuOpen(false);
+                        handleDeleteClick();
                       }}
                       data-testid="delete-task-button"
                     >
@@ -350,6 +364,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           </div>
         </div>
       </div>
+
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        taskTitle={task.title}
+      />
     </div>
   );
 };
