@@ -334,7 +334,7 @@ const MainApp = () => {
               </div>
               <div className="whitespace-nowrap">
                 <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} mobile-logo-animation ${theme}`}>
-                  {'TaskLite'.split('').map((letter, index) => (
+                  {'Kolium'.split('').map((letter, index) => (
                     <span key={index}>{letter}</span>
                   ))}
                 </h1>
@@ -436,7 +436,7 @@ const MainApp = () => {
                   />
                 </div>
                 <h1 className={`text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} mobile-logo-animation ${theme}`}>
-                  {'TaskLite'.split('').map((letter, index) => (
+                  {'Kolium'.split('').map((letter, index) => (
                     <span key={index}>{letter}</span>
                   ))}
                 </h1>

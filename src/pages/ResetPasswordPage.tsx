@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import loginIllustrationLight from '../assets/images/login-illustration-light.png';
@@ -16,7 +16,6 @@ const ResetPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [isSessionValid, setIsSessionValid] = useState(false);
   const [isValidatingSession, setIsValidatingSession] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handlePasswordReset = async () => {
@@ -119,7 +118,7 @@ const ResetPasswordPage: React.FC = () => {
         {/* Logo context in the image side - Top Left over image */}
         <div className="absolute top-10 left-12 z-20">
           <div data-testid="app-logo-desktop" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
-            {'TaskLite'.split('').map((letter, index) => (
+            {'Kolium'.split('').map((letter, index) => (
               <span key={index} className="drop-shadow-md">{letter}</span>
             ))}
           </div>
@@ -145,7 +144,7 @@ const ResetPasswordPage: React.FC = () => {
   const MobileLogo = () => (
     <div className="flex justify-center mb-8 lg:hidden">
       <div data-testid="app-logo-mobile" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
-        {'TaskLite'.split('').map((letter, index) => (
+        {'Kolium'.split('').map((letter, index) => (
           <span key={index}>{letter}</span>
         ))}
       </div>
