@@ -102,6 +102,11 @@ test.describe('Task Management', () => {
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
     await boardPage.deleteTask('Task to Delete in Board');
+    
+    // Confirm deletion in modal
+    await expect(appPage.page.getByRole('dialog')).toBeVisible();
+    await appPage.page.getByTestId('confirm-delete-button').click();
+    
     await expect(appPage.page.getByText('Task to Delete in Board')).not.toBeVisible();
 
     // Test deletion in Tree View
@@ -122,7 +127,13 @@ test.describe('Task Management', () => {
     await expect(moreButton).toBeVisible();
     await moreButton.click();    const deleteOption = appPage.page.getByRole('button', { name: 'Delete' });
     await expect(deleteOption).toBeVisible();
-    await deleteOption.click();    await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
+    await deleteOption.click();
+    
+    // Confirm deletion in modal
+    await expect(appPage.page.getByRole('dialog')).toBeVisible();
+    await appPage.page.getByTestId('confirm-delete-button').click();
+    
+    await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
   });
 
   test('should prevent creating task without title (required field validation)', async () => {
