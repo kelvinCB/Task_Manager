@@ -143,6 +143,52 @@ describe('Task Utility Functions', () => {
       // Act & Assert
       expect(canCompleteTask(parentTask, allTasks)).toBe(false);
     });
+
+    it('should return false when grandchild tasks are not done but children are done', () => {
+      // Arrange
+      const rootTask: Task = {
+        id: 'root',
+        title: 'Root',
+        description: '',
+        status: 'In Progress',
+        createdAt: new Date(),
+        childIds: ['child'],
+        depth: 0,
+        timeTracking: { isActive: false, totalTimeSpent: 0, timeEntries: [] }
+      };
+      
+      const childTask: Task = {
+        id: 'child',
+        title: 'Child',
+        description: '',
+        status: 'Done', // Child is done
+        createdAt: new Date(),
+        childIds: ['grandchild'],
+        parentId: 'root',
+        depth: 1,
+        timeTracking: { isActive: false, totalTimeSpent: 0, timeEntries: [] }
+      };
+      
+      const grandchildTask: Task = {
+        id: 'grandchild',
+        title: 'Grandchild',
+        description: '',
+        status: 'In Progress', // But grandchild is not done
+        createdAt: new Date(),
+        childIds: [],
+        parentId: 'child',
+        depth: 2,
+        timeTracking: { isActive: false, totalTimeSpent: 0, timeEntries: [] }
+      };
+      
+      const allTasks: Task[] = [rootTask, childTask, grandchildTask];
+      
+      // Act & Assert
+      // Root cannot be done because grandchild is not done
+      expect(canCompleteTask(rootTask, allTasks)).toBe(false);
+      // Child itself would also be considered "not completable" effectively if we check it
+      expect(canCompleteTask(childTask, allTasks)).toBe(false);
+    });
   });
   
   describe('buildTaskTree', () => {
