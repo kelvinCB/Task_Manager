@@ -325,11 +325,11 @@ const MainApp = () => {
           {/* Desktop Header - Original Design */}
           <div className="hidden lg:flex items-center justify-between h-16">
             <div className="flex shrink-0 items-center gap-3 mr-4">
-              <div className={`p-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-100'} rounded-lg mobile-icon-animation`}>
-                <ProgressIcon
-                  size={24}
-                  className={`${theme === 'dark' ? 'text-yellow-400' : 'text-indigo-600'}`}
-                  progress={75}
+              <div className={`shrink-0 mobile-icon-animation`}>
+                <img 
+                  src="/favicon.png" 
+                  alt="Kolium Logo" 
+                  className="w-10 h-10 rounded-lg object-contain"
                 />
               </div>
               <div className="whitespace-nowrap">
