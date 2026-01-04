@@ -58,6 +58,7 @@ describe('TaskItem Component', () => {
           onStartTimer={mockOnStartTimer}
           onPauseTimer={mockOnPauseTimer}
           getElapsedTime={mockGetElapsedTime}
+          allTasks={[mockTask]}
         />
       </ThemeProvider>
     );
@@ -84,6 +85,7 @@ describe('TaskItem Component', () => {
           onStartTimer={mockOnStartTimer}
           onPauseTimer={mockOnPauseTimer}
           getElapsedTime={mockGetElapsedTime}
+          allTasks={[mockTask]}
         />
       </ThemeProvider>
     );
@@ -109,6 +111,7 @@ describe('TaskItem Component', () => {
           onStartTimer={mockOnStartTimer}
           onPauseTimer={mockOnPauseTimer}
           getElapsedTime={mockGetElapsedTime}
+          allTasks={[mockTask]}
         />
       </ThemeProvider>
     );
@@ -147,6 +150,7 @@ describe('TaskItem Component', () => {
           onStartTimer={mockOnStartTimer}
           onPauseTimer={mockOnPauseTimer}
           getElapsedTime={mockGetElapsedTime}
+          allTasks={[mockTask]}
         />
       </ThemeProvider>
     );
@@ -186,6 +190,7 @@ describe('TaskItem Component', () => {
           onStartTimer={mockOnStartTimer}
           onPauseTimer={mockOnPauseTimer}
           getElapsedTime={mockGetElapsedTime}
+          allTasks={[mockTask]}
         />
       </ThemeProvider>
     );
@@ -217,6 +222,7 @@ describe('TaskItem Component', () => {
           onStartTimer={mockOnStartTimer}
           onPauseTimer={mockOnPauseTimer}
           getElapsedTime={mockGetElapsedTime}
+          allTasks={[mockTask]}
         />
       </ThemeProvider>
     );
@@ -230,7 +236,7 @@ describe('TaskItem Component', () => {
     expect(mockOnStartTimer).toHaveBeenCalledWith('task-1');
   });
   
-  it('should call onDelete when delete option is clicked', () => {
+  it('should show confirmation modal when delete option is clicked', () => {
     // Act
     render(
       <ThemeProvider>
@@ -247,6 +253,7 @@ describe('TaskItem Component', () => {
           onStartTimer={mockOnStartTimer}
           onPauseTimer={mockOnPauseTimer}
           getElapsedTime={mockGetElapsedTime}
+          allTasks={[mockTask]}
         />
       </ThemeProvider>
     );
@@ -266,7 +273,15 @@ describe('TaskItem Component', () => {
     const deleteOption = screen.getByText(/delete/i);
     fireEvent.click(deleteOption);
     
-    // Assert
+    // Assert - modal should appear, not direct deletion
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(mockOnDelete).not.toHaveBeenCalled();
+    
+    // Click confirm in modal
+    const confirmButton = screen.getByTestId('confirm-delete-button');
+    fireEvent.click(confirmButton);
+    
+    // Now onDelete should be called
     expect(mockOnDelete).toHaveBeenCalledWith('task-1');
   });
 });
