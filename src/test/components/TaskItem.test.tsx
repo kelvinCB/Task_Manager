@@ -16,11 +16,11 @@ const mockGetElapsedTime = vi.fn().mockReturnValue(3600000); // 1h
 
 describe('TaskItem Component', () => {
   let mockTask: Task;
-  
+
   beforeEach(() => {
     // Reiniciar mocks
     vi.clearAllMocks();
-    
+
     // Crear tarea mock para las pruebas
     mockTask = {
       id: 'task-1',
@@ -36,11 +36,11 @@ describe('TaskItem Component', () => {
         timeEntries: []
       }
     };
-    
+
     // Configurar valor por defecto para el tiempo transcurrido
     mockGetElapsedTime.mockReturnValue(3600000);
   });
-  
+
   it('should render the task title and status', () => {
     // Act
     render(
@@ -61,12 +61,12 @@ describe('TaskItem Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert
     expect(screen.getByText('Test Task')).toBeInTheDocument();
     expect(screen.getByText('Open')).toBeInTheDocument();
   });
-  
+
   it('should render the task description when expanded', () => {
     // Act
     render(
@@ -87,11 +87,11 @@ describe('TaskItem Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Assert
     expect(screen.getByText('Test Description')).toBeInTheDocument();
   });
-  
+
   it('should open menu when clicking menu button', () => {
     // Act
     render(
@@ -112,24 +112,24 @@ describe('TaskItem Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Clic en el botón de menú con el ícono MoreHorizontal
     // Usamos una consulta más específica para obtener el botón de menú que tiene el svg de puntos
     const menuButtons = screen.getAllByRole('button', { name: '' });
-    const menuButton = menuButtons.find(button => 
+    const menuButton = menuButtons.find(button =>
       button.innerHTML.includes('lucide-more-horizontal'));
-    
+
     if (!menuButton) {
       throw new Error('Menu button not found');
     }
-    
+
     fireEvent.click(menuButton);
-    
+
     // Assert - buscar opciones del menú
-    expect(screen.getByText(/edit/i)).toBeInTheDocument();
-    expect(screen.getByText(/delete/i)).toBeInTheDocument();
+    expect(screen.getByTestId('edit-task-button')).toBeInTheDocument();
+    expect(screen.getByTestId('delete-task-button')).toBeInTheDocument();
   });
-  
+
   it('should call onStatusChange when changing task status', () => {
     // Act
     render(
@@ -150,16 +150,16 @@ describe('TaskItem Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Cambiar el estado directamente en el selector
     const statusSelect = screen.getByRole('combobox');
     fireEvent.change(statusSelect, { target: { value: 'In Progress' } });
-    
+
     // Assert
     expect(mockOnStatusChange).toHaveBeenCalled();
     expect(mockOnStatusChange).toHaveBeenCalledWith('task-1', 'In Progress');
   });
-  
+
   it('should display the task timer component with elapsed time', () => {
     // Configurar tarea con temporizador activo
     const taskWithActiveTimer = {
@@ -169,7 +169,7 @@ describe('TaskItem Component', () => {
         isActive: true
       }
     };
-    
+
     // Act
     render(
       <ThemeProvider>
@@ -189,17 +189,17 @@ describe('TaskItem Component', () => {
         />
       </ThemeProvider>
     );
-    
-    // Assert - Verificar que se muestra el tiempo formateado (01:00:00 para 3600000ms)
-    // Ahora tenemos versiones mobile y desktop, usamos getAllByText
-    const timeDisplays = screen.getAllByText('01:00:00');
+
+    // Assert - Verificar que se muestra el tiempo formateado (1:00:00 para 3600000ms en formato compacto)
+    // Ahora usamos formato compacto por defecto en la UI rediseñada
+    const timeDisplays = screen.getAllByText('1:00:00');
     expect(timeDisplays.length).toBeGreaterThan(0);
-    
+
     // Verificar que se muestra el botón de pausa (puede haber múltiples)
     const pauseButtons = screen.getAllByTitle('Pause timer');
     expect(pauseButtons.length).toBeGreaterThan(0);
   });
-  
+
   it('should call onStartTimer when play button is clicked', () => {
     // Act
     render(
@@ -220,16 +220,16 @@ describe('TaskItem Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Clic en el botón de iniciar temporizador (tomar el primero disponible)
     const playButtons = screen.getAllByTitle('Start timer');
     expect(playButtons.length).toBeGreaterThan(0);
     fireEvent.click(playButtons[0]);
-    
+
     // Assert
     expect(mockOnStartTimer).toHaveBeenCalledWith('task-1');
   });
-  
+
   it('should call onDelete when delete option is clicked', () => {
     // Act
     render(
@@ -250,22 +250,22 @@ describe('TaskItem Component', () => {
         />
       </ThemeProvider>
     );
-    
+
     // Abrir menú - usar el mismo enfoque que en la prueba anterior
     const menuButtons = screen.getAllByRole('button', { name: '' });
-    const menuButton = menuButtons.find(button => 
+    const menuButton = menuButtons.find(button =>
       button.innerHTML.includes('lucide-more-horizontal'));
-    
+
     if (!menuButton) {
       throw new Error('Menu button not found');
     }
-    
+
     fireEvent.click(menuButton);
-    
+
     // Clic en la opción de eliminar
-    const deleteOption = screen.getByText(/delete/i);
+    const deleteOption = screen.getByTestId('delete-task-button');
     fireEvent.click(deleteOption);
-    
+
     // Assert
     expect(mockOnDelete).toHaveBeenCalledWith('task-1');
   });

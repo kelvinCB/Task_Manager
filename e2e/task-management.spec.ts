@@ -13,7 +13,7 @@ test.describe('Task Management', () => {
     taskPage = new TaskPage(page);
     boardPage = new BoardPage(page);
     await appPage.goto();
-    
+
     // Clear local storage to start fresh
     await page.evaluate(() => localStorage.clear());
     await appPage.page.reload();
@@ -21,7 +21,8 @@ test.describe('Task Management', () => {
 
   test.afterEach(async ({ page }, testInfo) => {
     // Wait 1 second before ending test    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();  });
+    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  });
 
   test('should create a new task successfully', async () => {
     // Open task creation modal
@@ -74,12 +75,14 @@ test.describe('Task Management', () => {
     // Test editing in Tree View
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
-    
+
     const taskRow = appPage.page.locator('.group').filter({ hasText: 'Original Tree Task' });
-    await taskRow.hover();    const moreButton = taskRow.locator('button').filter({ has: appPage.page.locator('svg') }).last();
+    await taskRow.hover();
+    const moreButton = taskRow.locator('[data-testid="task-menu-button"]');
     await moreButton.click();
-    
-    const editOption = appPage.page.getByText('Edit').first();
+
+    // Use the reliable test ID we added
+    const editOption = appPage.page.getByTestId('edit-task-button');
     await editOption.click();
     await taskPage.verifyModalOpen();
 
@@ -116,13 +119,14 @@ test.describe('Task Management', () => {
     await expect(appPage.page.getByText('Task to Delete in Tree')).toBeVisible();
 
     const taskRow = appPage.page.locator('.group').filter({ hasText: 'Task to Delete in Tree' });
-    await taskRow.hover();    const buttons = taskRow.locator('button');
-    const buttonCount = await buttons.count();
-    const moreButton = buttons.nth(buttonCount - 1);
+    await taskRow.hover();
+    const moreButton = taskRow.locator('[data-testid="task-menu-button"]');
     await expect(moreButton).toBeVisible();
-    await moreButton.click();    const deleteOption = appPage.page.getByRole('button', { name: 'Delete' });
+    await moreButton.click();
+
+    const deleteOption = appPage.page.getByTestId('delete-task-button');
     await expect(deleteOption).toBeVisible();
-    await deleteOption.click();    await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
+    await deleteOption.click(); await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
   });
 
   test('should prevent creating task without title (required field validation)', async () => {
@@ -135,12 +139,12 @@ test.describe('Task Management', () => {
 
     // Modal should still be open because validation failed (form won't submit)
     await taskPage.verifyModalOpen();
-    
+
     // Try adding a title now and verify it works
     await taskPage.titleInput.fill('Valid Task Title');
     await taskPage.createButton.click();
     await taskPage.verifyModalClosed();
-    
+
     // Verify the task was created with valid title
     await expect(appPage.page.getByText('Valid Task Title')).toBeVisible();
   });

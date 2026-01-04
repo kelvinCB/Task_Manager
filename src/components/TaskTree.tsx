@@ -75,7 +75,7 @@ export const TaskTree: React.FC<TaskTreeProps> = ({
   }
 
   return (
-    <div className={`space-y-2 ${theme === 'dark' ? 'bg-gray-800' : ''}`}>
+    <div className="space-y-2">
       {flatTasks.map(task => (
         <TaskItem
           key={task.id}

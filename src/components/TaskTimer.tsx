@@ -10,6 +10,7 @@ interface TaskTimerProps {
   elapsedTime: number; // in milliseconds
   onStart: (taskId: string) => void;
   onPause: (taskId: string) => void;
+  compact?: boolean;
 }
 
 // Utility to format time in hh:mm:ss format
@@ -30,7 +31,8 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   isActive,
   elapsedTime,
   onStart,
-  onPause
+  onPause,
+  compact = false
 }) => {
   const { theme } = useTheme();
   const [currentTime, setCurrentTime] = useState(elapsedTime);
@@ -85,14 +87,20 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   };
 
   return (
-    <div className="timer-component flex items-center gap-1 text-sm" data-testid="task-timer">
+    <div className={`timer-component flex items-center gap-1 text-sm ${compact ? 'text-xs' : ''}`} data-testid="task-timer">
       <Clock className={`w-3 h-3 sm:w-4 sm:h-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
       <span className={`font-mono text-xs sm:text-sm ${isActive
         ? (theme === 'dark' ? 'text-green-400 font-bold' : 'text-green-600 font-bold')
         : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')
         }`} data-testid="elapsed-time">
-        <span className="hidden sm:inline">{formatTime(currentTime)}</span>
-        <span className="sm:hidden">{formatTimeCompact(currentTime)}</span>
+        {compact ? (
+          <span>{formatTimeCompact(currentTime)}</span>
+        ) : (
+          <>
+            <span className="hidden sm:inline">{formatTime(currentTime)}</span>
+            <span className="sm:hidden">{formatTimeCompact(currentTime)}</span>
+          </>
+        )}
       </span>
       {isActive ? (
         <button
