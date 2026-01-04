@@ -67,7 +67,7 @@ test.describe('Username Display Feature', () => {
     expect(usernameText).toMatch(/^@[a-z0-9]+$/);
     
     // Verify it's in the user info section (has proper styling)
-    const userInfoSection = appPage.page.locator('div[class*="px-4 py-3"]').filter({ hasText: usernameText });
+    const userInfoSection = appPage.page.locator('div[class*="px-4 py-3"]').filter({ hasText: usernameText || '' });
     await expect(userInfoSection.first()).toBeVisible();
   });
 

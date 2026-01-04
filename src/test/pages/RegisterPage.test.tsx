@@ -39,7 +39,6 @@ vi.mock('../../contexts/ThemeContext', () => ({
 
 // Setup default mock implementation for happy path
 beforeEach(() => {
-    const supabase = vi.mocked(import('../../lib/supabaseClient'));
     // We will override this in specific tests if needed using vi.mocked(...).auth.signUp.mockImplementation...
     // But since we are hoisting, we rely on the specific test to set the implementation or use a variable.
     // Actually, simplest is to use the same logic as before or just a basic success mock.
@@ -59,7 +58,7 @@ describe('RegisterPage', () => {
     });
   });
 
-  it('renders registration page with TaskLite animated logo', () => {
+  it('renders registration page with Kolium animated logo', () => {
     render(
       <MemoryRouter>
         <ThemeProvider>

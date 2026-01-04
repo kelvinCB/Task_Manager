@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides comprehensive documentation for frontend development in the Task Manager application using React, TypeScript, Vite, and Tailwind CSS.
+This guide provides comprehensive documentation for frontend development in the Kolium application using React, TypeScript, Vite, and Tailwind CSS.
 
 ## Table of Contents
 
@@ -106,7 +106,7 @@ The authentication system uses **Supabase Auth** for secure user management with
 **Login Page** (`src/pages/LoginPage.tsx`)
 - Modern interface based on Scale's design system
 - Gradient background with indigo/blue/purple colors
-- Animated TaskLite logo in header
+- Animated Kolium logo in header
 - Visual social login buttons (Google and GitHub)
 - Input fields with integrated icons
 - "Don't remember your password?" link for password recovery

@@ -113,7 +113,7 @@ const RegisterPage: React.FC = () => {
         {/* Logo context in the image side - Top Left over image */}
         <div className="absolute top-10 left-12 z-20">
           <div data-testid="app-logo-desktop" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
-            {'TaskLite'.split('').map((letter, index) => (
+            {'Kolium'.split('').map((letter, index) => (
               <span key={index} className="drop-shadow-md">{letter}</span>
             ))}
           </div>
@@ -141,7 +141,7 @@ const RegisterPage: React.FC = () => {
           {/* Logo for mobile only */}
           <div className="flex justify-center mb-8 lg:hidden">
             <div data-testid="app-logo-mobile" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
-              {'TaskLite'.split('').map((letter, index) => (
+              {'Kolium'.split('').map((letter, index) => (
                 <span key={index}>{letter}</span>
               ))}
             </div>
