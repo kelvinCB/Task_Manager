@@ -26,9 +26,9 @@ export class TaskPage {
     this.dueDateInput = page.locator('#task-due-date');
     this.statusSelect = page.locator('#task-status');
     // The actual buttons are "Create Task", "Update Task", "Cancel", and "Dismiss" (inside AI)
-    this.createButton = page.getByRole('button', { name: /create task/i });
-    this.updateButton = page.getByRole('button', { name: /update task/i });
-    this.cancelButton = page.getByRole('button', { name: /cancel/i }).first();
+    this.createButton = page.getByTestId('task-form-submit-button');
+    this.updateButton = page.getByTestId('task-form-submit-button');
+    this.cancelButton = page.getByTestId('task-form-cancel-button');
     this.closeButton = page.getByRole('button', { name: /close modal/i });
     this.aiButton = page.getByTitle('AI Assistant');
     this.aiGenerateButton = page.getByText('Generate Description');

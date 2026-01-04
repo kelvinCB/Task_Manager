@@ -5,6 +5,7 @@ import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon, getTaskAncest
 import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, CheckCircle, Play, Pause, CornerDownRight } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
+import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
 interface TaskItemProps {
   task: Task;
@@ -44,6 +45,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -84,6 +86,79 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       return;
     }
     onStatusChange(task.id, newStatus);
+  };
+
+  const handleDeleteClick = () => {
+    setIsMenuOpen(false);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(task.id);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
+  };
+
+  const renderTitle = () => {
+    const maxLength = 60;
+    const isLong = task.title.length > maxLength;
+
+    if (isLong) {
+      const truncated = task.title.substring(0, maxLength);
+      return (
+        <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+          {truncated}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(task);
+            }}
+            className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
+          >
+            ...
+          </button>
+        </h3>
+      );
+    }
+
+    return (
+      <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} truncate`}>
+        {task.title}
+      </h3>
+    );
+  };
+
+  const renderDescription = () => {
+    if (!task.description) return null;
+
+    const maxLength = 80;
+    const isLong = task.description.length > maxLength;
+
+    if (isLong) {
+      const truncated = task.description.substring(0, maxLength);
+      return (
+        <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+          {truncated}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(task);
+            }}
+            className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
+          >
+            {t('tasks.see_more')}
+          </button>
+        </p>
+      );
+    }
+
+    return (
+      <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
+        {task.description}
+      </p>
+    );
   };
 
   return (
@@ -283,10 +358,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                     </button>
                     <div className={`border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}></div>
                     <button
-                      className={`w-full text-left px-4 py-2.5 flex items-center gap-2 text-red-500 ${theme === 'dark' ? 'hover:bg-gray-700/50' : 'hover:bg-red-50'}`}
-                      onClick={() => {
-                        onDelete(task.id);
-                        setIsMenuOpen(false);
+                      className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-red-400 hover:bg-red-900' : 'text-red-600 hover:bg-red-50'}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick();
                       }}
                       data-testid="delete-task-button"
                     >
@@ -335,6 +410,12 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         </div>
       </div>
 
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        taskTitle={task.title}
+      />
       {/* Connecting line for children (visual cue) */}
       {hasChildren && isExpanded && (
         <div

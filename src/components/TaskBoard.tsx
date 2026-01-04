@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { Task, TaskStatus } from '../types/Task';
 import { getStatusColor, formatDate, isTaskOverdue, canCompleteTask, getTaskAncestry } from '../utils/taskUtils';
 import { Plus, Calendar, Circle, Clock, CheckCircle, Edit2, Trash2 } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
+import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
 interface TaskBoardProps {
   tasks: Task[];
@@ -35,6 +36,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<{ id: string; title: string } | null>(null);
 
   const statusColumns: { status: TaskStatus; title: string; description: string }[] = [
     { status: 'Open', title: t('tasks.status_open'), description: t('tasks.status_open_desc') || 'Tasks ready to be started' },
@@ -70,6 +73,23 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       }
       onStatusChange(taskId, targetStatus);
     }
+  };
+
+  const handleDeleteClick = (task: Task) => {
+    setTaskToDelete({ id: task.id, title: task.title });
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (taskToDelete) {
+      onDelete(taskToDelete.id);
+      setTaskToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
+    setTaskToDelete(null);
   };
 
   const renderTitle = (task: Task) => {
@@ -270,7 +290,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onDelete(task.id);
+                              handleDeleteClick(task);
                             }}
                             className={`p-1 ${theme === 'dark' ? 'text-gray-400 hover:text-red-400 hover:bg-gray-600' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'} rounded transition-colors duration-200`}
                             title="Delete task"
@@ -299,6 +319,13 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
           );
         })}
       </div>
+
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        taskTitle={taskToDelete?.title}
+      />
     </div>
   );
 };
