@@ -61,9 +61,9 @@ describe('ForgotPasswordPage', () => {
 
     // Check animated logo presence
     const logoLetters = screen.getAllByText((content, element) => {
-      return element?.tagName.toLowerCase() === 'span' && 'TaskLite'.includes(content);
+      return element?.tagName.toLowerCase() === 'span' && 'Kolium'.includes(content);
     });
-    expect(logoLetters.length).toBe(16); // Each letter of TaskLite (rendered twice: mobile + desktop)
+    expect(logoLetters.length).toBe(12); // Each letter of Kolium (rendered twice: mobile + desktop)
 
     // Check form elements
     expect(screen.getByTestId('email-input')).toBeInTheDocument();
@@ -154,7 +154,7 @@ describe('ForgotPasswordPage', () => {
 
   it('shows loading state during password reset request', async () => {
     // Make the promise pending
-    let resolvePromise: (value: any) => void;
+    let resolvePromise: (value: any) => void = () => {};
     const pendingPromise = new Promise(resolve => {
       resolvePromise = resolve;
     });

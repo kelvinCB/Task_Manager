@@ -27,7 +27,6 @@ let mockSessionState = {
 vi.mock('../../pages/ResetPasswordPage', () => {
   const React = require('react');
   const { useState } = React;
-  const { Link } = require('react-router-dom');
   
   return {
     default: () => {
@@ -108,7 +107,7 @@ vi.mock('../../pages/ResetPasswordPage', () => {
               React.createElement('div', { 
                 'data-testid': 'app-logo',
                 className: 'font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark'
-              }, 'TaskLite'.split('').map((letter, index) => React.createElement('span', { key: index }, letter)))
+              }, 'Kolium'.split('').map((letter, index) => React.createElement('span', { key: index }, letter)))
             )
           ),
           React.createElement('div', { key: 'content', className: 'flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8' },
@@ -134,7 +133,7 @@ vi.mock('../../pages/ResetPasswordPage', () => {
               React.createElement('div', {
                 'data-testid': 'app-logo',
                 className: 'font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark'
-              }, 'TaskLite'.split('').map((letter, index) => React.createElement('span', { key: index }, letter)))
+              }, 'Kolium'.split('').map((letter, index) => React.createElement('span', { key: index }, letter)))
             )
           ),
           React.createElement('div', { key: 'content', className: 'flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8' },
@@ -165,7 +164,7 @@ vi.mock('../../pages/ResetPasswordPage', () => {
             React.createElement('div', {
               'data-testid': 'app-logo',
               className: 'font-bold text-indigo-600 dark:text-indigo-400 text-2xl sm:text-3xl mobile-logo-animation light dark:dark'
-            }, 'TaskLite'.split('').map((letter, index) => React.createElement('span', { key: index }, letter)))
+            }, 'Kolium'.split('').map((letter, index) => React.createElement('span', { key: index }, letter)))
           )
         ),
         React.createElement('div', { key: 'content', className: 'flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8' },

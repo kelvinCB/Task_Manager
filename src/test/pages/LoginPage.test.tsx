@@ -10,7 +10,7 @@ const LoginPage = () => (
   <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900">
     <h1>Log in to your account</h1>
     <div className="mobile-logo-animation">
-      {'TaskLite'.split('').map((letter, index) => (
+      {'Kolium'.split('').map((letter, index) => (
         <span key={index} data-testid="logo-letter">{letter}</span>
       ))}
     </div>
@@ -32,7 +32,7 @@ const LoadingLoginPage = () => (
   <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100">
     <h1>Log in to your account</h1>
     <div className="mobile-logo-animation">
-      {'TaskLite'.split('').map((letter, index) => (
+      {'Kolium'.split('').map((letter, index) => (
         <span key={index} data-testid="logo-letter">{letter}</span>
       ))}
     </div>
@@ -47,7 +47,7 @@ const ErrorLoginPage = () => (
   <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100">
     <h1>Log in to your account</h1>
     <div className="mobile-logo-animation">
-      {'TaskLite'.split('').map((letter, index) => (
+      {'Kolium'.split('').map((letter, index) => (
         <span key={index} data-testid="logo-letter">{letter}</span>
       ))}
     </div>
@@ -87,7 +87,7 @@ describe('LoginPage', () => {
     vi.clearAllMocks();
   });
 
-  it('renders login page with TaskLite animated logo', () => {
+  it('renders login page with Kolium animated logo', () => {
     render(
       <MemoryRouter>
         <ThemeProvider>
@@ -101,7 +101,7 @@ describe('LoginPage', () => {
     
     // Check animated logo presence
     const logoLetters = screen.getAllByTestId('logo-letter');
-    expect(logoLetters.length).toBe(8); // Each letter should be a separate span
+    expect(logoLetters.length).toBe(6); // Each letter should be a separate span
     
     // Verify the container has the animation class
     const logoContainer = logoLetters[0].parentElement;
