@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus, TaskFilter, TimeEntry } from '../types/Task';
 import { generateId, buildTaskTree, canCompleteTask } from '../utils/taskUtils';
 import { taskService } from '../services/taskService';
@@ -105,6 +106,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   const [useApi, setUseApi] = useState<boolean>(options.useApi !== false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Load tasks from localStorage or use defaults
   const [tasks, setTasks] = useState<Task[]>(() => {
@@ -291,8 +293,10 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   const createTask = useCallback(async (taskData: Omit<Task, 'id' | 'createdAt' | 'childIds' | 'depth' | 'timeTracking'>): Promise<Task | null> => {
     // If using API, try to create task on backend
     if (useApi) {
-      try {
-        const response = await taskService.createTask({
+      const isParentNumeric = !taskData.parentId || !isNaN(Number(taskData.parentId));
+      if (isParentNumeric) {
+        try {
+          const response = await taskService.createTask({
           ...taskData,
           timeTracking: {
             totalTimeSpent: 0,
@@ -330,6 +334,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
         // Continue to localStorage fallback
       }
     }
+  }
 
     // localStorage fallback
     const newTask: Task = {
@@ -417,6 +422,15 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
   }, [tasks]);
 
   const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    // Validation: Cannot complete if subtasks are not done
+    if (updates.status === 'Done' && !canCompleteTask(task, tasks)) {
+      setApiError(t('tasks.cannot_complete_subtasks'));
+      return;
+    }
+
     // If using API, try to update task on backend
     if (useApi) {
       try {
@@ -451,7 +465,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     setTasks(prev => prev.map(task =>
       task.id === id ? { ...task, ...updates } : task
     ));
-  }, [useApi]);
+  }, [useApi, tasks, t]);
 
   const deleteTask = useCallback(async (id: string) => {
     const taskToDelete = tasks.find(t => t.id === id);

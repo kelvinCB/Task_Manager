@@ -39,10 +39,13 @@ export const canCompleteTask = (task: Task, allTasks: Task[]): boolean => {
   // If it has no children, it can be completed
   if (task.childIds.length === 0) return true;
 
-  // If it has children, all must be completed
+  // If it has children, all must be completed AND their subtasks must be completed
   return task.childIds.every(childId => {
     const childTask = allTasks.find(t => t.id === childId);
-    return childTask?.status === 'Done';
+    if (!childTask) return true;
+    
+    // Recursive check: child must be Done AND its own subtasks must be completable/completed
+    return childTask.status === 'Done' && canCompleteTask(childTask, allTasks);
   });
 };
 
