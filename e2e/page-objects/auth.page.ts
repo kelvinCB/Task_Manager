@@ -29,56 +29,22 @@ export class AuthPage {
 
   async loginViaAccountMenu() {
     await this.page.goto('/');
-    // Use first() to handle multiple account menu buttons (desktop/mobile)
-    await this.page.locator('[data-testid="account-menu-button"]').first().click();
+    // Use :visible to handle multiple account menu buttons (desktop/mobile)
+    await this.page.locator('[data-testid="account-menu-button"]:visible').click();
     await this.page.click('[data-testid="login-button-menu"]');
     await expect(this.page).toHaveURL('/login');
   }
 
   async logout() {
-    // Find the correct AccountMenu button - look for one that contains UserCircle icon or "My Account" text
-    const menuButtons = this.page.locator('[data-testid="account-menu-button"]');
-    const menuCount = await menuButtons.count();
+    // Find the visible AccountMenu button
+    const accountMenuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
     
-    // Try to find the AccountMenu button by looking for the one that has UserCircle icon or "My Account" text
-    let correctMenuButton: Locator | null = null;
+    // Check if the menu is already open before clicking
+    const logoutButtonBeforeClick = this.page.locator('[data-testid="logout-button"]');
+    const isMenuAlreadyOpen = await logoutButtonBeforeClick.count() > 0 && await logoutButtonBeforeClick.isVisible().catch(() => false);
     
-    for (let i = 0; i < menuCount; i++) {
-      const button = menuButtons.nth(i);
-      const buttonText = await button.textContent();
-      const hasUserIcon = await button.locator('svg').count() > 0;
-      const isVisible = await button.isVisible();
-      
-      // The AccountMenu button should have "My Account" text or UserCircle icon
-      if (isVisible && (buttonText?.includes('My Account') || hasUserIcon)) {
-        correctMenuButton = button;
-        break;
-      }
-    }
-    
-    if (!correctMenuButton) {
-      // Fallback: use the last visible button (mobile version is usually last)
-      for (let i = menuCount - 1; i >= 0; i--) {
-        const button = menuButtons.nth(i);
-        const isVisible = await button.isVisible();
-        if (isVisible) {
-          correctMenuButton = button;
-          break;
-        }
-      }
-    }
-    
-    if (correctMenuButton) {
-      // Check if the menu is already open before clicking
-      const logoutButtonBeforeClick = this.page.locator('[data-testid="logout-button"]');
-      const isMenuAlreadyOpen = await logoutButtonBeforeClick.count() > 0 && await logoutButtonBeforeClick.isVisible().catch(() => false);
-      
-      if (!isMenuAlreadyOpen) {
-        // Only click if menu is not already open
-        await correctMenuButton.click();
-      }
-    } else {
-      throw new Error('Could not find any visible AccountMenu button');
+    if (!isMenuAlreadyOpen) {
+      await accountMenuButton.click();
     }
     
     // Wait for logout button and click it
@@ -168,24 +134,8 @@ export class AuthPage {
     }
     
     // Wait for the account menu button to appear after login
-    const accountMenuButtons = this.page.locator('[data-testid="account-menu-button"]');
-    await expect(accountMenuButtons.first()).toBeVisible({ timeout: 15000 });
-    
-    // Find the visible account menu button (handles both desktop and mobile)
-    const count = await accountMenuButtons.count();
-    let accountMenuButton: Locator | null = null;
-
-    for (let i = 0; i < count; i++) {
-        const btn = accountMenuButtons.nth(i);
-        if (await btn.isVisible()) {
-            accountMenuButton = btn;
-            break;
-        }
-    }
-
-    if (!accountMenuButton) {
-        throw new Error('No visible account menu button found after login');
-    }
+    const accountMenuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
+    await expect(accountMenuButton).toBeVisible({ timeout: 15000 });
     
     // Short pause to ensure UI is interactive
     await this.page.waitForTimeout(2000); // Increased from 500 to 2000
@@ -252,13 +202,9 @@ export class AuthPage {
     
     // If we don't find the login button in the menu, try opening the menu first
     if (!loginButtonExists) {
-      const menuButtons = this.page.locator('[data-testid="account-menu-button"]');
-      const menuExists = await menuButtons.count() > 0;
-      
-      if (menuExists) {
-        // Use first() to handle multiple menu buttons
-        await menuButtons.first().click();
-        
+      const menuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
+      if (await menuButton.count() > 0) {
+        await menuButton.click();
         // Check again if the login button appears
         loginButtonExists = await loginButtonMenu.count() > 0;
       }

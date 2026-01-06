@@ -117,13 +117,15 @@ vi.mock('../../pages/ResetPasswordPage', () => ({
 
 // Mock router
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+  const actual = (await vi.importActual('react-router-dom')) as any;
   return {
     ...actual,
     useNavigate: () => vi.fn(),
-    BrowserRouter: ({ children }: { children: React.ReactNode }) => <div data-testid="browser-router">{children}</div>,
-    Routes: ({ children }: { children: React.ReactNode }) => <div data-testid="routes">{children}</div>,
-    Route: ({ path, element }: { path: string, element: React.ReactNode }) => <div data-testid={`route-${path}`}>{element}</div>
+    BrowserRouter: ({ children }: { children: React.ReactNode }) => (
+      <actual.MemoryRouter initialEntries={['/dashboard']}>
+        {children}
+      </actual.MemoryRouter>
+    ),
   };
 });
 
