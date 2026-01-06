@@ -30,6 +30,7 @@ const taskRoutes = require('./routes/tasks');
 const timeEntryRoutes = require('./routes/timeEntries');
 const uploadRoutes = require('./routes/upload');
 const profileRoutes = require('./routes/profile');
+const aiRoutes = require('./routes/ai');
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/api/auth', authRoutes);
@@ -38,6 +39,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/time-entries', timeEntryRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.get('/', (req, res) => {
   res.send('Task Manager Backend is running!');

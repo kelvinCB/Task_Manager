@@ -92,6 +92,8 @@ backend/
 | **Upload** | | |
 | POST | `/api/upload` | Upload generic file (Docs, Images, Media) |
 | GET | `/api/upload/test` | Upload test endpoint |
+| **AI (Proxy to OpenAI)** | | |
+| POST | `/api/ai/chat` | Proxy to OpenAI Chat Completions (supports SSE) |
 | **System** | | |
 | GET | `/` | Server welcome message |
 | GET | `/health` | System status check (Health Check) |
