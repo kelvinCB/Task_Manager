@@ -16,7 +16,10 @@ test.describe('File Upload Service', () => {
 
     await page.goto('/login');
     // Assuming E2E_TEST_USER credentials are set in environment
-    await authPage.login(process.env.E2E_TEST_USER_EMAIL || 'test@example.com', process.env.E2E_TEST_USER_PASSWORD || 'password123');
+    if (!process.env.E2E_USER_FILE_EMAIL || !process.env.E2E_USER_FILE_PASSWORD) {
+      throw new Error('E2E_USER_FILE_EMAIL and E2E_USER_FILE_PASSWORD must be set in environment variables');
+    }
+    await authPage.login(process.env.E2E_USER_FILE_EMAIL, process.env.E2E_USER_FILE_PASSWORD);
 
     // Explicit wait loop for login success
     try {

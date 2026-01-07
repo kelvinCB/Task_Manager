@@ -10,8 +10,12 @@ test.describe('Task Advanced Features', () => {
   let boardPage: BoardPage;
   let authPage: AuthPage;
 
-  const TEST_EMAIL = 'automation-tasklite-001@yopmail.com';
-  const TEST_PASSWORD = 'Automation123';
+  if (!process.env.E2E_USER_TASK_EMAIL || !process.env.E2E_USER_TASK_PASSWORD) {
+    throw new Error('E2E_USER_TASK_EMAIL and E2E_USER_TASK_PASSWORD must be set in environment variables');
+  }
+
+  const TEST_EMAIL = process.env.E2E_USER_TASK_EMAIL;
+  const TEST_PASSWORD = process.env.E2E_USER_TASK_PASSWORD;
 
   test.beforeEach(async ({ page }) => {
     appPage = new AppPage(page);
