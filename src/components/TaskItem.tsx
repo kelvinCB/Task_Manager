@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus } from '../types/Task';
-import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon, getTaskAncestry } from '../utils/taskUtils';
-import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, CheckCircle, Play, Pause, CornerDownRight } from 'lucide-react';
+import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon, getTaskAncestry, getTaskDepth } from '../utils/taskUtils';
+import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, CheckCircle, Play, Pause, CornerDownRight, Plus } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
@@ -57,8 +57,22 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       default: return Circle;
     }
   };
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const StatusIcon = getIconComponent(task.status);
   const isOverdue = isTaskOverdue(task);
+  
+  // Robust calculation for depth and children to handle potential API/State sync issues
+  const effectiveDepth = task.parentId ? getTaskDepth(task, allTasks) : 0;
+  const effectiveHasChildren = hasChildren || allTasks.some(t => t.parentId === task.id);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -169,7 +183,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     >
       <div
         className={`
-          flex items-start gap-3 p-3 rounded-xl border transition-all duration-200
+          flex flex-col sm:flex-row items-start gap-2 sm:gap-3 p-3 rounded-xl border transition-all duration-200
           ${theme === 'dark'
             ? 'bg-gray-800 border-gray-700 shadow-sm hover:border-gray-600'
             : 'bg-white hover:bg-gray-50 border-gray-200 shadow hover:shadow-md'
@@ -178,47 +192,49 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           ${task.status === 'Done' ? 'opacity-70' : ''}
         `}
         style={{
-          marginLeft: `${task.depth * 28}px`,
+          marginLeft: isMobile 
+            ? `${effectiveDepth * 12}px` 
+            : `${effectiveDepth * 24}px`,
           borderLeftWidth: isOverdue ? '4px' : '1px'
         }}
         data-testid="task-item"
         data-task-title={task.title}
         onClick={() => onTaskClick?.(task.id)}
       >
-        {/* Toggle Expand Section */}
-        <div className="flex-shrink-0 pt-0.5">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleExpand(task.id);
-            }}
-            className={`
-              p-1 rounded-md transition-colors duration-200
-              ${hasChildren
-                ? theme === 'dark'
-                  ? 'text-gray-400 hover:text-indigo-400 hover:bg-gray-700'
-                  : 'text-gray-400 hover:text-indigo-600 hover:bg-gray-100'
-                : 'invisible'
-              }
-            `}
-            disabled={!hasChildren}
-            data-testid="expand-button"
-            aria-label={isExpanded ? "Collapse" : "Expand"}
-          >
-            {isExpanded ? <ChevronDown size={15} strokeWidth={2.5} /> : <ChevronRight size={15} strokeWidth={2.5} />}
-          </button>
-        </div>
+        <div className="flex w-full items-start gap-2 sm:gap-3">
+          {/* Toggle Expand Section */}
+          <div className="flex-shrink-0 pt-0.5">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleExpand(task.id);
+              }}
+              className={`
+                p-1 rounded-md transition-colors duration-200
+                ${hasChildren
+                  ? theme === 'dark'
+                    ? 'text-gray-400 hover:text-indigo-400 hover:bg-gray-700'
+                    : 'text-gray-400 hover:text-indigo-600 hover:bg-gray-100'
+                  : 'invisible'
+                }
+              `}
+              disabled={!hasChildren}
+              data-testid="expand-button"
+              aria-label={isExpanded ? "Collapse" : "Expand"}
+            >
+              {isExpanded ? <ChevronDown size={15} strokeWidth={2.5} /> : <ChevronRight size={15} strokeWidth={2.5} />}
+            </button>
+          </div>
 
-        {/* content container */}
-        <div className="flex-1 min-w-0 flex flex-col gap-1">
-
-          <div className="flex items-start justify-between gap-4">
-            {/* Title and breadcrumbs */}
+          {/* content container */}
+          <div className="flex-1 min-w-0 flex flex-col gap-1">
+            <div className="flex items-start justify-between gap-2 sm:gap-4">
+              {/* Title and breadcrumbs */}
             <div className="flex-1 min-w-0">
               {task.parentId && (
-                <div className={`flex items-center gap-1 text-[10px] font-medium mb-0.5 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                <div className={`flex items-center gap-1 text-[10px] font-medium mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                   <CornerDownRight size={10} />
-                  <span className="truncate max-w-[200px]">
+                  <span className="truncate max-w-[120px] sm:max-w-[200px]">
                     {getTaskAncestry(task, allTasks).map(p => p.title).join(' / ')}
                   </span>
                 </div>
@@ -239,7 +255,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                 />
                 <h3
                   className={`
-                    text-base font-medium truncate leading-tight cursor-pointer
+                    text-base sm:text-lg font-bold truncate leading-tight cursor-pointer
                     ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}
                     ${task.status === 'Done' ? 'line-through text-gray-500 decoration-gray-400' : ''}
                   `}
@@ -249,74 +265,39 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               </div>
             </div>
 
-            {/* QUICK Actions (Desktop) */}
-            <div className={`
-              hidden sm:flex items-center gap-2 transition-opacity duration-200
-              ${isHovered || isMenuOpen ? 'opacity-100' : 'opacity-0'}
-            `}>
-              {/* Quick Edit */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(task);
-                }}
-                className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
-                title={t('common.edit')}
-              >
-                <span className="sr-only">{t('common.edit')}</span>
-                {/* Reuse Edit Icon Logic or just text/icon - using simple edit icon here would be good if imported, or just triggering modal */}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-              </button>
-              {/* Quick Add Subtask */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddChild(task.id);
-                }}
-                className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
-                title={t('tasks.add_subtask')}
-              >
-                <span className="sr-only">{t('tasks.add_subtask')}</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              </button>
-            </div>
-
-            {/* Action Menu & Status Selector Container */}
-            <div className="flex items-center gap-2">
-              {/* Time Tracker Mini */}
-              {onStartTimer && onPauseTimer && getElapsedTime && (
-                <div
-                  className={`mr-2 px-3 py-1 rounded-full border flex items-center gap-2 ${theme === 'dark' ? 'bg-gray-900/50 border-gray-700' : 'bg-gray-100 border-gray-200'}`}
-                  onClick={(e) => e.stopPropagation()}
+            {/* Action Menu (Mobile always visible, Desktop on hover) */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* QUICK Actions (Desktop) */}
+              <div className={`
+                hidden sm:flex items-center gap-2 transition-opacity duration-200
+                ${isHovered || isMenuOpen ? 'opacity-100' : 'opacity-0'}
+              `}>
+                {/* Quick Add Subtask */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddChild(task.id);
+                  }}
+                  className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
+                  title={t('tasks.add_subtask')}
+                  data-testid="add-subtask-button"
                 >
-                  <TaskTimer
-                    taskId={task.id}
-                    isActive={task.timeTracking.isActive}
-                    elapsedTime={getElapsedTime(task.id)}
-                    onStart={onStartTimer}
-                    onPause={onPauseTimer}
-                    compact={true}
-                  />
-                </div>
-              )}
+                  <Plus size={16} />
+                </button>
 
-              <div onClick={(e) => e.stopPropagation()}>
-                <select
-                  value={task.status}
-                  onChange={handleStatusChange}
-                  className={`
-                    px-2 py-1 text-xs font-medium rounded-full border appearance-none cursor-pointer text-center min-w-[80px]
-                    transition-all duration-200
-                    ${getStatusColor(task.status)}
-                    focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500/50
-                  `}
+                {/* Quick Edit */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(task);
+                  }}
+                  className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
+                  title={t('common.edit')}
+                  data-testid="edit-task-button"
                 >
-                  <option value="Open">{t('tasks.status_open')}</option>
-                  <option value="In Progress">{t('tasks.status_in_progress')}</option>
-                  <option value="Done" disabled={!canComplete} title={!canComplete ? t('tasks.has_subtasks') : undefined}>
-                    {t('tasks.status_done')}
-                  </option>
-                </select>
+                  <span className="sr-only">{t('common.edit')}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                </button>
               </div>
 
               <div className="relative" ref={menuRef} onClick={(e) => e.stopPropagation()}>
@@ -342,7 +323,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                         onEdit(task);
                         setIsMenuOpen(false);
                       }}
-                      data-testid="edit-task-button"
+                      data-testid="edit-task-button-menu"
                     >
                       <span>{t('common.edit')}</span>
                     </button>
@@ -352,7 +333,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                         onAddChild(task.id);
                         setIsMenuOpen(false);
                       }}
-                      data-testid="add-subtask-button"
+                      data-testid="add-subtask-button-menu"
                     >
                       <span>{t('tasks.add_subtask')}</span>
                     </button>
@@ -376,39 +357,83 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           {/* Description Snippet */}
           {task.description && (
             <p className={`
-              text-xs line-clamp-1 ml-6
+              text-[11px] sm:text-xs line-clamp-1 ml-6
               ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
             `}>
               {task.description}
             </p>
           )}
-
-          {/* Metadata Row */}
-          <div className="flex items-center gap-3 mt-1 ml-6">
-            {/* Dates */}
-            {/* Dates in Pill */}
-            {task.dueDate ? (
-              <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border ${theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
-                <Calendar size={12} strokeWidth={2.5} />
-                <span>{formatDate(task.dueDate)}</span>
-                {isOverdue && <span className="text-[10px] px-1.5 py-0.5 bg-red-500/10 text-red-500 rounded-full ml-1">{t('tasks.overdue')}</span>}
-              </div>
-            ) : (
-              <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium border ${theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-500' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
-                <Calendar size={12} className="opacity-70" />
-                <span>Created {formatDate(task.createdAt)}</span>
-              </div>
-            )}
-
-            {/* Subtask Count Badge - Only if not zero and no expand button (or redundant) */}
-            {(hasChildren || task.depth > 0) && (
-              <div className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full ${theme === 'dark' ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
-                {hasChildren ? t('tasks.has_subtasks') : `Level ${task.depth}`}
-              </div>
-            )}
-          </div>
         </div>
       </div>
+
+      {/* Sub-row for Status, Timer and Metadata (Mobile prioritized and centered) */}
+      <div className={`
+        flex flex-wrap items-center gap-2 sm:gap-3 w-full mt-2 sm:mt-0 
+        justify-center sm:justify-start
+        ${isMobile ? 'border-t border-gray-700/30 dark:border-gray-700/50 pt-2 pb-1' : 'sm:ml-6 sm:pl-6'}
+      `}>
+        {/* Status Selector */}
+        <div onClick={(e) => e.stopPropagation()}>
+          <select
+            value={task.status}
+            onChange={handleStatusChange}
+            className={`
+              px-1.5 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full border appearance-none cursor-pointer text-center min-w-[70px] sm:min-w-[80px]
+              transition-all duration-200
+              ${getStatusColor(task.status)}
+              focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500/50
+            `}
+          >
+            <option value="Open">{t('tasks.status_open')}</option>
+            <option value="In Progress">{t('tasks.status_in_progress')}</option>
+            <option value="Done" disabled={!canComplete} title={!canComplete ? t('tasks.has_subtasks') : undefined}>
+              {t('tasks.status_done')}
+            </option>
+          </select>
+        </div>
+
+        {/* Time Tracker Mini */}
+        {onStartTimer && onPauseTimer && getElapsedTime && (
+          <div
+            className={`px-2 py-0.5 rounded-full border flex items-center gap-1.5 ${theme === 'dark' ? 'bg-gray-900/50 border-gray-700' : 'bg-gray-100 border-gray-200'}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <TaskTimer
+              taskId={task.id}
+              isActive={task.timeTracking.isActive}
+              elapsedTime={getElapsedTime(task.id)}
+              onStart={onStartTimer}
+              onPause={onPauseTimer}
+              compact={true}
+            />
+          </div>
+        )}
+
+        {/* Dates */}
+        {task.dueDate ? (
+          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-400' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
+            <Calendar size={10} strokeWidth={2.5} />
+            <span>{formatDate(task.dueDate)}</span>
+            {isOverdue && <span className="text-[9px] px-1.5 py-0 bg-red-500/10 text-red-500 rounded-full ml-1 font-bold">{t('tasks.overdue')}</span>}
+          </div>
+        ) : (
+          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium border ${theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-500' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
+            <Calendar size={10} className="opacity-70" />
+            <span>Created {formatDate(task.createdAt)}</span>
+          </div>
+        )}
+
+        {/* Subtask Count Badge (Highlighted and Centered) */}
+        {(effectiveHasChildren || effectiveDepth > 0) && (
+          <div 
+            data-testid="subtask-badge"
+            className={`flex items-center justify-center gap-1 text-[10px] sm:text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap font-bold shadow-sm ${theme === 'dark' ? 'bg-indigo-900/40 text-indigo-300 border border-indigo-500/30' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}
+          >
+            {effectiveHasChildren ? t('tasks.has_subtasks') : `Level ${effectiveDepth}`}
+          </div>
+        )}
+      </div>
+    </div>
 
       <DeleteConfirmationModal
         isOpen={deleteModalOpen}

@@ -427,7 +427,7 @@ const MainApp = () => {
           </div>
 
           {/* Mobile Header - Three Level Design */}
-          <div className="lg:hidden">
+          <div data-testid="mobile-header" className="lg:hidden">
             {/* Level 1: Logo and App Name */}
             <div className="flex items-center justify-center py-3">
               <div className="flex items-center gap-3">
@@ -449,14 +449,14 @@ const MainApp = () => {
             {/* Level 2: Search, Add Task, and View Buttons */}
             <div className="flex items-center gap-2 py-3 border-b border-gray-200 dark:border-gray-700">
               {/* Search */}
-              <div className="flex-1 relative">
-                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-400'} w-4 h-4`} />
+              <div className="flex-1 min-w-0 max-w-[140px] sm:max-w-none relative">
+                <Search className={`absolute left-2.5 top-1/2 transform -translate-y-1/2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-400'} w-3.5 h-3.5`} />
                 <input
                   type="text"
                   placeholder={t('common.search')}
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className={`pl-10 pr-3 py-2 w-full text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
+                  className={`pl-8 pr-2 py-1.5 w-full text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 ${theme === 'dark' ? 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-yellow-500' : ''}`}
                 />
               </div>
 
@@ -465,17 +465,18 @@ const MainApp = () => {
               {/* Add Task Button */}
               <button
                 onClick={openCreateForm}
-                className={`flex items-center gap-1 px-3 py-2 ${theme === 'dark' ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg transition-colors duration-200 text-sm font-medium shadow-sm`}
+                className={`flex items-center justify-center gap-1.5 px-3 py-2 ${theme === 'dark' ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg transition-colors duration-200 text-sm font-medium shadow-sm min-w-[40px] whitespace-nowrap`}
+                data-testid="add-task-mobile-button"
               >
-                <Plus size={16} />
-                <span>{t('common.create')}</span>
+                <Plus size={18} />
+                <span className="hidden min-[400px]:inline">{t('common.create')}</span>
               </button>
 
               {/* View Toggle Buttons with Background */}
               <div className={`flex items-center gap-0.5 p-1 rounded-lg ${theme === 'dark' ? 'bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100'} shadow-sm`}>
                 <button
                   onClick={() => setView('tree')}
-                  data-testid="tree-view-toggle"
+                  data-testid="tree-view-toggle-mobile"
                   title={t('nav.tree_view')}
                   className={`p-2 rounded-lg transition-colors duration-200 ${view === 'tree'
                     ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
@@ -486,7 +487,7 @@ const MainApp = () => {
                 </button>
                 <button
                   onClick={() => setView('board')}
-                  data-testid="board-view-toggle"
+                  data-testid="board-view-toggle-mobile"
                   title={t('nav.board_view')}
                   className={`p-2 rounded-lg transition-colors duration-200 ${view === 'board'
                     ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
@@ -497,7 +498,7 @@ const MainApp = () => {
                 </button>
                 <button
                   onClick={() => setView('stats')}
-                  data-testid="stats-view-toggle"
+                  data-testid="stats-view-toggle-mobile"
                   title={t('nav.stats_view')}
                   className={`p-2 rounded-lg transition-colors duration-200 ${view === 'stats'
                     ? (theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-indigo-100 text-indigo-700')
@@ -664,7 +665,7 @@ const MainApp = () => {
               <TaskTree
                 nodes={filteredTaskTree as unknown as TaskNode[]}
                 expandedNodes={expandedNodes}
-                allTasks={filteredTasks as unknown as TaskNode[]}
+                allTasks={tasks as unknown as TaskNode[]}
                 onToggleExpand={toggleNodeExpansion}
                 onStatusChange={handleStatusChange}
                 onEdit={(task: TaskNode) => handleEditTask(task as unknown as Task)}
