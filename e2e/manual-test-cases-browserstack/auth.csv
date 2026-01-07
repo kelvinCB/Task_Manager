@@ -2,7 +2,7 @@ Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automat
 "Login - Valid Credentials","Verify user can login successfully via Account Menu","User is not logged in","Open the application.","User sees homepage.","High","Functional","Auth,Login","Automated"
 "Login - Valid Credentials","","","Click on 'My Account' menu.","Dropdown menu appears with 'Log in' option.","High","Functional","Auth,Login","Automated"
 "Login - Valid Credentials","","","Select 'Log in'.","User is redirected to the Login page.","High","Functional","Auth,Login","Automated"
-"Login - Valid Credentials","","","Enter valid email (e.g. automation-tasklite-001@yopmail.com).","Email is entered.","High","Functional","Auth,Login","Automated"
+"Login - Valid Credentials","","","Enter valid email (e.g. automation-kolium-001@yopmail.com).","Email is entered.","High","Functional","Auth,Login","Automated"
 "Login - Valid Credentials","","","Enter valid password.","Password is entered.","High","Functional","Auth,Login","Automated"
 "Login - Valid Credentials","","","Click 'Log in' button.","1. Redirected to Dashboard. 2. 'My Account' shows logged in state.","High","Functional","Auth,Login","Automated"
 "Login - Invalid Credentials","Verify error message when entering invalid credentials","User is on Login page","Enter valid email.","Email entered.","High","Functional","Auth,Login,Negative","Automated"
