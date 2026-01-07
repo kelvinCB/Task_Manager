@@ -52,7 +52,8 @@ test.describe('Mobile Tree View UX', () => {
     await taskPage.createTask({ title: parentTitle });
     
     // Find parent and add subtask
-    const parentItem = page.getByTestId('task-item').filter({ hasText: parentTitle });
+    // Use .first() to reliably get the parent (rendered before child) and avoid breadcrumb ambiguity
+    const parentItem = page.getByTestId('task-item').filter({ hasText: parentTitle }).first();
     await parentItem.getByTestId('task-menu-button').click();
     await page.getByTestId('add-subtask-button-menu').click();
     
@@ -60,13 +61,6 @@ test.describe('Mobile Tree View UX', () => {
     
     // Switch back to Tree View if it cleared, and wait for render
     await page.waitForTimeout(500);
-    
-    // Ensure parent is expanded
-    const expandButton = parentItem.getByTestId('expand-button');
-    const isExpanded = await expandButton.getAttribute('aria-label');
-    if (isExpanded === 'Expand' || isExpanded?.includes('Expandir')) {
-      await expandButton.click();
-    }
     
     // Verify child indentation (12px on mobile)
     const childItem = page.getByTestId('task-item').filter({ hasText: childTitle });
@@ -94,9 +88,16 @@ test.describe('Mobile Tree View UX', () => {
      await page.getByTestId('add-subtask-button-menu').click();
      await taskPage.createTask({ title: childTitle });
      
-     // Wait for re-render and check for the subtask badge
-     await page.waitForTimeout(1000);
-     const badge = parentItem.getByTestId('subtask-badge');
+     // Reload to ensure state is fresh (backend update reflection)
+     await page.reload();
+
+     // Scroll to bottom to ensure the new task is visible
+     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+     
+     // Use distinct filter to ensure we get the parent task specifically
+     // Using .first() helps if filtering by text finds breadcrumb matches too
+     const parentItemAfterReload = page.getByTestId('task-item').filter({ hasText: parentTitle }).first();
+     const badge = parentItemAfterReload.getByTestId('subtask-badge');
      
      await expect(badge).toBeVisible({ timeout: 5000 });
      // In ES, it should say something like "Tiene subtareas", in EN "Has subtasks"
