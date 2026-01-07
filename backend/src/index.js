@@ -57,7 +57,6 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log('SERVER_ID: DEBUG_SESSION_123'); // Unique ID for debugging
   // Keep process alive
   setInterval(() => { }, 60000);
 });

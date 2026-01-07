@@ -20,9 +20,6 @@ test.describe('Task Drag and Drop', () => {
         // Clear local storage to start fresh
         await page.evaluate(() => localStorage.clear());
 
-        // Listen to console logs
-        page.on('console', msg => console.log(`[Browser Console] ${msg.text()}`));
-
         await appPage.page.reload();
     });
 

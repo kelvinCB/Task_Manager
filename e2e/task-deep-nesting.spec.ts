@@ -20,19 +20,17 @@ test.describe('Deep Nesting and Persistence', () => {
     });
 
     test('should allow creating deep nested subtasks (Level 3+) and persist view', async ({ page }) => {
-        console.log('Switching to Tree View');
+       
         // 1. Switch to Tree View
         await appPage.switchToView('tree');
         await appPage.verifyCurrentView('tree');
 
-        console.log('Creating Root Task');
         // Create Root Task
         const rootTitle = 'Deep Nest Root';
         await appPage.openAddTaskModal();
         await taskPage.createTask({ title: rootTitle });
         await treePage.verifyTaskExists(rootTitle);
 
-        console.log('Adding Level 2');
         // Level 1 -> Level 2
         const level2Title = 'Level 2 Child';
         await treePage.addSubtask(rootTitle);
@@ -42,10 +40,8 @@ test.describe('Deep Nesting and Persistence', () => {
         // Usually TreePage.addSubtask doesn't expand, but our new useTasks code should auto-expand properties
         // Wait a bit for state update
         await page.waitForTimeout(500);
-        console.log('Verifying Level 2');
         await treePage.verifyTaskExists(level2Title);
 
-        console.log('Adding Level 3');
         // Level 2 -> Level 3
         // We need to find the Level 2 task and add subtask
         const level3Title = 'Level 3 Grandchild';
@@ -53,20 +49,16 @@ test.describe('Deep Nesting and Persistence', () => {
         await taskPage.createTask({ title: level3Title });
 
         await page.waitForTimeout(500);
-        console.log('Verifying Level 3');
         await treePage.verifyTaskExists(level3Title);
 
-        console.log('Adding Level 4');
         // Level 3 -> Level 4 (Just to be sure)
         const level4Title = 'Level 4 Deep';
         await treePage.addSubtask(level3Title);
         await taskPage.createTask({ title: level4Title });
 
         await page.waitForTimeout(500);
-        console.log('Verifying Level 4');
         await treePage.verifyTaskExists(level4Title);
 
-        console.log('Testing Persistence');
         // 2. Test View Persistence
         // Reload page
         await page.reload();
