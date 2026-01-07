@@ -21,3 +21,6 @@ Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automat
 "A11y - Mobile Touch","Verify toggle functionality on mobile touch","User on Login (Mobile)","Tap toggle button.","Visibility toggles.","High","Usability","UI,Auth,Mobile","Automated"
 "A11y - ARIA Labels","Verify ARIA attributes for screen readers","User on Login Page","Inspect toggle button.","Proper ARIA labels present.","Medium","Accessibility","UI,Auth,A11y","Automated"
 "Account - Auto Close","Verify dropdown closes on outside click","Dropdown Open","Click content area.","Dropdown closes.","Low","Usability","UI,Account","Automated"
+"Mobile UX - Tree View Title","Verify task titles are clearly visible on mobile","Tree View open on mobile","View deep hierarchy.","Long titles are visible and not truncated.","High","Usability","UI,Mobile,Tree","Automated"
+"Mobile UX - Tree View Indentation","Verify indentation is reduced on mobile viewports","Tree View open on mobile","Expand multiple levels.","Indentation is compact (12px per level).","Medium","Usability","UI,Mobile,Tree","Automated"
+"Mobile UX - Subtask Badge","Verify 'Tiene subtareas' label is centered on mobile","Tree View open on mobile","View task with children.","Centered, readable subtask indicator.","Medium","Usability","UI,Mobile,Tree","Automated"

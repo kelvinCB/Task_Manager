@@ -82,7 +82,7 @@ test.describe('Task Management', () => {
     await moreButton.click();
 
     // Use the reliable test ID we added
-    const editOption = appPage.page.getByTestId('edit-task-button');
+    const editOption = appPage.page.getByTestId('edit-task-button-menu');
     await editOption.click();
     await taskPage.verifyModalOpen();
 

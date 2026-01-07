@@ -15,6 +15,7 @@ const generateRandomEmail = () => {
 };
 
 test.describe('Authentication E2E Tests', () => {
+  test.use({ viewport: { width: 1280, height: 720 } });
   let authPage: AuthPage;
   let appPage: AppPage;
 
