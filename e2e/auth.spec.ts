@@ -15,6 +15,7 @@ const generateRandomEmail = () => {
 };
 
 test.describe('Authentication E2E Tests', () => {
+  test.use({ viewport: { width: 1280, height: 720 } });
   let authPage: AuthPage;
   let appPage: AppPage;
 
@@ -91,6 +92,7 @@ test.describe('Authentication E2E Tests', () => {
     
     test('User can logout successfully', async ({ page }) => {
       // Perform logout
+      await page.waitForSelector('[data-testid="account-menu-button"]', { state: 'visible', timeout: 5000 });
       await authPage.logout();
       
       // Verify logged out state

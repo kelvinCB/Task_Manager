@@ -52,7 +52,7 @@ export const canCompleteTask = (task: Task, allTasks: Task[]): boolean => {
 export const getTaskDepth = (task: Task, allTasks: Task[]): number => {
   if (!task.parentId) return 0;
 
-  const parent = allTasks.find(t => t.id === task.parentId);
+  const parent = allTasks.find(t => String(t.id) === String(task.parentId));
   if (!parent) return 0;
 
   return getTaskDepth(parent, allTasks) + 1;
@@ -63,7 +63,7 @@ export const getTaskAncestry = (task: Task, allTasks: Task[]): Task[] => {
   let currentTask = task;
 
   while (currentTask.parentId) {
-    const parent = allTasks.find(t => t.id === currentTask.parentId);
+    const parent = allTasks.find(t => String(t.id) === String(currentTask.parentId));
     if (!parent) break;
     ancestry.unshift(parent);
     currentTask = parent;

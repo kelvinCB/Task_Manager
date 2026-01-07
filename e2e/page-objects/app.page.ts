@@ -14,17 +14,17 @@ export class AppPage {
 
   constructor(page: Page) {
     this.page = page;
-    // Navigation buttons use specific titles - use first() to handle desktop/mobile duplicates
-    this.boardViewButton = page.getByTestId('board-view-toggle').filter({ visible: true }).first();
-    this.treeViewButton = page.getByTestId('tree-view-toggle').filter({ visible: true }).first();
-    this.timeStatsButton = page.getByTestId('stats-view-toggle').filter({ visible: true }).first();
-    this.themeToggle = page.getByTitle('Toggle Dark Mode').first();
+    // Navigation buttons use specific titles - handle both desktop and mobile IDs
+    this.boardViewButton = page.getByTestId('board-view-toggle').or(page.getByTestId('board-view-toggle-mobile')).filter({ visible: true }).first();
+    this.treeViewButton = page.getByTestId('tree-view-toggle').or(page.getByTestId('tree-view-toggle-mobile')).filter({ visible: true }).first();
+    this.timeStatsButton = page.getByTestId('stats-view-toggle').or(page.getByTestId('stats-view-toggle-mobile')).filter({ visible: true }).first();
+    this.themeToggle = page.getByTitle('Toggle Dark Mode').or(page.getByTestId('theme-toggle')).filter({ visible: true }).first();
     // Search input - Mobile uses 'Search...', Desktop uses 'Search tasks...'
-    this.searchInput = page.getByPlaceholder('Search tasks...').or(page.getByPlaceholder('Search...')).first();
+    this.searchInput = page.getByPlaceholder('Search tasks...').or(page.getByPlaceholder('Search...')).filter({ visible: true }).first();
     // Add task button - Use data-testid for reliability
-    this.addTaskButton = page.getByTestId('add-task-button').first();
+    this.addTaskButton = page.getByTestId('add-task-button').or(page.getByTestId('add-task-mobile-button')).filter({ visible: true }).first();
     // My Account menu
-    this.accountMenu = page.getByTitle('My Account').first();
+    this.accountMenu = page.getByTitle('My Account').or(page.getByTestId('account-menu-button')).filter({ visible: true }).first();
     this.importInput = page.locator('input[type="file"]');
     this.languageToggle = page.getByTestId('language-toggle').filter({ visible: true }).first();
   }
@@ -38,45 +38,23 @@ export class AppPage {
   }
 
   async switchToView(view: 'board' | 'tree' | 'stats', force = false) {
-    let testId: string;
+    let baseId: string;
     switch (view) {
       case 'board':
-        testId = 'board-view-toggle';
+        baseId = 'board-view-toggle';
         break;
       case 'tree':
-        testId = 'tree-view-toggle';
+        baseId = 'tree-view-toggle';
         break;
       case 'stats':
-        testId = 'stats-view-toggle';
+        baseId = 'stats-view-toggle';
         break;
     }
 
-    const locator = this.page.getByTestId(testId);
+    const locator = this.page.getByTestId(baseId).or(this.page.getByTestId(`${baseId}-mobile`)).filter({ visible: true }).first();
 
-    // Wait for at least one element to be attached
-    try {
-      await locator.first().waitFor({ state: 'attached', timeout: 5000 });
-    } catch (e) {
-      // ignore
-    }
-
-    const count = await locator.count();
-    if (count === 0) {
-      // If we can't find it, dump failure info
-      // console.log(await this.page.content());
-      throw new Error(`No ${view} view button found (testid: ${testId})`);
-    }
-
-    // Try clicking the visible one
-    const visibleButton = locator.filter({ visible: true }).first();
-    if (await visibleButton.count() > 0) {
-      await visibleButton.click({ force });
-      return;
-    }
-
-    // Fallback: click the first one using force (might be mobile hidden on desktop or vice versa, but unlikely if count > 0)
-    console.log(`Warning: Clicking hidden ${view} button`);
-    await locator.first().click({ force: true });
+    await locator.waitFor({ state: 'visible', timeout: 5000 });
+    await locator.click({ force });
   }
 
   async toggleTheme() {
@@ -99,14 +77,14 @@ export class AppPage {
     // Open account menu first
     await this.accountMenu.click();
     // Click the Export Tasks option in the dropdown
-    await this.page.getByRole('menuitem').filter({ hasText: 'Export Tasks' }).click();
+    await this.page.getByRole('menuitem').filter({ hasText: /Export Tasks|Exportar Tareas/i }).click();
   }
 
   async importTasks(filePath: string) {
     // Open account menu first
     await this.accountMenu.click();
     // Click on the Import Tasks option which is associated with a hidden file input
-    await this.page.getByRole('menuitem').filter({ hasText: 'Import Tasks' }).click();
+    await this.page.getByRole('menuitem').filter({ hasText: /Import Tasks|Importar Tareas/i }).click();
     await this.importInput.setInputFiles(filePath);
   }
 
@@ -115,9 +93,9 @@ export class AppPage {
   }
 
   async verifyPageLoaded() {
-    await expect(this.page.getByTestId('board-view-toggle').filter({ visible: true }).first()).toBeVisible();
-    await expect(this.page.getByTestId('tree-view-toggle').filter({ visible: true }).first()).toBeVisible();
-    await expect(this.page.getByTestId('stats-view-toggle').filter({ visible: true }).first()).toBeVisible();
+    await expect(this.boardViewButton).toBeVisible();
+    await expect(this.treeViewButton).toBeVisible();
+    await expect(this.timeStatsButton).toBeVisible();
   }
 
   async verifyCurrentView(view: 'board' | 'tree' | 'stats') {
