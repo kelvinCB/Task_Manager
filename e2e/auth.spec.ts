@@ -3,15 +3,23 @@ import { AuthPage } from './page-objects/auth.page';
 import { AppPage } from './page-objects/app.page';
 
 // Test credentials
-const TEST_EMAIL = 'automation-tasklite-001@yopmail.com';
-const TEST_PASSWORD = 'Automation123';
+// Test credentials and validation
+if (!process.env.E2E_USER_AUTH_EMAIL || !process.env.E2E_USER_AUTH_PASSWORD) {
+  throw new Error('E2E_USER_AUTH_EMAIL and E2E_USER_AUTH_PASSWORD must be set in environment variables');
+}
+
+const TEST_EMAIL = process.env.E2E_USER_AUTH_EMAIL;
+const TEST_PASSWORD = process.env.E2E_USER_AUTH_PASSWORD;
 const INVALID_EMAIL = 'invalid.email';
 const INVALID_PASSWORD = '123'; // Too short
 
 // Function to generate random email with the required pattern
 const generateRandomEmail = () => {
   const randomNumber = Math.floor(10000 + Math.random() * 90000); // 5-digit random number
-  return `automation-tasklite-${randomNumber}@yopmail.com`;
+  // Extract base from configured email to maintain consistency (e.g. automation-kolium) if needed, 
+  // but for random emails we can follow the convention or use the configured one as base if amenable.
+  // For now, keeping the convention consistent with the configured user.
+  return `automation-kolium-${randomNumber}@yopmail.com`;
 };
 
 test.describe('Authentication E2E Tests', () => {

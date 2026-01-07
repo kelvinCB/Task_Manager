@@ -2,8 +2,13 @@ import { test, expect } from '@playwright/test';
 import { AuthPage } from './page-objects/auth.page';
 
 // Test credentials
-const TEST_EMAIL = 'automation-tasklite-001@yopmail.com';
-const TEST_PASSWORD = 'TestPassword123';
+// Test credentials
+if (!process.env.E2E_USER_AUTH_EMAIL || !process.env.E2E_USER_AUTH_PASSWORD) {
+  throw new Error('E2E_USER_AUTH_EMAIL and E2E_USER_AUTH_PASSWORD must be set in environment variables');
+}
+
+const TEST_EMAIL = process.env.E2E_USER_AUTH_EMAIL;
+const TEST_PASSWORD = process.env.E2E_USER_AUTH_PASSWORD;
 
 test.describe('Password Visibility Toggle E2E Tests', () => {
   let authPage: AuthPage;

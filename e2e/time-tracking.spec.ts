@@ -79,9 +79,14 @@ test.describe('Time Tracking', () => {
     // Login first as export requires authentication
     await authPage.goToLogin();
     await authPage.login(
-      process.env.E2E_TEST_USER_EMAIL || 'taski-test@yopmail.com',
-      process.env.E2E_TEST_USER_PASSWORD || 'password123'
+      process.env.E2E_USER_TIME_EMAIL || '',
+      process.env.E2E_USER_TIME_PASSWORD || ''
     );
+    
+    // Validate after login
+    if (!process.env.E2E_USER_TIME_EMAIL || !process.env.E2E_USER_TIME_PASSWORD) {
+       throw new Error('E2E_USER_TIME_EMAIL and E2E_USER_TIME_PASSWORD must be set');
+    }
     await authPage.expectLoggedIn();
     await appPage.goto();
     await appPage.page.waitForLoadState('networkidle');

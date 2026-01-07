@@ -8,8 +8,12 @@ test.describe('AI Error Feedback', () => {
     let taskPage: TaskPage;
     let authPage: AuthPage;
 
-    const TEST_EMAIL = 'automation-tasklite-001@yopmail.com';
-    const TEST_PASSWORD = 'Automation123';
+    if (!process.env.E2E_USER_AI_EMAIL || !process.env.E2E_USER_AI_PASSWORD) {
+      throw new Error('E2E_USER_AI_EMAIL and E2E_USER_AI_PASSWORD must be set in environment variables');
+    }
+
+    const TEST_EMAIL = process.env.E2E_USER_AI_EMAIL;
+    const TEST_PASSWORD = process.env.E2E_USER_AI_PASSWORD;
 
     test.beforeEach(async ({ page }) => {
         appPage = new AppPage(page);

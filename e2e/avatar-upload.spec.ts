@@ -1,8 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { AuthPage } from './page-objects/auth.page';
 
-const TEST_EMAIL = 'automation-tasklite-001@yopmail.com';
-const TEST_PASSWORD = 'Automation123';
+if (!process.env.E2E_USER_PROFILE_EMAIL || !process.env.E2E_USER_PROFILE_PASSWORD) {
+  throw new Error('E2E_USER_PROFILE_EMAIL and E2E_USER_PROFILE_PASSWORD must be set in environment variables');
+}
+
+const TEST_EMAIL = process.env.E2E_USER_PROFILE_EMAIL;
+const TEST_PASSWORD = process.env.E2E_USER_PROFILE_PASSWORD;
 
 test.describe('Avatar Upload E2E Tests', () => {
   let authPage: AuthPage;
