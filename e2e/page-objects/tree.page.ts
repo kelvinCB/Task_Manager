@@ -21,27 +21,23 @@ export class TreePage {
 
   async editTask(taskTitle: string) {
     const taskItem = this.getTaskItem(taskTitle);
-    // Hover over the task item to make buttons visible
     await taskItem.hover();
 
-    // Open the menu
-    const moreButton = taskItem.locator('button').filter({ has: this.page.locator('svg') }).last();
-    await moreButton.click();
-
-    // Click edit button
-    await this.page.getByTestId('edit-task-button').click();
+    const quickEditButton = taskItem.getByTestId('edit-task-button');
+    if (await quickEditButton.isVisible()) {
+      await quickEditButton.click();
+    } else {
+      await taskItem.getByTestId('task-menu-button').click();
+      await this.page.getByTestId('edit-task-button-menu').click();
+    }
   }
 
   async deleteTask(taskTitle: string) {
     const taskItem = this.getTaskItem(taskTitle);
-    // Hover over the task item to make buttons visible
     await taskItem.hover();
 
-    // Open the menu
-    const moreButton = taskItem.locator('button').filter({ has: this.page.locator('svg') }).last();
-    await moreButton.click();
-
-    // Click delete button
+    // Delete is currently only in the menu
+    await taskItem.getByTestId('task-menu-button').click();
     await this.page.getByTestId('delete-task-button').click();
   }
 
@@ -53,15 +49,16 @@ export class TreePage {
 
   async addSubtask(parentTaskTitle: string) {
     const taskItem = this.getTaskItem(parentTaskTitle);
-    // Hover over the task item to make buttons visible
     await taskItem.hover();
 
-    // Open the menu
-    const moreButton = taskItem.locator('button').filter({ has: this.page.locator('svg') }).last();
-    await moreButton.click();
-
-    // Click "Add Subtask"
-    await this.page.getByTestId('add-subtask-button').click();
+    const quickAddButton = taskItem.getByTestId('add-subtask-button');
+    if (await quickAddButton.isVisible()) {
+      await quickAddButton.click();
+    } else {
+      // Mobile flow
+      await taskItem.getByTestId('task-menu-button').click();
+      await this.page.getByTestId('add-subtask-button-menu').click();
+    }
   }
 
   async verifyTaskExists(taskTitle: string) {
