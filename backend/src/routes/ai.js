@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.post('/chat', async (req, res) => {
   const { model, messages, stream, ...rest } = req.body;
-  const apiKey = process.env.VITE_OPENAI_API_KEY;
+  const apiKey = process.env.VITE_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
   const baseUrl = process.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1';
 
   if (!apiKey) {
@@ -37,7 +37,7 @@ router.post('/chat', async (req, res) => {
       res.setHeader('Connection', 'keep-alive');
 
       const reader = response.body.getReader();
-      
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
