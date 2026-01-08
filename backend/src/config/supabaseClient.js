@@ -1,7 +1,9 @@
 const { createClient } = require('@supabase/supabase-js');
 const dotenv = require('dotenv');
 
-dotenv.config();
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  dotenv.config();
+}
 
 const supabaseUrl = process.env.SUPABASE_URL || (process.env.NODE_ENV === 'test' ? 'https://test.supabase.co' : undefined);
 const supabaseKey = process.env.SUPABASE_KEY || (process.env.NODE_ENV === 'test' ? 'test-key' : undefined); // Prefer service_role in production
