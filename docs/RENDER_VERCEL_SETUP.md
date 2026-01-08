@@ -1,9 +1,12 @@
-# Configuración Render + Vercel - Task Manager
+# [DEPRECATED] Configuración Render + Vercel
 
-## 🔗 URLs del Proyecto
+> [!CAUTION]
+> **THIS GUIDE IS OBSOLETE.**
+> The project has migrated to a fullstack Vercel deployment. Render is no longer used.
+> Please refer to [DEPLOY_GUIDE.md](./DEPLOY_GUIDE.md) for current deployment instructions.
 
-- **Frontend (Vercel):** https://task-manager-llwv.vercel.app
-- **Backend (Render):** https://task-manager-8p1p.onrender.com
+## Old Configuration (For Reference Only)
+
 - **Health Check:** https://task-manager-8p1p.onrender.com/health
 
 ## ⚙️ Variables de Entorno
@@ -60,10 +63,10 @@ curl https://task-manager-8p1p.onrender.com/health
 - Verificar que `FRONTEND_URL` en Render sea exactamente: `https://task-manager-llwv.vercel.app`
 
 ### Error de Conexión:
-- Verificar que `VITE_API_BASE_URL` en Vercel sea exactamente: `https://task-manager-8p1p.onrender.com`
+- Verificar que las variables `VITE_SUPABASE_...` estén correctamente copiadas en Vercel.
 
 ### Backend Inactivo:
-- Render puede "dormir" servicios gratuitos. La primera petición puede tardar 30 segundos.
+- Vercel Serverless tiene "cold starts" (arranques en frío) de ~1-2 segundos si no se ha usado recientemente, pero no tiene el retardo de 40s+ de Render. Es normal una pequeña pausa en la primera petición del día.
 
 ## 📝 Notas
 

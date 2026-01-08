@@ -18,12 +18,20 @@ This guide outlines the setup, architecture, and standards for backend developme
 5. Start development server: `npm run dev`
 
 ### Environment Variables
-Required environment variables in `.env`:
+### Deployment Environment (Vercel)
+In Vercel, the backend runs as a Serverless Function.
+
+**Required Vercel Environment Variables:**
 ```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_SUPABASE_KEY
-PORT=3001
+# Backend Critical
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_KEY=...       # Anon Key
+VITE_OPENAI_API_KEY=...
+VITE_OPENAI_MODEL=...
 ```
+
+**Note:** The backend automatically falls back to `VITE_` prefixed variables if the standard `SUPABASE_URL` is missing, simplifying configuration (same vars for front and back).
+
 
 ## Architecture
 
@@ -31,6 +39,7 @@ PORT=3001
 - **Node.js** - JavaScript runtime for server-side logic
 - **Express.js** - Web framework for RESTful API
 - **Supabase** - Backend-as-a-Service for authentication and database
+- **Vercel Serverless Functions** - Serverless runtime environment
 - **Jest** - Testing framework
 - **Supertest** - HTTP assertion library for testing
 
@@ -58,8 +67,11 @@ backend/
 │   │   └── setup.js              # Test configuration
 │   └── index.js                  # Main server file
 ├── jest.config.js                # Jest configuration
-├── package.json                  # Dependencies and scripts
-└── .env.example                  # Environment variables template
+├── package.json                  # Dependencies and scripts (Root & Backend)
+├── .env.example                  # Environment variables template
+├── api/
+│   └── index.js                  # Vercel Serverless Entry Point
+└── vercel.json                   # Vercel Configuration (Rewrites)
 ```
 
 ## Key Components

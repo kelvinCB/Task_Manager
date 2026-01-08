@@ -213,12 +213,12 @@ This project follows a comprehensive documentation structure. Each document serv
 - **Deployment:** Vercel
 
 ### Planned Architecture
-- **Backend:** Node.js + Express/Fastify
+- **Backend:** Node.js + Express (Vercel Serverless Functions)
 - **Database:** Supabase (PostgreSQL)
 - **Authentication:** Supabase Auth + OAuth
 - **File Storage:** Supabase Storage
 - **Email Service:** Resend/SendGrid
-- **Deployment:** Vercel (Frontend) + Railway/Heroku (Backend)
+- **Deployment:** Vercel (Fullstack: Frontend + Backend)
 
 ### Tech Stack Decisions
 
@@ -232,7 +232,7 @@ This project follows a comprehensive documentation structure. Each document serv
 | **Authentication** | Supabase Auth | Built-in OAuth, secure by default |
 | **Testing** | Vitest + RTL | Fast, modern testing tools |
 | **E2E Testing** | Playwright | Reliable, cross-browser testing |
-| **Deployment** | Vercel + Railway | Easy deployment, good performance |
+| **Deployment** | Vercel (Fullstack) | Unified deployment, zero-latency internal routing |
 
 ---
 

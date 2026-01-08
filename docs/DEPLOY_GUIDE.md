@@ -4,102 +4,50 @@
 
 This guide covers deploying the Task Manager application to production environments.
 
-## Frontend Deployment
+## Fullstack Deployment (Vercel)
 
-### Vercel Deployment (Recommended)
+The application is deployed as a unified fullstack application on Vercel. Code from `src/` is served as the frontend, and code from `backend/` is served as Serverless Functions under `/api`.
 
-1. **Connect Repository:**
-   - Login to Vercel dashboard
-   - Import your GitHub repository
-   - Select the Task Manager project
+### 1. Connect Repository
+- Login to Vercel dashboard
+- Import your GitHub repository
+- Select the Task Manager project
+- **Root Directory**: Leave as `./`
+- **Framework Preset**: Vite
 
-2. **Environment Variables:**
-   Set the following **REQUIRED** environment variables in Vercel dashboard:
-   ```
-   # REQUIRED - Supabase Configuration
-   SUPABASE_URL=your-supabase-project-url
-   SUPABASE_KEY=your-supabase-anon-key
-   
-   # OPTIONAL - AI Features (only if using AI functionality)
-   OPENAI_API_KEY=your-openai-api-key
-   VITE_OPENAI_MODEL=o4-mini-2025-04-16
-   VITE_OPENAI_BASE_URL=https://api.openai.com/v1
-   ```
-   
-   **⚠️ IMPORTANT:** Without `SUPABASE_URL` and `SUPABASE_KEY`, the app will show a blank page!
+### 2. Environment Variables
+Set the following **REQUIRED** environment variables in Vercel. You can use the same `VITE_` prefixed variables for both frontend and backend logic.
 
-3. **Build Settings:**
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-   - Install Command: `npm install`
+```bash
+# Critical for both Frontend and Backend
+VITE_SUPABASE_URL=your-supabase-project-url
+VITE_SUPABASE_KEY=your-supabase-anon-key
 
-4. **Deploy:**
-   - Vercel will automatically deploy on every push to main branch
+# AI Features
+VITE_OPENAI_API_KEY=your-openai-api-key
+VITE_OPENAI_MODEL=gpt-5-nano-2025-08-07
+VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 
-### Netlify Deployment (Alternative)
+# Note: VITE_BACKEND_URL and VITE_API_BASE_URL are NO LONGER NEEDED.
+# The app uses relative paths (/api/...) which Vercel routes inevitably.
+```
 
-1. **Connect Repository:**
-   - Login to Netlify dashboard
-   - New site from Git
-   - Choose your GitHub repository
+### 3. Build Settings (Standard)
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Install Command**: `npm install`
 
-2. **Build Settings:**
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-   - Environment variables: Same as Vercel above
+### 4. Deploy
+- Vercel will automatically deploy both frontend and serverless functions on every push to main.
 
-3. **Deploy Settings:**
-   - Branch to deploy: `main`
-   - Auto-deploy: Enabled
 
-## Backend Deployment
+## Backend Architecture
+The backend is no longer a separate service. It resides in `backend/` but is deployed transactionally with the frontend.
+- `api/index.js`: The entry point for Vercel Serverless Functions.
+- `vercel.json`: Handles routing rewrites to direct `/api/*` traffic to the backend.
 
-### Node.js Backend with Heroku
+No separate backend deployment (Heroku/Railway/Render) is required.
 
-1. **Prepare Application:**
-   ```bash
-   # Create Procfile
-   echo "web: node server.js" > Procfile
-   
-   # Ensure package.json has start script
-   "scripts": {
-     "start": "node server.js"
-   }
-   ```
-
-2. **Heroku Setup:**
-   ```bash
-   # Install Heroku CLI
-   # Login to Heroku
-   heroku login
-   
-   # Create new app
-   heroku create your-taskmanager-api
-   
-   # Set environment variables
-   heroku config:set NODE_ENV=production
-   heroku config:set JWT_SECRET=your-jwt-secret
-   heroku config:set SUPABASE_URL=your-supabase-url
-   heroku config:set SUPABASE_SERVICE_KEY=your-service-key
-   heroku config:set OPENAI_API_KEY=your-openai-key
-   
-   # Deploy
-   git push heroku main
-   ```
-
-### Alternative: Railway Deployment
-
-1. **Connect Repository:**
-   - Login to Railway dashboard
-   - New project from GitHub repo
-
-2. **Environment Variables:**
-   Set same variables as Heroku above
-
-3. **Deploy:**
-   - Railway will auto-deploy from main branch
-
-## Database Setup (Supabase)
 
 ### Initial Setup
 
