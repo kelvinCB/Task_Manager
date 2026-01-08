@@ -266,8 +266,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                                 <span className="dot-1">.</span>
                                 <span className="dot-2">.</span>
                                 <span className="dot-3">.</span>
-                                <span className="ml-2 text-xs opacity-70">
-                                  for {thinkingTime} {thinkingTime === 1 ? 'second' : 'seconds'}
+                                <span className="ml-2 opacity-70">
+                                  {thinkingTime} {thinkingTime === 1 ? 'second' : 'seconds'}
                                 </span>
                               </span>
                             )}
