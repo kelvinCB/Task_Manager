@@ -38,53 +38,53 @@ export class AuthPage {
   async logout() {
     // Find the visible AccountMenu button
     const accountMenuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
-    
+
     // Check if the menu is already open before clicking
     const logoutButtonBeforeClick = this.page.locator('[data-testid="logout-button"]');
     const isMenuAlreadyOpen = await logoutButtonBeforeClick.count() > 0 && await logoutButtonBeforeClick.isVisible().catch(() => false);
-    
+
     if (!isMenuAlreadyOpen) {
       await accountMenuButton.click();
     }
-    
+
     // Wait for logout button and click it
     const logoutButton = this.page.locator('[data-testid="logout-button"]');
-    
+
     try {
       await expect(logoutButton).toBeVisible({ timeout: 10000 });
       await logoutButton.click({ timeout: 10000 });
-      
+
       // Wait for logout to complete - check URL change or logout button disappearance
       let logoutCompleted = false;
       for (let i = 0; i < 20; i++) { // 20 iterations = 10 seconds
         await this.page.waitForTimeout(500);
-        
+
         const currentUrl = this.page.url();
         const logoutButtonStillExists = await logoutButton.count() > 0 && await logoutButton.isVisible().catch(() => false);
-        
+
         // If URL changed to login or logout button disappeared, logout was successful
         if (currentUrl.includes('/login') || !logoutButtonStillExists) {
           logoutCompleted = true;
           break;
         }
       }
-      
+
       if (!logoutCompleted) {
         throw new Error('Logout did not complete - page did not redirect and button did not disappear');
       }
-      
+
     } catch (logoutWaitError) {
       // Try to find alternative logout buttons
       const logoutAlt = this.page.getByText(/logout|cerrar sesi(o|ó)n/i);
       const altExists = await logoutAlt.count() > 0;
-      
+
       if (altExists) {
         await logoutAlt.click({ timeout: 30000 });
       } else {
         // If not authenticated, maybe menu shows login instead of logout
         const loginButtonInMenu = this.page.locator('[data-testid="login-button-menu"]');
         const hasLoginButton = await loginButtonInMenu.count() > 0;
-        
+
         if (hasLoginButton) {
           // User is already logged out
           return;
@@ -132,11 +132,11 @@ export class AuthPage {
         throw new Error(`Login did not redirect properly. Current URL: ${currentUrl}`);
       }
     }
-    
+
     // Wait for the account menu button to appear after login
     const accountMenuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
     await expect(accountMenuButton).toBeVisible({ timeout: 15000 });
-    
+
     // Short pause to ensure UI is interactive
     await this.page.waitForTimeout(2000); // Increased from 500 to 2000
     const isExpanded = await accountMenuButton.getAttribute('aria-expanded') === 'true';
@@ -146,60 +146,60 @@ export class AuthPage {
       // Wait for animation/render
       await this.page.waitForTimeout(500);
     }
-    
+
     const logoutButton = this.page.locator('[data-testid="logout-button"]');
     const logoutExists = await logoutButton.count() > 0;
-    
+
     if (logoutExists) {
       const isVisible = await logoutButton.isVisible();
-      
+
       if (!isVisible) {
         // If still not visible (maybe animation), wait
-        await logoutButton.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
-        
+        await logoutButton.waitFor({ state: 'visible', timeout: 2000 }).catch(() => { });
+
         const isVisibleAfterWait = await logoutButton.isVisible();
         if (!isVisibleAfterWait) {
-             // Try clicking again if it failed to open
-             if (!isExpanded) await accountMenuButton.click();
+          // Try clicking again if it failed to open
+          if (!isExpanded) await accountMenuButton.click();
         }
       }
-      
+
       // Verify using expect so test fails properly if not visible
       await expect(logoutButton).toBeVisible({ timeout: 5000 });
     } else {
       // Look for other elements that confirm logged in state
       const userNameOrAvatar = this.page.locator('[data-testid="user-avatar"], [data-testid="user-name"]');
       const hasUserIndicator = await userNameOrAvatar.count() > 0;
-      
+
       if (!hasUserIndicator) {
         throw new Error('No logged in session indicators found');
       }
     }
-    
+
     // Close the menu only if we opened it (to restore state)
     // Or just always close it to be safe for subsequent steps
     if (await accountMenuButton.getAttribute('aria-expanded') === 'true') {
-        await this.page.keyboard.press('Escape');
-        // If escape didn't work (e.g. focus issue), click again
-        if (await accountMenuButton.getAttribute('aria-expanded') === 'true') {
-            await accountMenuButton.click();
-        }
+      await this.page.keyboard.press('Escape');
+      // If escape didn't work (e.g. focus issue), click again
+      if (await accountMenuButton.getAttribute('aria-expanded') === 'true') {
+        await accountMenuButton.click();
+      }
     }
   }
 
   async expectLoggedOut() {
     const currentUrl = this.page.url();
-    
+
     // Check if we are on a public page (login, register, landing page)
-    const isPublicPage = currentUrl.includes('/login') || 
-                        currentUrl.includes('/register') || 
-                        currentUrl.endsWith('/') || 
-                        new URL(currentUrl).pathname === '/';
-    
+    const isPublicPage = currentUrl.includes('/login') ||
+      currentUrl.includes('/register') ||
+      currentUrl.endsWith('/') ||
+      new URL(currentUrl).pathname === '/';
+
     // Check if there's a login button in the menu
     const loginButtonMenu = this.page.locator('[data-testid="login-button-menu"]');
     let loginButtonExists = await loginButtonMenu.count() > 0;
-    
+
     // If we don't find the login button in the menu, try opening the menu first
     if (!loginButtonExists) {
       const menuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
@@ -209,21 +209,21 @@ export class AuthPage {
         loginButtonExists = await loginButtonMenu.count() > 0;
       }
     }
-    
+
     // Check other signals that the user is logged out
     const loginForm = this.page.locator('form').filter({ hasText: 'login' });
     const hasLoginForm = await loginForm.count() > 0;
-    
+
     // Look for registration or login links
     const registerOrLoginLinks = this.page.getByRole('link').filter({
       hasText: /sign up|sign in|register|login/i
     });
     const hasAuthLinks = await registerOrLoginLinks.count() > 0;
-    
+
     // Check absence of logged-in user indicators
     const userIndicators = this.page.locator('[data-testid="user-name"], [data-testid="user-avatar"]');
     const noUserIndicators = (await userIndicators.count()) === 0;
-    
+
     // Check that logout button is not present
     let logoutButtonPresent = false;
     try {
@@ -232,15 +232,15 @@ export class AuthPage {
     } catch (e) {
       // Ignore errors, just checking
     }
-    
+
     // Determine if user is effectively logged out
-    const isLoggedOut = loginButtonExists || hasLoginForm || hasAuthLinks || 
-                      (isPublicPage && noUserIndicators && !logoutButtonPresent);
-    
+    const isLoggedOut = loginButtonExists || hasLoginForm || hasAuthLinks ||
+      (isPublicPage && noUserIndicators && !logoutButtonPresent);
+
     if (!isLoggedOut) {
       throw new Error('Insufficient logged out state indicators found');
     }
-    
+
     // Use expect so test fails if condition is not met
     if (loginButtonExists) {
       await expect(loginButtonMenu).toBeVisible({ timeout: 5000 });
@@ -281,21 +281,21 @@ export class AuthPage {
     // Check for invalid inputs
     const invalidInputs = this.page.locator('input:invalid');
     const count = await invalidInputs.count();
-    
+
     // Check for backend error messages
     const errorMessage = this.page.locator('[data-testid="error-message"]');
     const hasErrorMessage = await errorMessage.isVisible().catch(() => false);
-    
+
     if (hasErrorMessage) {
       const errorText = await errorMessage.textContent();
-      
+
       // If there's an error message, verify it's relevant
       if (errorText && (errorText.includes('Invalid email format') || errorText.includes('email') || errorText.includes('required'))) {
         await expect(errorMessage).toBeVisible();
         return;
       }
     }
-    
+
     // If there are multiple invalid inputs, check them
     if (count > 1) {
       await expect(invalidInputs.first()).toBeVisible();
@@ -306,17 +306,17 @@ export class AuthPage {
       // If no invalid inputs or error messages, look for other validations
       const form = this.page.locator('form');
       const hasNoValidate = await form.getAttribute('novalidate').catch(() => null);
-      
+
       // Try to verify if the email input is marked as invalid
       const emailInput = this.page.locator('[data-testid="email-input"]');
       const emailValue = await emailInput.inputValue();
       const emailValid = await emailInput.evaluate((el: HTMLInputElement) => el.validity.valid);
-      
+
       if (!emailValid) {
         // Don't throw error, consider validation works
         return;
       }
-      
+
       throw new Error('No invalid inputs or error messages found for form validation');
     }
   }

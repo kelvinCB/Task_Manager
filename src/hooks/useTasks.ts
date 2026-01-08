@@ -297,44 +297,44 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       if (isParentNumeric) {
         try {
           const response = await taskService.createTask({
-          ...taskData,
-          timeTracking: {
-            totalTimeSpent: 0,
-            isActive: false,
-            timeEntries: []
-          }
-        });
-
-        if (response.error) {
-          console.error('Failed to create task on API:', response.error);
-          setApiError(response.error);
-          // Fallback to localStorage
-        } else if (response.data) {
-          // Successfully created on API, update local state
-          setTasks(prev => {
-            const updated = [...prev, response.data!];
-
-            if (taskData.parentId) {
-              const parentIndex = updated.findIndex(t => t.id === taskData.parentId);
-              if (parentIndex !== -1) {
-                updated[parentIndex] = {
-                  ...updated[parentIndex],
-                  childIds: [...updated[parentIndex].childIds, response.data!.id]
-                };
-              }
+            ...taskData,
+            timeTracking: {
+              totalTimeSpent: 0,
+              isActive: false,
+              timeEntries: []
             }
-
-            return updated;
           });
-          return response.data;
+
+          if (response.error) {
+            console.error('Failed to create task on API:', response.error);
+            setApiError(response.error);
+            // Fallback to localStorage
+          } else if (response.data) {
+            // Successfully created on API, update local state
+            setTasks(prev => {
+              const updated = [...prev, response.data!];
+
+              if (taskData.parentId) {
+                const parentIndex = updated.findIndex(t => t.id === taskData.parentId);
+                if (parentIndex !== -1) {
+                  updated[parentIndex] = {
+                    ...updated[parentIndex],
+                    childIds: [...updated[parentIndex].childIds, response.data!.id]
+                  };
+                }
+              }
+
+              return updated;
+            });
+            return response.data;
+          }
+        } catch (error) {
+          console.error('Error creating task:', error);
+          setApiError(error instanceof Error ? error.message : 'Unknown error');
+          // Continue to localStorage fallback
         }
-      } catch (error) {
-        console.error('Error creating task:', error);
-        setApiError(error instanceof Error ? error.message : 'Unknown error');
-        // Continue to localStorage fallback
       }
     }
-  }
 
     // localStorage fallback
     const newTask: Task = {

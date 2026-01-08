@@ -235,7 +235,7 @@ describe('TaskItem Component', () => {
     // Assert
     expect(mockOnStartTimer).toHaveBeenCalledWith('task-1');
   });
-  
+
   it('should show confirmation modal when delete option is clicked', () => {
 
     // Act
@@ -273,15 +273,15 @@ describe('TaskItem Component', () => {
     // Clic en la opción de eliminar
     const deleteOption = screen.getByTestId('delete-task-button');
     fireEvent.click(deleteOption);
-    
+
     // Assert - modal should appear, not direct deletion
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(mockOnDelete).not.toHaveBeenCalled();
-    
+
     // Click confirm in modal
     const confirmButton = screen.getByTestId('confirm-delete-button');
     fireEvent.click(confirmButton);
-    
+
     // Now onDelete should be called
     expect(mockOnDelete).toHaveBeenCalledWith('task-1');
   });
