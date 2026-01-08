@@ -1,5 +1,7 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 
+const path = require('path');
+
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -14,7 +16,7 @@ const options = {
         description: 'Development server',
       },
       {
-        url: 'https://task-manager-8p1p.onrender.com/api',
+        url: 'https://kolium.com/api',
         description: 'Production server',
       },
     ],
@@ -28,7 +30,7 @@ const options = {
       },
     },
   },
-  apis: ['./src/routes/*.js'], // Path to the API docs
+  apis: [path.join(__dirname, '../routes/*.js')], // Absolute path to the API docs
 };
 
 const specs = swaggerJsdoc(options);

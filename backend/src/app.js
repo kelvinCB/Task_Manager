@@ -23,8 +23,14 @@ app.use((req, res, next) => {
 });
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./config/swagger');
 
+// Optional Swagger setup (non-critical)
+try {
+    const swaggerSpecs = require('./config/swagger');
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+} catch (err) {
+    console.warn('Failed to initialize Swagger docs:', err.message);
+}
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const timeEntryRoutes = require('./routes/timeEntries');
@@ -32,7 +38,6 @@ const uploadRoutes = require('./routes/upload');
 const profileRoutes = require('./routes/profile');
 const aiRoutes = require('./routes/ai');
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/api/auth', authRoutes);
 
 app.use('/api/tasks', taskRoutes);
