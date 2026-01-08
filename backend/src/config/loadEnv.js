@@ -5,8 +5,9 @@ const dotenv = require('dotenv');
 const mode = process.env.NODE_ENV || 'development';
 
 // On Vercel, env vars are pre-loaded. Skip file access to avoid errors.
-if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
-  console.log('[env] Running in production/Vercel. Skipping .env file loading.');
+// On Vercel, env vars are pre-loaded. Skip file access to avoid errors.
+if (process.env.VERCEL) {
+  console.log('[env] Running in Vercel environment. Skipping .env file loading.');
 } else {
   // Determine if we're running from root or backend directory
   const isInBackend = process.cwd().endsWith('backend');
