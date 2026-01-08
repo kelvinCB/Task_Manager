@@ -50,6 +50,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [isThinkingExpanded, setIsThinkingExpanded] = useState(true);
   const [validationError, setValidationError] = useState('');
   const [aiError, setAiError] = useState<string | null>(null);
+  const [thinkingTime, setThinkingTime] = useState(0);
+
+  // Timer effect for AI processing
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (aiProcessingState !== 'idle') {
+      setThinkingTime(0);
+      interval = setInterval(() => {
+        setThinkingTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      setThinkingTime(0);
+    }
+    return () => clearInterval(interval);
+  }, [aiProcessingState]);
 
   useEffect(() => {
     setValidationError('');
@@ -251,6 +266,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                                 <span className="dot-1">.</span>
                                 <span className="dot-2">.</span>
                                 <span className="dot-3">.</span>
+                                <span className="ml-2 text-xs opacity-70">
+                                  for {thinkingTime} {thinkingTime === 1 ? 'second' : 'seconds'}
+                                </span>
                               </span>
                             )}
                           </div>
