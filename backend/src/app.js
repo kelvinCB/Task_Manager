@@ -22,14 +22,15 @@ app.use((req, res, next) => {
     next();
 });
 
-const swaggerUi = require('swagger-ui-express');
-
-// Optional Swagger setup (non-critical)
-try {
-    const swaggerSpecs = require('./config/swagger');
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
-} catch (err) {
-    console.warn('Failed to initialize Swagger docs:', err.message);
+// Optional Swagger setup (Development only)
+if (process.env.NODE_ENV !== 'production') {
+    try {
+        const swaggerUi = require('swagger-ui-express');
+        const swaggerSpecs = require('./config/swagger');
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+    } catch (err) {
+        console.warn('Failed to initialize Swagger docs:', err.message);
+    }
 }
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
