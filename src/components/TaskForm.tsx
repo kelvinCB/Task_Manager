@@ -330,7 +330,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                                   setThinkingProcess(fullResponse);
                                 }
 
-                                if (fullResponse.length > 50 && !fullResponse.includes('<thinking>')) {
+                                if (fullResponse.length > 0 && !fullResponse.includes('<thinking>')) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
                                 }
                               }
@@ -406,7 +406,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                                   setThinkingProcess(fullResponse);
                                 }
 
-                                if (fullResponse.length > 30 && !fullResponse.includes('<thinking>')) {
+                                if (fullResponse.length > 0 && !fullResponse.includes('<thinking>')) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
                                 }
                               }
