@@ -9,7 +9,7 @@ test.describe('AI Error Feedback', () => {
     let authPage: AuthPage;
 
     if (!process.env.E2E_USER_AI_EMAIL || !process.env.E2E_USER_AI_PASSWORD) {
-      throw new Error('E2E_USER_AI_EMAIL and E2E_USER_AI_PASSWORD must be set in environment variables');
+        throw new Error('E2E_USER_AI_EMAIL and E2E_USER_AI_PASSWORD must be set in environment variables');
     }
 
     const TEST_EMAIL = process.env.E2E_USER_AI_EMAIL;
