@@ -90,6 +90,11 @@ vi.mock('react-i18next', () => ({
         'auth.google_error': 'Google login failed',
         'auth.github_error': 'GitHub login failed',
         'auth.invalid_email': 'Invalid email format',
+        'tasks.created': 'Created',
+        'tasks.has_subtasks': 'Has subtasks',
+        'tasks.due': 'Due',
+        'tasks.overdue': 'Overdue',
+        'tasks.level': 'Level',
         // Add more mapping as needed by tests
       };
       return translations[key] || key;

@@ -11,6 +11,7 @@ import { AttachmentList } from './AttachmentList';
 
 interface TaskDetailModalProps {
   task: Task | null;
+  allTasks?: Task[];
   isOpen: boolean;
   onClose: () => void;
   onEdit: (task: Task) => void;
@@ -19,6 +20,7 @@ interface TaskDetailModalProps {
 
 export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   task,
+  allTasks = [],
   isOpen,
   onClose,
   onEdit,
@@ -172,7 +174,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   </div>
                   <p className={`text-lg font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                     }`}>
-                    {task.childIds.length}
+                    {allTasks.filter(t => t.parentId === task.id).length}
                   </p>
                 </div>
               </div>

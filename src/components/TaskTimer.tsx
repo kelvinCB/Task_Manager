@@ -88,7 +88,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
 
   return (
     <div className={`timer-component flex items-center gap-1 text-sm ${compact ? 'text-xs' : ''}`} data-testid="task-timer">
-      <Clock className={`w-3 h-3 sm:w-4 sm:h-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
+      <Clock className={`${compact ? 'w-2.5 h-2.5' : 'w-3 h-3 sm:w-4 sm:h-4'} ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
       <span className={`font-mono text-xs sm:text-sm ${isActive
         ? (theme === 'dark' ? 'text-green-400 font-bold' : 'text-green-600 font-bold')
         : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')
@@ -108,13 +108,13 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
             e.stopPropagation();
             onPause(taskId);
           }}
-          className={`p-0.5 sm:p-1 ${theme === 'dark'
+          className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
             ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700'
             : 'text-orange-500 hover:text-orange-700 hover:bg-orange-50'} rounded transition-all`}
           title="Pause timer"
           data-testid="pause-timer"
         >
-          <Pause className="w-3 h-3 sm:w-4 sm:h-4" />
+          <Pause className={compact ? "w-2.5 h-2.5" : "w-3 h-3 sm:w-4 sm:h-4"} />
         </button>
       ) : (
         <button
@@ -122,13 +122,13 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
             e.stopPropagation();
             onStart(taskId);
           }}
-          className={`p-0.5 sm:p-1 ${theme === 'dark'
+          className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
             ? 'text-green-400 hover:text-green-300 hover:bg-gray-700'
             : 'text-green-500 hover:text-green-700 hover:bg-green-50'} rounded transition-all`}
           title="Start timer"
           data-testid="start-timer"
         >
-          <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+          <Play className={compact ? "w-2.5 h-2.5" : "w-3 h-3 sm:w-4 sm:h-4"} />
         </button>
       )}
     </div>

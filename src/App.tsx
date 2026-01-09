@@ -684,6 +684,7 @@ const MainApp = () => {
             <div data-testid="board-view-container" className="h-full overflow-auto">
               <TaskBoard
                 tasks={filteredTasks}
+                allTasks={tasks}
                 onStatusChange={handleStatusChange}
                 onEdit={handleEditTask}
                 onDelete={deleteTask}
@@ -770,6 +771,7 @@ const MainApp = () => {
       {/* Task Detail Modal */}
       <TaskDetailModal
         task={selectedTaskId ? getTaskById(selectedTaskId) || null : null}
+        allTasks={tasks}
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetailModal}
         onEdit={(task) => {
