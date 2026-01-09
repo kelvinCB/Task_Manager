@@ -12,15 +12,10 @@ const cors = require('cors');
 
 const app = express();
 
+
 // Use permissive CORS to ensure E2E works locally
 app.use(cors());
 app.use(express.json());
-
-// Request logging for debugging
-app.use((req, res, next) => {
-    console.log('Incoming request:', req.method, req.url);
-    next();
-});
 
 // Optional Swagger setup (Development only)
 if (process.env.NODE_ENV !== 'production') {
@@ -38,6 +33,7 @@ const timeEntryRoutes = require('./routes/timeEntries');
 const uploadRoutes = require('./routes/upload');
 const profileRoutes = require('./routes/profile');
 const aiRoutes = require('./routes/ai');
+const featureRequestRoutes = require('./routes/featureRequests');
 
 app.use('/api/auth', authRoutes);
 
@@ -46,6 +42,7 @@ app.use('/api/time-entries', timeEntryRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/feature-requests', featureRequestRoutes);
 
 app.get('/', (req, res) => {
     res.send('Task Manager Backend is running!');
