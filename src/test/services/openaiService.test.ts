@@ -3,6 +3,7 @@ import { OpenAIService, openaiService } from '../../services/openaiService';
 
 // Mock environment variables
 const mockEnv = {
+  // Secure key simulation
   OPENAI_API_KEY: 'test-api-key',
   VITE_OPENAI_BASE_URL: 'https://api.openai.com/v1',
   VITE_OPENAI_MODEL: 'gpt-4o'
@@ -73,7 +74,7 @@ describe('OpenAIService', () => {
       const fetchCall = (fetch as any).mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
       const systemMessage = requestBody.messages.find((m: any) => m.role === 'system');
-      
+
       expect(systemMessage.content).toContain('Use Markdown for formatting');
     });
 
@@ -266,7 +267,7 @@ describe('OpenAIService', () => {
         body: mockStream
       });
 
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
       const result = await service.generateTaskDescription('Test task', 'gpt-4o', vi.fn());
 
       expect(result).toBe('Valid');

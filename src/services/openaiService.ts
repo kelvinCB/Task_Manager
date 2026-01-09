@@ -25,24 +25,12 @@ interface OpenAIError {
 }
 
 export class OpenAIService {
-  private apiKey: string | undefined;
   private baseUrl: string;
 
   constructor() {
     // Look for VITE_API_BASE_URL (for proxying) or use absolute path
     // In dev mode with Vite proxy, '/api/ai' will point to localhost:3001
     this.baseUrl = '/api/ai';
-    
-    // API Key is handled by the backend proxy if possible
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-
-    // Fallback logic for direct browser calls (kept for backward compatibility, but discouraged)
-    const directBaseUrl = import.meta.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1';
-    
-    // If apiKey is 'your-openai-api-key-here', don't warn yet as backend might have it
-    if (this.apiKey === 'your-openai-api-key-here') {
-      this.apiKey = undefined;
-    }
   }
 
   /**
@@ -50,7 +38,7 @@ export class OpenAIService {
    */
   private async handleStreamingResponse(response: Response, onToken: (token: string) => void): Promise<string> {
     if (!response.body) return '';
-    
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let fullContent = '';
@@ -62,14 +50,14 @@ export class OpenAIService {
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
-      
+
       // Keep the last partial line in the buffer
       buffer = lines.pop() || '';
 
       for (const line of lines) {
         const trimmedLine = line.trim();
         if (!trimmedLine || trimmedLine === 'data: [DONE]') continue;
-        
+
         if (trimmedLine.startsWith('data: ')) {
           try {
             const json = JSON.parse(trimmedLine.slice(6));

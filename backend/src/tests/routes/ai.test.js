@@ -12,11 +12,11 @@ app.use('/api/ai', aiRoutes);
 describe('AI Routes', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        process.env.VITE_OPENAI_API_KEY = 'test-api-key';
+        process.env.OPENAI_API_KEY = 'test-api-key';
     });
 
     afterEach(() => {
-        delete process.env.VITE_OPENAI_API_KEY;
+        delete process.env.OPENAI_API_KEY;
     });
 
     describe('POST /api/ai/chat', () => {
@@ -39,7 +39,7 @@ describe('AI Routes', () => {
         });
 
         it('should return 500 if API key is not configured', async () => {
-            delete process.env.VITE_OPENAI_API_KEY;
+            delete process.env.OPENAI_API_KEY;
 
             const res = await request(app)
                 .post('/api/ai/chat')
