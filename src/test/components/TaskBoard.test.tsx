@@ -86,6 +86,7 @@ describe('TaskBoard Component', () => {
       <ThemeProvider>
         <TaskBoard
           tasks={mockTasks}
+          allTasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
@@ -114,6 +115,7 @@ describe('TaskBoard Component', () => {
       <ThemeProvider>
         <TaskBoard
           tasks={mockTasks}
+          allTasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
@@ -136,6 +138,7 @@ describe('TaskBoard Component', () => {
       <ThemeProvider>
         <TaskBoard
           tasks={mockTasks}
+          allTasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
@@ -161,6 +164,7 @@ describe('TaskBoard Component', () => {
       <ThemeProvider>
         <TaskBoard
           tasks={mockTasks}
+          allTasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
@@ -186,6 +190,7 @@ describe('TaskBoard Component', () => {
       <ThemeProvider>
         <TaskBoard
           tasks={mockTasks}
+          allTasks={mockTasks}
           onStatusChange={mockOnStatusChange}
           onEdit={mockOnEdit}
           onDelete={mockOnDelete}
@@ -205,5 +210,70 @@ describe('TaskBoard Component', () => {
 
     // Assert - verificar que se muestra la descripción
     expect(screen.getByText('This is an open task')).toBeInTheDocument();
+  });
+
+  it('should render created date when no due date is present', () => {
+    // Act
+    render(
+      <ThemeProvider>
+        <TaskBoard
+          tasks={mockTasks}
+          allTasks={mockTasks}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onCreateTask={mockOnCreateTask}
+        />
+      </ThemeProvider>
+    );
+
+    // Assert - 'task-1' no tiene due date, debería mostrar 'Created'
+    // El formato de fecha depende de la utilidad formatDate, pero podemos buscar el texto 'Created'
+    expect(screen.getAllByText(/created/i).length).toBeGreaterThan(0);
+  });
+
+  it('should render "Has subtasks" badge for parent tasks', () => {
+    // Agregar una tarea con subtasks
+    const tasksWithSubtasks = [
+      ...mockTasks,
+      {
+        id: 'parent-task',
+        title: 'Parent Task',
+        description: 'Has children',
+        status: 'Open' as TaskStatus,
+        createdAt: new Date(),
+        childIds: ['child-task'],
+        depth: 0,
+        timeTracking: { isActive: false, totalTimeSpent: 0, timeEntries: [] }
+      },
+      {
+        id: 'child-task',
+        title: 'Child Task',
+        description: 'Subtask',
+        status: 'Open' as TaskStatus,
+        createdAt: new Date(),
+        parentId: 'parent-task',
+        childIds: [],
+        depth: 1,
+        timeTracking: { isActive: false, totalTimeSpent: 0, timeEntries: [] }
+      }
+    ];
+
+    // Act
+    render(
+      <ThemeProvider>
+        <TaskBoard
+          tasks={tasksWithSubtasks}
+          allTasks={tasksWithSubtasks}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onCreateTask={mockOnCreateTask}
+        />
+      </ThemeProvider>
+    );
+
+    // Assert
+    expect(screen.getByText(/has subtasks/i)).toBeInTheDocument();
   });
 });

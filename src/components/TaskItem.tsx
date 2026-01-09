@@ -183,7 +183,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     >
       <div
         className={`
-          flex flex-col sm:flex-row items-start gap-2 sm:gap-3 p-3 rounded-xl border transition-all duration-200
+          flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 rounded-xl border transition-all duration-200
           ${theme === 'dark'
             ? 'bg-gray-800 border-gray-700 shadow-sm hover:border-gray-600'
             : 'bg-white hover:bg-gray-50 border-gray-200 shadow hover:shadow-md'
@@ -201,7 +201,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         data-task-title={task.title}
         onClick={() => onTaskClick?.(task.id)}
       >
-        <div className="flex w-full items-start gap-2 sm:gap-3">
+        {/* Main Content: Title, Description, and Expansion Toggle */}
+        <div className="flex flex-1 min-w-0 items-start gap-2 sm:gap-3">
           {/* Toggle Expand Section */}
           <div className="flex-shrink-0 pt-0.5">
             <button
@@ -226,10 +227,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </button>
           </div>
 
-          {/* content container */}
+          {/* Title and breadcrumbs container */}
           <div className="flex-1 min-w-0 flex flex-col gap-1">
             <div className="flex items-start justify-between gap-2 sm:gap-4">
-              {/* Title and breadcrumbs */}
               <div className="flex-1 min-w-0">
                 {task.parentId && (
                   <div className={`flex items-center gap-1 text-[10px] font-medium mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -264,94 +264,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                   </h3>
                 </div>
               </div>
-
-              {/* Action Menu (Mobile always visible, Desktop on hover) */}
-              <div className="flex items-center gap-1 sm:gap-2">
-                {/* QUICK Actions (Desktop) */}
-                <div className={`
-                hidden sm:flex items-center gap-2 transition-opacity duration-200
-                ${isHovered || isMenuOpen ? 'opacity-100' : 'opacity-0'}
-              `}>
-                  {/* Quick Add Subtask */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddChild(task.id);
-                    }}
-                    className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
-                    title={t('tasks.add_subtask')}
-                    data-testid="add-subtask-button"
-                  >
-                    <Plus size={16} />
-                  </button>
-
-                  {/* Quick Edit */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(task);
-                    }}
-                    className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
-                    title={t('common.edit')}
-                    data-testid="edit-task-button"
-                  >
-                    <span className="sr-only">{t('common.edit')}</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                  </button>
-                </div>
-
-                <div className="relative" ref={menuRef} onClick={(e) => e.stopPropagation()}>
-                  <button
-                    className={`
-                    p-1.5 rounded-md transition-colors duration-200
-                    ${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}
-                  `}
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    data-testid="task-menu-button"
-                  >
-                    <MoreHorizontal size={18} />
-                  </button>
-
-                  {isMenuOpen && (
-                    <div className={`
-                    absolute right-0 mt-2 w-40 rounded-xl shadow-xl border z-20 overflow-hidden text-sm font-medium
-                    ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 ring-1 ring-black/5'}
-                  `}>
-                      <button
-                        className={`w-full text-left px-4 py-2.5 flex items-center gap-2 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50 text-gray-700'}`}
-                        onClick={() => {
-                          onEdit(task);
-                          setIsMenuOpen(false);
-                        }}
-                        data-testid="edit-task-button-menu"
-                      >
-                        <span>{t('common.edit')}</span>
-                      </button>
-                      <button
-                        className={`w-full text-left px-4 py-2.5 flex items-center gap-2 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50 text-gray-700'}`}
-                        onClick={() => {
-                          onAddChild(task.id);
-                          setIsMenuOpen(false);
-                        }}
-                        data-testid="add-subtask-button-menu"
-                      >
-                        <span>{t('tasks.add_subtask')}</span>
-                      </button>
-                      <div className={`border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}></div>
-                      <button
-                        className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-red-400 hover:bg-red-900' : 'text-red-600 hover:bg-red-50'}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick();
-                        }}
-                        data-testid="delete-task-button"
-                      >
-                        <span>{t('common.delete')}</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
 
             {/* Description Snippet */}
@@ -366,12 +278,101 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           </div>
         </div>
 
-        {/* Sub-row for Status, Timer and Metadata (Mobile prioritized and centered) */}
+        {/* Action Items (Buttons, Status, Timer, Dates) */}
         <div className={`
-        flex flex-wrap items-center gap-2 sm:gap-3 w-full mt-2 sm:mt-0 
-        justify-center sm:justify-start
-        ${isMobile ? 'border-t border-gray-700/30 dark:border-gray-700/50 pt-2 pb-1' : 'sm:ml-6 sm:pl-6'}
-      `}>
+          flex flex-wrap items-center gap-2 sm:gap-3 
+          mt-2 sm:mt-0 w-full sm:w-auto
+          justify-center sm:justify-end
+          ${isMobile ? 'border-t border-gray-700/30 dark:border-gray-700/50 pt-2 pb-1' : 'sm:flex-shrink-0'}
+        `}>
+          {/* Action Menu (Visible on Desktop hover, or always for small screens) */}
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 mr-1">
+            {/* QUICK Actions (Desktop) */}
+            <div className={`
+                hidden sm:flex items-center gap-2 transition-opacity duration-200
+                ${isHovered || isMenuOpen ? 'opacity-100' : 'opacity-0'}
+              `}>
+              {/* Quick Add Subtask */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddChild(task.id);
+                }}
+                className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
+                title={t('tasks.add_subtask')}
+                data-testid="add-subtask-button"
+              >
+                <Plus size={16} />
+              </button>
+
+              {/* Quick Edit */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(task);
+                }}
+                className={`p-1.5 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-700 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-indigo-600'}`}
+                title={t('common.edit')}
+                data-testid="edit-task-button"
+              >
+                <span className="sr-only">{t('common.edit')}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+              </button>
+            </div>
+
+            <div className="relative" ref={menuRef} onClick={(e) => e.stopPropagation()}>
+              <button
+                className={`
+                    p-1.5 rounded-md transition-colors duration-200
+                    ${theme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}
+                  `}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                data-testid="task-menu-button"
+              >
+                <MoreHorizontal size={18} />
+              </button>
+
+              {isMenuOpen && (
+                <div className={`
+                    absolute right-0 mt-2 w-40 rounded-xl shadow-xl border z-20 overflow-hidden text-sm font-medium
+                    ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100 ring-1 ring-black/5'}
+                  `}>
+                  <button
+                    className={`w-full text-left px-4 py-2.5 flex items-center gap-2 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50 text-gray-700'}`}
+                    onClick={() => {
+                      onEdit(task);
+                      setIsMenuOpen(false);
+                    }}
+                    data-testid="edit-task-button-menu"
+                  >
+                    <span>{t('common.edit')}</span>
+                  </button>
+                  <button
+                    className={`w-full text-left px-4 py-2.5 flex items-center gap-2 ${theme === 'dark' ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50 text-gray-700'}`}
+                    onClick={() => {
+                      onAddChild(task.id);
+                      setIsMenuOpen(false);
+                    }}
+                    data-testid="add-subtask-button-menu"
+                  >
+                    <span>{t('tasks.add_subtask')}</span>
+                  </button>
+                  <div className={`border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}></div>
+                  <button
+                    className={`block w-full px-3 py-2 text-left text-sm ${theme === 'dark' ? 'text-red-400 hover:bg-red-900' : 'text-red-600 hover:bg-red-50'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick();
+                    }}
+                    data-testid="delete-task-button"
+                  >
+                    <span>{t('common.delete')}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Status Selector */}
           <div onClick={(e) => e.stopPropagation()}>
             <select
@@ -419,11 +420,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           ) : (
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium border ${theme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-gray-500' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
               <Calendar size={10} className="opacity-70" />
-              <span>Created {formatDate(task.createdAt)}</span>
+              <span>{formatDate(task.createdAt)}</span>
             </div>
           )}
 
-          {/* Subtask Count Badge (Highlighted and Centered) */}
+          {/* Subtask Count Badge */}
           {(effectiveHasChildren || effectiveDepth > 0) && (
             <div
               data-testid="subtask-badge"
