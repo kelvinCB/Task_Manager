@@ -48,6 +48,19 @@ Stores the tasks for each user. Each task is linked to a user and supports hiera
 | `created_at`      | `timestamptz` | Not Null, Default `now()`                          |
 | `updated_at`      | `timestamptz` | Not Null, Default `now()`                          |
 
+### `public.feature_requests`
+
+Stores user feedback, bug reports, and feature requests.
+
+| Column        | Type          | Constraints                                        |
+|---------------|---------------|----------------------------------------------------|
+| `id`          | `uuid`        | Primary Key, Default `gen_random_uuid()`           |
+| `user_id`     | `uuid`        | Nullable, Foreign Key to `auth.users(id)`, On Delete Set Null |
+| `description` | `text`        | Not Null                                           |
+| `type`        | `text`        | Not Null, CHECK (type IN ('bug', 'help', 'feature')) |
+| `priority`    | `text`        | Not Null, Default 'Medium', CHECK (priority IN ('Low', 'Medium', 'High')) |
+| `created_at`  | `timestamptz` | Not Null, Default `now()`                          |
+
 ### Indexes
 
 For optimal query performance:
@@ -144,6 +157,25 @@ CREATE POLICY "Users can insert own time entries"
 CREATE POLICY "Users can update own time entries"
   ON public.time_entries FOR UPDATE
   USING (auth.uid() = user_id);
+
+### `feature_requests` Table Policies
+
+Allows all users (authenticated or anonymous) to submit requests. Only service role/admins (not covered by RLS here) would typically read these.
+
+```sql
+-- Enable RLS
+ALTER TABLE public.feature_requests ENABLE ROW LEVEL SECURITY;
+
+-- Insert policy (unauthenticated users can also submit)
+CREATE POLICY "Anyone can insert feature requests" 
+  ON public.feature_requests FOR INSERT 
+  WITH CHECK (true);
+
+-- Select policy (only owner can see their own, or restricted)
+CREATE POLICY "Users can view own feature requests" 
+  ON public.feature_requests FOR SELECT 
+  USING (auth.uid() = user_id);
+```
 ```
 
 ## Relationships
@@ -225,6 +257,21 @@ CREATE INDEX IF NOT EXISTS idx_time_entries_start_time ON public.time_entries(st
 
 -- RLS
 ALTER TABLE public.time_entries ENABLE ROW LEVEL SECURITY;
+
+-- feature_requests
+CREATE TABLE IF NOT EXISTS public.feature_requests (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+    description text NOT NULL,
+    type text NOT NULL CHECK (type IN ('bug', 'help', 'feature')),
+    priority text NOT NULL DEFAULT 'Medium' CHECK (priority IN ('Low', 'Medium', 'High')),
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- RLS for feature_requests
+ALTER TABLE public.feature_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can insert feature requests" ON public.feature_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can view own feature requests" ON public.feature_requests FOR SELECT USING (auth.uid() = user_id);
 ```
 
 ### Automatic updated_at trigger
