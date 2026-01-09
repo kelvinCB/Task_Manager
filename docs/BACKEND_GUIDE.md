@@ -106,6 +106,9 @@ backend/
 | GET | `/api/upload/test` | Upload test endpoint |
 | **AI (Proxy to OpenAI)** | | |
 | POST | `/api/ai/chat` | Proxy to OpenAI Chat Completions (supports SSE) |
+| **Feature Requests** | | |
+| POST | `/api/feature-requests` | Submit feature request, bug, or help query |
+| GET | `/api/feature-requests/my` | Get current user's submitted requests |
 | **System** | | |
 | GET | `/` | Server welcome message |
 | GET | `/health` | System status check (Health Check) |

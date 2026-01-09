@@ -38,6 +38,7 @@ import { TaskDetailModal } from './components/TaskDetailModal';
 import { ErrorModal } from './components/features/ErrorModal';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
+import HelpFAB from './components/features/help/HelpFAB';
 
 const MainApp = () => {
   const {
@@ -64,6 +65,7 @@ const MainApp = () => {
 
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     document.title = t('app.title');
@@ -329,9 +331,9 @@ const MainApp = () => {
           <div className="hidden lg:flex items-center justify-between h-16">
             <div className="flex shrink-0 items-center gap-3 mr-4">
               <div className={`shrink-0 mobile-icon-animation`}>
-                <img 
-                  src="/favicon.png" 
-                  alt="Kolium Logo" 
+                <img
+                  src="/favicon.png"
+                  alt="Kolium Logo"
                   className="w-10 h-10 rounded-lg object-contain"
                 />
               </div>
@@ -786,13 +788,16 @@ const MainApp = () => {
         title={t('errors.error_title')}
         message={errorMessage}
       />
+
+      {/* Floating Help Button */}
+      {isAuthenticated && <HelpFAB />}
     </div>
   );
 }
 
 const App = () => {
   const { isAuthenticated } = useAuth();
-  
+
   // Handle unhandled promise rejections from Vercel Analytics
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {

@@ -178,7 +178,7 @@ test.describe('Task Advanced Features', () => {
     // Switch to board view and edit the task  
     await appPage.switchToView('board');
     await expect(appPage.page.getByText(uniqueTitle).first()).toBeVisible();
-    
+
     // Use BoardPage to properly edit the task
     await boardPage.editTask(uniqueTitle);
 
@@ -188,15 +188,14 @@ test.describe('Task Advanced Features', () => {
     // Wait for AI options and click Improve Grammar
     await expect(taskPage.aiImproveButton).toBeVisible({ timeout: 10000 });
     await taskPage.aiImproveButton.click();
-    
+
     // Wait for AI to process grammar improvement (~12-15 seconds observed)
     await appPage.page.waitForTimeout(20000);
 
-    // Wait for AI to improve description (check simple logic: text changed)
-    // We pass poorGrammarText as an argument to the function
+    // Wait for AI to improve description (must be different AND not empty)
     await appPage.page.waitForFunction((originalText) => {
       const descInput = document.querySelector('#task-description') as HTMLTextAreaElement;
-      return descInput && descInput.value !== originalText;
+      return descInput && descInput.value !== originalText && descInput.value.length > 5;
     }, poorGrammarText, { timeout: 90000 });
 
     const newDescription = await taskPage.descriptionInput.inputValue();

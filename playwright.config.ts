@@ -51,7 +51,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
       },
@@ -71,7 +71,8 @@ export default defineConfig({
       // Pass environment variables to the dev server
       VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL,
       VITE_SUPABASE_KEY: process.env.VITE_SUPABASE_KEY,
-      VITE_OPENAI_API_KEY: process.env.VITE_OPENAI_API_KEY,
+      // NOTE: We do NOT expose OPENAI_API_KEY to the browser to prevent leaks.
+      // E2E tests should assume the backend handles AI requests.
       VITE_OPENAI_BASE_URL: process.env.VITE_OPENAI_BASE_URL,
       VITE_OPENAI_MODEL: process.env.VITE_OPENAI_MODEL,
       E2E_TEST_USER_EMAIL: process.env.E2E_TEST_USER_EMAIL,
@@ -85,7 +86,7 @@ export default defineConfig({
 
   /* Output directories */
   outputDir: 'test-results/',
-  
+
   /* Test timeout */
   timeout: 30 * 1000,
   expect: {
