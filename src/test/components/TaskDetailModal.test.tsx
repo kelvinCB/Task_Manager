@@ -67,6 +67,7 @@ describe('TaskDetailModal', () => {
     renderWithTheme(
       <TaskDetailModal
         task={mockTask}
+        allTasks={[]}
         isOpen={true}
         onClose={mockOnClose}
         onEdit={mockOnEdit}
@@ -83,6 +84,7 @@ describe('TaskDetailModal', () => {
     renderWithTheme(
       <TaskDetailModal
         task={mockTask}
+        allTasks={[]}
         isOpen={true}
         onClose={mockOnClose}
         onEdit={mockOnEdit}
@@ -99,6 +101,7 @@ describe('TaskDetailModal', () => {
     renderWithTheme(
       <TaskDetailModal
         task={mockTask}
+        allTasks={[]}
         isOpen={true}
         onClose={mockOnClose}
         onEdit={mockOnEdit}
@@ -109,5 +112,24 @@ describe('TaskDetailModal', () => {
     fireEvent.click(editButton);
 
     expect(mockOnEdit).toHaveBeenCalledWith(mockTask);
+  });
+
+  it('should render correct subtask count', () => {
+    const subtasks: Task[] = [
+      { ...mockTask, id: '2', parentId: mockTask.id, title: 'Subtask 1' },
+      { ...mockTask, id: '3', parentId: mockTask.id, title: 'Subtask 2' },
+    ];
+
+    renderWithTheme(
+      <TaskDetailModal
+        task={mockTask}
+        allTasks={[mockTask, ...subtasks]}
+        isOpen={true}
+        onClose={mockOnClose}
+        onEdit={mockOnEdit}
+      />
+    );
+
+    expect(screen.getByText('2')).toBeInTheDocument();
   });
 });
