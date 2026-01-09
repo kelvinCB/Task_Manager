@@ -156,5 +156,31 @@
         "message": "¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer.",
         "confirm": "Sí, Eliminar",
         "cancel": "Cancelar"
+    },
+    "help": {
+        "title": "Ayuda y Feedback",
+        "fab_label": "Ayuda",
+        "faq_title": "Preguntas Frecuentes",
+        "bug_report_title": "Reportar un Error",
+        "feature_request_title": "Sugerir una Funcionalidad",
+        "description_label": "Descripción",
+        "type_label": "Tipo",
+        "priority_label": "Prioridad",
+        "submit": "Enviar",
+        "success_msg": "¡Gracias por tus comentarios!",
+        "submit_success": "Tu reporte ha sido enviado, pronto lo atendemos. Muchas gracias!",
+        "error_msg": "Error al enviar comentarios. Intenta de nuevo.",
+        "tab_faq": "FAQ",
+        "tab_bug": "Bug",
+        "tab_feature": "Funcionalidad",
+        "placeholder_bug": "Describe el error que encontraste...",
+        "placeholder_feature": "¿Qué nueva funcionalidad o mejora te gustaría ver? ¡Lo implementaremos para ti!",
+        "priority_low": "Baja",
+        "priority_medium": "Media",
+        "priority_high": "Alta",
+        "faq_1_q": "¿Cómo creo una nueva tarea?",
+        "faq_1_a": "En la lista de tareas, haz clic en el botón '+' o usa el botón 'Añadir Tarea' en el encabezado.",
+        "faq_2_q": "¿Cómo se rastrea el tiempo?",
+        "faq_2_a": "Usa el botón 'Iniciar Temporizador' en cualquier tarea. El tiempo se guarda localmente y se sincroniza con el servidor."
     }
 }
