@@ -51,7 +51,7 @@ export class TaskService {
   constructor() {
     // Use backend API URL from environment or default to localhost
     const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
-    this.baseUrl = env.VITE_BACKEND_URL || env.VITE_API_BASE_URL || 'http://127.0.0.1:3001';
+    this.baseUrl = env.VITE_BACKEND_URL || env.VITE_API_BASE_URL || (env.PROD ? '' : 'http://127.0.0.1:3001');
   }
 
   /**
