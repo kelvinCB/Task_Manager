@@ -12,10 +12,28 @@ const startEntry = async (req, res) => {
 
     const db = req.supabase || supabase;
 
-    // Ensure task belongs to user
+    // 1. Check if an active timer already exists for this task
+    const { data: existingEntry, error: checkErr } = await db
+      .from('time_entries')
+      .select('*')
+      .eq('task_id', task_id)
+      .eq('user_id', user_id)
+      .is('end_time', null)
+      .order('start_time', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existingEntry) {
+      return res.status(200).json({
+        message: 'A timer is already active for this task',
+        entry: existingEntry
+      });
+    }
+
+    // 2. Ensure task belongs to user and update status if needed
     const { data: task, error: taskErr } = await db
       .from('tasks')
-      .select('id, user_id')
+      .select('id, user_id, status')
       .eq('id', task_id)
       .eq('user_id', user_id)
       .single();
@@ -24,13 +42,21 @@ const startEntry = async (req, res) => {
       return res.status(404).json({ error: 'Not found', message: 'Task not found' });
     }
 
+    // Automatically move task to 'In Progress' if it's not already
+    if (task.status !== 'In Progress') {
+      await db
+        .from('tasks')
+        .update({ status: 'In Progress' })
+        .eq('id', task_id)
+        .eq('user_id', user_id);
+    }
+
     const { data, error } = await db
       .from('time_entries')
       .insert([{ task_id, user_id, start_time: start_time || new Date().toISOString(), end_time: null }])
       .select()
       .single();
 
-    if (error) throw error;
     res.status(201).json({ entry: data });
   } catch (error) {
     console.error('Start time entry error:', error);
@@ -64,6 +90,10 @@ const stopEntry = async (req, res) => {
       .single();
 
     if (error) throw error;
+
+    // Sync task's total_time_ms
+    await syncTaskTotalTime(db, entry.task_id, user_id);
+
     res.status(200).json({ entry: data });
   } catch (error) {
     console.error('Stop time entry error:', error);
@@ -119,8 +149,7 @@ const getSummary = async (req, res) => {
   }
 };
 
-module.exports = { startEntry, stopEntry, getSummary };
-// New: record a single summary row when a task is completed
+// record a single summary row when a task is completed/stopped with a specific duration
 const completeEntry = async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -154,6 +183,10 @@ const completeEntry = async (req, res) => {
       .single();
 
     if (error) throw error;
+
+    // Sync task's total_time_ms
+    await syncTaskTotalTime(db, task_id, user_id);
+
     res.status(201).json({ entry: data });
   } catch (error) {
     console.error('Complete time entry error:', error);
@@ -161,4 +194,42 @@ const completeEntry = async (req, res) => {
   }
 };
 
-module.exports.completeEntry = completeEntry;
+const syncTaskTotalTime = async (db, task_id, user_id) => {
+  try {
+    // 1. Get all time entries for this task
+    const { data: entries, error: entriesErr } = await db
+      .from('time_entries')
+      .select('start_time, end_time')
+      .eq('task_id', task_id)
+      .eq('user_id', user_id);
+
+    if (entriesErr) throw entriesErr;
+
+    // 2. Calculate sum of durations
+    let total_ms = 0;
+    for (const e of entries || []) {
+      const start = new Date(e.start_time).getTime();
+      // Only include entries that have an end_time (completed sessions)
+      if (e.end_time) {
+        const end = new Date(e.end_time).getTime();
+        total_ms += Math.max(0, end - start);
+      }
+    }
+
+    // 3. Update the tasks table
+    const { error: updateErr } = await db
+      .from('tasks')
+      .update({ total_time_ms: total_ms })
+      .eq('id', task_id)
+      .eq('user_id', user_id);
+
+    if (updateErr) throw updateErr;
+
+    return total_ms;
+  } catch (err) {
+    console.error(`Error syncing total time for task ${task_id}:`, err);
+    return null;
+  }
+};
+
+module.exports = { startEntry, stopEntry, getSummary, completeEntry };
