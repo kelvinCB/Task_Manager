@@ -242,15 +242,45 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
           const mergedServerTasks = response.data.map(apiTask => {
             const prev = prevMap.get(apiTask.id);
             let mergedTask = apiTask;
-            if (prev && (prev.timeTracking.isActive || prev.timeTracking.totalTimeSpent > 0 || prev.timeTracking.timeEntries.length > 0)) {
-              mergedTask = { ...apiTask, timeTracking: prev.timeTracking };
+
+            if (prev) {
+              const backendTotal = apiTask.timeTracking?.totalTimeSpent || 0;
+              const localTotal = prev.timeTracking?.totalTimeSpent || 0;
+
+              mergedTask = {
+                ...apiTask,
+                timeTracking: {
+                  ...apiTask.timeTracking,
+                  // Trust backend but keep local if it has more recorded time (e.g. offline work)
+                  totalTimeSpent: Math.max(backendTotal, localTotal),
+                  // Rehydrate active state based on who has the freshest data (highest total time)
+                  isActive: backendTotal > localTotal
+                    ? apiTask.timeTracking.isActive
+                    : (localTotal > backendTotal
+                      ? prev.timeTracking.isActive
+                      : (apiTask.timeTracking.isActive || prev.timeTracking.isActive)),
+                  lastStarted: backendTotal > localTotal
+                    ? apiTask.timeTracking.lastStarted
+                    : (localTotal > backendTotal
+                      ? prev.timeTracking.lastStarted
+                      : (apiTask.timeTracking.lastStarted || prev.timeTracking.lastStarted)),
+                  timeEntries: prev.timeTracking.timeEntries.length > 0
+                    ? prev.timeTracking.timeEntries
+                    : apiTask.timeTracking.timeEntries
+                }
+              };
             }
+
             const lsStart = activeTimers[apiTask.id];
-            // Only rehydrate running timers for tasks actually in "In Progress"
+            // Rehydrate/ensure running timers for tasks actually in "In Progress"
             if (lsStart && apiTask.status === 'In Progress') {
               mergedTask = {
                 ...mergedTask,
-                timeTracking: { ...mergedTask.timeTracking, isActive: true, lastStarted: lsStart }
+                timeTracking: {
+                  ...mergedTask.timeTracking,
+                  isActive: true,
+                  lastStarted: lsStart
+                }
               };
             }
             return mergedTask;

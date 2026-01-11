@@ -38,6 +38,7 @@ interface BackendTask {
   updated_at?: string;
   due_date: string | null; // ISO date string (YYYY-MM-DD)
   total_time_ms?: number; // Summary total (persisted only when Done)
+  active_start_time?: string | null; // ISO string if a timer is currently running
 }
 
 // No mapping needed; backend and frontend share the same status values
@@ -122,7 +123,8 @@ export class TaskService {
       timeTracking: {
         // If backend provided a summary, prefer it (especially for Done)
         totalTimeSpent: backendTask.total_time_ms ?? 0,
-        isActive: false,
+        isActive: !!backendTask.active_start_time,
+        lastStarted: backendTask.active_start_time ? new Date(backendTask.active_start_time).getTime() : undefined,
         timeEntries: [],
       },
     };
