@@ -6,21 +6,32 @@ This guide provides comprehensive documentation for frontend development in the 
 
 ## Table of Contents
 
-1. [Architecture Overview](#architecture-overview)
-2. [Project Structure](#project-structure)
-3. [Authentication Integration](#authentication-integration)
-4. [Component Development](#component-development)
-5. [State Management](#state-management)
-6. [Styling Guidelines](#styling-guidelines)
-7. [Performance Optimization](#performance-optimization)
-8. [Accessibility Standards](#accessibility-standards)
-9. [Error Handling](#error-handling)
-10. [API Integration](#api-integration)
-11. [Internationalization (i18n)](#internationalization-i18n)
-12. [Testing Guidelines](#testing-guidelines)
-13. [Build and Deployment](#build-and-deployment)
-
----
+- [Frontend Development Guide](#frontend-development-guide)
+  - [Overview](#overview)
+  - [Architecture Overview](#architecture-overview)
+  - [Project Structure](#project-structure)
+  - [Authentication Integration](#authentication-integration)
+  - [Component Development](#component-development)
+  - [State Management](#state-management)
+  - [API Integration](#api-integration)
+  - [Internationalization (i18n)](#internationalization-i18n)
+  - [Styling Guidelines](#styling-guidelines)
+  - [Performance Optimization](#performance-optimization)
+  - [Accessibility Standards](#accessibility-standards)
+  - [Error Handling](#error-handling)
+  - [API Integration](#api-integration)
+  - [Testing Guidelines](#testing-guidelines)
+  - [Build and Deployment](#build-and-deployment)
+- [Analyze bundle size](#analyze-bundle-size)
+- [Performance auditing](#performance-auditing)
+  - [Future Enhancements](#future-enhancements)
+  - [Troubleshooting](#troubleshooting)
+- [Clear node modules and reinstall](#clear-node-modules-and-reinstall)
+- [Clear Vite cache](#clear-vite-cache)
+- [Check TypeScript compilation](#check-typescript-compilation)
+- [Purge and rebuild Tailwind](#purge-and-rebuild-tailwind)
+- [Check for conflicting styles](#check-for-conflicting-styles)
+- [Check browser dev tools for specificity issues](#check-browser-dev-tools-for-specificity-issues)
 
 ## Architecture Overview
 

@@ -1,4 +1,14 @@
 # API Documentation
+## Table of Contents
+
+- [API Documentation](#api-documentation)
+  - [Overview](#overview)
+  - [Base URL](#base-url)
+  - [Authentication](#authentication)
+  - [Endpoints](#endpoints)
+  - [Error Responses](#error-responses)
+  - [Rate Limiting](#rate-limiting)
+  - [Data Models](#data-models)
 
 ## Overview
 

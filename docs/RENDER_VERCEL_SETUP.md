@@ -1,9 +1,15 @@
 # [DEPRECATED] Configuración Render + Vercel
+## Table of Contents
 
-> [!CAUTION]
-> **THIS GUIDE IS OBSOLETE.**
-> The project has migrated to a fullstack Vercel deployment. Render is no longer used.
-> Please refer to [DEPLOY_GUIDE.md](./DEPLOY_GUIDE.md) for current deployment instructions.
+- [[DEPRECATED] Configuración Render + Vercel](#deprecated-configuraci-n-render-vercel)
+  - [Old Configuration (For Reference Only)](#old-configuration-for-reference-only)
+  - [⚙️ Variables de Entorno](#variables-de-entorno)
+  - [🚀 Pasos de Despliegue](#pasos-de-despliegue)
+  - [🔧 Verificación](#verificaci-n)
+- [Debe retornar: {"status":"healthy","timestamp":"...","environment":"production"}](#debe-retornar-status-healthy-timestamp-environment-production)
+  - [🐛 Solución de Problemas](#soluci-n-de-problemas)
+  - [📝 Notas](#notas)
+  - [🎯 Siguiente Paso](#siguiente-paso)
 
 ## Old Configuration (For Reference Only)
 

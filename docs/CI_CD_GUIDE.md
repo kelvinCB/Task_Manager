@@ -1,4 +1,30 @@
 # CI/CD Guide
+## Table of Contents
+
+- [CI/CD Guide](#ci-cd-guide)
+  - [Overview](#overview)
+  - [CI/CD Strategy](#ci-cd-strategy)
+  - [Pipeline Stages](#pipeline-stages)
+  - [Environment Configuration](#environment-configuration)
+  - [GitHub Actions Workflows](#github-actions-workflows)
+- [.github/workflows/pr.yml](#github-workflows-pr-yml)
+- [- Run tests](#run-tests)
+- [- Run linting](#run-linting)
+- [- Build check](#build-check)
+- [- Security scanning](#security-scanning)
+- [.github/workflows/deploy.yml](#github-workflows-deploy-yml)
+- [- Test suite](#test-suite)
+- [- Build application](#build-application)
+- [- Deploy to environment](#deploy-to-environment)
+- [- Post-deployment tests](#post-deployment-tests)
+  - [Monitoring and Alerts](#monitoring-and-alerts)
+  - [Rollback Procedures](#rollback-procedures)
+  - [Security Considerations](#security-considerations)
+  - [Performance Monitoring](#performance-monitoring)
+  - [Troubleshooting](#troubleshooting)
+  - [Future Enhancements](#future-enhancements)
+  - [Best Practices](#best-practices)
+  - [Configuration Files](#configuration-files)
 
 ## Overview
 

@@ -1,4 +1,26 @@
 # Deployment Guide
+## Table of Contents
+
+- [Deployment Guide](#deployment-guide)
+  - [Overview](#overview)
+  - [Fullstack Deployment (Vercel)](#fullstack-deployment-vercel)
+- [Critical for both Frontend and Backend](#critical-for-both-frontend-and-backend)
+- [AI Features](#ai-features)
+- [Note: VITE_BACKEND_URL and VITE_API_BASE_URL are NO LONGER NEEDED.](#note-vite-backend-url-and-vite-api-base-url-are-no-longer-needed)
+- [The app uses relative paths (/api/...) which Vercel routes inevitably.](#the-app-uses-relative-paths-api-which-vercel-routes-inevitably)
+  - [Backend Architecture](#backend-architecture)
+  - [Environment Management](#environment-management)
+  - [SSL/TLS Configuration](#ssl-tls-configuration)
+  - [Monitoring and Logging](#monitoring-and-logging)
+  - [Backup Strategy](#backup-strategy)
+  - [Security Checklist](#security-checklist)
+  - [Rollback Procedures](#rollback-procedures)
+  - [Performance Optimization](#performance-optimization)
+  - [Troubleshooting](#troubleshooting)
+- [Check deployment logs](#check-deployment-logs)
+- [Test API endpoints](#test-api-endpoints)
+- [Check database connectivity](#check-database-connectivity)
+- [Use Supabase dashboard SQL editor](#use-supabase-dashboard-sql-editor)
 
 ## Overview
 

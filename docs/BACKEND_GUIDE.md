@@ -1,5 +1,20 @@
 # Backend Development Guide
 
+## Table of Contents
+
+- [Backend Development Guide](#backend-development-guide)
+  - [Overview](#overview)
+  - [Setup and Installation](#setup-and-installation)
+- [Backend Critical](#backend-critical)
+  - [Architecture](#architecture)
+  - [Key Components](#key-components)
+  - [Standards](#standards)
+  - [Integration](#integration)
+  - [Testing](#testing)
+  - [Development Workflow](#development-workflow)
+  - [Implementation Details](#implementation-details)
+  - [Future Enhancements](#future-enhancements)
+
 ## Overview
 
 This guide outlines the setup, architecture, and standards for backend development in the Task Manager project. The backend is built with Node.js and Express.js, using Supabase for authentication and database operations.

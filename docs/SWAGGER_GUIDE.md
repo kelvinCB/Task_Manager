@@ -1,6 +1,12 @@
 # Swagger Testing Guide 🚀
+## Table of Contents
 
-This guide explains how to use the local Swagger UI to test the API endpoints directly from your browser.
+- [Swagger Testing Guide 🚀](#swagger-testing-guide)
+  - [Prerequisites](#prerequisites)
+  - [Accessing Swagger UI](#accessing-swagger-ui)
+  - [Switching Environments](#switching-environments)
+  - [How to Test Endpoints](#how-to-test-endpoints)
+  - [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
 

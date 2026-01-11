@@ -1,4 +1,16 @@
 # Performance Guide
+## Table of Contents
+
+- [Performance Guide](#performance-guide)
+  - [Overview](#overview)
+  - [Frontend Performance](#frontend-performance)
+  - [Backend Performance](#backend-performance)
+  - [Monitoring and Metrics](#monitoring-and-metrics)
+  - [Optimization Checklist](#optimization-checklist)
+  - [Tools and Libraries](#tools-and-libraries)
+  - [Performance Targets](#performance-targets)
+  - [Troubleshooting Performance Issues](#troubleshooting-performance-issues)
+  - [Future Optimizations](#future-optimizations)
 
 ## Overview
 

@@ -1,4 +1,13 @@
 # User Guide
+## Table of Contents
+
+- [User Guide](#user-guide)
+  - [Overview](#overview)
+  - [Getting Started](#getting-started)
+  - [Features](#features)
+  - [Settings](#settings)
+  - [Support](#support)
+  - [Legal](#legal)
 
 ## Overview
 

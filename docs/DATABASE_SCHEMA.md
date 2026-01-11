@@ -1,4 +1,13 @@
 # Database Schema Documentation
+## Table of Contents
+
+- [Database Schema Documentation](#database-schema-documentation)
+  - [Overview](#overview)
+  - [Supabase Setup](#supabase-setup)
+  - [Tables](#tables)
+  - [Row Level Security (RLS) Policies](#row-level-security-rls-policies)
+  - [Relationships](#relationships)
+  - [Data Migration](#data-migration)
 
 ## Overview
 

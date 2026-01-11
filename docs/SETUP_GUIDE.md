@@ -1,4 +1,10 @@
 # Setup Guide
+## Table of Contents
+
+- [Setup Guide](#setup-guide)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Environment Setup](#environment-setup)
 
 ## Installation
 

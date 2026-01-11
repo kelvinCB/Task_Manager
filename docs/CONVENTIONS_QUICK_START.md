@@ -1,4 +1,17 @@
 # 🚀 Guía Rápida de Convenciones
+## Table of Contents
+
+- [🚀 Guía Rápida de Convenciones](#gu-a-r-pida-de-convenciones)
+  - [Instalación Inicial](#instalaci-n-inicial)
+  - [📝 Hacer un Commit](#hacer-un-commit)
+  - [🌿 Crear una Rama](#crear-una-rama)
+  - [✅ Validar Convenciones](#validar-convenciones)
+  - [🏷️ Crear Releases](#crear-releases)
+  - [🔧 Scripts Útiles](#scripts-tiles)
+  - [❌ Qué NO hacer](#qu-no-hacer)
+  - [✅ Ejemplos Correctos](#ejemplos-correctos)
+  - [🚨 Validaciones Automáticas](#validaciones-autom-ticas)
+  - [📚 Documentación Completa](#documentaci-n-completa)
 
 ## Instalación Inicial
 Las herramientas ya están configuradas, pero asegúrate de que los hooks estén activos:

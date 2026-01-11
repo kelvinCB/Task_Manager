@@ -1,4 +1,13 @@
 # Encryption Guide
+## Table of Contents
+
+- [Encryption Guide](#encryption-guide)
+  - [Overview](#overview)
+  - [Encryption Techniques](#encryption-techniques)
+  - [Data Protection](#data-protection)
+  - [Security Policies](#security-policies)
+  - [Incident Response](#incident-response)
+  - [Additional Recommendations](#additional-recommendations)
 
 ## Overview
 

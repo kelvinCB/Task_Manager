@@ -1,4 +1,17 @@
 # Convenciones de Desarrollo - Task Manager
+## Table of Contents
+
+- [Convenciones de Desarrollo - Task Manager](#convenciones-de-desarrollo-task-manager)
+  - [📋 Convenciones de Commits](#convenciones-de-commits)
+  - [🌿 Convenciones de Ramas](#convenciones-de-ramas)
+  - [🏷️ Convenciones de Versionado](#convenciones-de-versionado)
+  - [📝 Convenciones de Pull Requests](#convenciones-de-pull-requests)
+  - [📋 Descripción](#descripci-n)
+  - [🎯 Tipo de Cambio](#tipo-de-cambio)
+  - [🧪 Pruebas](#pruebas)
+  - [📝 Checklist](#checklist)
+  - [🔧 Configuración de Herramientas](#configuraci-n-de-herramientas)
+  - [📚 Recursos Adicionales](#recursos-adicionales)
 
 ## 📋 Convenciones de Commits
 

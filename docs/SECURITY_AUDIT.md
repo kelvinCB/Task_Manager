@@ -1,4 +1,21 @@
 # Security Audit Guide
+## Table of Contents
+
+- [Security Audit Guide](#security-audit-guide)
+  - [Overview](#overview)
+  - [Security Audit Schedule](#security-audit-schedule)
+  - [Frontend Security Audit](#frontend-security-audit)
+  - [Backend Security Audit](#backend-security-audit)
+  - [Database Security Audit](#database-security-audit)
+  - [Infrastructure Security Audit](#infrastructure-security-audit)
+  - [Application Security Testing](#application-security-testing)
+  - [Security Monitoring and Incident Response](#security-monitoring-and-incident-response)
+  - [Compliance and Legal](#compliance-and-legal)
+  - [Security Tools and Services](#security-tools-and-services)
+  - [Security Metrics and KPIs](#security-metrics-and-kpis)
+  - [Audit Documentation](#audit-documentation)
+  - [Post-Audit Actions](#post-audit-actions)
+  - [Remediation Tracking](#remediation-tracking)
 
 ## Overview
 

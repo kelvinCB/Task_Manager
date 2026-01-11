@@ -1,4 +1,25 @@
 # E2E Environment Configuration
+## Table of Contents
+
+- [E2E Environment Configuration](#e2e-environment-configuration)
+  - [📋 Overview](#overview)
+  - [🔧 Configuración Realizada](#configuraci-n-realizada)
+  - [📦 Dependencias Instaladas](#dependencias-instaladas)
+  - [✅ Variables de Entorno Requeridas](#variables-de-entorno-requeridas)
+- [Supabase (con prefijo VITE_ para Vite)](#supabase-con-prefijo-vite-para-vite)
+- [OpenAI (con prefijo VITE_)](#openai-con-prefijo-vite)
+- [Credenciales de usuario de prueba E2E](#credenciales-de-usuario-de-prueba-e2e)
+  - [🚀 Cómo Ejecutar las Pruebas E2E](#c-mo-ejecutar-las-pruebas-e2e)
+- [Ejecutar todas las pruebas E2E](#ejecutar-todas-las-pruebas-e2e)
+- [Ejecutar con interfaz visible](#ejecutar-con-interfaz-visible)
+- [Ejecutar en modo headless (CI)](#ejecutar-en-modo-headless-ci)
+- [Ejecutar en modo debug](#ejecutar-en-modo-debug)
+- [Con npx](#con-npx)
+- [Con workers específicos](#con-workers-espec-ficos)
+  - [🔍 Verificación de Variables](#verificaci-n-de-variables)
+  - [⚠️ Notas Importantes](#notas-importantes)
+  - [🐛 Troubleshooting](#troubleshooting)
+  - [📚 Referencias](#referencias)
 
 ## 📋 Overview
 

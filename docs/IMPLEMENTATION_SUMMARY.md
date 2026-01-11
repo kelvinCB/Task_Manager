@@ -1,4 +1,22 @@
 # ✅ Resumen de Implementación - Convenciones de Desarrollo
+## Table of Contents
+
+- [✅ Resumen de Implementación - Convenciones de Desarrollo](#resumen-de-implementaci-n-convenciones-de-desarrollo)
+  - [🎯 Lo que se implementó](#lo-que-se-implement)
+  - [🚀 Estado de Validaciones](#estado-de-validaciones)
+  - [📁 Archivos Creados/Modificados](#archivos-creados-modificados)
+  - [🎮 Comandos Principales](#comandos-principales)
+- [Crear una rama feature](#crear-una-rama-feature)
+- [Validar nombre de rama](#validar-nombre-de-rama)
+- [Hacer commit interactivo](#hacer-commit-interactivo)
+- [Validar último commit](#validar-ltimo-commit)
+- [Release patch (1.0.0 -> 1.0.1)](#release-patch-1-0-0-1-0-1)
+- [Release minor (1.0.0 -> 1.1.0)](#release-minor-1-0-0-1-1-0)
+- [Release major (1.0.0 -> 2.0.0)](#release-major-1-0-0-2-0-0)
+  - [📊 Estadísticas de Implementación](#estad-sticas-de-implementaci-n)
+  - [🔐 Validaciones Automáticas](#validaciones-autom-ticas)
+  - [🎯 Próximos Pasos Recomendados](#pr-ximos-pasos-recomendados)
+  - [📝 Notas Importantes](#notas-importantes)
 
 ## 🎯 Lo que se implementó
 

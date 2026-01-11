@@ -1,4 +1,18 @@
 # 🔗 URL Redirection Configuration Guide
+## Table of Contents
+
+- [🔗 URL Redirection Configuration Guide](#url-redirection-configuration-guide)
+  - [📋 Overview](#overview)
+  - [🎯 Key Configuration Points](#key-configuration-points)
+- [For Development Environment](#for-development-environment)
+- [For Production Environment (uncomment when needed)](#for-production-environment-uncomment-when-needed)
+- [SUPABASE_URL=https://uuepapqtfvufcgxvghwn.supabase.co](#supabase-url-https-uuepapqtfvufcgxvghwn-supabase-co)
+- [SUPABASE_KEY=your_SUPABASE_KEY](#supabase-key-your-supabase-key)
+  - [🔄 Authentication Flow](#authentication-flow)
+  - [🧪 Testing Configuration](#testing-configuration)
+  - [⚠️ Important Notes](#important-notes)
+  - [🔍 Troubleshooting](#troubleshooting)
+  - [📞 Support](#support)
 
 ## 📋 Overview
 

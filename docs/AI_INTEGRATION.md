@@ -1,4 +1,21 @@
 # AI Integration Documentation
+## Table of Contents
+
+- [AI Integration Documentation](#ai-integration-documentation)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Configuration](#configuration)
+  - [Implementation Details](#implementation-details)
+  - [UI Integration](#ui-integration)
+  - [Testing](#testing)
+- [Run all tests](#run-all-tests)
+- [Run specific test files](#run-specific-test-files)
+- [Run with coverage](#run-with-coverage)
+  - [Security Considerations](#security-considerations)
+  - [Future Enhancements](#future-enhancements)
+  - [Troubleshooting](#troubleshooting)
+  - [Performance Considerations](#performance-considerations)
+  - [API Usage and Costs](#api-usage-and-costs)
 
 ## Overview
 
