@@ -1,6 +1,7 @@
 
 const { createTask, getTasks, getTaskById, updateTask, deleteTask } = require('../../controllers/taskController');
 const supabaseMod = require('../../config/supabaseClient');
+const { mockCreateChain } = require('../testHelper');
 
 // Save original items
 const originalSupabase = supabaseMod.supabase;
@@ -15,16 +16,13 @@ describe('Task Controller', () => {
     jest.clearAllMocks();
 
     // Create fresh mock client for each test
-    const mockFrom = jest.fn();
-    mockClient = {
-        from: mockFrom,
-        auth: { getUser: jest.fn() }
-    };
-    
+    mockClient = mockCreateChain();
+    mockClient.auth = { getUser: jest.fn() };
+
     // Inject mock into the live module
     supabaseMod.supabase = mockClient;
     supabaseMod.createClientWithToken = jest.fn(() => mockClient);
-    
+
     // Expose as 'supabase' for test convenience
     // This allows existing test code `supabase.from` to access `mockClient.from`
     supabase = mockClient;
@@ -35,7 +33,7 @@ describe('Task Controller', () => {
       params: {},
       query: {}
     };
-    
+
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis()
@@ -68,7 +66,7 @@ describe('Task Controller', () => {
       const mockSingle = jest.fn().mockResolvedValue({ data: mockTask, error: null });
       const mockSelect = jest.fn().mockReturnValue({ single: mockSingle });
       const mockInsert = jest.fn().mockReturnValue({ select: mockSelect });
-      
+
       supabase.from.mockReturnValue({
         insert: mockInsert
       });
@@ -159,16 +157,16 @@ describe('Task Controller', () => {
         { id: 2, title: 'Task 2', user_id: 'user-123' }
       ];
 
-      const mockOrder = jest.fn().mockResolvedValue({ data: mockTasks, error: null });
-      const mockEq = jest.fn().mockReturnValue({ order: mockOrder });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
-
-      supabase.from.mockReturnValue({ select: mockSelect });
+      supabase.from.mockImplementation((table) => {
+        if (table === 'tasks') return mockCreateChain(mockTasks);
+        if (table === 'time_entries') return mockCreateChain([]);
+        return mockCreateChain();
+      });
 
       await getTasks(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ tasks: mockTasks });
+      expect(res.json).toHaveBeenCalledWith({ tasks: mockTasks.map(t => ({ ...t, active_start_time: null })) });
     });
 
     it('should filter tasks by status', async () => {
@@ -176,22 +174,21 @@ describe('Task Controller', () => {
 
       const mockTasks = [{ id: 1, title: 'Task 1', status: 'Done', user_id: 'user-123' }];
 
-      const mockEqStatus = jest.fn().mockResolvedValue({ data: mockTasks, error: null });
-      const mockOrder = jest.fn().mockReturnValue({ eq: mockEqStatus });
-      const mockEq = jest.fn().mockReturnValue({ order: mockOrder });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
-
-      supabase.from.mockReturnValue({ select: mockSelect });
+      supabase.from.mockImplementation((table) => {
+        if (table === 'tasks') return mockCreateChain(mockTasks);
+        if (table === 'time_entries') return mockCreateChain([]);
+        return mockCreateChain();
+      });
 
       await getTasks(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ tasks: mockTasks });
+      expect(res.json).toHaveBeenCalledWith({ tasks: mockTasks.map(t => ({ ...t, active_start_time: null })) });
     });
 
     it('should return 400 for invalid status filter', async () => {
       req.query.status = 'invalid_status';
-      
+
       // Mock db chain (needed because query is built before validation)
       const mockOrder = jest.fn().mockReturnThis();
       const mockEq = jest.fn().mockReturnValue({ order: mockOrder });
@@ -230,17 +227,16 @@ describe('Task Controller', () => {
 
       const mockTask = { id: 1, title: 'Task 1', user_id: 'user-123' };
 
-      const mockSingle = jest.fn().mockResolvedValue({ data: mockTask, error: null });
-      const mockEqUser = jest.fn().mockReturnValue({ single: mockSingle });
-      const mockEq = jest.fn().mockReturnValue({ eq: mockEqUser });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
-
-      supabase.from.mockReturnValue({ select: mockSelect });
+      supabase.from.mockImplementation((table) => {
+        if (table === 'tasks') return mockCreateChain(mockTask);
+        if (table === 'time_entries') return mockCreateChain(null); // maybeSingle
+        return mockCreateChain();
+      });
 
       await getTaskById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ task: mockTask });
+      expect(res.json).toHaveBeenCalledWith({ task: { ...mockTask, active_start_time: null } });
     });
 
     it('should return 400 for invalid task id', async () => {
@@ -308,17 +304,16 @@ describe('Task Controller', () => {
         total_time_ms: 5000
       };
 
-      const mockSingle = jest.fn().mockResolvedValue({ data: mockTask, error: null });
-      const mockEqUser = jest.fn().mockReturnValue({ single: mockSingle });
-      const mockEq = jest.fn().mockReturnValue({ eq: mockEqUser });
-      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
-
-      supabase.from.mockReturnValue({ select: mockSelect });
+      supabase.from.mockImplementation((table) => {
+        if (table === 'tasks') return mockCreateChain(mockTask);
+        if (table === 'time_entries') return mockCreateChain(null);
+        return mockCreateChain();
+      });
 
       await getTaskById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ task: mockTask });
+      expect(res.json).toHaveBeenCalledWith({ task: { ...mockTask, active_start_time: null } });
     });
   });
 
