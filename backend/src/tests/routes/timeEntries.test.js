@@ -1,29 +1,25 @@
 const request = require('supertest');
 const express = require('express');
 const timeEntryRoutes = require('../../routes/timeEntries');
-const supabase = require('../../config/supabaseClient');
 
 // Test app
 const app = express();
 app.use(express.json());
 app.use('/api/time-entries', timeEntryRoutes);
 
-// Mock Supabase client
-const buildClient = () => ({
-  from: jest.fn(),
-  auth: { getUser: jest.fn() }
-});
 jest.mock('../../config/supabaseClient', () => {
-  const client = buildClient();
-  return {
-    from: client.from,
-    auth: client.auth,
-    supabase: client,
-    createClientWithToken: jest.fn(() => buildClient())
-  };
+  const { mockCreateChain } = jest.requireActual('../testHelper');
+  const mockClient = mockCreateChain();
+  mockClient.supabase = mockClient;
+  mockClient.auth = { getUser: jest.fn() };
+  mockClient.createClientWithToken = jest.fn(() => mockCreateChain());
+  return mockClient;
 });
 
-// Mock auth middleware to always set a user
+const supabase = require('../../config/supabaseClient');
+const { mockCreateChain } = require('../testHelper');
+
+// Mock auth middleware
 jest.mock('../../middlewares/authMiddleware', () => ({
   authenticateUser: jest.fn((req, res, next) => {
     req.user = { id: 'user-123', email: 'test@example.com' };
@@ -32,24 +28,19 @@ jest.mock('../../middlewares/authMiddleware', () => ({
 }));
 
 describe('Time Entries Routes', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    supabase.from.mockImplementation(() => mockCreateChain());
+  });
 
   it('POST /api/time-entries/complete should insert a summary row', async () => {
-    // First call to supabase.from('tasks') for task ownership check
-    const mockTaskSingle = jest.fn().mockResolvedValue({ data: { id: 1, user_id: 'user-123' }, error: null });
-    const mockTaskEqUser = jest.fn().mockReturnValue({ single: mockTaskSingle });
-    const mockTaskEq = jest.fn().mockReturnValue({ eq: mockTaskEqUser });
-    const mockTaskSelect = jest.fn().mockReturnValue({ eq: mockTaskEq });
+    const mockTask = { id: 1, user_id: 'user-123' };
+    const mockEntries = [{ id: 10, start_time: new Date().toISOString(), end_time: new Date().toISOString() }];
 
-    // Second call to supabase.from('time_entries') for insert
-    const mockInsertSingle = jest.fn().mockResolvedValue({ data: { id: 99 }, error: null });
-    const mockInsertSelect = jest.fn().mockReturnValue({ single: mockInsertSingle });
-    const mockInsert = jest.fn().mockReturnValue({ select: mockInsertSelect });
-
-    let call = 0;
-    supabase.from.mockImplementation(() => {
-      call += 1;
-      return call === 1 ? { select: mockTaskSelect } : { insert: mockInsert };
+    supabase.from.mockImplementation((table) => {
+      if (table === 'tasks') return mockCreateChain(mockTask);
+      if (table === 'time_entries') return mockCreateChain(mockEntries);
+      return mockCreateChain();
     });
 
     const response = await request(app)
@@ -57,7 +48,24 @@ describe('Time Entries Routes', () => {
       .send({ task_id: 1, duration_ms: 5000 });
 
     expect(response.status).toBe(201);
-    expect(mockInsert).toHaveBeenCalled();
+    expect(response.body).toHaveProperty('entry');
+  });
+
+  it('POST /api/time-entries/stop should stop an active entry', async () => {
+    const mockTask = { id: 1, user_id: 'user-123' };
+    const mockActiveEntry = { id: 5, task_id: 1, start_time: new Date().toISOString() };
+
+    supabase.from.mockImplementation((table) => {
+      if (table === 'tasks') return mockCreateChain(mockTask);
+      if (table === 'time_entries') return mockCreateChain(mockActiveEntry); // For the select().single() after update
+      return mockCreateChain();
+    });
+
+    const response = await request(app)
+      .post('/api/time-entries/stop')
+      .send({ task_id: 1 });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('entry');
   });
 });
-
