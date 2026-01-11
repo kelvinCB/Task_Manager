@@ -47,10 +47,15 @@ describe('Profile Controller', () => {
         };
 
         createClientWithToken.mockReturnValue(mockClient);
+
+        // Silence console output during tests
+        jest.spyOn(console, 'error').mockImplementation(() => { });
+        jest.spyOn(console, 'warn').mockImplementation(() => { });
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it('should return 400 if no file is provided', async () => {

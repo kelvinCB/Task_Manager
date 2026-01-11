@@ -40,10 +40,15 @@ describe('Upload Controller', () => {
     };
 
     createClientWithToken.mockReturnValue(mockClient);
+
+    // Silence console output during tests
+    jest.spyOn(console, 'error').mockImplementation(() => { });
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('should return 400 if no file is provided', async () => {
@@ -62,16 +67,16 @@ describe('Upload Controller', () => {
     expect(createClientWithToken).toHaveBeenCalledWith('test-token');
     expect(mockClient.storage.from).toHaveBeenCalledWith('Attachments');
     expect(mockClient.storage.upload).toHaveBeenCalledWith(
-        expect.stringContaining('test-user-id/'), 
-        expect.any(Buffer), 
-        expect.any(Object)
+      expect.stringContaining('test-user-id/'),
+      expect.any(Buffer),
+      expect.any(Object)
     );
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-        message: 'File uploaded successfully',
-        file: expect.objectContaining({
-            url: 'http://example.com/file.jpg'
-        })
+      message: 'File uploaded successfully',
+      file: expect.objectContaining({
+        url: 'http://example.com/file.jpg'
+      })
     }));
   });
 
@@ -84,10 +89,10 @@ describe('Upload Controller', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to upload file to storage' }));
   });
 
-   it('should handle exception', async () => {
-        createClientWithToken.mockImplementation(() => { throw new Error('Client error'); });
-        await uploadFile(req, res);
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: 'Internal server error during upload' });
-   });
+  it('should handle exception', async () => {
+    createClientWithToken.mockImplementation(() => { throw new Error('Client error'); });
+    await uploadFile(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Internal server error during upload' });
+  });
 });
