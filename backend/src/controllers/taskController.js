@@ -11,18 +11,18 @@ const createTask = async (req, res) => {
 
     // Validation
     if (!title || !title.trim()) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        message: 'Title is required' 
+        message: 'Title is required'
       });
     }
 
     // Validate status if provided
     const validStatuses = ['Open', 'In Progress', 'Done'];
     if (status && !validStatuses.includes(status)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        message: 'Invalid status. Must be one of: Open, In Progress, Done' 
+        message: 'Invalid status. Must be one of: Open, In Progress, Done'
       });
     }
 
@@ -36,9 +36,9 @@ const createTask = async (req, res) => {
         .single();
 
       if (parentError || !parentTask) {
-        return res.status(404).json({ 
+        return res.status(404).json({
           error: 'Not found',
-          message: 'Parent task not found or does not belong to you' 
+          message: 'Parent task not found or does not belong to you'
         });
       }
     }
@@ -68,9 +68,9 @@ const createTask = async (req, res) => {
     res.status(201).json({ task: data });
   } catch (error) {
     console.error('Create task error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
-      message: 'Failed to create task' 
+      message: 'Failed to create task'
     });
   }
 };
@@ -96,26 +96,45 @@ const getTasks = async (req, res) => {
     if (status) {
       const validStatuses = ['Open', 'In Progress', 'Done'];
       if (!validStatuses.includes(status)) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: 'Validation error',
-          message: 'Invalid status filter' 
+          message: 'Invalid status filter'
         });
       }
       query = query.eq('status', status);
     }
 
-    const { data, error } = await query;
+    const { data: tasks, error } = await query;
 
     if (error) {
       throw error;
     }
 
-    res.status(200).json({ tasks: data });
+    // Fetch active time entries for this user to inject into tasks
+    const { data: activeEntries, error: activeErr } = await db
+      .from('time_entries')
+      .select('task_id, start_time')
+      .eq('user_id', user_id)
+      .is('end_time', null);
+
+    const activeMap = new Map();
+    if (!activeErr && activeEntries) {
+      activeEntries.forEach(entry => {
+        activeMap.set(entry.task_id, entry.start_time);
+      });
+    }
+
+    const tasksWithActiveInfo = (tasks || []).map(task => ({
+      ...task,
+      active_start_time: activeMap.get(task.id) || null
+    }));
+
+    res.status(200).json({ tasks: tasksWithActiveInfo });
   } catch (error) {
     console.error('Get tasks error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
-      message: 'Failed to fetch tasks' 
+      message: 'Failed to fetch tasks'
     });
   }
 };
@@ -131,9 +150,9 @@ const getTaskById = async (req, res) => {
 
     // Validate ID format
     if (!id || isNaN(parseInt(id))) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        message: 'Invalid task ID' 
+        message: 'Invalid task ID'
       });
     }
 
@@ -146,18 +165,34 @@ const getTaskById = async (req, res) => {
       .single();
 
     if (error || !data) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Not found',
-        message: 'Task not found' 
+        message: 'Task not found'
       });
     }
 
-    res.status(200).json({ task: data });
+    // Check if there is an active timer for this specific task
+    const { data: activeEntry } = await db
+      .from('time_entries')
+      .select('start_time')
+      .eq('task_id', id)
+      .eq('user_id', user_id)
+      .is('end_time', null)
+      .order('start_time', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const taskWithActiveInfo = {
+      ...data,
+      active_start_time: activeEntry ? activeEntry.start_time : null
+    };
+
+    res.status(200).json({ task: taskWithActiveInfo });
   } catch (error) {
     console.error('Get task by ID error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
-      message: 'Failed to fetch task' 
+      message: 'Failed to fetch task'
     });
   }
 };
@@ -174,9 +209,9 @@ const updateTask = async (req, res) => {
 
     // Validate ID format
     if (!id || isNaN(parseInt(id))) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        message: 'Invalid task ID' 
+        message: 'Invalid task ID'
       });
     }
 
@@ -190,9 +225,9 @@ const updateTask = async (req, res) => {
       .single();
 
     if (fetchError || !existingTask) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Not found',
-        message: 'Task not found' 
+        message: 'Task not found'
       });
     }
 
@@ -200,9 +235,9 @@ const updateTask = async (req, res) => {
     if (status) {
       const validStatuses = ['Open', 'In Progress', 'Done'];
       if (!validStatuses.includes(status)) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: 'Validation error',
-          message: 'Invalid status. Must be one of: Open, In Progress, Done' 
+          message: 'Invalid status. Must be one of: Open, In Progress, Done'
         });
       }
     }
@@ -212,9 +247,9 @@ const updateTask = async (req, res) => {
       if (parent_id === null) {
         // Removing parent is allowed
       } else if (parseInt(parent_id) === parseInt(id)) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: 'Validation error',
-          message: 'A task cannot be its own parent' 
+          message: 'A task cannot be its own parent'
         });
       } else {
         const { data: parentTask, error: parentError } = await (req.supabase || supabaseClient.supabase)
@@ -225,9 +260,9 @@ const updateTask = async (req, res) => {
           .single();
 
         if (parentError || !parentTask) {
-          return res.status(404).json({ 
+          return res.status(404).json({
             error: 'Not found',
-            message: 'Parent task not found or does not belong to you' 
+            message: 'Parent task not found or does not belong to you'
           });
         }
       }
@@ -244,17 +279,17 @@ const updateTask = async (req, res) => {
 
     // Validate that at least one field is being updated
     if (Object.keys(updates).length === 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        message: 'No fields to update' 
+        message: 'No fields to update'
       });
     }
 
     // Validate title if it's being updated
     if (updates.title !== undefined && !updates.title) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        message: 'Title cannot be empty' 
+        message: 'Title cannot be empty'
       });
     }
 
@@ -274,9 +309,9 @@ const updateTask = async (req, res) => {
     res.status(200).json({ task: data });
   } catch (error) {
     console.error('Update task error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
-      message: 'Failed to update task' 
+      message: 'Failed to update task'
     });
   }
 };
@@ -293,9 +328,9 @@ const deleteTask = async (req, res) => {
 
     // Validate ID format
     if (!id || isNaN(parseInt(id))) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        message: 'Invalid task ID' 
+        message: 'Invalid task ID'
       });
     }
 
@@ -308,9 +343,9 @@ const deleteTask = async (req, res) => {
       .single();
 
     if (fetchError || !existingTask) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Not found',
-        message: 'Task not found' 
+        message: 'Task not found'
       });
     }
 
@@ -325,15 +360,15 @@ const deleteTask = async (req, res) => {
       throw error;
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Task deleted successfully',
-      task_id: id 
+      task_id: id
     });
   } catch (error) {
     console.error('Delete task error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
-      message: 'Failed to delete task' 
+      message: 'Failed to delete task'
     });
   }
 };
