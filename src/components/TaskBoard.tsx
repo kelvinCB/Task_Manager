@@ -6,6 +6,7 @@ import { getStatusColor, formatDate, isTaskOverdue, canCompleteTask, getTaskAnce
 import { Plus, Calendar, Circle, Clock, CheckCircle, Edit2, Trash2 } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
+import { SpotlightCard } from './ui/SpotlightCard';
 
 interface TaskBoardProps {
   tasks: Task[];
@@ -189,14 +190,15 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
               >
                 <div className="space-y-3">
                   {columnTasks.map(task => (
-                    <div
+                    <SpotlightCard
                       key={task.id}
                       draggable
                       data-testid="board-task-item"
                       data-task-title={task.title}
                       onDragStart={(e) => handleDragStart(e, task.id)}
                       onClick={() => onTaskClick?.(task.id)}
-                      className={`group mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm rounded-lg transition-all duration-200 cursor-move border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
+                      className={`group mb-2 p-4 ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-gray-50'} shadow-sm border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'} cursor-move`}
+                      spotlightColor={theme === 'dark' ? '255, 255, 255' : '99, 102, 241'} // Indigo-500 equivalent for light mode, white for dark
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
@@ -290,7 +292,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                           </button>
                         </div>
                       </div>
-                    </div>
+                    </SpotlightCard>
                   ))}
 
                   {/* Add Task Button */}
