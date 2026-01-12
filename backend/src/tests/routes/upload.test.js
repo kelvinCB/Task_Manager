@@ -77,6 +77,14 @@ describe('Upload Middleware via Routes', () => {
         expect(res.statusCode).toBe(201);
     });
 
+    it('should allow valid markdown file', async () => {
+        const res = await request(appWithHandler)
+            .post('/api/upload')
+            .attach('file', Buffer.from('# Markdown'), 'readme.md');
+        
+        expect(res.statusCode).toBe(201);
+    });
+
     it('should reject invalid file extension', async () => {
         const res = await request(appWithHandler)
             .post('/api/upload')
