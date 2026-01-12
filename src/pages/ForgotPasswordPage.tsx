@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import supabase from '../lib/supabaseClient';
 import { ArrowLeft, Mail } from 'lucide-react';
-import loginIllustrationLight from '../assets/images/login-illustration-light.png';
-import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
+import loginIllustrationLight from '../assets/images/login-illustration-light.webp';
+import loginIllustrationDark from '../assets/images/login-illustration-dark.webp';
 
 const ForgotPasswordPage: React.FC = () => {
   const { t } = useTranslation();

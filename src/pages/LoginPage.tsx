@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { AuthForm } from '../components/features/auth/AuthForm';
 import { LanguageToggle } from '../components/ui/LanguageToggle';
-import loginIllustrationLight from '../assets/images/login-illustration-light.png';
-import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
+import loginIllustrationLight from '../assets/images/login-illustration-light.webp';
+import loginIllustrationDark from '../assets/images/login-illustration-dark.webp';
 
 const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);

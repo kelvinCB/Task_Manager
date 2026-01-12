@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
-import loginIllustrationLight from '../assets/images/login-illustration-light.png';
-import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
+import loginIllustrationLight from '../assets/images/login-illustration-light.webp';
+import loginIllustrationDark from '../assets/images/login-illustration-dark.webp';
 
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
