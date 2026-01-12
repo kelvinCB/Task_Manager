@@ -106,7 +106,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
           className="hidden"
           onChange={handleFileSelect}
           // Accept commonly used types
-          accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,image/*,.mp3,.mp4"
+          accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,image/*,.mp3,.mp4,.md"
         />
 
         {isUploading ? (

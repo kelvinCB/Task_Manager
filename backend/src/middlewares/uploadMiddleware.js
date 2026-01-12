@@ -23,7 +23,8 @@ const fileFilter = (req, file, cb) => {
     'application/vnd.openxmlformats-officedocument.presentationml.presentation', // pptx
     'text/csv',
     'audio/mpeg', // mp3
-    'video/mp4'
+    'video/mp4',
+    'text/markdown'
   ];
 
   if (allowedMimes.includes(file.mimetype)) {
@@ -31,12 +32,12 @@ const fileFilter = (req, file, cb) => {
   } else {
     // Check key extensions if mimetype is generic (e.g. application/octet-stream sometimes happens)
     const ext = path.extname(file.originalname).toLowerCase();
-    const allowedExts = ['.jpg', '.jpeg', '.png', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.csv', '.mp3', '.mp4'];
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.csv', '.mp3', '.mp4', '.md'];
     
     if (allowedExts.includes(ext)) {
        cb(null, true);
     } else {
-       cb(new Error('Invalid file type. Allowed types: Word, Excel, PPT, CSV, PNG, JPG, MP3, MP4'), false);
+       cb(new Error('Invalid file type. Allowed types: Word, Excel, PPT, CSV, PNG, JPG, MP3, MP4, Markdown'), false);
     }
   }
 };

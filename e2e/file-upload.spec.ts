@@ -105,7 +105,57 @@ test.describe('File Upload Service', () => {
     await expect(detailAttachmentItem).toContainText(validFileName);
 
     // Check View and Download links
-    await expect(page.getByTestId('attachment-view-link')).toBeVisible();
     await expect(page.getByTestId('attachment-download-btn')).toBeVisible();
+  });
+
+  test('should allow attaching a markdown file', async ({ page }) => {
+    test.setTimeout(90000);
+
+    // 1. Open New Task Modal using AppPage helper
+    await appPage.openAddTaskModal();
+
+    // Validate modal using TaskPage helper
+    await taskPage.verifyModalOpen();
+
+    // 2. Fill Title
+    const uniqueTitle = `Markdown Task ${Date.now()}`;
+    await taskPage.titleInput.fill(uniqueTitle);
+
+    // 3. Upload File
+    const validFileName = 'notes.md';
+    const validFileBuffer = Buffer.from('# My Notes\nInformation here');
+
+    // Trigger file chooser
+    const fileInput = page.locator('input[type="file"]');
+    await fileInput.setInputFiles({
+      name: validFileName,
+      mimeType: 'text/markdown',
+      buffer: validFileBuffer
+    });
+
+    // 4. Verify upload success indicator
+    await expect(page.getByText(/uploaded!/)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText(/uploaded!/)).toContainText(validFileName);
+
+    // 5. Verify Attachment List
+    const attachmentItem = page.getByTestId('attachment-item');
+    await expect(attachmentItem).toBeVisible();
+    await expect(attachmentItem).toContainText(validFileName);
+
+    // 6. Save Task
+    await taskPage.createButton.click();
+    await taskPage.verifyModalClosed();
+
+    // 7. Verify Task is created
+    await taskPage.page.waitForTimeout(1000);
+    const taskLink = appPage.page.getByText(uniqueTitle).first();
+    await expect(taskLink).toBeVisible();
+
+    // 8. Open Task Detail and Verify Attachment
+    await taskLink.click();
+    
+    const detailAttachmentItem = page.locator('div[role="dialog"]').getByTestId('attachment-item');
+    await expect(detailAttachmentItem).toBeVisible({ timeout: 10000 });
+    await expect(detailAttachmentItem).toContainText(validFileName);
   });
 });

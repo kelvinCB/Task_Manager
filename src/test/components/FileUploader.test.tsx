@@ -65,6 +65,27 @@ describe('FileUploader', () => {
     });
   });
 
+  it('handles markdown file selection', async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithTheme(<FileUploader onUploadComplete={mockOnUploadComplete} />);
+    
+    const file = new File(['# Markdown Content'], 'readme.md', { type: 'text/markdown' });
+    const hiddenInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    
+    expect(hiddenInput).toBeInTheDocument();
+    expect(hiddenInput.accept).toContain('.md');
+
+    await user.upload(hiddenInput, file);
+
+    await waitFor(() => {
+        expect(taskService.uploadFile).toHaveBeenCalledWith(file);
+    });
+    
+    await waitFor(() => {
+         expect(mockOnUploadComplete).toHaveBeenCalled();
+    });
+  });
+
   it('displays error logic (passed via prop)', async () => {
     const { container } = renderWithTheme(<FileUploader onUploadComplete={mockOnUploadComplete} onError={mockOnError} />);
     

@@ -48,3 +48,7 @@ Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automat
 "AI - Error UI","Verify premium in-app error feedback","User is logged in","Open AI Assistant with empty description.","AI Options visible.","Medium","Functional","Tasks,AI,UI","Automated"
 "AI - Error UI","","","Click 'Improve Grammar'.","In-app red error card is visible with message 'Please enter a description first.'","Medium","Functional","Tasks,AI,UI","Automated"
 "AI - Error UI","","","Click 'X' on error card.","Error card disappears.","Medium","Functional","Tasks,AI,UI","Automated"
+"Attachments - Markdown Upload","Verify markdown .md file attachment","User is logged in","Open Add Task Modal.","Modal opens.","High","Functional","Tasks,Upload","Automated"
+"Attachments - Markdown Upload","","","Attach a .md file.","Upload success indicator visible.","High","Functional","Tasks,Upload","Automated"
+"Attachments - Markdown Upload","","","Save task.","Task created with attachment.","High","Functional","Tasks,Upload","Automated"
+"Attachments - Markdown Upload","","","Open Task Detail.","Attachment listed with View/Download options.","High","Functional","Tasks,Upload","Automated"
