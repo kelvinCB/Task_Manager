@@ -12,6 +12,7 @@ import { UploadResult } from '../services/taskService';
 import { extractAttachments, formatDescriptionWithAttachments, Attachment } from '../utils/attachmentUtils';
 import { AttachmentList } from './AttachmentList';
 import { AuthRequiredModal } from './features/account/AuthRequiredModal';
+import { HoverBorderGradient } from './ui/hover-border-gradient';
 
 interface TaskFormProps {
   task?: Task;
@@ -277,8 +278,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     )}
 
                     <div className="flex flex-wrap items-center gap-3">
-                      <button
+                      <HoverBorderGradient
+                        as="button"
                         type="button"
+                        highlightColor="#4f46e5" // Indigo-600
+                        containerClassName="rounded-xl"
+                        className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-[inherit]`}
                         onClick={async () => {
                           if (!isAuthenticated) {
                             setIsAuthModalOpen(true);
@@ -348,17 +353,22 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           }
                         }}
                         disabled={aiProcessingState !== 'idle'}
-                        className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md transition-all active:scale-95 disabled:opacity-50"
                       >
-                        {aiProcessingState === 'generating' ? (
-                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>{t('ai.generating')}</>
-                        ) : (
-                          <><AIIcon size={14} />{t('ai.generate')}</>
-                        )}
-                      </button>
+                        <div className={`flex items-center gap-2 px-0 py-0 text-sm font-bold ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`}>
+                          {aiProcessingState === 'generating' ? (
+                            <><div className="w-4 h-4 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin"></div>{t('ai.generating')}</>
+                          ) : (
+                            <><AIIcon size={14} />{t('ai.generate')}</>
+                          )}
+                        </div>
+                      </HoverBorderGradient>
 
-                      <button
+                      <HoverBorderGradient
+                        as="button"
                         type="button"
+                        highlightColor="#10b981" // Emerald-500
+                        containerClassName="rounded-xl"
+                        className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-[inherit]`}
                         onClick={async () => {
                           if (!isAuthenticated) {
                             setIsAuthModalOpen(true);
@@ -378,16 +388,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           try {
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
                             const originalDescription = formData.description;
-
-                            // For improving, we might want to clear or keep? 
-                            // The user wants "in real time", so let's clear it if they click improve.
                             setFormData(prev => ({ ...prev, description: '' }));
-
                             let hasFoundStartTag = false;
 
                             await openaiService.improveGrammar(originalDescription, model, (token) => {
                               fullResponse += token;
-
                               const thinkingStartIdx = fullResponse.indexOf('<thinking>');
                               const thinkingEndIdx = fullResponse.indexOf('</thinking>');
 
@@ -405,14 +410,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                                 if (!hasFoundStartTag) {
                                   setThinkingProcess(fullResponse);
                                 }
-
                                 if (fullResponse.length > 0 && !fullResponse.includes('<thinking>')) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
                                 }
                               }
                             });
                             setShowAIOptions(false);
-                            playNotificationSound(1000, 0.5, 0.3); // AI improvement completion sound
+                            playNotificationSound(1000, 0.5, 0.3);
                           } catch (error) {
                             console.error('Error improving grammar:', error);
                             setAiError(error instanceof Error ? error.message : 'Unknown error');
@@ -421,14 +425,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           }
                         }}
                         disabled={aiProcessingState !== 'idle'}
-                        className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition-all active:scale-95 disabled:opacity-50"
                       >
-                        {aiProcessingState === 'improving' ? (
-                          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>{t('ai.improving')}</>
-                        ) : (
-                          <><AIIcon size={14} />{t('ai.improve')}</>
-                        )}
-                      </button>
+                        <div className={`flex items-center gap-2 px-0 py-0 text-sm font-bold ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                          {aiProcessingState === 'improving' ? (
+                            <><div className="w-4 h-4 border-2 border-emerald-600/30 border-t-emerald-600 rounded-full animate-spin"></div>{t('ai.improving')}</>
+                          ) : (
+                            <><AIIcon size={14} />{t('ai.improve')}</>
+                          )}
+                        </div>
+                      </HoverBorderGradient>
 
                       <button
                         type="button"
