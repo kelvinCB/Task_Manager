@@ -56,7 +56,7 @@ Utilizamos **Conventional Commits** con el siguiente formato:
 
 #### ✅ Hacer:
 - Usar imperativo presente: "add" no "added" o "adds"
-- Primera letra en minúscula
+- Primera letra en minúscula (Todo el asunto debe ser en minúscula para pasar el linter)
 - No terminar con punto
 - Ser descriptivo pero conciso (máximo 72 caracteres en el título)
 - Usar inglés para consistencia
