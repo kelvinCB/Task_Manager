@@ -5,8 +5,8 @@ import supabase from '../lib/supabaseClient';
 import { AuthForm } from '../components/features/auth/AuthForm';
 import { LanguageToggle } from '../components/ui/LanguageToggle';
 import { RegistrationSuccessModal } from '../components/features/auth/RegistrationSuccessModal';
-import loginIllustrationLight from '../assets/images/login-illustration-light.png';
-import loginIllustrationDark from '../assets/images/login-illustration-dark.png';
+import loginIllustrationLight from '../assets/images/login-illustration-light.webp';
+import loginIllustrationDark from '../assets/images/login-illustration-dark.webp';
 
 const RegisterPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);

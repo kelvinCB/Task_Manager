@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { X, MailCheck } from 'lucide-react';
+import BalloonBackground from '../../ui/BalloonBackground';
 
 interface RegistrationSuccessModalProps {
     isOpen: boolean;
@@ -28,6 +29,7 @@ export const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> =
 
     return (
         <div className={`fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
+            <BalloonBackground />
             <div
                 className={`relative w-full max-w-sm rounded-2xl shadow-2xl transform transition-all duration-300 ${isAnimating ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
                     } ${theme === 'dark'
