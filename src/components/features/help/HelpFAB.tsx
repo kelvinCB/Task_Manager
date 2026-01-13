@@ -33,7 +33,17 @@ const HelpFAB: React.FC = () => {
                 )}
             </button>
 
-            {isOpen && <HelpPanel onClose={() => setIsOpen(false)} />}
+            {isOpen && (
+                <>
+                    {/* Backdrop for mobile to focus on Help Center */}
+                    <div 
+                        className="fixed inset-0 bg-black/20 backdrop-blur-md z-40 lg:hidden animate-in fade-in duration-300"
+                        onClick={() => setIsOpen(false)}
+                        aria-hidden="true"
+                    />
+                    <HelpPanel onClose={() => setIsOpen(false)} />
+                </>
+            )}
         </>
     );
 };
