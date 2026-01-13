@@ -221,44 +221,6 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
               </div>
             )}
 
-            {/* Login/Logout depending on auth state */}
-            {isAuthenticated ? (
-              <button
-                onClick={handleLogout}
-                data-testid="logout-button"
-                className={`
-                  w-full text-left px-4 py-2 flex items-center gap-2
-                  ${theme === 'dark'
-                    ? 'text-gray-200 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                  }
-                `}
-                role="menuitem"
-              >
-                <LogOut size={16} />
-                <span>{t('auth.logout')}</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleLogin}
-                data-testid="login-button-menu"
-                className={`
-                  w-full text-left px-4 py-2 flex items-center gap-2
-                  ${theme === 'dark'
-                    ? 'text-gray-200 hover:bg-gray-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                  }
-                `}
-                role="menuitem"
-              >
-                <LogIn size={16} />
-                <span>{t('auth.login')}</span>
-              </button>
-            )}
-
-            {/* Divider */}
-            <div className={`my-1 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}></div>
-
             {/* Export option */}
             <button
               onClick={() => {
@@ -320,6 +282,44 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
                 className="hidden"
               />
             </div>
+
+            {/* Divider */}
+            <div className={`my-1 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}></div>
+
+            {/* Login/Logout depending on auth state */}
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                data-testid="logout-button"
+                className={`
+                  w-full text-left px-4 py-2 flex items-center gap-2
+                  ${theme === 'dark'
+                    ? 'text-gray-200 hover:bg-gray-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                  }
+                `}
+                role="menuitem"
+              >
+                <LogOut size={16} />
+                <span>{t('auth.logout')}</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleLogin}
+                data-testid="login-button-menu"
+                className={`
+                  w-full text-left px-4 py-2 flex items-center gap-2
+                  ${theme === 'dark'
+                    ? 'text-gray-200 hover:bg-gray-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                  }
+                `}
+                role="menuitem"
+              >
+                <LogIn size={16} />
+                <span>{t('auth.login')}</span>
+              </button>
+            )}
           </div>
         </div>
       )}
