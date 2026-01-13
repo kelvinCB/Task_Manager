@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../utils/apiConfig';
+
 interface OpenAIMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -30,7 +32,7 @@ export class OpenAIService {
   constructor() {
     // Look for VITE_API_BASE_URL (for proxying) or use absolute path
     // In dev mode with Vite proxy, '/api/ai' will point to localhost:3001
-    this.baseUrl = '/api/ai';
+    this.baseUrl = `${API_BASE_URL}/api/ai`;
   }
 
   /**

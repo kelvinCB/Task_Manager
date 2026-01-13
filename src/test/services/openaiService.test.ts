@@ -61,7 +61,7 @@ describe('OpenAIService', () => {
 
       expect(result).toBe('Generated task description for implementing user authentication');
       expect(fetch).toHaveBeenCalledWith(
-        '/api/ai/chat',
+        'http://localhost:3001/api/ai/chat',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -310,7 +310,7 @@ describe('OpenAIService', () => {
 
       expect(result).toBe('Corrected text');
       expect(fetch).toHaveBeenCalledWith(
-        '/api/ai/chat',
+        'http://localhost:3001/api/ai/chat',
         expect.objectContaining({
           method: 'POST',
           body: expect.stringContaining('Improve this text')
