@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import supabase from '../lib/supabaseClient';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 export interface UserProfile {
   id: string;
@@ -93,7 +94,7 @@ export const useUserProfile = () => {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/profile/avatar`, {
+      const response = await fetch(`${API_BASE_URL}/api/profile/avatar`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -127,7 +128,7 @@ export const useUserProfile = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/profile/avatar`, {
+      const response = await fetch(`${API_BASE_URL}/api/profile/avatar`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
