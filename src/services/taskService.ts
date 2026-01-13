@@ -1,5 +1,6 @@
 import supabase from '../lib/supabaseClient';
 import { Task, TaskStatus } from '../types/Task';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 export interface UploadResult {
   message: string;
@@ -50,9 +51,7 @@ export class TaskService {
   private baseUrl: string;
 
   constructor() {
-    // Use backend API URL from environment or default to localhost
-    const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
-    this.baseUrl = env.VITE_BACKEND_URL || env.VITE_API_BASE_URL || (env.PROD ? '' : 'http://127.0.0.1:3001');
+    this.baseUrl = API_BASE_URL;
   }
 
   /**
