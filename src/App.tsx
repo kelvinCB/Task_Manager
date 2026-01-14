@@ -136,6 +136,14 @@ const MainApp = () => {
     setEditingTask(undefined);
     setParentId(undefined);
     setIsFormOpen(false);
+
+    // Scroll to top on mobile after creating or editing a task
+    if (window.innerWidth < 768) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const handleEditTask = (task: Task) => {
