@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '../../App';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import { AuthProvider } from '../../contexts/AuthContext';
@@ -337,5 +337,43 @@ describe('App Component', () => {
     // For this test we just verify task items are present
     // Actual timer functionality would be tested in TaskTimer component tests
     expect(mockTasks.length).toBeGreaterThan(0);
+  });
+
+  it('should scroll to top when creating a task on mobile', async () => {
+    // Mock mobile viewport
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 500 });
+
+    // Mock scrollTo
+    const scrollToMock = vi.fn();
+    Object.defineProperty(window, 'scrollTo', { writable: true, configurable: true, value: scrollToMock });
+
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    // Open form using the visible button
+    const addTaskButtons = screen.getAllByText(/new task/i);
+    fireEvent.click(addTaskButtons[0]);
+
+    // Fill form
+    const titleInput = screen.getByLabelText(/title/i);
+    fireEvent.change(titleInput, { target: { value: 'Mobile Task' } });
+
+    // Submit form
+    const submitButton = screen.getByRole('button', { name: /create task/i });
+    fireEvent.click(submitButton);
+
+    // Assert
+    await waitFor(() => {
+      expect(createTaskMock).toHaveBeenCalled();
+      expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+    });
+
+    // Reset window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
   });
 });
