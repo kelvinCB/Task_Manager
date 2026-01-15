@@ -39,6 +39,9 @@ Extends user information beyond what Supabase Auth provides. Each profile is lin
 | `avatar_url`  | `text`      | Nullable                                           |
 | `created_at`  | `timestamptz` | Not Null, Default `now()`                          |
 | `updated_at`  | `timestamptz` | Not Null, Default `now()`                          |
+| `credits`     | `integer`     | Not Null, Default `5`                              |
+| `about`       | `text`        | Nullable                                           |
+| `linkedin`    | `text`        | Nullable                                           |
 
 ### `public.tasks`
 

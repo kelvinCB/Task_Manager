@@ -1,0 +1,9 @@
+Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automation Status
+"Credits - No Credits Warning","Verify user receives warning when credits are 0","User with 0 credits logged in","Navigate to Task Board.","Board is visible.","High","Functional","Credits,AI,Error","Automated"
+"Credits - No Credits Warning","","","Click 'Add Task' button.","Task creation modal appears.","High","Functional","Credits,AI,Error","Automated"
+"Credits - No Credits Warning","","","Enter task title.","Title field populated.","High","Functional","Credits,AI,Error","Automated"
+"Credits - No Credits Warning","","","Click 'Generate AI' button.","Error message appears: 'No tienes créditos suficientes. Por favor recarga tu cuenta.' or similar.","High","Functional","Credits,AI,Error","Automated"
+"Credits - Admin Set Credits","Verify admin can set user credits","Admin API access enabled","Send POST to /api/admin/credits/set with userId and amount=0.","Response 200 OK, returns new credit balance 0.","High","Functional","Credits,Admin,API","Automated"
+"Credits - Admin Set Credits","","","Check response.","Response contains updated credit information.","High","Functional","Credits,Admin,API","Automated"
+"Credits - Profile Display","Verify credits are displayed in Profile Modal","User Logged In","Open Account Menu.","Account menu matches expected layout.","Medium","UI","Credits,Profile","Automated"
+"Credits - Profile Display","","","Click 'My Profile'.","'Remaining credits' field shows the current credit balance (e.g. 0).","Medium","UI","Credits,Profile","Automated"

@@ -34,6 +34,7 @@ const uploadRoutes = require('./routes/upload');
 const profileRoutes = require('./routes/profile');
 const aiRoutes = require('./routes/ai');
 const featureRequestRoutes = require('./routes/featureRequests');
+const adminRoutes = require('./routes/admin');
 
 app.use('/api/auth', authRoutes);
 
@@ -43,6 +44,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/feature-requests', featureRequestRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
     res.send('Task Manager Backend is running!');

@@ -1,6 +1,42 @@
 const { createClientWithToken, supabase } = require('../config/supabaseClient');
 
 /**
+ * Get user profile including credits
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        // Use service role if needed? No, user token is fine for RLS.
+        // Actually RLS allows viewing own profile.
+        const token = req.headers.authorization?.split(' ')[1];
+        const userClient = token ? createClientWithToken(token) : supabase;
+
+        const { data: profile, error } = await userClient
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+
+        if (error) {
+            console.error('Error fetching profile:', error);
+            return res.status(500).json({ error: 'Failed to fetch profile', details: error.message });
+        }
+
+        // Ensure credits is present, default to 5 if not in DB (backward compatibility before migration runs)
+        if (profile && profile.credits === undefined) {
+            profile.credits = 5;
+        }
+
+        res.status(200).json(profile);
+    } catch (err) {
+        console.error('Get Profile Error:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+/**
  * Upload a profile avatar to Supabase Storage
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
@@ -149,7 +185,44 @@ const deleteAvatar = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { username, display_name, about, linkedin } = req.body;
+        const token = req.headers.authorization?.split(' ')[1];
+        const userClient = token ? createClientWithToken(token) : supabase;
+
+        // Build update object with only provided fields
+        const updates = {
+            updated_at: new Date().toISOString()
+        };
+        if (username !== undefined) updates.username = username;
+        if (display_name !== undefined) updates.display_name = display_name;
+        if (about !== undefined) updates.about = about;
+        if (linkedin !== undefined) updates.linkedin = linkedin;
+
+        const { data: profile, error } = await userClient
+            .from('profiles')
+            .update(updates)
+            .eq('id', userId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error updating profile:', error);
+            return res.status(500).json({ error: 'Failed to update profile', details: error.message });
+        }
+
+        res.status(200).json(profile);
+    } catch (err) {
+        console.error('Update Profile Error:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 module.exports = {
     uploadAvatar,
-    deleteAvatar
+    deleteAvatar,
+    getProfile,
+    updateProfile
 };

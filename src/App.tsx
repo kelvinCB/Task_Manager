@@ -39,6 +39,7 @@ import { ErrorModal } from './components/features/ErrorModal';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import HelpFAB from './components/features/help/HelpFAB';
+import { Toaster } from 'sonner';
 
 const MainApp = () => {
   const {
@@ -804,7 +805,7 @@ const MainApp = () => {
 }
 
 const App = () => {
-  const { isAuthenticated } = useAuth();
+
 
   // Handle unhandled promise rejections from Vercel Analytics
   useEffect(() => {
@@ -836,6 +837,7 @@ const App = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Analytics />
+      <Toaster />
     </Router>
   );
 };

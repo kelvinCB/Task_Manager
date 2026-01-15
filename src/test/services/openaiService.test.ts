@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { OpenAIService, openaiService } from '../../services/openaiService';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { OpenAIService } from '../../services/openaiService';
 
 // Mock environment variables
 const mockEnv = {
@@ -22,9 +22,27 @@ Object.defineProperty(globalThis, 'import', {
   configurable: true
 });
 
+// Mock Supabase client
+vi.mock('../../lib/supabaseClient', () => ({
+  default: {
+    auth: {
+      getSession: vi.fn(),
+    },
+  },
+}));
+
+import supabase from '../../lib/supabaseClient';
+
 describe('OpenAIService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (supabase.auth.getSession as any).mockResolvedValue({
+      data: {
+        session: {
+          access_token: 'mock-token'
+        }
+      }
+    });
   });
 
   describe('Constructor', () => {
