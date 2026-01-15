@@ -121,7 +121,8 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
         }
     };
 
-    const profileImage = profile?.avatar_url || "https://github.com/shadcn.png";
+
+    const profileImage = profile?.avatar_url || "";
 
     return (
         <>
