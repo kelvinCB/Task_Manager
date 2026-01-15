@@ -3,6 +3,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useUserProfile } from '../../../hooks/useUserProfile';
 import { useTranslation } from 'react-i18next';
+import { cn, getAvatarColor } from '@/lib/utils';
 import { ImagePlus, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -152,7 +153,9 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
                         >
                             <Avatar className="h-24 w-24 border-4 border-background shadow-lg rounded-full group-hover:opacity-90 transition-opacity">
                                 <AvatarImage src={profileImage} alt="Profile" />
-                                <AvatarFallback>{profile?.display_name?.charAt(0) || profile?.username?.charAt(0) || 'U'}</AvatarFallback>
+                                <AvatarFallback className={`${getAvatarColor(profile?.username || 'U')} text-4xl text-white`}>
+                                    {profile?.display_name?.charAt(0) || profile?.username?.charAt(0) || 'U'}
+                                </AvatarFallback>
                             </Avatar>
 
                             {/* Overlay for hover effect */}

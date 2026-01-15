@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { cn, getAvatarColor } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -92,7 +93,9 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
         {isAuthenticated && profile ? (
           <Avatar className={`h-8 w-8 ${isOpen ? (theme === 'dark' ? 'ring-2 ring-yellow-500' : 'ring-2 ring-indigo-500') : ''}`}>
             <AvatarImage src={profile.avatar_url || ''} alt={profile.display_name || profile.username} />
-            <AvatarFallback>{(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarFallback className={`${getAvatarColor(profile.username || 'U')} text-white border-white`}>
+              {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
         ) : (
           <div className={`
@@ -127,7 +130,9 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
                   <div className="cursor-pointer" onClick={handleProfileClick} data-testid="user-profile-trigger">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={profile.avatar_url || ''} alt={profile.display_name || profile.username} />
-                      <AvatarFallback>{(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback className={`${getAvatarColor(profile.username || 'U')} text-white`}>
+                        {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="flex-1 min-w-0">

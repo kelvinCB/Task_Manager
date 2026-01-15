@@ -76,8 +76,18 @@ const addUserCredits = async (req, res) => {
             return res.status(500).json({ error: 'Failed to update credits', details: updateError.message });
         }
 
+
+        let message = 'Credits updated successfully';
+        if (parseInt(amount) < 0 && newCredits === 0) {
+            if (currentCredits === 0) {
+                message = 'User already has 0 credits (no change)';
+            } else {
+                message = 'Credits updated (floored at 0)';
+            }
+        }
+
         res.status(200).json({
-            message: 'Credits updated successfully',
+            message: message,
             previous: currentCredits,
             added: amount,
             current: updated.credits
