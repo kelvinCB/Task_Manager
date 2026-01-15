@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "../../lib/utils";
 
 type Direction = "TOP" | "LEFT" | "BOTTOM" | "RIGHT";
@@ -12,6 +12,8 @@ interface HoverBorderGradientProps extends React.HTMLAttributes<HTMLElement> {
   duration?: number;
   clockwise?: boolean;
   highlightColor?: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 export function HoverBorderGradient({
