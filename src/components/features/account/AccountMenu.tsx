@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { cn, getAvatarColor } from '@/lib/utils';
+import { getAvatarColor } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {

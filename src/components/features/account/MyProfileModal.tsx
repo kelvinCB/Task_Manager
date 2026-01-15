@@ -3,7 +3,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useUserProfile } from '../../../hooks/useUserProfile';
 import { useTranslation } from 'react-i18next';
-import { cn, getAvatarColor } from '@/lib/utils';
+import { getAvatarColor } from '@/lib/utils';
 import { ImagePlus, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
