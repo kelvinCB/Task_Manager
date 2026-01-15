@@ -179,9 +179,9 @@ Allows all users (authenticated or anonymous) to submit requests. Only service r
 ALTER TABLE public.feature_requests ENABLE ROW LEVEL SECURITY;
 
 -- Insert policy (unauthenticated users can also submit)
-CREATE POLICY "Anyone can insert feature requests" 
+CREATE POLICY "Allow anyone to insert feature requests" 
   ON public.feature_requests FOR INSERT 
-  WITH CHECK (true);
+  WITH CHECK ((auth.uid() = user_id) OR (auth.uid() IS NULL AND user_id IS NULL));
 
 -- Select policy (only owner can see their own, or restricted)
 CREATE POLICY "Users can view own feature requests" 
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS public.feature_requests (
 
 -- RLS for feature_requests
 ALTER TABLE public.feature_requests ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can insert feature requests" ON public.feature_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow anyone to insert feature requests" ON public.feature_requests FOR INSERT WITH CHECK ((auth.uid() = user_id) OR (auth.uid() IS NULL AND user_id IS NULL));
 CREATE POLICY "Users can view own feature requests" ON public.feature_requests FOR SELECT USING (auth.uid() = user_id);
 ```
 
