@@ -88,3 +88,77 @@ router.post('/chat', authenticateUser, async (req, res) => {
 });
 
 module.exports = router;
+
+router.post('/generate-image', authenticateUser, async (req, res) => {
+  const { prompt, model = 'dall-e-3', quality = 'hd', ...rest } = req.body;
+  const apiKey = process.env.OPENAI_API_KEY;
+  const baseUrl = process.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1';
+
+  if (!apiKey) {
+    return res.status(500).json({ error: { message: 'OpenAI API key not configured on server.' } });
+  }
+
+  const userId = req.user.id;
+  const token = req.headers.authorization?.split(' ')[1];
+  const userClient = token ? createClientWithToken(token) : supabase;
+  const COST_PER_IMAGE = 3;
+
+  try {
+    // 1. Check Credits
+    const { data: profile, error: profileError } = await userClient
+      .from('profiles')
+      .select('credits')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.error('Error verifying credits:', profileError);
+      return res.status(500).json({ error: { message: 'Failed to verify credits.' } });
+    }
+
+    if (!profile || profile.credits < COST_PER_IMAGE) {
+      return res.status(403).json({ error: { message: `Insufficient credits. This feature requires ${COST_PER_IMAGE} credits.` } });
+    }
+
+    // 2. Call OpenAI Image Generation
+    const response = await fetch(`${baseUrl}/images/generations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        prompt,
+        n: 1,
+        size: "1024x1024",
+        quality,
+        ...rest
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI Image API Error:', errorData);
+      return res.status(response.status).json(errorData);
+    }
+
+    const data = await response.json();
+
+    // 3. Deduct Credits
+    const { error: deductionError } = await userClient
+      .from('profiles')
+      .update({ credits: profile.credits - COST_PER_IMAGE })
+      .eq('id', userId);
+
+    if (deductionError) {
+      console.warn('Failed to deduct credits for image generation:', userId, deductionError);
+    }
+
+    res.json(data);
+
+  } catch (error) {
+    console.error('AI Image Proxy Error:', error);
+    res.status(500).json({ error: { message: 'Failed to connect to OpenAI via proxy' } });
+  }
+});

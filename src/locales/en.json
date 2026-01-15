@@ -146,7 +146,10 @@
         "dismiss": "Dismiss",
         "generating": "Generating...",
         "improving": "Improving...",
-        "thinking_status": "Thinking"
+        "thinking_status": "Thinking",
+        "generate_image": "Generate Image",
+        "image_prompt_placeholder": "Describe the image you want regarding this task...",
+        "image_cost_warning": "Costs 3 credits"
     },
     "errors": {
         "cannot_add_subtask_to_done": "Cannot add a subtask because the parent task is already completed and marked as \"Done\"",

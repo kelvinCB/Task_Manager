@@ -5,6 +5,8 @@ import { AppPage } from './page-objects/app.page';
 import { createClient } from '@supabase/supabase-js';
 
 test.describe('Credit Management', () => {
+    test.describe.configure({ mode: 'serial' });
+
     let authPage: AuthPage;
     let appPage: AppPage;
     let userId: string;
@@ -145,12 +147,61 @@ test.describe('Credit Management', () => {
         // Wait for options panel
         await page.waitForTimeout(500);
 
-        // Click Generate AI button
-        await page.click('button:has-text("Generate")');
+        // Click Generate Description button
+        await page.click('button:has-text("Generate Description")');
 
         // 6. Verify "No Credits" Error Feedback
         const errorLocator = page.locator('[data-testid="ai-error-container"]');
         await expect(errorLocator).toBeVisible();
+        await expect(errorLocator).toContainText(/credits|recargas/i);
+    });
+
+    test('should show error when generating image with no credits', async ({ page, request }) => {
+        if (!process.env.SUPABASE_SERVICE_KEY) {
+            test.skip();
+        }
+        authPage = new AuthPage(page);
+        appPage = new AppPage(page);
+
+        // 1. Login
+        await authPage.goToLogin();
+        await authPage.login(noCreditsUser.email, noCreditsUser.password);
+        await authPage.expectLoggedIn();
+
+        // 2. Set Credits to 0 via Admin API
+        const setCreditsResponse = await request.post(`${apiUrl}/api/admin/credits/set`, {
+            headers: { 'x-admin-secret': adminSecret },
+            data: { userId: userId, amount: 0 }
+        });
+        expect(setCreditsResponse.ok()).toBeTruthy();
+        const setCreditsData = await setCreditsResponse.json();
+        expect(setCreditsData.current).toBe(0);
+
+        // 3. Reload and attempt Image Generation
+        await page.reload();
+        await authPage.expectLoggedIn();
+        await appPage.openAddTaskModal();
+        await page.fill('#task-title', 'Test Image Gen No Credits');
+
+        // Open AI Options
+        await page.click('button[title="AI Assistant"]');
+        await page.waitForTimeout(500);
+
+        // Click Generate Image button to show prompt input
+        await page.click('button:has-text("Generate Image")');
+
+        // Wait for prompt input and fill it
+        const promptInput = page.locator('textarea[placeholder*="Describe the image"]');
+        await expect(promptInput).toBeVisible();
+        await promptInput.fill('A test image prompt');
+
+        // Click Confirm to generate
+        await page.click('button:has-text("Confirm")');
+
+        // Verify "No Credits" Error Feedback
+        const errorLocator = page.locator('[data-testid="ai-error-container"]');
+        await expect(errorLocator).toBeVisible();
+        // The error message might differ slightly but generally mentions credits
         await expect(errorLocator).toContainText(/credits|recargas/i);
     });
 });

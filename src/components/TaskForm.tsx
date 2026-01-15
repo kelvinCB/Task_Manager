@@ -46,7 +46,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   });
   const [showAIOptions, setShowAIOptions] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [aiProcessingState, setAiProcessingState] = useState<'idle' | 'generating' | 'improving'>('idle');
+  const [aiProcessingState, setAiProcessingState] = useState<'idle' | 'generating' | 'improving' | 'generating-image'>('idle');
+  const [showImagePrompt, setShowImagePrompt] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState('');
   const [thinkingProcess, setThinkingProcess] = useState('');
   const [isThinkingExpanded, setIsThinkingExpanded] = useState(true);
   const [validationError, setValidationError] = useState('');
@@ -70,6 +72,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   useEffect(() => {
     setValidationError('');
     setShowAIOptions(false);
+    setShowImagePrompt(false);
+    setImagePrompt('');
     if (task) {
       const { text, attachments } = extractAttachments(task.description);
       setFormData({
@@ -250,7 +254,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     )}
 
                     {/* Thinking Process Accordion */}
-                    {(aiProcessingState === 'generating' || aiProcessingState === 'improving') && (
+                    {(aiProcessingState === 'generating' || aiProcessingState === 'improving' || aiProcessingState === 'generating-image') && (
                       <div className="mb-4">
                         <button
                           type="button"
@@ -473,6 +477,88 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           )}
                         </div>
                       </HoverBorderGradient>
+
+                      <HoverBorderGradient
+                        as="button"
+                        type="button"
+                        highlightColor="#ec4899" // Pink-500
+                        containerClassName="rounded-xl"
+                        className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-[inherit]`}
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            setIsAuthModalOpen(true);
+                            return;
+                          }
+                          setShowImagePrompt(!showImagePrompt);
+                          setAiError(null);
+                        }}
+                        disabled={aiProcessingState !== 'idle'}
+                      >
+                        <div className={`flex items-center gap-2 px-0 py-0 text-sm font-bold ${theme === 'dark' ? 'text-pink-400' : 'text-pink-600'}`}>
+                          <AIIcon size={14} />
+                          {t('ai.generate_image')}
+                        </div>
+                      </HoverBorderGradient>
+
+                      {showImagePrompt && (
+                        <div className="w-full mt-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2">
+                          <textarea
+                            value={imagePrompt}
+                            onChange={(e) => setImagePrompt(e.target.value)}
+                            placeholder={t('ai.image_prompt_placeholder')}
+                            className={`w-full p-2 mb-2 text-sm rounded border ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'} focus:ring-2 focus:ring-pink-500 focus:border-transparent`}
+                            rows={3}
+                          />
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">
+                              {t('ai.image_cost_warning')}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (!imagePrompt.trim()) return;
+
+                                setAiProcessingState('generating-image');
+                                setAiError(null);
+
+                                try {
+                                  const imageUrl = await openaiService.generateImage(imagePrompt);
+
+                                  const newAttachment: Attachment = {
+                                    name: `AI Generated Image - ${new Date().toLocaleTimeString()}`,
+                                    url: imageUrl,
+                                    type: 'image'
+                                  };
+
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    attachments: [...prev.attachments, newAttachment]
+                                  }));
+
+                                  setShowImagePrompt(false);
+                                  setImagePrompt('');
+                                  setShowAIOptions(false);
+                                  playNotificationSound(1000, 0.5, 0.3);
+
+                                } catch (error) {
+                                  console.error('Error generating image:', error);
+                                  setAiError(error instanceof Error ? error.message : t('common.error'));
+                                } finally {
+                                  setAiProcessingState('idle');
+                                }
+                              }}
+                              className="px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-2"
+                              disabled={aiProcessingState !== 'idle' || !imagePrompt.trim()}
+                            >
+                              {aiProcessingState === 'generating-image' ? (
+                                <><div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> {t('ai.generating')}</>
+                              ) : (
+                                t('common.confirm')
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       <button
                         type="button"
