@@ -7,11 +7,11 @@
 // or 'http://localhost:3001' in development.
 const getApiBaseUrl = () => {
   const env = import.meta.env;
-  
+
   if (env.VITE_API_URL) {
     return env.VITE_API_URL;
   }
-  
+
   if (env.VITE_BACKEND_URL) {
     return env.VITE_BACKEND_URL;
   }
@@ -24,6 +24,7 @@ const getApiBaseUrl = () => {
   }
 
   // Default to local backend for development
+  // Direct connection to bypass any potential Vite proxy buffering
   return 'http://localhost:3001';
 };
 

@@ -40,10 +40,11 @@ export class OpenAIService {
       const { done, value } = await reader.read();
       if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
+      const chunk = decoder.decode(value, { stream: true });
+      buffer += chunk;
 
-      // Keep the last partial line in the buffer
+      const lines = buffer.split('\n');
+      // Keep the last line in the buffer as it might be incomplete
       buffer = lines.pop() || '';
 
       for (const line of lines) {
@@ -52,7 +53,8 @@ export class OpenAIService {
 
         if (trimmedLine.startsWith('data: ')) {
           try {
-            const json = JSON.parse(trimmedLine.slice(6));
+            const jsonStr = trimmedLine.slice(6);
+            const json = JSON.parse(jsonStr);
             const deltaContent = json.choices[0]?.delta?.content || json.choices[0]?.text || '';
 
             if (deltaContent) {
@@ -60,9 +62,7 @@ export class OpenAIService {
               onToken(deltaContent);
             }
           } catch (e) {
-            // If it's not valid JSON, it might be split across lines despite our split('\n')
-            // This is less likely with correctly formatted SSE, but good to handle
-            console.warn('Error parsing stream chunk:', e, 'Line:', trimmedLine);
+            console.warn('Error parsing stream chunk:', e);
           }
         }
       }

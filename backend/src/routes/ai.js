@@ -68,14 +68,14 @@ router.post('/chat', authenticateUser, async (req, res) => {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no'); // Disable buffering in some proxies
+      res.flushHeaders();
 
-      const reader = response.body.getReader();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(value);
+      for await (const chunk of response.body) {
+        res.write(chunk);
+        if (res.flush) res.flush();
       }
+      res.write('\n\n');
       res.end();
     } else {
       const data = await response.json();
