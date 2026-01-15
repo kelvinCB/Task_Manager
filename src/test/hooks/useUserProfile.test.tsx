@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useUserProfile } from '../../hooks/useUserProfile';
+import { UserProfileProvider } from '../../contexts/UserProfileContext';
 import { useAuth } from '../../contexts/AuthContext';
 import supabase from '../../lib/supabaseClient';
 
@@ -18,7 +19,11 @@ const mockSupabase = vi.mocked(supabase);
 describe('useUserProfile Hook', () => {
   const mockUser = {
     id: 'test-user-id',
-    email: 'test@example.com'
+    email: 'test@example.com',
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: new Date().toISOString()
   };
 
   const mockProfile = {
@@ -46,7 +51,9 @@ describe('useUserProfile Hook', () => {
       logout: vi.fn()
     });
 
-    const { result } = renderHook(() => useUserProfile());
+    const { result } = renderHook(() => useUserProfile(), {
+      wrapper: UserProfileProvider
+    });
 
     expect(result.current.loading).toBe(false); // Loading is false when not authenticated
     expect(result.current.profile).toBe(null);
@@ -74,7 +81,9 @@ describe('useUserProfile Hook', () => {
       select: mockSelect
     } as any);
 
-    const { result } = renderHook(() => useUserProfile());
+    const { result } = renderHook(() => useUserProfile(), {
+      wrapper: UserProfileProvider
+    });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -107,7 +116,9 @@ describe('useUserProfile Hook', () => {
       select: mockSelect
     } as any);
 
-    const { result } = renderHook(() => useUserProfile());
+    const { result } = renderHook(() => useUserProfile(), {
+      wrapper: UserProfileProvider
+    });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -125,7 +136,9 @@ describe('useUserProfile Hook', () => {
       logout: vi.fn()
     });
 
-    const { result } = renderHook(() => useUserProfile());
+    const { result } = renderHook(() => useUserProfile(), {
+      wrapper: UserProfileProvider
+    });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -172,7 +185,9 @@ describe('useUserProfile Hook', () => {
       update: mockUpdate
     } as any);
 
-    const { result } = renderHook(() => useUserProfile());
+    const { result } = renderHook(() => useUserProfile(), {
+      wrapper: UserProfileProvider
+    });
 
     // Wait for initial load
     await waitFor(() => {
@@ -225,7 +240,9 @@ describe('useUserProfile Hook', () => {
       update: mockUpdate
     } as any);
 
-    const { result } = renderHook(() => useUserProfile());
+    const { result } = renderHook(() => useUserProfile(), {
+      wrapper: UserProfileProvider
+    });
 
     // Wait for initial load
     await waitFor(() => {
@@ -237,3 +254,4 @@ describe('useUserProfile Hook', () => {
       .rejects.toThrow('Update failed');
   });
 });
+

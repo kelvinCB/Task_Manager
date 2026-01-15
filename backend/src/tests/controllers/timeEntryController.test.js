@@ -102,8 +102,10 @@ describe('Time Entry Controller', () => {
       const mockEntry = { id: 5, task_id: 1, user_id: 'user-123', start_time: '2023-01-01T10:00:00Z' };
       const mockStoppedEntry = { ...mockEntry, end_time: new Date().toISOString() };
 
+      let callCount = 0;
       supabase.from.mockImplementation((table) => {
         if (table === 'time_entries') {
+          callCount++;
           const chain = mockCreateChain(mockEntry); // For find entry
           // For update().eq().eq().select().single()
           chain.update.mockReturnValue(mockCreateChain(mockStoppedEntry));
@@ -112,19 +114,6 @@ describe('Time Entry Controller', () => {
           // So we need a chain that resolves to an array.
           const syncChain = mockCreateChain([mockStoppedEntry]);
 
-          let callCount = 0;
-          const originalFrom = supabase.from;
-          // This is getting complicated. Let's just make mockCreateChain resolve to array if needed.
-          // Or override 'then' for the sync call.
-
-          // Actually, stopEntry calls db.from('time_entries') twice.
-          // 1. find entry (single)
-          // 2. update entry (single)
-          // Then syncTaskTotalTime calls it again:
-          // 3. select all (list)
-          // 4. update task (different table)
-
-          callCount++;
           if (callCount === 1) return chain; // find
           if (callCount === 2) return chain; // update (chain.update is mocked)
           return syncChain; // syncTaskTotalTime select
@@ -143,8 +132,13 @@ describe('Time Entry Controller', () => {
       const mockEntry = { id: 5, task_id: 1, user_id: 'user-123', start_time: '2023-01-01T10:00:00Z' };
       const mockStoppedEntry = { ...mockEntry, end_time: new Date().toISOString() };
 
+      let callCount = 0;
       supabase.from.mockImplementation((table) => {
-        if (table === 'time_entries') return mockCreateChain(mockEntry);
+        if (table === 'time_entries') {
+          callCount++;
+          if (callCount === 3) return mockCreateChain([mockStoppedEntry]); // syncTaskTotalTime
+          return mockCreateChain(mockEntry); // find & update
+        }
         return mockCreateChain({});
       });
 

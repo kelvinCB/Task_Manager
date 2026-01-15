@@ -1,4 +1,4 @@
-const { uploadAvatar, deleteAvatar } = require('../../controllers/profileController');
+const { uploadAvatar, deleteAvatar, getProfile } = require('../../controllers/profileController');
 const { createClientWithToken, supabase } = require('../../config/supabaseClient');
 
 jest.mock('../../config/supabaseClient', () => ({
@@ -56,6 +56,53 @@ describe('Profile Controller', () => {
     afterEach(() => {
         jest.clearAllMocks();
         jest.restoreAllMocks();
+    });
+
+    describe('getProfile', () => {
+        it('should get profile successfully', async () => {
+            mockClient.single.mockResolvedValue({
+                data: { id: 'test-user-id', username: 'testuser', credits: 5 },
+                error: null
+            });
+
+            await getProfile(req, res);
+
+            expect(createClientWithToken).toHaveBeenCalledWith('test-token');
+            expect(mockClient.from).toHaveBeenCalledWith('profiles');
+            expect(mockClient.select).toHaveBeenCalledWith('*');
+            expect(mockClient.eq).toHaveBeenCalledWith('id', 'test-user-id');
+            expect(mockClient.single).toHaveBeenCalled();
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith({ id: 'test-user-id', username: 'testuser', credits: 5 });
+        });
+
+        it('should handle get profile error', async () => {
+            mockClient.single.mockResolvedValue({
+                data: null,
+                error: { message: 'DB error' }
+            });
+
+            await getProfile(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to fetch profile' }));
+        });
+
+        it('should use default client if no token provided', async () => {
+            req.headers.authorization = undefined;
+            // When no token, it should use generic supabase client which we mocked in top
+            // But getProfile code uses `createClientWithToken` only if token exists, else `supabase`.
+            // Let's verify that path.
+
+            // Mock default supabase client behavior
+            supabase.from.mockReturnValue(mockClient); // Reuse the chain structure
+
+            await getProfile(req, res);
+
+            expect(createClientWithToken).not.toHaveBeenCalled();
+            expect(supabase.from).toHaveBeenCalledWith('profiles');
+        });
     });
 
     it('should return 400 if no file is provided', async () => {

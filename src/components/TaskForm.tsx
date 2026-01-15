@@ -297,54 +297,80 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           let fullResponse = '';
 
                           try {
-                            // Reset description if we are generating a new one? 
-                            // Or append? Usually "Generate" implies replacing or filling empty.
-                            // Let's clear it if the user explicitely asked to generate.
-                            // But usually we might want to keep what they wrote. 
-                            // The current flow replaces it at the end. For streaming, we should probably clear strictly if we stream directly into it.
-                            // However, let's keep it safe: We will populate formData.description as we receive the "final" part.
-
-                            // Strategy: parsing on the fly
-
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
-
-                            // We need to clear description to show the stream effect clearly
+                            // Clear description to visualize the flow, but only if it's a fresh generation to avoid losing context unintentionally
+                            // However, strictly adhering to "Generate" means creating content.
                             setFormData(prev => ({ ...prev, description: '' }));
 
                             let hasFoundStartTag = false;
 
+
                             await openaiService.generateTaskDescription(formData.title, model, (token) => {
                               fullResponse += token;
+
+                              // Optimization: Check for tags in the accumulating response
+                              // Use regex or simple index search. Since we stream, we might get partial tags.
+                              // We only care about complete tags to switch modes.
 
                               const thinkingStartIdx = fullResponse.indexOf('<thinking>');
                               const thinkingEndIdx = fullResponse.indexOf('</thinking>');
 
                               if (thinkingStartIdx !== -1) {
                                 hasFoundStartTag = true;
-                                const contentStart = thinkingStartIdx + '<thinking>'.length;
+                                if (!isThinkingExpanded) setIsThinkingExpanded(true); // Auto expand if not already
+
                                 if (thinkingEndIdx !== -1) {
-                                  setThinkingProcess(fullResponse.substring(contentStart, thinkingEndIdx));
-                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + '</thinking>'.length);
-                                  setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                                  // Thinking is complete
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10, thinkingEndIdx); // 10 is length of <thinking>
+                                  setThinkingProcess(thinkingContent);
+
+                                  // The rest is the actual description
+                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + 11); // 11 is length of </thinking>
+                                  if (descriptionPart) {
+                                    setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                                  }
                                 } else {
-                                  setThinkingProcess(fullResponse.substring(contentStart));
+                                  // Still thinking - stream content to thinking process
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10);
+                                  setThinkingProcess(thinkingContent);
                                 }
                               } else {
-                                // If no start tag found yet, show raw response in thinking area to see what's happening
-                                if (!hasFoundStartTag) {
-                                  setThinkingProcess(fullResponse);
-                                }
+                                // detailed thought might not be used by this model or format is different
+                                // If we don't see thinking tag yet, we might render everything as thinking if we assume it starts with it?
+                                // OR we render as description.
+                                // Current prompt instruction enforces <thinking>, so we wait for it or assume it's coming.
+                                // If it doesn't come immediately, we might be showing nothing.
+                                // Let's show as thinking tentatively until we are sure it's not.
+                                // BUT: if the model outputs description directly, we shouldn't hide it.
 
-                                if (fullResponse.length > 0 && !fullResponse.includes('<thinking>')) {
+                                // Fallback: if response gets long (e.g. > 20 chars) and no <thinking>, assume description.
+                                if (fullResponse.length > 20 && !hasFoundStartTag) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
+                                } else {
+                                  // Short buffer, might be start of <thinking>
+                                  // or just showing raw token stream in thinking box for immediate feedback
+                                  setThinkingProcess(fullResponse);
                                 }
                               }
                             });
 
-                            // Final cleanup/formatting after stream ends
-                            // (Handled by the fact that promise resolves with full string, but we rely on callback)
+                            // Final cleanup when promise resolves
+                            const thinkingStartIdx = fullResponse.indexOf('<thinking>');
+                            const thinkingEndIdx = fullResponse.indexOf('</thinking>');
+
+                            if (thinkingStartIdx !== -1 && thinkingEndIdx !== -1) {
+                              const thinkingContent = fullResponse.substring(thinkingStartIdx + 10, thinkingEndIdx);
+                              setThinkingProcess(thinkingContent);
+                              const descriptionPart = fullResponse.substring(thinkingEndIdx + 11);
+                              setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                            } else if (thinkingStartIdx === -1) {
+                              // No thinking block found at all, treat whole thing as description
+                              setFormData(prev => ({ ...prev, description: fullResponse }));
+                              setThinkingProcess('');
+                            }
+
                             setShowAIOptions(false);
-                            playNotificationSound(1000, 0.5, 0.3); // AI generation completion sound
+                            playNotificationSound(1000, 0.5, 0.3);
                           } catch (error) {
                             console.error('Error generating AI description:', error);
                             setAiError(error instanceof Error ? error.message : t('common.error'));
@@ -389,32 +415,45 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
                             const originalDescription = formData.description;
                             setFormData(prev => ({ ...prev, description: '' }));
-                            let hasFoundStartTag = false;
 
                             await openaiService.improveGrammar(originalDescription, model, (token) => {
                               fullResponse += token;
+
                               const thinkingStartIdx = fullResponse.indexOf('<thinking>');
                               const thinkingEndIdx = fullResponse.indexOf('</thinking>');
 
                               if (thinkingStartIdx !== -1) {
-                                hasFoundStartTag = true;
-                                const contentStart = thinkingStartIdx + '<thinking>'.length;
                                 if (thinkingEndIdx !== -1) {
-                                  setThinkingProcess(fullResponse.substring(contentStart, thinkingEndIdx));
-                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + '</thinking>'.length);
+                                  // Thinking done
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10, thinkingEndIdx);
+                                  setThinkingProcess(thinkingContent);
+                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + 11);
                                   setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
                                 } else {
-                                  setThinkingProcess(fullResponse.substring(contentStart));
+                                  // Thinking in progress
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10);
+                                  setThinkingProcess(thinkingContent);
                                 }
                               } else {
-                                if (!hasFoundStartTag) {
-                                  setThinkingProcess(fullResponse);
-                                }
-                                if (fullResponse.length > 0 && !fullResponse.includes('<thinking>')) {
+                                // No thinking tag yet? Just stream to description if it lacks tag
+                                if (fullResponse.length > 20) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
+                                } else {
+                                  setThinkingProcess(fullResponse);
                                 }
                               }
                             });
+
+                            // Final cleanup
+                            const thinkingStartIdx = fullResponse.indexOf('<thinking>');
+                            const thinkingEndIdx = fullResponse.indexOf('</thinking>');
+                            if (thinkingStartIdx !== -1 && thinkingEndIdx !== -1) {
+                              const descriptionPart = fullResponse.substring(thinkingEndIdx + 11);
+                              setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                            } else if (thinkingStartIdx === -1) {
+                              setFormData(prev => ({ ...prev, description: fullResponse }));
+                            }
+
                             setShowAIOptions(false);
                             playNotificationSound(1000, 0.5, 0.3);
                           } catch (error) {

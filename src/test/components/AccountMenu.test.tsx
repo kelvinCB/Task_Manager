@@ -11,6 +11,13 @@ vi.mock('../../contexts/AuthContext');
 vi.mock('../../hooks/useUserProfile');
 vi.mock('../../contexts/ThemeContext');
 
+// Mock MyProfileModal
+vi.mock('../../components/features/account/MyProfileModal', () => ({
+  MyProfileModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+    isOpen ? <div data-testid="my-profile-modal">My Profile Modal <button onClick={onClose}>Close</button></div> : null
+  )
+}));
+
 const mockUseAuth = vi.mocked(useAuth);
 const mockUseUserProfile = vi.mocked(useUserProfile);
 const mockUseTheme = vi.mocked(useTheme);
@@ -40,7 +47,10 @@ describe('AccountMenu Component', () => {
     display_name: 'Test User',
     avatar_url: null,
     created_at: '2023-01-01T00:00:00.000Z',
-    updated_at: '2023-01-01T00:00:00.000Z'
+    updated_at: '2023-01-01T00:00:00.000Z',
+    credits: 5,
+    about: null,
+    linkedin: null
   };
 
   const defaultProps = {
@@ -69,7 +79,10 @@ describe('AccountMenu Component', () => {
       profile: null,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -90,7 +103,10 @@ describe('AccountMenu Component', () => {
       profile: mockProfile,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -100,7 +116,7 @@ describe('AccountMenu Component', () => {
     expect(screen.queryByText('@pizza123')).not.toBeInTheDocument();
   });
 
-  it('should show username in dropdown when authenticated and clicked', async () => {
+  it('should show username and credits in dropdown when authenticated and clicked', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       user: { id: 'test-user-id', email: 'test@example.com' } as any,
@@ -112,7 +128,10 @@ describe('AccountMenu Component', () => {
       profile: mockProfile,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -129,6 +148,43 @@ describe('AccountMenu Component', () => {
     expect(screen.getByText('Test User')).toBeInTheDocument();
   });
 
+  it('should open MyProfileModal when user info is clicked', async () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      user: { id: 'test-user-id', email: 'test@example.com' } as any,
+      session: null,
+      logout: vi.fn()
+    });
+
+    mockUseUserProfile.mockReturnValue({
+      profile: mockProfile,
+      loading: false,
+      error: null,
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
+    });
+
+    renderWithRouter(<AccountMenu {...defaultProps} />);
+
+    // Click to open dropdown
+    fireEvent.click(screen.getByTestId('account-menu-button'));
+
+    // Wait for dropdown
+    await waitFor(() => {
+      expect(screen.getByText('Test User')).toBeInTheDocument();
+    });
+
+    // Click "My Profile" menu item
+    fireEvent.click(screen.getByTestId('my-profile-menu-item'));
+
+    // Check if modal is opened
+    await waitFor(() => {
+      expect(screen.getByTestId('my-profile-modal')).toBeInTheDocument();
+    });
+  });
+
   it('should show logout button when authenticated', async () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
@@ -141,7 +197,10 @@ describe('AccountMenu Component', () => {
       profile: mockProfile,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -168,7 +227,10 @@ describe('AccountMenu Component', () => {
       profile: null,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -196,7 +258,10 @@ describe('AccountMenu Component', () => {
       profile: mockProfile,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -231,7 +296,10 @@ describe('AccountMenu Component', () => {
       profile: null,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -261,7 +329,10 @@ describe('AccountMenu Component', () => {
       profile: mockProfile,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);
@@ -287,7 +358,10 @@ describe('AccountMenu Component', () => {
       profile: null,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     const mockOnExport = vi.fn();
@@ -323,7 +397,10 @@ describe('AccountMenu Component', () => {
       profile: null,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     const mockOnImport = vi.fn();
@@ -360,7 +437,10 @@ describe('AccountMenu Component', () => {
       profile: mockProfile,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} onExport={mockOnExport} />);
@@ -390,7 +470,10 @@ describe('AccountMenu Component', () => {
       profile: null,
       loading: false,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} compact={true} />);
@@ -412,7 +495,10 @@ describe('AccountMenu Component', () => {
       profile: null,
       loading: true,
       error: null,
-      updateProfile: vi.fn()
+      updateProfile: vi.fn(),
+      uploadAvatar: vi.fn(),
+      deleteAvatar: vi.fn(),
+      refreshProfile: vi.fn()
     });
 
     renderWithRouter(<AccountMenu {...defaultProps} />);

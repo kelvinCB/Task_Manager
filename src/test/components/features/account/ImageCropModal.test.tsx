@@ -49,7 +49,7 @@ describe('ImageCropModal', () => {
   it('should render the modal with image cropper', () => {
     renderModal();
 
-    expect(screen.getByText('Ajustar foto de perfil')).toBeInTheDocument();
+    expect(screen.getAllByText('Ajustar foto de perfil')[0]).toBeInTheDocument();
     expect(screen.getByTestId('cropper')).toBeInTheDocument();
   });
 
@@ -87,7 +87,7 @@ describe('ImageCropModal', () => {
 
     const closeButtons = screen.getAllByRole('button');
     const xButton = closeButtons.find(btn => btn.querySelector('[class*="lucide"]'));
-    
+
     if (xButton) {
       fireEvent.click(xButton);
       expect(onCancel).toHaveBeenCalled();
