@@ -253,6 +253,62 @@ IMPORTANT:
     }
   }
 
+  /**
+   * Generate an image based on a prompt
+   */
+  async generateImage(
+    prompt: string,
+    model: string = 'dall-e-3',
+    quality: string = 'hd'
+  ): Promise<string> {
+    if (!prompt.trim()) {
+      throw new Error('Prompt is required to generate image');
+    }
+
+    const token = await this.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token provided');
+    }
+
+    try {
+      // Use the dedicated image generation endpoint
+      // Note: we use this.baseUrl which points to /api/ai
+      // So the full URL will be /api/ai/generate-image
+      const url = `${this.baseUrl}/generate-image`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          prompt,
+          model,
+          quality
+        })
+      });
+
+      if (!response.ok) {
+        let errorMsg = 'AI Image API Error';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error?.message || errorData.message || errorMsg;
+        } catch (e) {
+          errorMsg = response.statusText;
+        }
+        throw new Error(errorMsg);
+      }
+
+      const data = await response.json();
+      // OpenAI Image API returns { created: number, data: [{ url: string, ... }] }
+      return data.data?.[0]?.url || '';
+
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Failed to connect to AI Image Service');
+    }
+  }
+
   isConfigured(): boolean {
     // If using proxy, we assume it's configured on the server side
     return true;
