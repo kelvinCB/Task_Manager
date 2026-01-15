@@ -155,7 +155,7 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
                             <Avatar className="h-24 w-24 border-4 border-background shadow-lg rounded-full group-hover:opacity-90 transition-opacity">
                                 <AvatarImage src={profileImage} alt="Profile" />
                                 <AvatarFallback className={`${getAvatarColor(profile?.username || 'U')} text-4xl text-white`}>
-                                    {profile?.display_name?.charAt(0) || profile?.username?.charAt(0) || 'U'}
+                                    {(profile?.display_name?.charAt(0) || profile?.username?.charAt(0) || 'U').toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
 
