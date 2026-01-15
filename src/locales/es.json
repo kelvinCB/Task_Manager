@@ -129,11 +129,14 @@
     },
     "account": {
         "my_account": "Mi Cuenta",
+        "my_profile": "Mi Perfil",
         "import_tasks": "Importar Tareas",
         "export_tasks": "Exportar Tareas",
         "upload_error": "Error al subir imagen. Por favor intenta de nuevo.",
         "upload_success": "Foto de perfil actualizada con éxito",
-        "image_too_large": "La imagen es demasiado grande. Máx 10MB."
+        "image_too_large": "La imagen es demasiado grande. Máx 10MB.",
+        "username": "Nombre de usuario",
+        "email": "Correo electrónico"
     },
     "ai": {
         "powered": "IMPULSADO POR IA",

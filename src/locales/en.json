@@ -129,11 +129,14 @@
     },
     "account": {
         "my_account": "My Account",
+        "my_profile": "My Profile",
         "import_tasks": "Import Tasks",
         "export_tasks": "Export Tasks",
         "upload_error": "Error uploading image. Please try again.",
         "upload_success": "Profile photo updated successfully",
-        "image_too_large": "Image is too large. Max 10MB."
+        "image_too_large": "Image is too large. Max 10MB.",
+        "username": "Username",
+        "email": "Email"
     },
     "ai": {
         "powered": "AI POWERED",
