@@ -241,6 +241,8 @@ describe('TaskForm', () => {
         status: 'In Progress',
         dueDate: new Date('2030-12-25'),
         parentId: undefined,
+        estimation: 1,
+        responsible: undefined,
         timeTracking: {
           totalTimeSpent: 0,
           isActive: false,
@@ -376,6 +378,31 @@ describe('TaskForm', () => {
           }
         })
       );
+    });
+
+    it('should initialize estimation and responsible fields when editing', () => {
+      const taskWithFields = {
+        ...mockTask,
+        estimation: 5,
+        responsible: 'Jane Doe'
+      };
+
+      render(
+        <TestWrapper>
+          <TaskForm
+            task={taskWithFields}
+            isOpen={true}
+            onClose={mockOnClose}
+            onSubmit={mockOnSubmit}
+          />
+        </TestWrapper>
+      );
+
+      const responsibleInput = screen.getByLabelText(/responsible/i);
+      const estimationSelect = screen.getByRole('combobox', { name: /estimation/i });
+
+      expect(responsibleInput).toHaveValue('Jane Doe');
+      expect(estimationSelect).toHaveValue('5');
     });
   });
 
