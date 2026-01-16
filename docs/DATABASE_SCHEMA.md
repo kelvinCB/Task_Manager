@@ -56,6 +56,8 @@ Stores the tasks for each user. Each task is linked to a user and supports hiera
 | `status`          | `text`        | Not Null, Default `'Open'`, CHECK (status IN ('Open', 'In Progress', 'Done')) |
 | `parent_id`       | `bigint`      | Nullable, Foreign Key to `public.tasks(id)`, On Delete SET NULL |
 | `due_date`        | `date`        | Nullable                                           |
+| `estimation`      | `integer`     | Nullable, Default `1`, CHECK (estimation IN (1, 2, 3, 5, 8, 13)) |
+| `responsible`     | `text`        | Nullable                                           |
 | `total_time_ms`   | `bigint`      | Not Null, Default `0` (persisted total when task is Done) |
 | `created_at`      | `timestamptz` | Not Null, Default `now()`                          |
 | `updated_at`      | `timestamptz` | Not Null, Default `now()`                          |
@@ -239,6 +241,8 @@ CREATE TABLE IF NOT EXISTS public.tasks (
     status text NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Done')),
     parent_id bigint REFERENCES public.tasks(id) ON DELETE SET NULL,
     due_date date,
+    estimation integer DEFAULT 1 CHECK (estimation IN (1, 2, 3, 5, 8, 13)),
+    responsible text,
     total_time_ms bigint NOT NULL DEFAULT 0,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()

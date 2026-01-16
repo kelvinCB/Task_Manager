@@ -56,11 +56,24 @@ Create an intuitive, powerful task management tool that combines hierarchical or
   - One credit consumed per AI generation (description/grammar).
   - "No Credits" error handling in UI when limit reached.
   - Admin API for credit management (view, add, set).
-- **Profile Management:**
+- Profile Management:
   - Editable Display Name, Bio, LinkedIn, About Me.
   - Avatar image upload with cropping and resizing.
   - Read-only Email and Username field.
   - "My Profile" modal accessible from account menu.
+
+**Feature TM-57: Task Estimation & Responsible Assignment** (✅ Completed)
+- **Estimation Field:**
+  - Story point estimation (1, 2, 3, 5, 8, 13, 21).
+  - Visual display in Task Detail and Board views.
+  - Default value of 1 point.
+- **Responsible Assignment:**
+  - Assign a person responsible for the task.
+  - Free-text input for flexibility (e.g., "Frontend Team", "John Doe").
+  - Visual display in Task Detail and Board views.
+- **Integration:**
+  - Full support in Create/Edit forms.
+  - Persisted in database and frontend state.
 
 
 **Status:** All tests passing, documentation updated, ready for production deployment.
@@ -73,8 +86,8 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
-| **Task Creation** | ✅ Complete | 100% | Create tasks with title, description, due date |
-| **Task Editing** | ✅ Complete | 100% | Edit existing tasks inline |
+| **Task Creation** | ✅ Complete | 100% | Create tasks with title, description, due date, estimation, and responsible |
+| **Task Editing** | ✅ Complete | 100% | Edit existing tasks inline (including new fields) |
 | **Task Deletion** | ✅ Complete | 100% | Delete tasks from Tree View and Board View |
 | **Subtask Dependency** | ✅ Complete | 100% | Tasks with incomplete subtasks cannot be marked as "Done". Users receive explicit UI feedback (alerts and disabled options) in Tree View, Board View (drag & drop), and Task Form. |
 | **Hierarchical Tasks** | ✅ Complete | 100% | Parent-child task relationships |
