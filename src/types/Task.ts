@@ -8,7 +8,9 @@ export interface Task {
   parentId?: string;
   childIds: string[];
   depth: number;
-  
+  estimation?: number;
+  responsible?: string;
+
   // Time tracking properties
   timeTracking: {
     totalTimeSpent: number; // Total time spent in milliseconds
