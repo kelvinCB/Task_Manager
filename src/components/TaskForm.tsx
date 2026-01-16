@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus } from '../types/Task';
-import { X, Calendar, FileText, Tag, AlertCircle } from 'lucide-react';
+import { X, Calendar, FileText, Tag, AlertCircle, User, Calculator } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { AIIcon } from './AIIcon';
@@ -42,7 +42,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     status: 'Open' as TaskStatus,
     attachments: [] as Attachment[],
     dueDate: '',
-    parentId: parentId || ''
+    parentId: parentId || '',
+    estimation: 1,
+    responsible: ''
   });
   const [showAIOptions, setShowAIOptions] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -82,7 +84,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         status: task.status,
         dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
         parentId: task.parentId || '',
-        attachments: attachments
+        attachments: attachments,
+        estimation: task.estimation || 0,
+        responsible: task.responsible || ''
       });
     } else {
       setFormData({
@@ -91,7 +95,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         status: 'Open',
         dueDate: '',
         parentId: parentId || '',
-        attachments: []
+        attachments: [],
+        estimation: 1,
+        responsible: ''
       });
     }
   }, [task, parentId, isOpen]);
@@ -114,6 +120,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       status: formData.status,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       parentId: formData.parentId || undefined,
+      estimation: formData.estimation || undefined,
+      responsible: formData.responsible || undefined,
       timeTracking: task?.timeTracking || {
         totalTimeSpent: 0,
         isActive: false,
@@ -600,6 +608,43 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         attachments: prev.attachments.filter((_, i) => i !== index)
                       }));
                     }}
+                  />
+                </div>
+              </div>
+
+              {/* Estimation and Responsible Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Estimation Section */}
+                <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
+                  <label htmlFor="task-estimation" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Calculator size={16} className="text-indigo-500" />
+                    {t('tasks.estimation')}
+                  </label>
+                  <select
+                    id="task-estimation"
+                    value={formData.estimation}
+                    onChange={(e) => setFormData(prev => ({ ...prev, estimation: Number(e.target.value) }))}
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
+                  >
+                    {[1, 2, 3, 5, 8, 13].map(points => (
+                      <option key={points} value={points}>{points}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Responsible Section */}
+                <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
+                  <label htmlFor="task-responsible" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <User size={16} className="text-indigo-500" />
+                    {t('tasks.responsible')}
+                  </label>
+                  <input
+                    id="task-responsible"
+                    type="text"
+                    value={formData.responsible}
+                    onChange={(e) => setFormData(prev => ({ ...prev, responsible: e.target.value }))}
+                    placeholder={t('tasks.responsible')}
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
                   />
                 </div>
               </div>
