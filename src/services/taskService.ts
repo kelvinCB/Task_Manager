@@ -40,6 +40,8 @@ interface BackendTask {
   due_date: string | null; // ISO date string (YYYY-MM-DD)
   total_time_ms?: number; // Summary total (persisted only when Done)
   active_start_time?: string | null; // ISO string if a timer is currently running
+  estimation?: number | null;
+  responsible?: string | null;
 }
 
 // No mapping needed; backend and frontend share the same status values
@@ -126,6 +128,8 @@ export class TaskService {
         lastStarted: backendTask.active_start_time ? new Date(backendTask.active_start_time).getTime() : undefined,
         timeEntries: [],
       },
+      estimation: backendTask.estimation || undefined,
+      responsible: backendTask.responsible || undefined,
     };
   }
 
@@ -155,6 +159,9 @@ export class TaskService {
     if (task.dueDate !== undefined) {
       backendTask.due_date = task.dueDate ? task.dueDate.toISOString().split('T')[0] : null;
     }
+    if (task.estimation !== undefined) backendTask.estimation = task.estimation;
+    if (task.responsible !== undefined) backendTask.responsible = task.responsible;
+
     // pass-through for backend-specific fields (e.g., total_time_ms)
     if ((task as any).total_time_ms !== undefined) {
       backendTask.total_time_ms = (task as any).total_time_ms;

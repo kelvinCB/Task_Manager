@@ -77,6 +77,38 @@ describe('Task Controller', () => {
       expect(res.json).toHaveBeenCalledWith({ task: mockTask });
     });
 
+    it('should create a task with estimation and responsible fields', async () => {
+      req.body = {
+        title: 'Task with Fields',
+        estimation: 5,
+        responsible: 'John Doe'
+      };
+
+      const mockTask = {
+        id: 1,
+        title: 'Task with Fields',
+        estimation: 5,
+        responsible: 'John Doe',
+        user_id: 'user-123'
+      };
+
+      const mockSingle = jest.fn().mockResolvedValue({ data: mockTask, error: null });
+      const mockSelect = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockInsert = jest.fn().mockReturnValue({ select: mockSelect });
+
+      supabase.from.mockReturnValue({ insert: mockInsert });
+
+      await createTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({ task: mockTask });
+      // Verify insert arguments include new fields
+      expect(mockInsert).toHaveBeenCalledWith([expect.objectContaining({
+        estimation: 5,
+        responsible: 'John Doe'
+      })]);
+    });
+
     it('should return 400 if title is missing', async () => {
       req.body = { description: 'Test Description' };
 
@@ -352,6 +384,47 @@ describe('Task Controller', () => {
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ task: updatedTask });
+    });
+
+    it('should update estimation and responsible fields', async () => {
+      req.params.id = '1';
+      req.body = { estimation: 8, responsible: 'Alice' };
+
+      const existingTask = { id: 1, title: 'Task', user_id: 'user-123' };
+      const updatedTask = { id: 1, title: 'Task', estimation: 8, responsible: 'Alice', user_id: 'user-123' };
+
+      // Mock for checking existing task
+      const mockSingleExisting = jest.fn().mockResolvedValue({ data: existingTask, error: null });
+      const mockEqUserExisting = jest.fn().mockReturnValue({ single: mockSingleExisting });
+      const mockEqExisting = jest.fn().mockReturnValue({ eq: mockEqUserExisting });
+      const mockSelectExisting = jest.fn().mockReturnValue({ eq: mockEqExisting });
+
+      // Mock for update
+      const mockSingleUpdate = jest.fn().mockResolvedValue({ data: updatedTask, error: null });
+      const mockSelectUpdate = jest.fn().mockReturnValue({ single: mockSingleUpdate });
+      const mockEqUserUpdate = jest.fn().mockReturnValue({ select: mockSelectUpdate });
+      const mockEqUpdate = jest.fn().mockReturnValue({ eq: mockEqUserUpdate });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockEqUpdate });
+
+      let callCount = 0;
+      supabase.from.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return { select: mockSelectExisting };
+        } else {
+          return { update: mockUpdate };
+        }
+      });
+
+      await updateTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ task: updatedTask });
+      // Verify update arguments
+      expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
+        estimation: 8,
+        responsible: 'Alice'
+      }));
     });
 
     it('should return 400 if no fields to update', async () => {

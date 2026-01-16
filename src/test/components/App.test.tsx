@@ -162,6 +162,7 @@ vi.mock('lucide-react', () => ({
   Tag: ({ size }: { size?: number }) => <div data-testid="tag-icon" style={{ width: size, height: size }}>Tag</div>,
   Calendar: ({ size }: { size?: number }) => <div data-testid="calendar-icon" style={{ width: size, height: size }}>Calendar</div>,
   Menu: ({ size }: { size?: number }) => <div data-testid="menu-icon" style={{ width: size, height: size }}>Menu</div>,
+  Calculator: () => <div data-testid="calculator-icon" />,
   User: ({ size }: { size?: number }) => <div data-testid="user-icon" style={{ width: size, height: size }}>User</div>,
   UserCircle: ({ size }: { size?: number }) => <div data-testid="user-circle-icon" style={{ width: size, height: size }}>UserCircle</div>,
   ChevronDown: ({ size }: { size?: number }) => <div data-testid="chevron-down-icon" style={{ width: size, height: size }}>ChevronDown</div>,

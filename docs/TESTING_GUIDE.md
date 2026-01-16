@@ -16,9 +16,9 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 
-✅ **340 pruebas unitarias** (100% pasando)
-✅ **135 pruebas E2E** (100% pasando)
-✅ **141 pruebas de backend** (100% pasando)
+✅ **341 pruebas unitarias** (100% pasando)
+✅ **142 pruebas E2E** (100% pasando)
+✅ **145 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
 ✅ **Feature de Username** con tests específicos implementados
@@ -66,7 +66,7 @@ src/test/
   - ForgotPasswordPage (8 tests)
   - ResetPasswordPage (7 tests)
 - **PasswordInput**: Componente de contraseña con toggle de visibilidad (8 tests)
-- **TaskForm**: Creación, edición, validación, IA (21 tests)
+- **TaskForm**: Creación, edición, validación, IA, campos de Estimación y Responsable (22 tests)
 - **TaskTimer**: Cronometraje, notificaciones (6 tests)
 - **useTasks**: Lógica de tareas y tiempo (10 tests)
 - **openaiService**: Integración IA (16 tests)
@@ -377,6 +377,7 @@ Para cada nuevo test automatizado que se agregue a la suite E2E, es **OBLIGATORI
 
 - Crear, editar, eliminar tareas
 - Validación de campos requeridos
+- Verificación de campos Estimación y Responsable
 - Cancelación de formularios
 
 #### Filtrado Global (10 tests)
@@ -488,7 +489,7 @@ Para cada nuevo test automatizado que se agregue a la suite E2E, es **OBLIGATORI
 
 ### Resultados E2E actuales
 
-✅ **134/134 tests pasando** (100% de éxito)
+✅ **142/142 tests pasando** (100% de éxito)
 ✅ **Todos los tests funcionando** (incluido username-display)⏱️ **~2.6 minutos** con 5 workers🧹 **Tests limpios y optimizados**🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
 🔒 **User Isolation** - Tests de seguridad multi-usuario
@@ -726,4 +727,4 @@ render(
 
 ---
 
-**Última actualización**: Enero 2026 - Suite de testing completamente funcional, robusta y optimizada con **604 tests** (333 Frontend + 137 Backend + 134 E2E).
+**Última actualización**: Enero 2026 - Suite de testing completamente funcional, robusta y optimizada con **628 tests** (341 Frontend + 145 Backend + 142 E2E).

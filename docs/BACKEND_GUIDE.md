@@ -185,6 +185,28 @@ Response: 200 OK
 }
 ```
 
+**Create Task:**
+```json
+POST /api/tasks
+{
+  "title": "New Features Implementation",
+  "description": "Implement estimation and responsible",
+  "estimation": 5,
+  "responsible": "Frontend Team"
+}
+
+Response: 201 Created
+{
+  "data": {
+    "id": "uuid",
+    "title": "New Features Implementation",
+    "estimation": 5,
+    "responsible": "Frontend Team",
+    "user_id": "user_uuid"
+  }
+}
+```
+
 ### Controllers
 
 #### authController.js
@@ -198,7 +220,7 @@ Handles authentication logic with:
 #### taskController.js
 Manages task CRUD operations with:
 - **User Isolation**: All operations automatically scoped to authenticated user
-- **Input Validation**: Title required, status validation, parent task verification
+- **Input Validation**: Title required, status validation, parent task verification, estimation & responsible sanitization
 - **CRUD Operations**:
   - `createTask`: Create new task with user ownership
   - `getTasks`: Retrieve user's tasks with optional status filter
