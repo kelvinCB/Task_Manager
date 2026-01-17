@@ -103,13 +103,13 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   {task.estimation && task.estimation > 0 && (
                     <div className="flex items-center gap-2">
                       <Calculator size={16} className={theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'} />
-                      <span>{t('tasks.estimation')}: {task.estimation}</span>
+                      <span data-testid="task-detail-estimation">{t('tasks.estimation')}: {task.estimation}</span>
                     </div>
                   )}
                   {task.responsible && (
                     <div className="flex items-center gap-2">
                       <User size={16} className={theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'} />
-                      <span>{t('tasks.responsible')}: {task.responsible}</span>
+                      <span data-testid="task-detail-responsible">{t('tasks.responsible')}: {task.responsible}</span>
                     </div>
                   )}
                 </div>

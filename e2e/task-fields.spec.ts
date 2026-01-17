@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { AuthPage } from './page-objects/auth.page';
 
-test.describe.skip('Task Fields', () => {
+test.describe('Task Fields', () => {
     let authPage: AuthPage;
 
     test.beforeEach(async ({ page }) => {
@@ -37,8 +37,8 @@ test.describe.skip('Task Fields', () => {
         await taskCard.click();
 
         // 3. Verify Details
-        await expect(page.getByText('5 points', { exact: false })).toBeVisible(); // Matches "Estimation: 5" or just "5"
-        await expect(page.getByText('Board User')).toBeVisible();
+        await expect(page.getByTestId('task-detail-estimation')).toContainText('5');
+        await expect(page.getByTestId('task-detail-responsible')).toContainText('Board User');
 
         // Close modal
         await page.getByLabel('Close modal').click();
@@ -65,8 +65,8 @@ test.describe.skip('Task Fields', () => {
         await taskItem.click();
 
         // 3. Verify Details
-        await expect(page.getByText('8 points', { exact: false })).toBeVisible();
-        await expect(page.getByText('Tree User')).toBeVisible();
+        await expect(page.getByTestId('task-detail-estimation')).toContainText('8');
+        await expect(page.getByTestId('task-detail-responsible')).toContainText('Tree User');
     });
 
     test('should edit task in Board View and verify pre-fill', async ({ page }) => {
@@ -90,16 +90,14 @@ test.describe.skip('Task Fields', () => {
         await expect(page.getByLabel('Responsible')).toHaveValue('Pre-fill Check');
 
         // 4. Modify and Save
-        await page.getByLabel('Estimation').selectOption('21'); // Invalid Fibonacci? UI constraints? 
-        // Dropdown options are: 1, 2, 3, 5, 8, 13. Let's stick to valid ones.
         await page.getByLabel('Estimation').selectOption('13');
         await page.getByLabel('Responsible').fill('Updated User');
         await page.getByTestId('task-form-submit-button').click();
 
         // 5. Verify Update in Detail
         await taskCard.click();
-        await expect(page.getByText('13 points', { exact: false })).toBeVisible();
-        await expect(page.getByText('Updated User')).toBeVisible();
+        await expect(page.getByTestId('task-detail-estimation')).toContainText('13');
+        await expect(page.getByTestId('task-detail-responsible')).toContainText('Updated User');
     });
 
     test('should edit task in Tree View and verify pre-fill', async ({ page }) => {
@@ -114,7 +112,7 @@ test.describe.skip('Task Fields', () => {
         await page.getByTestId('task-form-submit-button').click();
 
         // 2. Open Edit Form
-        const taskRow = page.getByTestId('tree-node').filter({ hasText: taskTitle });
+        const taskRow = page.getByTestId('task-item').filter({ hasText: taskTitle });
         await taskRow.hover();
         await taskRow.getByTestId('edit-task-button').click();
 
@@ -128,8 +126,8 @@ test.describe.skip('Task Fields', () => {
         await page.getByTestId('task-form-submit-button').click();
 
         // 5. Verify Update in Detail
-        await taskRow.getByText(taskTitle).click(); // Open detail
-        await expect(page.getByText('5 points', { exact: false })).toBeVisible();
-        await expect(page.getByText('Tree Updated')).toBeVisible();
+        await taskRow.click(); // Open detail
+        await expect(page.getByTestId('task-detail-estimation')).toContainText('5');
+        await expect(page.getByTestId('task-detail-responsible')).toContainText('Tree Updated');
     });
 });
