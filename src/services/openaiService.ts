@@ -1,30 +1,12 @@
 import { API_BASE_URL } from '../utils/apiConfig';
+import supabase from '../lib/supabaseClient';
 
 interface OpenAIMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }
 
-interface OpenAIResponse {
-  choices: {
-    message?: {
-      content?: string;
-      text?: string;
-    };
-    text?: string;
-    content?: string;
-    [key: string]: any; // Allow for unknown properties
-  }[];
-  [key: string]: any; // Allow for unknown properties at root level
-}
 
-interface OpenAIError {
-  error: {
-    message: string;
-    type: string;
-    code?: string;
-  };
-}
 
 export class OpenAIService {
   private baseUrl: string;
@@ -33,6 +15,14 @@ export class OpenAIService {
     // Look for VITE_API_BASE_URL (for proxying) or use absolute path
     // In dev mode with Vite proxy, '/api/ai' will point to localhost:3001
     this.baseUrl = `${API_BASE_URL}/api/ai`;
+  }
+
+  /**
+   * Get the current user's JWT token
+   */
+  private async getAuthToken(): Promise<string | null> {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token || null;
   }
 
   /**
@@ -50,10 +40,11 @@ export class OpenAIService {
       const { done, value } = await reader.read();
       if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
+      const chunk = decoder.decode(value, { stream: true });
+      buffer += chunk;
 
-      // Keep the last partial line in the buffer
+      const lines = buffer.split('\n');
+      // Keep the last line in the buffer as it might be incomplete
       buffer = lines.pop() || '';
 
       for (const line of lines) {
@@ -62,7 +53,8 @@ export class OpenAIService {
 
         if (trimmedLine.startsWith('data: ')) {
           try {
-            const json = JSON.parse(trimmedLine.slice(6));
+            const jsonStr = trimmedLine.slice(6);
+            const json = JSON.parse(jsonStr);
             const deltaContent = json.choices[0]?.delta?.content || json.choices[0]?.text || '';
 
             if (deltaContent) {
@@ -70,9 +62,7 @@ export class OpenAIService {
               onToken(deltaContent);
             }
           } catch (e) {
-            // If it's not valid JSON, it might be split across lines despite our split('\n')
-            // This is less likely with correctly formatted SSE, but good to handle
-            console.warn('Error parsing stream chunk:', e, 'Line:', trimmedLine);
+            console.warn('Error parsing stream chunk:', e);
           }
         }
       }
@@ -92,12 +82,17 @@ export class OpenAIService {
       throw new Error('Task title is required to generate description');
     }
 
+    const token = await this.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token provided');
+    }
+
     const isNewModel = model.startsWith('o4-') || model.startsWith('gpt-5');
     const messages: OpenAIMessage[] = [
       {
         role: 'system',
         content: `You are an expert task management assistant. Your job is to create detailed, actionable task descriptions based on task titles. 
-
+        
 Guidelines:
 - Create clear, concise, and actionable descriptions
 - Include specific steps or objectives when possible
@@ -142,7 +137,10 @@ IMPORTANT:
 
       const response = await fetch(`${this.baseUrl}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(requestBody)
       });
 
@@ -179,6 +177,11 @@ IMPORTANT:
   ): Promise<string> {
     if (!text.trim()) {
       throw new Error('Text is required to improve grammar');
+    }
+
+    const token = await this.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token provided');
     }
 
     const isNewModel = model.startsWith('o4-') || model.startsWith('gpt-5');
@@ -220,7 +223,10 @@ IMPORTANT:
 
       const response = await fetch(`${this.baseUrl}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(requestBody)
       });
 
@@ -244,6 +250,62 @@ IMPORTANT:
 
     } catch (error) {
       throw error instanceof Error ? error : new Error('Failed to connect to AI Service');
+    }
+  }
+
+  /**
+   * Generate an image based on a prompt
+   */
+  async generateImage(
+    prompt: string,
+    model: string = 'dall-e-3',
+    quality: string = 'hd'
+  ): Promise<string> {
+    if (!prompt.trim()) {
+      throw new Error('Prompt is required to generate image');
+    }
+
+    const token = await this.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token provided');
+    }
+
+    try {
+      // Use the dedicated image generation endpoint
+      // Note: we use this.baseUrl which points to /api/ai
+      // So the full URL will be /api/ai/generate-image
+      const url = `${this.baseUrl}/generate-image`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          prompt,
+          model,
+          quality
+        })
+      });
+
+      if (!response.ok) {
+        let errorMsg = 'AI Image API Error';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error?.message || errorData.message || errorMsg;
+        } catch (e) {
+          errorMsg = response.statusText;
+        }
+        throw new Error(errorMsg);
+      }
+
+      const data = await response.json();
+      // OpenAI Image API returns { created: number, data: [{ url: string, ... }] }
+      return data.data?.[0]?.url || '';
+
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Failed to connect to AI Image Service');
     }
   }
 

@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import { Task } from '../types/Task';
 import { useTheme } from '../contexts/ThemeContext';
 import { formatDate, getStatusColor, formatTime } from '../utils/taskUtils';
-import { X, Calendar, Clock, Edit2, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Calendar, Clock, Edit2, AlertCircle, CheckCircle, Calculator, User } from 'lucide-react';
 import { extractAttachments } from '../utils/attachmentUtils';
 import { AttachmentList } from './AttachmentList';
 
@@ -95,6 +95,21 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       <span className={new Date(task.dueDate) < new Date() && task.status !== 'Done' ? 'text-red-500 font-medium' : ''}>
                         {t('tasks.due')} {formatDate(task.dueDate)}
                       </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  {task.estimation && task.estimation > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Calculator size={16} className={theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'} />
+                      <span data-testid="task-detail-estimation">{t('tasks.estimation')}: {task.estimation}</span>
+                    </div>
+                  )}
+                  {task.responsible && (
+                    <div className="flex items-center gap-2">
+                      <User size={16} className={theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'} />
+                      <span data-testid="task-detail-responsible">{t('tasks.responsible')}: {task.responsible}</span>
                     </div>
                   )}
                 </div>

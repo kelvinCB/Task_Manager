@@ -189,14 +189,44 @@ test.describe('Task Advanced Features', () => {
     await expect(taskPage.aiImproveButton).toBeVisible({ timeout: 10000 });
     await taskPage.aiImproveButton.click();
 
-    // Wait for AI to process grammar improvement (~12-15 seconds observed)
-    await appPage.page.waitForTimeout(20000);
-
     // Wait for AI to improve description (must be different AND not empty)
+    // We expect streaming to start updating the field or thinking process relatively quickly.
+
+    // 1. Verify activity starts (Thinking process or Description update) OR Error
     await appPage.page.waitForFunction((originalText) => {
       const descInput = document.querySelector('#task-description') as HTMLTextAreaElement;
-      return descInput && descInput.value !== originalText && descInput.value.length > 5;
+      const thinkingBox = document.querySelector('.font-mono');
+      const errorContainer = document.querySelector('[data-testid="ai-error-container"]');
+
+      if (errorContainer) return true; // Fail fast if error appears
+
+      const hasDescriptionChange = descInput && descInput.value !== originalText && descInput.value.length > 0;
+      const hasThinkingActivity = thinkingBox && (thinkingBox.textContent?.length || 0) > 10;
+
+      return hasDescriptionChange || hasThinkingActivity;
+    }, poorGrammarText, { timeout: 30000 });
+
+    // Check for error immediately after wait
+    const errorVisible = await appPage.page.isVisible('[data-testid="ai-error-container"]');
+    if (errorVisible) {
+      const errorText = await appPage.page.textContent('[data-testid="ai-error-container"]');
+      throw new Error(`AI Generation failed with error: ${errorText}`);
+    }
+
+    // 2. Wait for final completion (Description populated)
+    await appPage.page.waitForFunction((originalText) => {
+      const descInput = document.querySelector('#task-description') as HTMLTextAreaElement;
+      const errorContainer = document.querySelector('[data-testid="ai-error-container"]');
+      if (errorContainer) return true; // Stop waiting if error
+
+      return descInput && descInput.value.length > originalText.length && descInput.value !== originalText;
     }, poorGrammarText, { timeout: 90000 });
+
+    // Final error check
+    if (await appPage.page.isVisible('[data-testid="ai-error-container"]')) {
+      const errorText = await appPage.page.textContent('[data-testid="ai-error-container"]');
+      throw new Error(`AI Generation failed with error: ${errorText}`);
+    }
 
     const newDescription = await taskPage.descriptionInput.inputValue();
     expect(newDescription).not.toBe(poorGrammarText);

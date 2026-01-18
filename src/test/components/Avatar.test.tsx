@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 
 // Polyfill for crypto.getRandomValues if needed (for node environments in vitest)
 if (typeof window !== 'undefined' && !window.crypto) {
@@ -13,7 +13,7 @@ if (typeof window !== 'undefined' && !window.crypto) {
     };
 }
 import { render, screen } from '@testing-library/react';
-import { Avatar } from '../../components/ui/Avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar';
 import { ThemeContext } from '../../contexts/ThemeContext';
 
 describe('Avatar Component', () => {
@@ -30,36 +30,68 @@ describe('Avatar Component', () => {
         );
     };
 
-    it('renders initials when no avatarUrl is provided', () => {
-        renderWithTheme(<Avatar username="Kelvin" />);
+    // Mock Image to invoke onload immediately
+    const originalImage = window.Image;
+    beforeAll(() => {
+        // @ts-ignore
+        window.Image = class {
+            onload: (() => void) | null = null;
+            onerror: (() => void) | null = null;
+
+            constructor() { }
+
+            addEventListener(type: string, listener: () => void) {
+                if (type === 'load') {
+                    this.onload = listener;
+                }
+                if (type === 'error') {
+                    this.onerror = listener;
+                }
+            }
+
+            removeEventListener(_type: string, _listener: () => void) { }
+
+            set src(_: string) {
+                // Simulate async load
+                setTimeout(() => {
+                    if (this.onload) {
+                        this.onload();
+                    }
+                }, 50);
+            }
+        };
+    });
+
+    afterAll(() => {
+        window.Image = originalImage;
+    });
+
+    it('renders fallback when no image source is provided', () => {
+        renderWithTheme(
+            <Avatar>
+                <AvatarFallback>K</AvatarFallback>
+            </Avatar>
+        );
         expect(screen.getByText('K')).toBeInTheDocument();
     });
 
-    it('renders image when avatarUrl is provided', () => {
+    it('renders image when source is provided', async () => {
         const url = 'http://example.com/avatar.png';
-        renderWithTheme(<Avatar username="Kelvin" avatarUrl={url} />);
-        const img = screen.getByRole('img');
+        renderWithTheme(
+            <Avatar>
+                <AvatarImage src={url} alt="Kelvin" />
+                <AvatarFallback>K</AvatarFallback>
+            </Avatar>
+        );
+        const img = await screen.findByRole('img');
         expect(img).toHaveAttribute('src', url);
         expect(img).toHaveAttribute('alt', 'Kelvin');
     });
 
-    it('applies a background color based on username when no image', () => {
-        const { container } = renderWithTheme(<Avatar username="Kelvin" />);
-        const avatarDiv = container.firstChild as HTMLElement;
-        // We check if it has A background class (regex for bg-*-500)
-        expect(avatarDiv.className).toMatch(/bg-[a-z]+-500/);
-    });
-
-    it('renders uppercase first letter of username', () => {
-        renderWithTheme(<Avatar username="kelvinr02" />);
-        expect(screen.getByText('K')).toBeInTheDocument();
-    });
-
-    it('applies correct size classes', () => {
-        const { container: containerSm } = renderWithTheme(<Avatar username="K" size="sm" />);
-        expect(containerSm.firstChild).toHaveClass('w-8 h-8');
-
-        const { container: containerXl } = renderWithTheme(<Avatar username="K" size="xl" />);
-        expect(containerXl.firstChild).toHaveClass('w-24 h-24');
+    it('passes className correctly', () => {
+        const { container } = renderWithTheme(
+            <Avatar className="h-12 w-12" />
+        );
+        expect(container.firstChild).toHaveClass('h-12 w-12');
     });
 });

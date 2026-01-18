@@ -52,3 +52,6 @@ Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automat
 "Attachments - Markdown Upload","","","Attach a .md file.","Upload success indicator visible.","High","Functional","Tasks,Upload","Automated"
 "Attachments - Markdown Upload","","","Save task.","Task created with attachment.","High","Functional","Tasks,Upload","Automated"
 "Attachments - Markdown Upload","","","Open Task Detail.","Attachment listed with View/Download options.","High","Functional","Tasks,Upload","Automated"
+"AI - Generate Image","Verify AI image generation and credit deduction","User is logged in (credits >= 3)","Open Task Form. Click Generate Image.","Prompt input appears.","High","Functional","Tasks,AI,Image","Manual"
+"AI - Generate Image","","","Enter prompt and confirm.","Image generated and added as attachment. Credits deducted.","High","Functional","Tasks,AI,Image","Manual"
+"AI - Generate Image - No Credits","Verify validation when user lacks credits","User logged in (credits < 3)","Try to generate image.","Error message about insufficient credits.","Medium","Functional","Tasks,AI,Image","Manual"

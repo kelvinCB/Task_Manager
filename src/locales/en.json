@@ -98,6 +98,9 @@
         "due": "Due",
         "created": "Created",
         "attachments": "Attachments",
+        "estimation": "Estimation",
+        "responsible": "Responsible",
+        "points": "points",
         "no_description": "No description provided",
         "upload_prompt": "Click to upload or drag and drop",
         "upload_hint": "Documents, Images, Audio, Video (max 10MB)",
@@ -129,11 +132,14 @@
     },
     "account": {
         "my_account": "My Account",
+        "my_profile": "My Profile",
         "import_tasks": "Import Tasks",
         "export_tasks": "Export Tasks",
         "upload_error": "Error uploading image. Please try again.",
         "upload_success": "Profile photo updated successfully",
-        "image_too_large": "Image is too large. Max 10MB."
+        "image_too_large": "Image is too large. Max 10MB.",
+        "username": "Username",
+        "email": "Email"
     },
     "ai": {
         "powered": "AI POWERED",
@@ -143,7 +149,10 @@
         "dismiss": "Dismiss",
         "generating": "Generating...",
         "improving": "Improving...",
-        "thinking_status": "Thinking"
+        "thinking_status": "Thinking",
+        "generate_image": "Generate Image",
+        "image_prompt_placeholder": "Describe the image you want regarding this task...",
+        "image_cost_warning": "Costs 3 credits"
     },
     "errors": {
         "cannot_add_subtask_to_done": "Cannot add a subtask because the parent task is already completed and marked as \"Done\"",

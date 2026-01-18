@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus } from '../types/Task';
-import { X, Calendar, FileText, Tag, AlertCircle } from 'lucide-react';
+import { X, Calendar, FileText, Tag, AlertCircle, User, Calculator } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { AIIcon } from './AIIcon';
@@ -42,11 +42,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     status: 'Open' as TaskStatus,
     attachments: [] as Attachment[],
     dueDate: '',
-    parentId: parentId || ''
+    parentId: parentId || '',
+    estimation: 1,
+    responsible: ''
   });
   const [showAIOptions, setShowAIOptions] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [aiProcessingState, setAiProcessingState] = useState<'idle' | 'generating' | 'improving'>('idle');
+  const [aiProcessingState, setAiProcessingState] = useState<'idle' | 'generating' | 'improving' | 'generating-image'>('idle');
+  const [showImagePrompt, setShowImagePrompt] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState('');
   const [thinkingProcess, setThinkingProcess] = useState('');
   const [isThinkingExpanded, setIsThinkingExpanded] = useState(true);
   const [validationError, setValidationError] = useState('');
@@ -70,6 +74,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   useEffect(() => {
     setValidationError('');
     setShowAIOptions(false);
+    setShowImagePrompt(false);
+    setImagePrompt('');
     if (task) {
       const { text, attachments } = extractAttachments(task.description);
       setFormData({
@@ -78,7 +84,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         status: task.status,
         dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
         parentId: task.parentId || '',
-        attachments: attachments
+        attachments: attachments,
+        estimation: task.estimation || 0,
+        responsible: task.responsible || ''
       });
     } else {
       setFormData({
@@ -87,7 +95,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         status: 'Open',
         dueDate: '',
         parentId: parentId || '',
-        attachments: []
+        attachments: [],
+        estimation: 1,
+        responsible: ''
       });
     }
   }, [task, parentId, isOpen]);
@@ -110,6 +120,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       status: formData.status,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       parentId: formData.parentId || undefined,
+      estimation: formData.estimation || undefined,
+      responsible: formData.responsible || undefined,
       timeTracking: task?.timeTracking || {
         totalTimeSpent: 0,
         isActive: false,
@@ -250,7 +262,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                     )}
 
                     {/* Thinking Process Accordion */}
-                    {(aiProcessingState === 'generating' || aiProcessingState === 'improving') && (
+                    {(aiProcessingState === 'generating' || aiProcessingState === 'improving' || aiProcessingState === 'generating-image') && (
                       <div className="mb-4">
                         <button
                           type="button"
@@ -297,54 +309,80 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           let fullResponse = '';
 
                           try {
-                            // Reset description if we are generating a new one? 
-                            // Or append? Usually "Generate" implies replacing or filling empty.
-                            // Let's clear it if the user explicitely asked to generate.
-                            // But usually we might want to keep what they wrote. 
-                            // The current flow replaces it at the end. For streaming, we should probably clear strictly if we stream directly into it.
-                            // However, let's keep it safe: We will populate formData.description as we receive the "final" part.
-
-                            // Strategy: parsing on the fly
-
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
-
-                            // We need to clear description to show the stream effect clearly
+                            // Clear description to visualize the flow, but only if it's a fresh generation to avoid losing context unintentionally
+                            // However, strictly adhering to "Generate" means creating content.
                             setFormData(prev => ({ ...prev, description: '' }));
 
                             let hasFoundStartTag = false;
 
+
                             await openaiService.generateTaskDescription(formData.title, model, (token) => {
                               fullResponse += token;
+
+                              // Optimization: Check for tags in the accumulating response
+                              // Use regex or simple index search. Since we stream, we might get partial tags.
+                              // We only care about complete tags to switch modes.
 
                               const thinkingStartIdx = fullResponse.indexOf('<thinking>');
                               const thinkingEndIdx = fullResponse.indexOf('</thinking>');
 
                               if (thinkingStartIdx !== -1) {
                                 hasFoundStartTag = true;
-                                const contentStart = thinkingStartIdx + '<thinking>'.length;
+                                if (!isThinkingExpanded) setIsThinkingExpanded(true); // Auto expand if not already
+
                                 if (thinkingEndIdx !== -1) {
-                                  setThinkingProcess(fullResponse.substring(contentStart, thinkingEndIdx));
-                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + '</thinking>'.length);
-                                  setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                                  // Thinking is complete
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10, thinkingEndIdx); // 10 is length of <thinking>
+                                  setThinkingProcess(thinkingContent);
+
+                                  // The rest is the actual description
+                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + 11); // 11 is length of </thinking>
+                                  if (descriptionPart) {
+                                    setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                                  }
                                 } else {
-                                  setThinkingProcess(fullResponse.substring(contentStart));
+                                  // Still thinking - stream content to thinking process
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10);
+                                  setThinkingProcess(thinkingContent);
                                 }
                               } else {
-                                // If no start tag found yet, show raw response in thinking area to see what's happening
-                                if (!hasFoundStartTag) {
-                                  setThinkingProcess(fullResponse);
-                                }
+                                // detailed thought might not be used by this model or format is different
+                                // If we don't see thinking tag yet, we might render everything as thinking if we assume it starts with it?
+                                // OR we render as description.
+                                // Current prompt instruction enforces <thinking>, so we wait for it or assume it's coming.
+                                // If it doesn't come immediately, we might be showing nothing.
+                                // Let's show as thinking tentatively until we are sure it's not.
+                                // BUT: if the model outputs description directly, we shouldn't hide it.
 
-                                if (fullResponse.length > 0 && !fullResponse.includes('<thinking>')) {
+                                // Fallback: if response gets long (e.g. > 20 chars) and no <thinking>, assume description.
+                                if (fullResponse.length > 20 && !hasFoundStartTag) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
+                                } else {
+                                  // Short buffer, might be start of <thinking>
+                                  // or just showing raw token stream in thinking box for immediate feedback
+                                  setThinkingProcess(fullResponse);
                                 }
                               }
                             });
 
-                            // Final cleanup/formatting after stream ends
-                            // (Handled by the fact that promise resolves with full string, but we rely on callback)
+                            // Final cleanup when promise resolves
+                            const thinkingStartIdx = fullResponse.indexOf('<thinking>');
+                            const thinkingEndIdx = fullResponse.indexOf('</thinking>');
+
+                            if (thinkingStartIdx !== -1 && thinkingEndIdx !== -1) {
+                              const thinkingContent = fullResponse.substring(thinkingStartIdx + 10, thinkingEndIdx);
+                              setThinkingProcess(thinkingContent);
+                              const descriptionPart = fullResponse.substring(thinkingEndIdx + 11);
+                              setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                            } else if (thinkingStartIdx === -1) {
+                              // No thinking block found at all, treat whole thing as description
+                              setFormData(prev => ({ ...prev, description: fullResponse }));
+                              setThinkingProcess('');
+                            }
+
                             setShowAIOptions(false);
-                            playNotificationSound(1000, 0.5, 0.3); // AI generation completion sound
+                            playNotificationSound(1000, 0.5, 0.3);
                           } catch (error) {
                             console.error('Error generating AI description:', error);
                             setAiError(error instanceof Error ? error.message : t('common.error'));
@@ -389,32 +427,45 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                             const model = import.meta.env.VITE_OPENAI_MODEL || 'gpt-5-nano-2025-08-07';
                             const originalDescription = formData.description;
                             setFormData(prev => ({ ...prev, description: '' }));
-                            let hasFoundStartTag = false;
 
                             await openaiService.improveGrammar(originalDescription, model, (token) => {
                               fullResponse += token;
+
                               const thinkingStartIdx = fullResponse.indexOf('<thinking>');
                               const thinkingEndIdx = fullResponse.indexOf('</thinking>');
 
                               if (thinkingStartIdx !== -1) {
-                                hasFoundStartTag = true;
-                                const contentStart = thinkingStartIdx + '<thinking>'.length;
                                 if (thinkingEndIdx !== -1) {
-                                  setThinkingProcess(fullResponse.substring(contentStart, thinkingEndIdx));
-                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + '</thinking>'.length);
+                                  // Thinking done
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10, thinkingEndIdx);
+                                  setThinkingProcess(thinkingContent);
+                                  const descriptionPart = fullResponse.substring(thinkingEndIdx + 11);
                                   setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
                                 } else {
-                                  setThinkingProcess(fullResponse.substring(contentStart));
+                                  // Thinking in progress
+                                  const thinkingContent = fullResponse.substring(thinkingStartIdx + 10);
+                                  setThinkingProcess(thinkingContent);
                                 }
                               } else {
-                                if (!hasFoundStartTag) {
-                                  setThinkingProcess(fullResponse);
-                                }
-                                if (fullResponse.length > 0 && !fullResponse.includes('<thinking>')) {
+                                // No thinking tag yet? Just stream to description if it lacks tag
+                                if (fullResponse.length > 20) {
                                   setFormData(prev => ({ ...prev, description: fullResponse }));
+                                } else {
+                                  setThinkingProcess(fullResponse);
                                 }
                               }
                             });
+
+                            // Final cleanup
+                            const thinkingStartIdx = fullResponse.indexOf('<thinking>');
+                            const thinkingEndIdx = fullResponse.indexOf('</thinking>');
+                            if (thinkingStartIdx !== -1 && thinkingEndIdx !== -1) {
+                              const descriptionPart = fullResponse.substring(thinkingEndIdx + 11);
+                              setFormData(prev => ({ ...prev, description: descriptionPart.trimStart() }));
+                            } else if (thinkingStartIdx === -1) {
+                              setFormData(prev => ({ ...prev, description: fullResponse }));
+                            }
+
                             setShowAIOptions(false);
                             playNotificationSound(1000, 0.5, 0.3);
                           } catch (error) {
@@ -434,6 +485,88 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           )}
                         </div>
                       </HoverBorderGradient>
+
+                      <HoverBorderGradient
+                        as="button"
+                        type="button"
+                        highlightColor="#ec4899" // Pink-500
+                        containerClassName="rounded-xl"
+                        className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-[inherit]`}
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            setIsAuthModalOpen(true);
+                            return;
+                          }
+                          setShowImagePrompt(!showImagePrompt);
+                          setAiError(null);
+                        }}
+                        disabled={aiProcessingState !== 'idle'}
+                      >
+                        <div className={`flex items-center gap-2 px-0 py-0 text-sm font-bold ${theme === 'dark' ? 'text-pink-400' : 'text-pink-600'}`}>
+                          <AIIcon size={14} />
+                          {t('ai.generate_image')}
+                        </div>
+                      </HoverBorderGradient>
+
+                      {showImagePrompt && (
+                        <div className="w-full mt-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2">
+                          <textarea
+                            value={imagePrompt}
+                            onChange={(e) => setImagePrompt(e.target.value)}
+                            placeholder={t('ai.image_prompt_placeholder')}
+                            className={`w-full p-2 mb-2 text-sm rounded border ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'} focus:ring-2 focus:ring-pink-500 focus:border-transparent`}
+                            rows={3}
+                          />
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">
+                              {t('ai.image_cost_warning')}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (!imagePrompt.trim()) return;
+
+                                setAiProcessingState('generating-image');
+                                setAiError(null);
+
+                                try {
+                                  const imageUrl = await openaiService.generateImage(imagePrompt);
+
+                                  const newAttachment: Attachment = {
+                                    name: `AI Generated Image - ${new Date().toLocaleTimeString()}`,
+                                    url: imageUrl,
+                                    type: 'image'
+                                  };
+
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    attachments: [...prev.attachments, newAttachment]
+                                  }));
+
+                                  setShowImagePrompt(false);
+                                  setImagePrompt('');
+                                  setShowAIOptions(false);
+                                  playNotificationSound(1000, 0.5, 0.3);
+
+                                } catch (error) {
+                                  console.error('Error generating image:', error);
+                                  setAiError(error instanceof Error ? error.message : t('common.error'));
+                                } finally {
+                                  setAiProcessingState('idle');
+                                }
+                              }}
+                              className="px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-2"
+                              disabled={aiProcessingState !== 'idle' || !imagePrompt.trim()}
+                            >
+                              {aiProcessingState === 'generating-image' ? (
+                                <><div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> {t('ai.generating')}</>
+                              ) : (
+                                t('common.confirm')
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       <button
                         type="button"
@@ -475,6 +608,43 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         attachments: prev.attachments.filter((_, i) => i !== index)
                       }));
                     }}
+                  />
+                </div>
+              </div>
+
+              {/* Estimation and Responsible Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Estimation Section */}
+                <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
+                  <label htmlFor="task-estimation" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Calculator size={16} className="text-indigo-500" />
+                    {t('tasks.estimation')}
+                  </label>
+                  <select
+                    id="task-estimation"
+                    value={formData.estimation}
+                    onChange={(e) => setFormData(prev => ({ ...prev, estimation: Number(e.target.value) }))}
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
+                  >
+                    {[1, 2, 3, 5, 8, 13].map(points => (
+                      <option key={points} value={points}>{points}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Responsible Section */}
+                <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-gray-700/20 border-gray-700' : 'bg-white border-gray-200'}`}>
+                  <label htmlFor="task-responsible" className={`flex items-center gap-2 text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <User size={16} className="text-indigo-500" />
+                    {t('tasks.responsible')}
+                  </label>
+                  <input
+                    id="task-responsible"
+                    type="text"
+                    value={formData.responsible}
+                    onChange={(e) => setFormData(prev => ({ ...prev, responsible: e.target.value }))}
+                    placeholder={t('tasks.responsible')}
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100 hover:bg-gray-700' : 'border-gray-200 bg-white hover:border-indigo-300'}`}
                   />
                 </div>
               </div>

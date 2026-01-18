@@ -98,6 +98,20 @@ vi.mock('../../contexts/AuthContext', () => {
   };
 });
 
+// Mock UserProfileContext
+vi.mock('../../contexts/UserProfileContext', () => ({
+  UserProfileProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useUserProfile: () => ({
+    profile: null,
+    loading: false,
+    error: null,
+    updateProfile: vi.fn(),
+    uploadAvatar: vi.fn(),
+    deleteAvatar: vi.fn(),
+    refreshProfile: vi.fn()
+  })
+}));
+
 // Mock Login and Register pages
 vi.mock('../../pages/LoginPage', () => ({
   default: () => <div data-testid="login-page">Login Page</div>
@@ -148,6 +162,7 @@ vi.mock('lucide-react', () => ({
   Tag: ({ size }: { size?: number }) => <div data-testid="tag-icon" style={{ width: size, height: size }}>Tag</div>,
   Calendar: ({ size }: { size?: number }) => <div data-testid="calendar-icon" style={{ width: size, height: size }}>Calendar</div>,
   Menu: ({ size }: { size?: number }) => <div data-testid="menu-icon" style={{ width: size, height: size }}>Menu</div>,
+  Calculator: () => <div data-testid="calculator-icon" />,
   User: ({ size }: { size?: number }) => <div data-testid="user-icon" style={{ width: size, height: size }}>User</div>,
   UserCircle: ({ size }: { size?: number }) => <div data-testid="user-circle-icon" style={{ width: size, height: size }}>UserCircle</div>,
   ChevronDown: ({ size }: { size?: number }) => <div data-testid="chevron-down-icon" style={{ width: size, height: size }}>ChevronDown</div>,
@@ -159,6 +174,8 @@ vi.mock('lucide-react', () => ({
   Eye: ({ size }: { size?: number }) => <div data-testid="eye-icon" style={{ width: size, height: size }}>Eye</div>,
   EyeOff: ({ size }: { size?: number }) => <div data-testid="eye-off-icon" style={{ width: size, height: size }}>EyeOff</div>,
   CheckCircle: ({ size }: { size?: number }) => <div data-testid="check-circle-icon" style={{ width: size, height: size }}>CheckCircle</div>,
+  ImagePlus: ({ size }: { size?: number }) => <div data-testid="image-plus-icon" style={{ width: size, height: size }}>ImagePlus</div>,
+  CreditCard: ({ size }: { size?: number }) => <div data-testid="credit-card-icon" style={{ width: size, height: size }}>CreditCard</div>,
 }));
 
 // Mock view components

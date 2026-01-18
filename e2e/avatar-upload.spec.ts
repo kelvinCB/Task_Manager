@@ -13,7 +13,7 @@ test.describe('Avatar Upload E2E Tests', () => {
 
   test.beforeEach(async ({ page }) => {
     authPage = new AuthPage(page);
-    
+
     // Login before each test
     await authPage.goToLogin();
     await authPage.login(TEST_EMAIL, TEST_PASSWORD);
@@ -23,37 +23,47 @@ test.describe('Avatar Upload E2E Tests', () => {
   test('should show avatar in account menu for authenticated user', async ({ page }) => {
     // Open account menu
     await page.click('[data-testid="account-menu-button"]');
-    
+
     // Wait for dropdown to be visible
     await page.waitForSelector('[role="menu"]', { timeout: 3000 });
-    
-    // Verify user profile section is visible (only shows when authenticated)
-    const userInfoSection = page.locator('[role="menu"]').first();
+
+    // Verify user profile section is visible
+    const userInfoSection = page.getByTestId('user-profile-trigger');
     await expect(userInfoSection).toBeVisible();
-    
-    // Verify avatar element exists (either Avatar component or default User icon)
-    const hasAvatar = await page.locator('img[alt*="avatar"]').count() > 0;
-    const hasUserIcon = await page.locator('svg').count() > 0; // User icon from lucide-react
-    
-    expect(hasAvatar || hasUserIcon).toBe(true);
+
+    // Click profile to open modal
+    await userInfoSection.click();
+
+    // Wait for modal
+    const modal = page.getByTestId('my-profile-modal');
+    await expect(modal).toBeVisible();
+
+    // Verify avatar element exists inside modal
+    // Avatar component renders a container with w-24 h-24 in the modal (xl size)
+    // This covers both image (if present) and fallback (initials) states
+    const avatarContainer = modal.locator('.rounded-full.w-24.h-24');
+    await expect(avatarContainer).toBeVisible();
   });
 
   test('should have avatar upload capability', async ({ page }) => {
     // Open account menu
     await page.click('[data-testid="account-menu-button"]');
-    
+
     // Wait for menu
     await page.waitForSelector('[role="menu"]', { timeout: 3000 });
-    
+
+    // Open profile modal
+    await page.click('[data-testid="user-profile-trigger"]');
+    await expect(page.getByTestId('my-profile-modal')).toBeVisible();
+
     // Verify hidden file input for avatar upload exists
     const avatarInput = page.locator('input[type="file"][accept*="image"]').first();
     await expect(avatarInput).toHaveCount(1);
-    
+
     // Verify it accepts the correct image types
     const acceptAttr = await avatarInput.getAttribute('accept');
-    expect(acceptAttr).toContain('image/png');
-    expect(acceptAttr).toContain('image/jpeg');
-    
+    expect(acceptAttr).toContain('image/*');
+
     // Verify the input is hidden (not visible to user, triggered by clicking avatar)
     await expect(avatarInput).toHaveClass(/hidden/);
   });

@@ -39,6 +39,9 @@ Extends user information beyond what Supabase Auth provides. Each profile is lin
 | `avatar_url`  | `text`      | Nullable                                           |
 | `created_at`  | `timestamptz` | Not Null, Default `now()`                          |
 | `updated_at`  | `timestamptz` | Not Null, Default `now()`                          |
+| `credits`     | `integer`     | Not Null, Default `5`                              |
+| `about`       | `text`        | Nullable                                           |
+| `linkedin`    | `text`        | Nullable                                           |
 
 ### `public.tasks`
 
@@ -53,6 +56,8 @@ Stores the tasks for each user. Each task is linked to a user and supports hiera
 | `status`          | `text`        | Not Null, Default `'Open'`, CHECK (status IN ('Open', 'In Progress', 'Done')) |
 | `parent_id`       | `bigint`      | Nullable, Foreign Key to `public.tasks(id)`, On Delete SET NULL |
 | `due_date`        | `date`        | Nullable                                           |
+| `estimation`      | `integer`     | Nullable, Default `1`, CHECK (estimation IN (1, 2, 3, 5, 8, 13)) |
+| `responsible`     | `text`        | Nullable                                           |
 | `total_time_ms`   | `bigint`      | Not Null, Default `0` (persisted total when task is Done) |
 | `created_at`      | `timestamptz` | Not Null, Default `now()`                          |
 | `updated_at`      | `timestamptz` | Not Null, Default `now()`                          |
@@ -176,9 +181,9 @@ Allows all users (authenticated or anonymous) to submit requests. Only service r
 ALTER TABLE public.feature_requests ENABLE ROW LEVEL SECURITY;
 
 -- Insert policy (unauthenticated users can also submit)
-CREATE POLICY "Anyone can insert feature requests" 
+CREATE POLICY "Allow anyone to insert feature requests" 
   ON public.feature_requests FOR INSERT 
-  WITH CHECK (true);
+  WITH CHECK ((auth.uid() = user_id) OR (auth.uid() IS NULL AND user_id IS NULL));
 
 -- Select policy (only owner can see their own, or restricted)
 CREATE POLICY "Users can view own feature requests" 
@@ -236,6 +241,8 @@ CREATE TABLE IF NOT EXISTS public.tasks (
     status text NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Done')),
     parent_id bigint REFERENCES public.tasks(id) ON DELETE SET NULL,
     due_date date,
+    estimation integer DEFAULT 1 CHECK (estimation IN (1, 2, 3, 5, 8, 13)),
+    responsible text,
     total_time_ms bigint NOT NULL DEFAULT 0,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
@@ -279,7 +286,7 @@ CREATE TABLE IF NOT EXISTS public.feature_requests (
 
 -- RLS for feature_requests
 ALTER TABLE public.feature_requests ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can insert feature requests" ON public.feature_requests FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow anyone to insert feature requests" ON public.feature_requests FOR INSERT WITH CHECK ((auth.uid() = user_id) OR (auth.uid() IS NULL AND user_id IS NULL));
 CREATE POLICY "Users can view own feature requests" ON public.feature_requests FOR SELECT USING (auth.uid() = user_id);
 ```
 

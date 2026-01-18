@@ -324,7 +324,7 @@ export const ComponentName: React.FC<ComponentNameProps> = ({
 
 #### TaskForm Component
 - **Purpose**: Task creation and editing
-- **Features**: Form validation, AI integration, modal display
+- **Features**: Form validation, AI integration, modal display, estimation & responsible fields
 - **Props**: `task`, `parentId`, `isOpen`, `onClose`, `onSubmit`
 
 #### TaskTimer Component

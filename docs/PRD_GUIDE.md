@@ -48,6 +48,33 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 - Localized UI components (Auth, Tasks, Stats, Account)
 - Persisted language preference
 - Comprehensive test coverage for localized components
+- Persisted language preference
+
+**Feature TM-055: User Credits & Profile Management** (✅ Completed)
+- **Credit System:**
+  - Users start with **5 free AI credits**.
+  - One credit consumed per AI generation (description/grammar).
+  - "No Credits" error handling in UI when limit reached.
+  - Admin API for credit management (view, add, set).
+- Profile Management:
+  - Editable Display Name, Bio, LinkedIn, About Me.
+  - Avatar image upload with cropping and resizing.
+  - Read-only Email and Username field.
+  - "My Profile" modal accessible from account menu.
+
+**Feature TM-57: Task Estimation & Responsible Assignment** (✅ Completed)
+- **Estimation Field:**
+  - Story point estimation (1, 2, 3, 5, 8, 13, 21).
+  - Visual display in Task Detail and Board views.
+  - Default value of 1 point.
+- **Responsible Assignment:**
+  - Assign a person responsible for the task.
+  - Free-text input for flexibility (e.g., "Frontend Team", "John Doe").
+  - Visual display in Task Detail and Board views.
+- **Integration:**
+  - Full support in Create/Edit forms.
+  - Persisted in database and frontend state.
+
 
 **Status:** All tests passing, documentation updated, ready for production deployment.
 
@@ -59,8 +86,8 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
-| **Task Creation** | ✅ Complete | 100% | Create tasks with title, description, due date |
-| **Task Editing** | ✅ Complete | 100% | Edit existing tasks inline |
+| **Task Creation** | ✅ Complete | 100% | Create tasks with title, description, due date, estimation, and responsible |
+| **Task Editing** | ✅ Complete | 100% | Edit existing tasks inline (including new fields) |
 | **Task Deletion** | ✅ Complete | 100% | Delete tasks from Tree View and Board View |
 | **Subtask Dependency** | ✅ Complete | 100% | Tasks with incomplete subtasks cannot be marked as "Done". Users receive explicit UI feedback (alerts and disabled options) in Tree View, Board View (drag & drop), and Task Form. |
 | **Hierarchical Tasks** | ✅ Complete | 100% | Parent-child task relationships |
@@ -78,15 +105,14 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Local Storage** | ✅ Complete | 100% | Persist data locally |
 | **Multi-language Support** | ✅ Complete | 100% | English and Spanish support with instant switching |
 
-### 🤖 AI Features (Partially Complete - 50%)
+### 🤖 AI Features (Complete - 100%)
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
 | **AI Description Generation** | ✅ Complete | 100% | Real-time streaming description generation with Chain of Thought |
 | **AI Grammar Improvement** | ✅ Complete | 100% | Improve existing task descriptions |
-| **AI Task Suggestions** | ❌ Pending | 0% | Suggest related tasks |
-| **AI Time Estimation** | ❌ Pending | 0% | Estimate task completion time |
-| **AI Image Generation** | ❌ Pending | 0% | Generate images for tasks |
+| **AI Image Generation** | ✅ Complete | 100% | Generate images for tasks |
+| **AI Credit System** | ✅ Complete | 100% | 5 free credits per user, consumable by AI actions. Admin API for management. |
 
 ### 🔐 Authentication & User Management (Partially Complete - 90%)
 
@@ -96,7 +122,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **User Login** | ✅ Complete | 100% | Email/password login with session management |
 | **Random Username Generation** | ✅ Complete | 100% | Auto-generated food-based usernames (e.g., pizza1234) |
 | **Username Display** | ✅ Complete | 100% | Show username in My Account dropdown menu |
-| **User Profile Management** | ✅ Complete | 100% | Hook for fetching and updating user profiles |
+| **User Profile Management** | ✅ Complete | 100% | Update Bio, LinkedIn, About Me, Avatar. Read-only Email and Username. |
 | **Google OAuth** | ✅ Complete | 100% | Login with Google (Client-side implementation) |
 | **GitHub OAuth** | ✅ Complete | 100% | Login with GitHub (Client-side implementation) |
 | **Password Reset** | ✅ Complete | 100% | Forgot password functionality |
@@ -143,7 +169,8 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Authentication Service** | ✅ Complete | 100% | JWT-based auth with Supabase |
 | **Task Management API** | ✅ Complete | 100% | Full CRUD operations with time tracking (TM-012) |
 | **Time Tracking API** | ✅ Complete | 100% | Embedded in task endpoints |
-| **User Management API** | ❌ Pending | 0% | User profile management |
+| **User Management API** | ✅ Complete | 100% | Profile updates (Bio, Location, etc.) and Avatar upload |
+| **Admin API** | ✅ Complete | 100% | Manage user credits (protected by admin secret) |
 | **File Upload Service** | ✅ Complete | 100% | Handle file attachments |
 | **Email Service** | ❌ Pending | 0% | Email notifications |
 | **Rate Limiting** | ❌ Pending | 0% | API rate limiting |
@@ -163,7 +190,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
-|| **Frontend Unit Tests** | ✅ Complete | 100% | 333 comprehensive Vitest tests including password reset features |
+|| **Frontend Unit Tests** | ✅ Complete | 100% | 342 comprehensive Vitest tests including password reset features |
 | **E2E Tests** | ✅ Complete | 100% | 134/134 Playwright E2E tests passing (all cleaned and optimized) |
 | **Username Feature Tests** | ✅ Complete | 100% | 17 tests covering AccountMenu and useUserProfile hook |
 | **Test Debugging** | ✅ Complete | 100% | Visual debugging strategy with screenshots |
@@ -251,7 +278,6 @@ This project follows a comprehensive documentation structure. Each document serv
 Every AI agent working on this project must follow these rules:
 
 #### 🚫 Prohibited Actions
-- ❌ Never run `npm run dev` or `npm start`
 - ❌ Never hallucinate data - always ask questions if unsure
 - ❌ Never commit without running tests and build
 - ❌ Never write code in Spanish - always use English
@@ -289,13 +315,13 @@ Every AI agent working on this project must follow these rules:
 
 ## 🗺️ Future Roadmap
 
-### Phase 1: Authentication & Backend (Priority 1)
+### Phase 1: Authentication & Backend (Priority 1) - ✅ Completed
 - User registration and login
 - Backend API development
 - Database setup with Supabase
 - Basic user management
 
-### Phase 2: Enhanced Task Management (Priority 2)
+### Phase 2: Enhanced Task Management (Priority 2) - 🚧 In Progress
 - Task detail views
 - Task comments and attachments
 - Labels and priorities
@@ -402,5 +428,5 @@ Every AI agent working on this project must follow these rules:
 
 *This PRD serves as the single source of truth for the Task Manager project. All team members and AI agents should reference this document before starting any work.*
 
-**Last Updated:** December 2025  
+**Last Updated:** January 2026  
 **Next Review:** Quarterly

@@ -98,6 +98,9 @@
         "due": "Vence",
         "created": "Creada",
         "attachments": "Adjuntos",
+        "estimation": "Estimación",
+        "responsible": "Responsable",
+        "points": "puntos",
         "no_description": "Sin descripción",
         "upload_prompt": "Haz clic para subir o arrastra y suelta",
         "upload_hint": "Documentos, Imágenes, Audio, Video (máx 10MB)",
@@ -129,11 +132,14 @@
     },
     "account": {
         "my_account": "Mi Cuenta",
+        "my_profile": "Mi Perfil",
         "import_tasks": "Importar Tareas",
         "export_tasks": "Exportar Tareas",
         "upload_error": "Error al subir imagen. Por favor intenta de nuevo.",
         "upload_success": "Foto de perfil actualizada con éxito",
-        "image_too_large": "La imagen es demasiado grande. Máx 10MB."
+        "image_too_large": "La imagen es demasiado grande. Máx 10MB.",
+        "username": "Nombre de usuario",
+        "email": "Correo electrónico"
     },
     "ai": {
         "powered": "IMPULSADO POR IA",
@@ -143,7 +149,10 @@
         "dismiss": "Descartar",
         "generating": "Generando...",
         "improving": "Mejorando...",
-        "thinking_status": "Pensando"
+        "thinking_status": "Pensando",
+        "generate_image": "Generar Imagen",
+        "image_prompt_placeholder": "Describe la imagen que deseas para esta tarea...",
+        "image_cost_warning": "Cuesta 3 créditos"
     },
     "errors": {
         "cannot_add_subtask_to_done": "No se puede añadir una subtarea porque la tarea padre ya está completada y marcada como \"Completado\"",

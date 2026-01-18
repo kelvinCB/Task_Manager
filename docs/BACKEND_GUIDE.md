@@ -2,18 +2,20 @@
 
 ## Table of Contents
 
-- [Backend Development Guide](#backend-development-guide)
-  - [Overview](#overview)
-  - [Setup and Installation](#setup-and-installation)
-- [Backend Critical](#backend-critical)
-  - [Architecture](#architecture)
-  - [Key Components](#key-components)
-  - [Standards](#standards)
-  - [Integration](#integration)
-  - [Testing](#testing)
-  - [Development Workflow](#development-workflow)
-  - [Implementation Details](#implementation-details)
-  - [Future Enhancements](#future-enhancements)
+- [Overview](#overview)
+- [Setup and Installation](#setup-and-installation)
+- [Architecture](#architecture)
+  - [Technology Stack](#technology-stack)
+  - [Project Structure](#project-structure)
+  - [Key Endpoints](#key-endpoints-rest)
+  - [Controllers](#controllers)
+  - [Middleware](#middleware)
+- [Standards](#standards)
+- [Integration](#integration)
+- [Testing](#testing)
+- [Development Workflow](#development-workflow)
+- [Implementation Details](#implementation-details)
+- [Future Enhancements](#future-enhancements)
 
 ## Overview
 
@@ -89,9 +91,6 @@ backend/
 └── vercel.json                   # Vercel Configuration (Rewrites)
 ```
 
-## Key Components
-
-### API Endpoints
 
 #### Key Endpoints (REST)
 
@@ -114,6 +113,7 @@ backend/
 | GET | `/api/time-entries/summary` | Get time summary (query: start, end) |
 | POST | `/api/time-entries/complete` | Log time on task completion |
 | **Profile** | | |
+| GET | `/api/profile` | Get user profile (includes credits) |
 | POST | `/api/profile/avatar` | Upload profile avatar |
 | DELETE | `/api/profile/avatar` | Delete profile avatar |
 | **Upload** | | |
@@ -127,6 +127,10 @@ backend/
 | **System** | | |
 | GET | `/` | Server welcome message |
 | GET | `/health` | System status check (Health Check) |
+| **Admin (Protected with x-admin-secret)** | | |
+| GET | `/api/admin/credits/:userId` | Get user credits |
+| POST | `/api/admin/credits/add` | Add/subtract credits (`{userId, amount}`) |
+| POST | `/api/admin/credits/set` | Set absolute credits (`{userId, amount}`) |
 
 ### Instructions for AI Agents
 > [!IMPORTANT]
@@ -181,6 +185,28 @@ Response: 200 OK
 }
 ```
 
+**Create Task:**
+```json
+POST /api/tasks
+{
+  "title": "New Features Implementation",
+  "description": "Implement estimation and responsible",
+  "estimation": 5,
+  "responsible": "Frontend Team"
+}
+
+Response: 201 Created
+{
+  "data": {
+    "id": "uuid",
+    "title": "New Features Implementation",
+    "estimation": 5,
+    "responsible": "Frontend Team",
+    "user_id": "user_uuid"
+  }
+}
+```
+
 ### Controllers
 
 #### authController.js
@@ -194,7 +220,7 @@ Handles authentication logic with:
 #### taskController.js
 Manages task CRUD operations with:
 - **User Isolation**: All operations automatically scoped to authenticated user
-- **Input Validation**: Title required, status validation, parent task verification
+- **Input Validation**: Title required, status validation, parent task verification, estimation & responsible sanitization
 - **CRUD Operations**:
   - `createTask`: Create new task with user ownership
   - `getTasks`: Retrieve user's tasks with optional status filter
