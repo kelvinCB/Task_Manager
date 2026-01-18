@@ -17,7 +17,7 @@
   - [Performance Considerations](#performance-considerations)
   - [API Usage and Costs](#api-usage-and-costs)
 
-## Overview Esto es una prueba
+## Overview
 
 TaskFlow integrates with OpenAI's API to provide intelligent task description generation. This document covers the technical implementation, configuration, and usage of the AI features.
 
