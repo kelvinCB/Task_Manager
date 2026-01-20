@@ -90,7 +90,7 @@ vi.mock('../../contexts/AuthContext', () => {
     ...originalModule,
     AuthProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="auth-provider">{children}</div>,
     useAuth: () => ({
-      isAuthenticated: false,
+      isAuthenticated: true,
       logout: vi.fn(),
       user: null,
       session: null
@@ -136,12 +136,27 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => vi.fn(),
     BrowserRouter: ({ children }: { children: React.ReactNode }) => (
-      <actual.MemoryRouter initialEntries={['/dashboard']}>
+      <actual.MemoryRouter initialEntries={['/']}>
         {children}
       </actual.MemoryRouter>
     ),
   };
 });
+
+// Mock AccountMenu
+vi.mock('../../components/features/account/AccountMenu', () => ({
+  AccountMenu: () => <div data-testid="account-menu">Mock Account Menu</div>
+}));
+
+// Mock LanguageToggle
+vi.mock('../../components/ui/LanguageToggle', () => ({
+  LanguageToggle: () => <div data-testid="language-toggle">Mock Language Toggle</div>
+}));
+
+// Mock HelpFAB
+vi.mock('../../components/features/help/HelpFAB', () => ({
+  default: () => <div data-testid="help-fab">Mock Help FAB</div>
+}));
 
 // Mock icons
 vi.mock('lucide-react', () => ({
@@ -338,8 +353,8 @@ describe('App Component', () => {
     );
 
     // Verify My Account buttons exist (now contains export/import functionality)
-    const accountButtons = screen.getAllByTitle('My Account');
-    expect(accountButtons.length).toBeGreaterThan(0);
+    const accountMenus = screen.getAllByTestId('account-menu');
+    expect(accountMenus.length).toBeGreaterThan(0);
   });
 
   it('should handle task timer controls across views', () => {
