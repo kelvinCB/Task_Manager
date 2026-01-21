@@ -43,16 +43,7 @@ test.describe('Credit Management', () => {
                     }
                 });
 
-                // Clean up existing user to ensure fresh state
-                const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
-                if (!listError && users) {
-                    const existingUser = users.find(u => u.email === noCreditsUser.email);
-                    if (existingUser) {
-                        await supabase.auth.admin.deleteUser(existingUser.id);
-                        console.log(`Deleted existing test user: ${noCreditsUser.email}`);
-                    }
-                }
-
+                // Attempt to create user
                 const { data, error } = await supabase.auth.admin.createUser({
                     email: noCreditsUser.email,
                     password: noCreditsUser.password,
@@ -60,8 +51,23 @@ test.describe('Credit Management', () => {
                 });
 
                 if (error) {
-                    console.error(`User creation FAILED for ${noCreditsUser.email}:`, error.message);
-                    throw error; // Fail the test setup if user creation fails
+                    if (error.message.includes('already been registered') || error.code === 'email_exists') {
+                        console.log(`User ${noCreditsUser.email} already exists, fetching existing user...`);
+                        const { data: { users } } = await supabase.auth.admin.listUsers();
+                        const existingUser = users?.find(u => u.email === noCreditsUser.email);
+                        if (existingUser) {
+                            userId = existingUser.id;
+                            // Reset password just in case
+                            await supabase.auth.admin.updateUserById(userId, { password: noCreditsUser.password });
+                        } else {
+                            // If not found in first page, we really have a problem or need to search better
+                            // But for E2E this usually means it's one of the first few
+                            throw new Error(`User claimed to exist but not found in first page of users: ${noCreditsUser.email}`);
+                        }
+                    } else {
+                        console.error(`User creation FAILED for ${noCreditsUser.email}:`, error.message);
+                        throw error;
+                    }
                 } else {
                     console.log(`User ${noCreditsUser.email} created successfully. ID: ${data.user?.id}`);
                     userId = data.user.id;
