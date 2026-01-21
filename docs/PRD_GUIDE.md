@@ -56,7 +56,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
   - One credit consumed per AI generation (description/grammar).
   - "No Credits" error handling in UI when limit reached.
   - Admin API for credit management (view, add, set).
-- Profile Management:
+- **Profile Management:**
   - Editable Display Name, Bio, LinkedIn, About Me.
   - Avatar image upload with cropping and resizing.
   - Read-only Email and Username field.
@@ -428,5 +428,5 @@ Every AI agent working on this project must follow these rules:
 
 *This PRD serves as the single source of truth for the Task Manager project. All team members and AI agents should reference this document before starting any work.*
 
-**Last Updated:** January 2026  
+**Last Updated:** January 20th, 2026 
 **Next Review:** Quarterly
