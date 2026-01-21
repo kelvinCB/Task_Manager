@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useTasks } from './hooks/useTasks';
 import { TaskTree } from './components/TaskTree';
 import { TaskBoard } from './components/TaskBoard';
@@ -25,6 +25,7 @@ import Papa from 'papaparse';
 
 import { useTheme } from './contexts/ThemeContext';
 import { AccountMenu } from './components/features/account/AccountMenu';
+import { Analytics } from '@vercel/analytics/react';
 
 import { canCompleteTask } from './utils/taskUtils';
 import './styles/logoAnimation.css';
@@ -35,10 +36,10 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import AuthCallback from './pages/AuthCallback';
 import { TaskDetailModal } from './components/TaskDetailModal';
 import { ErrorModal } from './components/features/ErrorModal';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import HelpFAB from './components/features/help/HelpFAB';
 import { Toaster } from 'sonner';
-import PricingPage from './pages/PricingPage';
 
 const MainApp = () => {
   const {
@@ -195,8 +196,8 @@ const MainApp = () => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: (results: Papa.ParseResult<Record<string, string>>) => {
-        const importedTasks: Omit<Task, 'id' | 'childIds' | 'depth'>[] = results.data.map((row: Record<string, string>) => {
+      complete: (results: Papa.ParseResult<any>) => {
+        const importedTasks: Omit<Task, 'id' | 'childIds' | 'depth'>[] = results.data.map((row: any) => {
           // Parse time tracking data if available
           let timeEntries = [];
           let totalTimeSpent = 0;
@@ -262,7 +263,7 @@ const MainApp = () => {
         });
         alert(t('common.success')); // Or improved alert
       },
-      error: (error: unknown) => {
+      error: (error: any) => {
         console.error('Error parsing CSV:', error);
         alert(t('common.error'));
       }
@@ -804,7 +805,7 @@ const MainApp = () => {
 }
 
 const App = () => {
-  const { isAuthenticated } = useAuth();
+
 
   // Handle unhandled promise rejections from Vercel Analytics
   useEffect(() => {
@@ -828,16 +829,14 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/" element={
-            isAuthenticated ? (
-              <MainApp />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          } />
-        </Routes>
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route
+          path="/"
+          element={<MainApp />}
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Analytics />
       <Toaster />
     </Router>
   );
