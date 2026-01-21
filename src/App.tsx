@@ -196,16 +196,29 @@ const MainApp = () => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: (results: Papa.ParseResult<any>) => {
-        const importedTasks: Omit<Task, 'id' | 'childIds' | 'depth'>[] = results.data.map((row: any) => {
+      complete: (results: Papa.ParseResult<unknown>) => {
+        interface CsvRow {
+          timeEntries?: string;
+          totalTimeSpent?: string | number;
+          title?: string;
+          description?: string;
+          status?: string;
+          createdAt?: string;
+          dueDate?: string;
+          parentId?: string;
+          [key: string]: unknown;
+        }
+
+        const importedTasks: Omit<Task, 'id' | 'childIds' | 'depth'>[] = results.data.map((row: unknown) => {
+          const csvRow = row as CsvRow;
           // Parse time tracking data if available
           let timeEntries = [];
           let totalTimeSpent = 0;
 
-          if (row.timeEntries) {
+          if (csvRow.timeEntries) {
             try {
               // Handle escaped quotes from CSV export
-              const cleanedTimeEntries = row.timeEntries.replace(/""/g, '"');
+              const cleanedTimeEntries = csvRow.timeEntries.replace(/""/g, '"');
               timeEntries = JSON.parse(cleanedTimeEntries);
 
               // Ensure timeEntries is an array and has valid structure
@@ -234,22 +247,22 @@ const MainApp = () => {
                 timeEntries = [];
               }
             } catch (e) {
-              console.warn('Could not parse time entries for task:', row.title, 'Error:', e);
+              console.warn('Could not parse time entries for task:', csvRow.title, 'Error:', e);
               timeEntries = [];
             }
           }
 
-          if (row.totalTimeSpent && !isNaN(Number(row.totalTimeSpent))) {
-            totalTimeSpent = Number(row.totalTimeSpent);
+          if (csvRow.totalTimeSpent && !isNaN(Number(csvRow.totalTimeSpent))) {
+            totalTimeSpent = Number(csvRow.totalTimeSpent);
           }
 
           return {
-            title: row.title || 'Untitled Task',
-            description: row.description || '',
-            status: row.status as Task['status'] || 'Open',
-            createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
-            dueDate: row.dueDate ? new Date(row.dueDate) : undefined,
-            parentId: row.parentId || undefined,
+            title: csvRow.title || 'Untitled Task',
+            description: csvRow.description || '',
+            status: csvRow.status as Task['status'] || 'Open',
+            createdAt: csvRow.createdAt ? new Date(csvRow.createdAt) : new Date(),
+            dueDate: csvRow.dueDate ? new Date(csvRow.dueDate) : undefined,
+            parentId: csvRow.parentId || undefined,
             timeTracking: {
               totalTimeSpent,
               isActive: false,
@@ -263,7 +276,7 @@ const MainApp = () => {
         });
         alert(t('common.success')); // Or improved alert
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         console.error('Error parsing CSV:', error);
         alert(t('common.error'));
       }
