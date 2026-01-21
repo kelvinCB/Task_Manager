@@ -22,7 +22,7 @@ test.describe('Board View Badges', () => {
         await appPage.page.reload();
     });
 
-    test('should show "Created" date when no due date is present', async ({ page }) => {
+    test('should show "Created" date when no due date is present', async () => {
         const title = 'Badge Task';
         await appPage.openAddTaskModal();
         await taskPage.createTask({ title });
@@ -34,7 +34,7 @@ test.describe('Board View Badges', () => {
         await expect(taskCard).toContainText(/Created/i);
     });
 
-    test('should show "Has subtasks" badge on board view', async ({ page }) => {
+    test('should show "Has subtasks" badge on board view', async () => {
         const parentTitle = 'Parent Task';
         const subtaskTitle = 'Subtask Task';
 
@@ -57,7 +57,7 @@ test.describe('Board View Badges', () => {
         await expect(badge).toContainText(/Has subtasks/i);
     });
 
-    test('should show "Level" badge for subtasks on board view', async ({ page }) => {
+    test('should show "Level" badge for subtasks on board view', async () => {
         const parentTitle = 'Parent Project';
         const subtaskTitle = 'Child Task';
 

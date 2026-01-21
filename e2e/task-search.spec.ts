@@ -16,9 +16,7 @@ test.describe('Task Search Functionality', () => {
     await appPage.page.reload();
   });
 
-  test.afterEach(async ({ page }, testInfo) => {
-    // Wait 1 second before ending test    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();  });
+
 
   // Helper function to create test tasks with different title patterns
   async function createSearchTestTasks() {
@@ -216,10 +214,11 @@ test.describe('Task Search Functionality', () => {
     await expect(appPage.page.getByText('Process 2024 Q1')).not.toBeVisible();
     
     const taskListContainer = appPage.page.locator('.task-list, .board-column');
+    await expect(taskListContainer).toBeVisible({ timeout: 5000 }).catch(() => {});
     
     try {
         await expect(appPage.page.getByText(/No tasks found/i)).toBeVisible({ timeout: 5000 });
-    } catch (e) {
+    } catch {
         // Silent fail - just checking
     }
     

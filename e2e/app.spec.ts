@@ -9,10 +9,7 @@ test.describe('Task Manager App', () => {
     await appPage.goto();
   });
 
-  test.afterEach(async ({ page }, testInfo) => {
-    // Wait 1 second before ending test    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  });
+
 
   test('should load the application successfully', async () => {
     await appPage.verifyPageLoaded();

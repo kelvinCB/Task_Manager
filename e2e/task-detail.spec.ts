@@ -1,17 +1,17 @@
 import { test, expect } from '@playwright/test';
 import { AppPage } from './page-objects/app.page';
 import { TaskPage } from './page-objects/task.page';
-import { BoardPage } from './page-objects/board.page';
+
 
 test.describe('Task Detail View', () => {
     let appPage: AppPage;
     let taskPage: TaskPage;
-    let boardPage: BoardPage;
+
 
     test.beforeEach(async ({ page }) => {
         appPage = new AppPage(page);
         taskPage = new TaskPage(page);
-        boardPage = new BoardPage(page);
+
         await appPage.goto();
 
         // Clear local storage to start fresh

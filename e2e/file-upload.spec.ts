@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { AuthPage } from './page-objects/auth.page';
 import { AppPage } from './page-objects/app.page';
 import { TaskPage } from './page-objects/task.page';
-import path from 'path';
+
 
 test.describe('File Upload Service', () => {
   let authPage: AuthPage;
@@ -22,11 +22,7 @@ test.describe('File Upload Service', () => {
     await authPage.login(process.env.E2E_USER_FILE_EMAIL, process.env.E2E_USER_FILE_PASSWORD);
 
     // Explicit wait loop for login success
-    try {
-      await expect(page).toHaveURL('/', { timeout: 10000 });
-    } catch (e) {
-      throw e;
-    }
+    await expect(page).toHaveURL('/', { timeout: 10000 });
 
     // Verify Dashboard
     // Use a CSS selector to match either button, and take the first one visible
@@ -94,7 +90,7 @@ test.describe('File Upload Service', () => {
     await taskLink.click();
 
     // Explicitly wait for modal content
-    const detailModal = page.locator('div[role="dialog"]'); // Assuming modal has role dialog, or check class
+    // const detailModal = page.locator('div[role="dialog"]'); // Assuming modal has role dialog, or check class
     // Or use text matching
     await expect(page.getByText('Description')).toBeVisible();
 

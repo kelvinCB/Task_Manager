@@ -213,7 +213,7 @@ test.describe('Username Display Feature', () => {
     const usernamePattern = appPage.page.locator('text=/^@[a-z0-9-]+$/');
     
     // Check if dropdown is already open
-    let isDropdownOpen = await logoutButton.isVisible().catch(() => false);
+    const isDropdownOpen = await logoutButton.isVisible().catch(() => false);
     
     if (!isDropdownOpen) {
       await accountButton.click();

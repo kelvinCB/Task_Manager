@@ -1,17 +1,17 @@
 import { test, expect } from '@playwright/test';
 import { AppPage } from './page-objects/app.page';
 import { TaskPage } from './page-objects/task.page';
-import { BoardPage } from './page-objects/board.page';
+
 
 test.describe('Task Filtering', () => {
   let appPage: AppPage;
   let taskPage: TaskPage;
-  let boardPage: BoardPage;
+
 
   test.beforeEach(async ({ page }) => {
     appPage = new AppPage(page);
     taskPage = new TaskPage(page);
-    boardPage = new BoardPage(page);
+
     await appPage.goto();
 
     // Clear local storage to start fresh
@@ -19,21 +19,19 @@ test.describe('Task Filtering', () => {
     await appPage.page.reload();
   });
 
-  test.afterEach(async ({ page }, testInfo) => {
-    // Small wait before ending test for stability
-  });
+
 
   // Helper function to show filters - DESKTOP/MOBILE COMPATIBLE
   async function showFilters() {
     const selectLocator = appPage.page.locator('select');
-    let initialSelectCount = await selectLocator.count();
+    const initialSelectCount = await selectLocator.count();
 
     // Check if any existing select has the GLOBAL filter options we need
     if (initialSelectCount > 0) {
       for (let i = 0; i < initialSelectCount; i++) {
         const select = selectLocator.nth(i);
         const isVisible = await select.isVisible().catch(() => false);
-        const options = await select.locator('option').allTextContents().catch(() => []);
+        const options = await select.locator('option').allTextContents().catch(() => [] as string[]);
 
         // Only consider it a working filter if it has "All Status" option (global filter)
         if (isVisible && (options.includes('All Status') || options.includes('Filter') || (options.includes('All') && options.includes('Open')))) {
@@ -86,7 +84,7 @@ test.describe('Task Filtering', () => {
             filterActivated = true;
             break;
           }
-        } catch (e) {
+        } catch {
           // Continue to next button
         }
       }

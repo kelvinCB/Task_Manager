@@ -260,7 +260,7 @@ test.describe('Time Stats View Features', () => {
                 await expect(appPage.page.getByText(new RegExp(statsText, 'i'))).toBeVisible({ timeout: 1000 });
                 statsFound = true;
                 break;
-            } catch (e) {
+            } catch {
                 // Continue to next element
             }
         }

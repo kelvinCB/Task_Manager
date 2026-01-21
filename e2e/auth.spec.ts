@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { AuthPage } from './page-objects/auth.page';
-import { AppPage } from './page-objects/app.page';
+
 
 // Test credentials
 // Test credentials and validation
@@ -25,12 +25,12 @@ const generateRandomEmail = () => {
 test.describe('Authentication E2E Tests', () => {
   test.use({ viewport: { width: 1280, height: 720 } });
   let authPage: AuthPage;
-  let appPage: AppPage;
+
 
   // Create new instances for each test
   test.beforeEach(async ({ page }) => {
     authPage = new AuthPage(page);
-    appPage = new AppPage(page);
+
   });
 
   test.describe('Scenario 1: Login through Account Menu', () => {
@@ -50,7 +50,7 @@ test.describe('Authentication E2E Tests', () => {
       await authPage.expectLoggedIn();
     });
     
-    test('Shows error when credentials are incorrect', async ({ page }) => {
+    test('Shows error when credentials are incorrect', async () => {
       await authPage.goToLogin();
       await authPage.login(TEST_EMAIL, 'contraseña-incorrecta');
       
@@ -68,7 +68,7 @@ test.describe('Authentication E2E Tests', () => {
       await authPage.expectFormValidationError();
     });
 
-    test('Email format validation', async ({ page }) => {
+    test('Email format validation', async () => {
       await authPage.goToLogin();
       
       // Email with invalid format
@@ -91,7 +91,7 @@ test.describe('Authentication E2E Tests', () => {
   });
 
   test.describe('Scenario 2: Logout from account', () => {
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async () => {
       // Login before each test in this group
       await authPage.goToLogin();
       await authPage.login(TEST_EMAIL, TEST_PASSWORD);
@@ -150,7 +150,7 @@ test.describe('Authentication E2E Tests', () => {
       }
     });
     
-    test('Form validation - required fields', async ({ page }) => {
+    test('Form validation - required fields', async () => {
       await authPage.goToRegister();
       
       // Try to submit empty form
@@ -160,7 +160,7 @@ test.describe('Authentication E2E Tests', () => {
       await authPage.expectFormValidationError();
     });
 
-    test('Password validation - minimum 6 characters', async ({ page }) => {
+    test('Password validation - minimum 6 characters', async () => {
       await authPage.goToRegister();
       
       // Password too short with a random email

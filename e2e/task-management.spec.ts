@@ -19,10 +19,7 @@ test.describe('Task Management', () => {
     await appPage.page.reload();
   });
 
-  test.afterEach(async ({ page }, testInfo) => {
-    // Wait 1 second before ending test    // Take final screenshot with test name
-    const testName = testInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  });
+
 
   test('should create a new task successfully', async () => {
     // Open task creation modal

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { AppPage } from './page-objects/app.page';
 import { TaskPage } from './page-objects/task.page';
 import { TreePage } from './page-objects/tree.page';
