@@ -8,7 +8,8 @@ import {
   ChevronDown,
   LogIn,
   LogOut,
-  User
+  User,
+  Sparkles
 } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -172,6 +173,26 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({
 
             {/* Divider */}
             {isAuthenticated && <div className={`my-1 border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}></div>}
+
+            {/* Upgrade Plan option */}
+            <button
+              onClick={() => {
+                navigate('/pricing');
+                setIsOpen(false);
+              }}
+              className={`
+                w-full text-left px-4 py-2 flex items-center gap-2
+                ${theme === 'dark'
+                  ? 'text-gray-200 hover:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100'
+                }
+              `}
+              role="menuitem"
+              data-testid="upgrade-plan-menu-item"
+            >
+              <Sparkles size={16} className="text-amber-500" />
+              <span>{t('account.upgrade_plan', 'Upgrade Plan')}</span>
+            </button>
 
             {/* Export option */}
             <button

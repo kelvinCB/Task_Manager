@@ -34,6 +34,7 @@ import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AuthCallback from './pages/AuthCallback';
+import PricingPage from './pages/PricingPage';
 import { TaskDetailModal } from './components/TaskDetailModal';
 import { ErrorModal } from './components/features/ErrorModal';
 import { Navigate } from 'react-router-dom';
@@ -843,6 +844,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route
           path="/"
           element={<MainApp />}
