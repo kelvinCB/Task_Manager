@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Task, TaskStatus } from '../types/Task';
 import { X, Calendar, FileText, Tag, AlertCircle, User, Calculator } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -36,6 +37,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -249,7 +251,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         className={`mb-4 p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-200 ${theme === 'dark' ? 'bg-red-500/10 border border-red-500/30 text-red-400' : 'bg-red-50 border border-red-200 text-red-600'}`}
                       >
                         <AlertCircle size={16} />
-                        <span className="text-sm font-semibold flex-1">{aiError}</span>
+                        <span className="text-sm font-semibold flex-1">
+                          {aiError}
+                          {(aiError.toLowerCase().includes('credits') || aiError.toLowerCase().includes('quota')) && (
+                            <button
+                              type="button"
+                              onClick={() => navigate('/pricing')}
+                              className={`ml-3 px-3 py-1 text-xs font-bold rounded-md shadow-sm transition-all hover:scale-105 active:scale-95 ${theme === 'dark' ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                            >
+                              Get Credits
+                            </button>
+                          )}
+                        </span>
                         <button
                           type="button"
                           onClick={() => setAiError(null)}
