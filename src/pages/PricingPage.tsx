@@ -1,14 +1,15 @@
 import React from 'react';
-import { Pricing, Plan } from '../components/blocks/pricing';
+import { Pricing, Plan, CreditsPurchase } from '../components/blocks/pricing';
 import { useTheme } from '../contexts/ThemeContext';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const demoPlans: Plan[] = [
   {
     id: 'starter',
     name: 'Starter',
-    price: { monthly: 0, yearly: 0 },
+    price: { monthly: 10, yearly: 96 },
     features: [
       'Up to 10 projects',
       'Basic analytics',
@@ -54,6 +55,15 @@ const demoPlans: Plan[] = [
 const PricingPage: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const creditsRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (searchParams.get('type') === 'credits') {
+      creditsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [searchParams]);
 
   const handlePlanSelect = (planId: string, interval: 'monthly' | 'yearly') => {
     console.log(`Selected plan: ${planId}, interval: ${interval}`);
@@ -61,39 +71,49 @@ const PricingPage: React.FC = () => {
     alert(`You selected the ${planId} plan (${interval}). Integration coming soon!`);
   };
 
+  const handleCreditSelect = (amount: number | 'custom', useCrypto: boolean) => {
+    console.log(`Selected credit amount: ${amount}, crypto: ${useCrypto}`);
+    alert(`You selected ${amount === 'custom' ? 'Custom Amount' : '$' + amount} in credits. Integration coming soon!`);
+  };
+
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-black text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="p-4 sm:p-6 lg:p-8">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className={`flex items-center gap-2 mb-4 px-4 py-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
         >
           <ArrowLeft size={20} />
           Back
         </button>
-        
-        <Pricing 
-          plans={demoPlans} 
-          title="Upgrade your productivity" 
-          description="Unlock your full potential with our Pro plan."
+
+        <Pricing
+          plans={demoPlans}
+          title={t('pricing.upgrade_productivity', 'Upgrade your productivity')}
+          description={t('pricing.unlock_potential_pro', 'Unlock your full potential with our Pro plan.')}
+          currentPlanId="starter"
           onPlanSelect={handlePlanSelect}
         />
+
+        <div ref={creditsRef}>
+          <CreditsPurchase onCreditSelect={handleCreditSelect} />
+        </div>
 
         {/* FAQ Section */}
         <div className="max-w-3xl mx-auto mt-20 mb-16">
           <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
           <div className="space-y-6">
-            <div className={`p-6 rounded-2xl ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'} shadow-sm`}>
+            <div className="p-6 rounded-3xl bg-card text-card-foreground border shadow-sm">
               <h3 className="text-lg font-bold mb-2">Can I switch plans later?</h3>
-              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Yes, you can upgrade or downgrade your plan at any time. Changes will be applied immediately.</p>
+              <p className="text-muted-foreground">Yes, you can upgrade or downgrade your plan at any time. Changes will be applied immediately.</p>
             </div>
-            <div className={`p-6 rounded-2xl ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'} shadow-sm`}>
+            <div className="p-6 rounded-3xl bg-card text-card-foreground border shadow-sm">
               <h3 className="text-lg font-bold mb-2">How does billing work?</h3>
-              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>We accept all major credit cards. For enterprise plans, we can also support invoicing.</p>
+              <p className="text-muted-foreground">We accept all major credit cards. For enterprise plans, we can also support invoicing.</p>
             </div>
-            <div className={`p-6 rounded-2xl ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'} shadow-sm`}>
+            <div className="p-6 rounded-3xl bg-card text-card-foreground border shadow-sm">
               <h3 className="text-lg font-bold mb-2">What happens to my data if I cancel?</h3>
-              <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>We'll keep your data safe for 30 days after cancellation. You can reactivate your account anytime within that period.</p>
+              <p className="text-muted-foreground">We'll keep your data safe for 30 days after cancellation. You can reactivate your account anytime within that period.</p>
             </div>
           </div>
         </div>
