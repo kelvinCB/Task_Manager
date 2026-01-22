@@ -28,15 +28,15 @@ test.describe('Pricing Page', () => {
         // Build history stack
         await page.goto('/');
         await page.goto('/pricing');
-        
+
         await expect(page.getByText('Back')).toBeVisible();
         await page.getByText('Back').click();
-        
+
         // Should return to dashboard/login
         await expect(page).not.toHaveURL(/\/pricing/);
     });
 
-    test('should navigate to pricing from dashboard account menu', async ({ page }) => {
+    test('should navigate to pricing from profile modal upgrade plan button', async ({ page }) => {
         // Need to login first for account menu
         await page.goto('/login');
         await page.getByPlaceholder('Email').fill(process.env.E2E_TEST_USER_EMAIL || 'test@example.com');
@@ -47,13 +47,15 @@ test.describe('Pricing Page', () => {
         await expect(page).toHaveURL('/');
         await expect(page.getByTestId('board-view-container')).toBeVisible({ timeout: 10000 });
 
-        // Open account menu
-        // Open account menu (filter by visibility to handle mobile/desktop duplicates)
+        // Open account menu and navigate to profile modal
         await page.getByTestId('account-menu-button').filter({ hasText: 'My Account' }).click();
-        
-        // Click upgrade plan
-        await expect(page.getByTestId('upgrade-plan-menu-item')).toBeVisible();
-        await page.getByTestId('upgrade-plan-menu-item').click();
+        await page.getByTestId('my-profile-menu-item').click();
+
+        // Wait for modal to open
+        await expect(page.getByTestId('my-profile-modal')).toBeVisible();
+
+        // Click upgrade plan button in modal
+        await page.getByTestId('upgrade-plan-button').click();
 
         // Verify URL
         await expect(page).toHaveURL(/\/pricing/);
@@ -77,7 +79,7 @@ test.describe('Pricing Page', () => {
 
         // Wait for dashboard and open new task modal
         await page.getByTestId('add-task-button').click();
-        
+
         // Fill title to enable form interactive parts if needed
         await page.getByPlaceholder('What needs to be done?').fill('Test AI Credits');
 
@@ -90,7 +92,7 @@ test.describe('Pricing Page', () => {
         // Check for specific error message "You have no credits left."
         // We skip checking for "Generating..." as it might appear too briefly if the failure is immediate.
         await expect(page.getByText('You have no credits left.')).toBeVisible({ timeout: 10000 });
-        
+
         // Click "Get Credits" (implicitly waits for it to appear in the error alert)
         await page.getByRole('button', { name: /get credits/i }).click();
         await expect(page).toHaveURL(/\/pricing/);
