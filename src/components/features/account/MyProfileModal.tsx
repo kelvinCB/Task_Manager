@@ -4,8 +4,9 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { useUserProfile } from '../../../hooks/useUserProfile';
 import { useTranslation } from 'react-i18next';
 import { getAvatarColor } from '@/lib/utils';
-import { ImagePlus, CreditCard } from 'lucide-react';
+import { ImagePlus, CreditCard, ShoppingCart, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 import {
     Dialog,
@@ -37,6 +38,7 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
     const { theme } = useTheme();
     const { profile, updateProfile, uploadAvatar } = useUserProfile();
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     // Form State
     const [displayName, setDisplayName] = useState('');
@@ -221,16 +223,58 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
 
                             <div className="space-y-1.5">
                                 <Label htmlFor="credits" className={theme === 'dark' ? 'text-gray-200' : ''}>Remaining credits</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="credits"
-                                        value={profile?.credits?.toString() || '0'}
-                                        disabled
-                                        className={`pl-9 opacity-70 cursor-not-allowed ${theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700' : 'bg-muted'}`}
-                                    />
-                                    <div className={`absolute left-3 top-2.5 ${theme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
-                                        <CreditCard size={16} />
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <Input
+                                            id="credits"
+                                            value={profile?.credits?.toString() || '0'}
+                                            disabled
+                                            className={`pl-9 opacity-70 cursor-not-allowed ${theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700' : 'bg-muted'}`}
+                                        />
+                                        <div className={`absolute left-3 top-2.5 ${theme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                                            <CreditCard size={16} />
+                                        </div>
                                     </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => {
+                                            navigate('/pricing?type=credits');
+                                            onClose();
+                                        }}
+                                        className={`whitespace-nowrap ${theme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white' : 'border-gray-200 hover:bg-gray-100'}`}
+                                        data-testid="buy-credits-button"
+                                    >
+                                        <ShoppingCart size={16} className="mr-2" />
+                                        {t('account.buy_credits')}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label htmlFor="current-plan" className={theme === 'dark' ? 'text-gray-200' : ''}>{t('account.current_plan')}</Label>
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <Input
+                                            id="current-plan"
+                                            value={t('account.starter_plan')}
+                                            disabled
+                                            className={`opacity-70 cursor-not-allowed ${theme === 'dark' ? 'bg-gray-800 text-gray-400 border-gray-700' : 'bg-muted'}`}
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => {
+                                            navigate('/pricing');
+                                            onClose();
+                                        }}
+                                        className={`whitespace-nowrap ${theme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white' : 'border-gray-200 hover:bg-gray-100'}`}
+                                        data-testid="upgrade-plan-button"
+                                    >
+                                        <Sparkles size={16} className="mr-2 text-amber-500" />
+                                        {t('account.upgrade_plan')}
+                                    </Button>
                                 </div>
                             </div>
 
