@@ -1,0 +1,26 @@
+Title,Description,Preconditions,Steps,Expected Result,Priority,Type,Tags,Automation Status
+"Profile Modal - Buy Credits Button","Verify Buy Credits button navigates to pricing page","User Logged In","Open Account Menu.","Menu opens.",High,Functional,"Profile,Credits,Navigation",Automated
+"Profile Modal - Buy Credits Button","","","Click 'My Profile'.","Profile Modal opens.",High,Functional,"Profile,Credits,Navigation",Automated
+"Profile Modal - Buy Credits Button","","","Locate 'Buy Credits' button next to Remaining credits field.","Button is visible with shopping cart icon.",High,Functional,"Profile,Credits,Navigation",Automated
+"Profile Modal - Buy Credits Button","","","Click 'Buy Credits' button.","1. Modal closes.\n2. User is redirected to /pricing page.",High,Functional,"Profile,Credits,Navigation",Automated
+"Profile Modal - Current Plan Display","Verify Current Plan field shows Starter Plan","User Logged In","Open Account Menu.","Menu opens.",High,UI,"Profile,Plan",Automated
+"Profile Modal - Current Plan Display","","","Click 'My Profile'.","Profile Modal opens.",High,UI,"Profile,Plan",Automated
+"Profile Modal - Current Plan Display","","","Locate 'Current Plan' field.","Field is visible and displays 'Starter Plan' value.",High,UI,"Profile,Plan",Automated
+"Profile Modal - Current Plan Display","","","Try to edit Current Plan field.","Field is disabled/read-only and cannot be edited.",High,UI,"Profile,Plan",Automated
+"Profile Modal - Upgrade Plan Button","Verify Upgrade Plan button navigates to pricing","User Logged In","Open Account Menu.","Menu opens.",High,Functional,"Profile,Plan,Navigation",Automated
+"Profile Modal - Upgrade Plan Button","","","Click 'My Profile'.","Profile Modal opens.",High,Functional,"Profile,Plan,Navigation",Automated
+"Profile Modal - Upgrade Plan Button","","","Locate 'Upgrade Plan' button next to Current Plan field.","Button is visible with sparkles icon and amber color.",High,Functional,"Profile,Plan,Navigation",Automated
+"Profile Modal - Upgrade Plan Button","","","Click 'Upgrade Plan' button.","1. Modal closes.\n2. User is redirected to /pricing page.",High,Functional,"Profile,Plan,Navigation",Automated
+"Account Menu - Upgrade Plan Removed","Verify Upgrade Plan is no longer in account menu","User Logged In","Open Account Menu.","Menu opens showing My Profile, Export Tasks, Import Tasks, Sign Out.",High,UI,"Account,Menu,Navigation",Automated
+"Account Menu - Upgrade Plan Removed","","","Scan menu items.","'Upgrade Plan' menu item is NOT present in dropdown.",High,UI,"Account,Menu,Navigation",Automated
+"Profile Modal - Credits and Plan Layout","Verify layout of credits and plan section","User Logged In","Open My Profile modal.","Modal opens with all fields.",Medium,UI,"Profile,Layout",Automated
+"Profile Modal - Credits and Plan Layout","","","Locate Remaining credits field.","Field shows credit balance with credit card icon and 'Buy Credits' button on the right.",Medium,UI,"Profile,Layout",Automated
+"Profile Modal - Credits and Plan Layout","","","Locate Current Plan field.","Field shows 'Starter Plan' with 'Upgrade Plan' button on the right.",Medium,UI,"Profile,Layout",Automated
+"Profile Modal - Buttons Styling","Verify button styling matches theme","User Logged In on Light Theme","Open My Profile modal.","Buttons have proper light theme styling.",Medium,UI,"Profile,Theme",Automated
+"Profile Modal - Buttons Styling","","","Switch to Dark Theme.","Theme changes to dark.",Medium,UI,"Profile,Theme",Automated
+"Profile Modal - Buttons Styling","","","Reopen My Profile modal.","Buttons have proper dark theme styling with appropriate borders and hover states.",Medium,UI,"Profile,Theme",Automated
+"Profile Modal - i18n Spanish","Verify Spanish translations for new features","User Logged In, Language set to Spanish","Open My Profile modal.","Modal opens.",Medium,Functional,"Profile,i18n",Automated
+"Profile Modal - i18n Spanish","","","Check 'Current Plan' label.","Label shows 'Plan Actual'.",Medium,Functional,"Profile,i18n",Automated
+"Profile Modal - i18n Spanish","","","Check 'Starter Plan' value.","Value shows 'Plan Inicial'.",Medium,Functional,"Profile,i18n",Automated
+"Profile Modal - i18n Spanish","","","Check 'Buy Credits' button.","Button shows 'Comprar Créditos'.",Medium,Functional,"Profile,i18n",Automated
+"Profile Modal - i18n Spanish","","","Check 'Upgrade Plan' button.","Button shows 'Mejorar Plan'.",Medium,Functional,"Profile,i18n",Automated
