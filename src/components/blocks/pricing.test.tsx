@@ -1,7 +1,6 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Pricing, Plan } from './pricing';
-import { vi } from 'vitest';
+import { Pricing, Plan, CreditsPurchase } from './pricing';
+import { vi, describe, it, expect } from 'vitest';
 
 // Mock confetti
 vi.mock('canvas-confetti', () => ({
@@ -25,18 +24,18 @@ vi.mock('@number-flow/react', () => ({
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 };
 
 // ... existing IntersectionObserver mock ...
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor(callback: any) {}
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  constructor() { }
+  observe() { }
+  unobserve() { }
+  disconnect() { }
   takeRecords() { return []; }
   root = null;
   rootMargin = '';
@@ -44,11 +43,11 @@ global.IntersectionObserver = class IntersectionObserver {
 };
 
 // Mock matchMedia
-global.matchMedia = global.matchMedia || function() {
+global.matchMedia = global.matchMedia || function () {
   return {
     matches: false,
-    addListener: function() {},
-    removeListener: function() {}
+    addListener: function () { },
+    removeListener: function () { }
   };
 };
 
@@ -56,7 +55,7 @@ const mockPlans: Plan[] = [
   {
     id: 'starter',
     name: 'Starter',
-    price: { monthly: 0, yearly: 0 },
+    price: { monthly: 10, yearly: 96 },
     features: ['Unique Feature 1'],
     recommended: false,
   },
@@ -79,7 +78,7 @@ const mockPlans: Plan[] = [
 describe('Pricing Component', () => {
   it('renders plans correctly', () => {
     render(<Pricing plans={mockPlans} />);
-    
+
     expect(screen.getByText('Starter')).toBeInTheDocument();
     expect(screen.getByText('Professional')).toBeInTheDocument();
     expect(screen.getByText('Enterprise')).toBeInTheDocument();
@@ -89,7 +88,7 @@ describe('Pricing Component', () => {
 
   it('renders correct buttons', () => {
     render(<Pricing plans={mockPlans} />);
-    
+
     expect(screen.getByText('Start Free Trial')).toBeInTheDocument();
     expect(screen.getByText('Get Started')).toBeInTheDocument();
     expect(screen.getByText('Contact Sales')).toBeInTheDocument();
@@ -97,7 +96,50 @@ describe('Pricing Component', () => {
 
   it('renders Popular badge for recommended plan', () => {
     render(<Pricing plans={mockPlans} />);
-    
+
     expect(screen.getByText('Popular')).toBeInTheDocument();
+  });
+
+  it('renders Current Plan button when currentPlanId is provided', () => {
+    render(<Pricing plans={mockPlans} currentPlanId="starter" />);
+
+    expect(screen.getByText('Current Plan')).toBeInTheDocument();
+    expect(screen.getByText('Current Plan')).toBeDisabled();
+    expect(screen.queryByText('Start Free Trial')).not.toBeInTheDocument();
+  });
+
+  it('renders correct prices', () => {
+    render(<Pricing plans={mockPlans} />);
+
+    expect(screen.getByText('$10.00')).toBeInTheDocument();
+    expect(screen.getByText('$99.00')).toBeInTheDocument();
+
+    // Toggle to yearly
+    const toggle = screen.getByLabelText(/annual billing/i);
+    fireEvent.click(toggle);
+
+    expect(screen.getByText('$96.00')).toBeInTheDocument();
+  });
+
+  it('renders CreditsPurchase elements correctly', () => {
+    const mockOnCreditSelect = vi.fn();
+    render(<CreditsPurchase onCreditSelect={mockOnCreditSelect} />);
+
+    // Check for specific headings to avoid multiple match error
+    expect(screen.getByRole('heading', { level: 2, name: /Credits/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: /Buy Credits/i })).toBeInTheDocument();
+
+    // Check for other elements
+    expect(screen.getByText(/Use crypto/i)).toBeInTheDocument();
+    expect(screen.getByText(/Custom/i)).toBeInTheDocument();
+
+    // In mock setup, we might have keys like pricing.price_amount
+    // Let's check for the button text specifically
+    const buttons = screen.getAllByRole('button');
+    const creditButtons = buttons.filter(b => b.textContent?.includes('pricing.price_amount') || b.textContent?.includes('$'));
+    expect(creditButtons.length).toBeGreaterThanOrEqual(1);
+
+    fireEvent.click(creditButtons[0]);
+    expect(mockOnCreditSelect).toHaveBeenCalled();
   });
 });

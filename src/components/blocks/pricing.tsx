@@ -7,6 +7,8 @@ import { Button } from "../ui/button"
 import { Switch } from "../ui/switch"
 import { Label } from "../ui/label"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
+import { Coins } from "lucide-react"
 
 export type Plan = {
   id: string
@@ -23,16 +25,79 @@ interface PricingProps {
   plans: Plan[]
   title?: string
   description?: string
+  currentPlanId?: string
   onPlanSelect?: (planId: string, interval: "monthly" | "yearly") => void
+}
+
+interface CreditsPurchaseProps {
+  onCreditSelect?: (amount: number | 'custom', useCrypto: boolean) => void
+}
+
+export function CreditsPurchase({ onCreditSelect }: CreditsPurchaseProps) {
+  const { t } = useTranslation()
+  const [useCrypto, setUseCrypto] = useState(false)
+
+  return (
+    <div className="mt-20">
+      <h2 className="text-3xl font-bold mb-8 text-foreground">{t('pricing.credits_section_title', 'Credits')}</h2>
+
+      <div className="p-8 rounded-3xl border bg-card text-card-foreground shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-secondary">
+              <Coins size={20} className="text-amber-500" />
+            </div>
+            <h3 className="text-xl font-bold">{t('pricing.buy_credits_title', 'Buy Credits')}</h3>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Label htmlFor="use-crypto-section" className="text-sm text-muted-foreground cursor-pointer">
+              {t('pricing.use_crypto', 'Use crypto')}
+            </Label>
+            <Switch
+              id="use-crypto-section"
+              checked={useCrypto}
+              onCheckedChange={setUseCrypto}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[20, 50, 100].map((amount) => (
+            <Button
+              key={amount}
+              variant="outline"
+              onClick={() => onCreditSelect?.(amount, useCrypto)}
+              className="h-14 text-lg font-bold rounded-xl border-2 transition-all hover:border-foreground"
+            >
+              {t('pricing.price_amount', { amount: amount.toString() }).replace('{{amount}}', amount.toString())}
+            </Button>
+          ))}
+          <Button
+            variant="outline"
+            onClick={() => onCreditSelect?.('custom', useCrypto)}
+            className="h-14 text-lg font-bold rounded-xl border-2 transition-all hover:border-foreground"
+          >
+            {t('pricing.custom_amount', 'Custom')}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function Pricing({
   plans,
-  title = "Simple, transparent pricing",
-  description = "Choose the plan that's right for you",
+  title,
+  description,
+  currentPlanId,
   onPlanSelect,
 }: PricingProps) {
+  const { t } = useTranslation()
   const [isYearly, setIsYearly] = useState(false)
+
+  const displayTitle = title || t('pricing.simple_transparent_pricing', 'Simple, transparent pricing')
+  const displayDescription = description || t('pricing.choose_plan_right_for_you', "Choose the plan that's right for you")
 
   const handleToggle = (checked: boolean) => {
     setIsYearly(checked)
@@ -72,10 +137,10 @@ export function Pricing({
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            {title}
+            {displayTitle}
           </h2>
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
-            {description}
+            {displayDescription}
           </p>
         </div>
 
@@ -115,7 +180,7 @@ export function Pricing({
                   </span>
                 </div>
               )}
-              
+
               <h3 className={cn("text-sm font-bold uppercase tracking-widest", plan.recommended ? "text-gray-400 dark:text-gray-500" : "text-muted-foreground")}>{plan.name}</h3>
               <div className="mt-4 flex items-baseline gap-x-2">
                 <span className="text-5xl font-bold tracking-tight">
@@ -128,7 +193,7 @@ export function Pricing({
                   /{isYearly ? "year" : "month"}
                 </span>
               </div>
-              
+
               <div className={cn("mt-2 text-xs", plan.recommended ? "text-gray-400 dark:text-gray-500" : "text-muted-foreground")}>
                 {isYearly ? "billed yearly" : "billed monthly"}
               </div>
@@ -144,9 +209,10 @@ export function Pricing({
                   </li>
                 ))}
               </ul>
-              
+
               <Button
                 onClick={() => onPlanSelect?.(plan.id, isYearly ? "yearly" : "monthly")}
+                disabled={plan.id === currentPlanId}
                 className={cn(
                   "mt-8 w-full h-12 rounded-xl text-base font-semibold transition-all duration-300",
                   plan.recommended
@@ -155,7 +221,13 @@ export function Pricing({
                 )}
                 variant="ghost"
               >
-                {plan.name === 'Enterprise' ? 'Contact Sales' : (plan.name === 'Starter' ? 'Start Free Trial' : 'Get Started')}
+                {plan.id === currentPlanId
+                  ? t('pricing.current_plan', 'Current Plan')
+                  : (plan.name === 'Enterprise'
+                    ? t('pricing.contact_sales', 'Contact Sales')
+                    : (plan.name === 'Starter'
+                      ? t('pricing.start_free_trial', 'Start Free Trial')
+                      : t('pricing.get_started', 'Get Started')))}
               </Button>
             </motion.div>
           ))}
