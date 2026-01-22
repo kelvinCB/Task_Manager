@@ -344,6 +344,9 @@ describe('AccountMenu Component', () => {
       expect(screen.getByText('Export Tasks')).toBeInTheDocument();
       expect(screen.getByText('Import Tasks')).toBeInTheDocument();
     });
+
+    // Verify Upgrade Plan is NOT in the menu anymore (moved to profile modal)
+    expect(screen.queryByTestId('upgrade-plan-menu-item')).not.toBeInTheDocument();
   });
 
   it('should show AuthRequiredModal when export is clicked while unauthenticated', async () => {
