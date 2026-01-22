@@ -48,6 +48,11 @@ test.describe('My Profile Modal', () => {
 
         await expect(page.locator('label:has-text("Remaining credits")')).toBeVisible();
         await expect(page.locator('input[id="credits"]')).toBeVisible();
+        await expect(page.getByTestId('buy-credits-button')).toBeVisible();
+
+        await expect(page.locator('label:has-text("Current Plan")')).toBeVisible();
+        await expect(page.locator('input[id="current-plan"]')).toBeVisible();
+        await expect(page.getByTestId('upgrade-plan-button')).toBeVisible();
 
         await expect(page.locator('label:has-text("LinkedIn Profile")')).toBeVisible();
         await expect(page.locator('input[id="linkedin"]')).toBeVisible();
