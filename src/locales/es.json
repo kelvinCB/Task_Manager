@@ -139,7 +139,26 @@
         "upload_success": "Foto de perfil actualizada con éxito",
         "image_too_large": "La imagen es demasiado grande. Máx 10MB.",
         "username": "Nombre de usuario",
-        "email": "Correo electrónico"
+        "email": "Correo electrónico",
+        "current_plan": "Plan Actual",
+        "starter_plan": "Plan Inicial",
+        "buy_credits": "Comprar Créditos",
+        "upgrade_plan": "Mejorar Plan"
+    },
+    "pricing": {
+        "credits_10": "10 Créditos",
+        "credits_30": "30 Créditos",
+        "credits_50": "50 Créditos",
+        "buy_credits_title": "Comprar Créditos",
+        "credit_packages": "Paquetes de Créditos",
+        "start_free_trial": "Iniciar Prueba Gratuita",
+        "get_started": "Comenzar",
+        "contact_sales": "Contactar a Ventas",
+        "current_plan": "Plan Actual",
+        "credits_section_title": "Créditos",
+        "use_crypto": "Usar cripto",
+        "custom_amount": "Personalizado",
+        "price_amount": "${{amount}}"
     },
     "ai": {
         "powered": "IMPULSADO POR IA",

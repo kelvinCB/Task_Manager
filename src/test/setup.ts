@@ -95,6 +95,15 @@ vi.mock('react-i18next', () => ({
         'tasks.due': 'Due',
         'tasks.overdue': 'Overdue',
         'tasks.level': 'Level',
+        'pricing.start_free_trial': 'Start Free Trial',
+        'pricing.get_started': 'Get Started',
+        'pricing.contact_sales': 'Contact Sales',
+        'pricing.current_plan': 'Current Plan',
+        'pricing.credits_section_title': 'Credits',
+        'pricing.buy_credits_title': 'Buy Credits',
+        'pricing.use_crypto': 'Use crypto',
+        'pricing.custom_amount': 'Custom',
+        'pricing.price_amount': '${{amount}}',
         // Add more mapping as needed by tests
       };
       return translations[key] || key;

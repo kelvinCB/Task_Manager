@@ -139,7 +139,26 @@
         "upload_success": "Profile photo updated successfully",
         "image_too_large": "Image is too large. Max 10MB.",
         "username": "Username",
-        "email": "Email"
+        "email": "Email",
+        "current_plan": "Current Plan",
+        "starter_plan": "Starter Plan",
+        "buy_credits": "Buy Credits",
+        "upgrade_plan": "Upgrade Plan"
+    },
+    "pricing": {
+        "credits_10": "10 Credits",
+        "credits_30": "30 Credits",
+        "credits_50": "50 Credits",
+        "buy_credits_title": "Buy Credits",
+        "credit_packages": "Credit Packages",
+        "start_free_trial": "Start Free Trial",
+        "get_started": "Get Started",
+        "contact_sales": "Contact Sales",
+        "current_plan": "Current Plan",
+        "credits_section_title": "Credits",
+        "use_crypto": "Use crypto",
+        "custom_amount": "Custom",
+        "price_amount": "${{amount}}"
     },
     "ai": {
         "powered": "AI POWERED",
