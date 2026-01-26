@@ -73,6 +73,7 @@ const defaultTasks: Task[] = [
 // Key for localStorage
 const TASKS_STORAGE_KEY = 'taskflow_tasks';
 const EXPANDED_NODES_STORAGE_KEY = 'taskflow_expanded_nodes';
+const MAX_TIMER_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
 
 // Function to parse dates from localStorage
 const parseTasksFromStorage = (storedTasks: string, useDefaultTasks: boolean = true): Task[] => {
@@ -600,16 +601,16 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       let newTimeEntries = [...task.timeTracking.timeEntries];
 
       if (lastEntry && !lastEntry.endTime) {
-        duration = now - lastEntry.startTime;
+        duration = Math.min(now - lastEntry.startTime, MAX_TIMER_DURATION_MS);
         newTimeEntries[lastEntryIndex] = {
           ...lastEntry,
-          endTime: now,
+          endTime: lastEntry.startTime + duration,
           duration
         };
       } else {
         const effectiveStart = task.timeTracking.lastStarted || now;
-        duration = Math.max(0, now - effectiveStart);
-        newTimeEntries.push({ startTime: effectiveStart, endTime: now, duration } as TimeEntry);
+        duration = Math.min(Math.max(0, now - effectiveStart), MAX_TIMER_DURATION_MS);
+        newTimeEntries.push({ startTime: effectiveStart, endTime: effectiveStart + duration, duration } as TimeEntry);
       }
 
       durationToRecord = duration;
@@ -738,16 +739,16 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     let newTimeEntries = [...task.timeTracking.timeEntries];
 
     if (lastEntry && !lastEntry.endTime) {
-      duration = now - lastEntry.startTime;
+      duration = Math.min(now - lastEntry.startTime, MAX_TIMER_DURATION_MS);
       newTimeEntries[lastEntryIndex] = {
         ...lastEntry,
-        endTime: now,
+        endTime: lastEntry.startTime + duration,
         duration
       };
     } else {
       const effectiveStart = task.timeTracking.lastStarted || now;
-      duration = Math.max(0, now - effectiveStart);
-      newTimeEntries.push({ startTime: effectiveStart, endTime: now, duration } as TimeEntry);
+      duration = Math.min(Math.max(0, now - effectiveStart), MAX_TIMER_DURATION_MS);
+      newTimeEntries.push({ startTime: effectiveStart, endTime: effectiveStart + duration, duration } as TimeEntry);
     }
 
     await updateTask(taskId, {
@@ -775,7 +776,8 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     // If the timer is active, add the current session time
     if (task.timeTracking.isActive && task.timeTracking.lastStarted) {
       const currentSession = Date.now() - task.timeTracking.lastStarted;
-      totalTime += currentSession;
+      // Cap at 8 hours per session
+      totalTime += Math.min(currentSession, MAX_TIMER_DURATION_MS);
     }
 
     return totalTime;

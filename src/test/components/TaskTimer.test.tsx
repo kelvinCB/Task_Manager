@@ -197,4 +197,31 @@ describe('TaskTimer Component', () => {
     });
     expect(playNotificationSound).toHaveBeenCalledTimes(2);
   });
+
+  it('should auto-pause and cap at 8 hours', () => {
+    // Arrange
+    const props = {
+      taskId: 'task-1',
+      isActive: true,
+      elapsedTime: 0,
+      onStart: mockOnStart,
+      onPause: mockOnPause,
+    };
+
+    render(
+      <ThemeProvider>
+        <TaskTimer {...props} />
+      </ThemeProvider>
+    );
+
+    // Act - trigger 8 hours passage (28800 seconds)
+    // We advance step by step or just enough to trigger the condition
+    act(() => {
+      vi.advanceTimersByTime(8 * 60 * 60 * 1000);
+    });
+
+    // Assert
+    expect(mockOnPause).toHaveBeenCalledWith('task-1');
+    expect(screen.getByText('08:00:00')).toBeInTheDocument();
+  });
 });

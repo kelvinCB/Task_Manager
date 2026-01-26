@@ -13,7 +13,8 @@ interface TaskTimerProps {
   compact?: boolean;
 }
 
-// Utility to format time in hh:mm:ss format
+const MAX_TIMER_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
+
 const formatTime = (ms: number): string => {
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
@@ -25,7 +26,6 @@ const formatTime = (ms: number): string => {
     seconds.toString().padStart(2, '0'),
   ].join(':');
 };
-
 export const TaskTimer: React.FC<TaskTimerProps> = ({
   taskId,
   isActive,
@@ -46,6 +46,14 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
       interval = window.setInterval(() => {
         setCurrentTime(prevTime => {
           const newTime = prevTime + 1000; // Update every second
+
+          // Check if we reached the 8-hour limit for this session
+          const sessionDuration = newTime - elapsedTime;
+          if (sessionDuration >= MAX_TIMER_DURATION_MS) {
+            if (interval) window.clearInterval(interval);
+            onPause(taskId);
+            return elapsedTime + MAX_TIMER_DURATION_MS;
+          }
 
           // Check if we should play a sound (every 10 minutes)
           const tenMinutesInMs = 10 * 60 * 1000;
@@ -72,7 +80,8 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     return () => {
       if (interval) window.clearInterval(interval);
     };
-  }, [isActive, elapsedTime]);
+  }, [isActive, elapsedTime, taskId, onPause]);
+
 
   // Format time more compactly for mobile
   const formatTimeCompact = (ms: number): string => {

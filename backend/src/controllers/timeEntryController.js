@@ -1,5 +1,7 @@
 const { supabase } = require('../config/supabaseClient');
 
+const MAX_TIMER_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
+
 // Start a time entry for a task
 const startEntry = async (req, res) => {
   try {
@@ -81,10 +83,16 @@ const stopEntry = async (req, res) => {
       return res.status(404).json({ error: 'Not found', message: 'Open time entry not found' });
     }
 
+    let targetEntry = Array.isArray(entry) ? entry[0] : entry;
+    const start = targetEntry?.start_time ? new Date(targetEntry.start_time).getTime() : Date.now();
+    const now = end_time ? new Date(end_time).getTime() : Date.now();
+    const duration = Math.min(Math.max(0, now - start), MAX_TIMER_DURATION_MS);
+    const end = start + duration;
+
     const { data, error } = await (req.supabase || supabase)
       .from('time_entries')
-      .update({ end_time: end_time || new Date().toISOString() })
-      .eq('id', entry.id)
+      .update({ end_time: new Date(end).toISOString() })
+      .eq('id', targetEntry.id)
       .eq('user_id', user_id)
       .select()
       .single();
@@ -92,7 +100,7 @@ const stopEntry = async (req, res) => {
     if (error) throw error;
 
     // Sync task's total_time_ms
-    await syncTaskTotalTime(db, entry.task_id, user_id);
+    await syncTaskTotalTime(db, targetEntry.task_id, user_id);
 
     res.status(200).json({ entry: data });
   } catch (error) {
@@ -125,7 +133,9 @@ const getSummary = async (req, res) => {
       const startTime = new Date(e.start_time).getTime();
       const endTime = e.end_time ? new Date(e.end_time).getTime() : Date.now();
       const dur = Math.max(0, endTime - startTime);
-      totals.set(e.task_id, (totals.get(e.task_id) || 0) + dur);
+      // Cap at 8 hours per session in summary as well
+      const cappedDur = Math.min(dur, MAX_TIMER_DURATION_MS);
+      totals.set(e.task_id, (totals.get(e.task_id) || 0) + cappedDur);
     }
 
     // Join with tasks for titles
@@ -153,7 +163,7 @@ const getSummary = async (req, res) => {
 const completeEntry = async (req, res) => {
   try {
     const user_id = req.user.id;
-    const { task_id, duration_ms } = req.body;
+    let { task_id, duration_ms } = req.body;
 
     if (!task_id || duration_ms === undefined) {
       return res.status(400).json({ error: 'Validation error', message: 'task_id and duration_ms are required' });
@@ -173,8 +183,11 @@ const completeEntry = async (req, res) => {
       return res.status(404).json({ error: 'Not found', message: 'Task not found' });
     }
 
+    // Enforce 8-hour limit per recorded session
+    duration_ms = Math.min(Number(duration_ms), MAX_TIMER_DURATION_MS);
+
     const end = new Date();
-    const start = new Date(end.getTime() - Math.max(0, Number(duration_ms)));
+    const start = new Date(end.getTime() - Math.max(0, duration_ms));
 
     const { data, error } = await db
       .from('time_entries')
@@ -212,7 +225,9 @@ const syncTaskTotalTime = async (db, task_id, user_id) => {
       // Only include entries that have an end_time (completed sessions)
       if (e.end_time) {
         const end = new Date(e.end_time).getTime();
-        total_ms += Math.max(0, end - start);
+        const sessionDur = Math.max(0, end - start);
+        // Retroactively enforce 8-hour limit per session during sync
+        total_ms += Math.min(sessionDur, MAX_TIMER_DURATION_MS);
       }
     }
 
@@ -233,3 +248,4 @@ const syncTaskTotalTime = async (db, task_id, user_id) => {
 };
 
 module.exports = { startEntry, stopEntry, getSummary, completeEntry };
+
