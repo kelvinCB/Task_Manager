@@ -4,6 +4,9 @@ import { TaskPage } from './page-objects/task.page';
 import { BoardPage } from './page-objects/board.page';
 import { AuthPage } from './page-objects/auth.page';
 
+// Helper to generate unique titles to avoid collisions in parallel runs
+const generateUniqueTitle = (base: string) => `${base} - ${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
 test.describe('Task Management', () => {
   let appPage: AppPage;
   let taskPage: TaskPage;
@@ -39,9 +42,11 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalOpen();
 
     // Fill and submit task form
+    const taskTitle = generateUniqueTitle('E2E Test Task');
+    const taskDescription = 'This is a test task created by E2E tests';
     const taskData = {
-      title: 'E2E Test Task',
-      description: 'This is a test task created by E2E tests',
+      title: taskTitle,
+      description: taskDescription,
       dueDate: '2030-12-31'
     };
 
@@ -49,35 +54,40 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalClosed();
 
     // Verify task appears in the board
-    await expect(appPage.page.getByText(taskData.title).first()).toBeVisible();
-    await expect(appPage.page.getByText(taskData.description).first()).toBeVisible();
+    await expect(appPage.page.getByText(taskTitle).first()).toBeVisible();
+    await expect(appPage.page.getByText(taskDescription).first()).toBeVisible();
   });
 
   test('should edit an existing task in both Board and Tree views', async () => {
+    const boardTaskTitle = generateUniqueTitle('Original Board Task');
+    const updatedBoardTaskTitle = generateUniqueTitle('Updated Board Task');
+    const treeTaskTitle = generateUniqueTitle('Original Tree Task');
+    const updatedTreeTaskTitle = generateUniqueTitle('Updated Tree Task');
+
     // Create a task for Board View testing
     await appPage.openAddTaskModal();
     await taskPage.createTask({
-      title: 'Original Board Task',
+      title: boardTaskTitle,
       description: 'Original description for board'
     });
 
     // Test editing in Board View
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
-    await boardPage.editTask('Original Board Task');
+    await boardPage.editTask(boardTaskTitle);
     await taskPage.verifyModalOpen();
 
     await taskPage.updateTask({
-      title: 'Updated Board Task',
+      title: updatedBoardTaskTitle,
       description: 'Updated description for board'
     });
     await taskPage.verifyModalClosed();
-    await expect(appPage.page.getByText('Updated Board Task').first()).toBeVisible();
+    await expect(appPage.page.getByText(updatedBoardTaskTitle).first()).toBeVisible();
 
     // Create another task for Tree View testing
     await appPage.openAddTaskModal();
     await taskPage.createTask({
-      title: 'Original Tree Task',
+      title: treeTaskTitle,
       description: 'Original description for tree'
     });
 
@@ -85,7 +95,7 @@ test.describe('Task Management', () => {
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
 
-    const taskRow = appPage.page.locator('.group').filter({ hasText: 'Original Tree Task' });
+    const taskRow = appPage.page.locator('.group').filter({ hasText: treeTaskTitle });
     await taskRow.hover();
     const moreButton = taskRow.locator('[data-testid="task-menu-button"]');
     await moreButton.click();
@@ -96,43 +106,46 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalOpen();
 
     await taskPage.updateTask({
-      title: 'Updated Tree Task',
+      title: updatedTreeTaskTitle,
       description: 'Updated description for tree'
     });
     await taskPage.verifyModalClosed();
-    await expect(appPage.page.getByText('Updated Tree Task').first()).toBeVisible();
+    await expect(appPage.page.getByText(updatedTreeTaskTitle).first()).toBeVisible();
   });
 
   test('should delete a task in both Board and Tree views', async () => {
+    const boardTaskToDelete = generateUniqueTitle('Task to Delete in Board');
+    const treeTaskToDelete = generateUniqueTitle('Task to Delete in Tree');
+
     // Test deletion in Board View
     await appPage.openAddTaskModal();
     await taskPage.createTask({
-      title: 'Task to Delete in Board',
+      title: boardTaskToDelete,
       description: 'This task will be deleted from board view'
     });
 
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
-    await boardPage.deleteTask('Task to Delete in Board');
+    await boardPage.deleteTask(boardTaskToDelete);
 
     // Confirm deletion in modal
     await expect(appPage.page.getByRole('dialog')).toBeVisible();
     await appPage.page.getByTestId('confirm-delete-button').click();
 
-    await expect(appPage.page.getByText('Task to Delete in Board')).not.toBeVisible();
+    await expect(appPage.page.getByText(boardTaskToDelete)).not.toBeVisible();
 
     // Test deletion in Tree View
     await appPage.openAddTaskModal();
     await taskPage.createTask({
-      title: 'Task to Delete in Tree',
+      title: treeTaskToDelete,
       description: 'This task will be deleted from tree view'
     });
 
     await appPage.switchToView('tree');
     await appPage.verifyCurrentView('tree');
-    await expect(appPage.page.getByText('Task to Delete in Tree')).toBeVisible();
+    await expect(appPage.page.getByText(treeTaskToDelete)).toBeVisible();
 
-    const taskRow = appPage.page.locator('.group').filter({ hasText: 'Task to Delete in Tree' });
+    const taskRow = appPage.page.locator('.group').filter({ hasText: treeTaskToDelete });
     await taskRow.hover();
     const moreButton = taskRow.locator('[data-testid="task-menu-button"]');
     await expect(moreButton).toBeVisible();
@@ -147,7 +160,7 @@ test.describe('Task Management', () => {
     await appPage.page.getByTestId('confirm-delete-button').click();
 
     // Verify task is gone
-    await expect(appPage.page.getByText('Task to Delete in Tree').first()).not.toBeVisible();
+    await expect(appPage.page.getByText(treeTaskToDelete).first()).not.toBeVisible();
   });
 
   test('should prevent creating task without title (required field validation)', async () => {
@@ -162,12 +175,13 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalOpen();
 
     // Try adding a title now and verify it works
-    await taskPage.titleInput.fill('Valid Task Title');
+    const validTitle = generateUniqueTitle('Valid Task Title');
+    await taskPage.titleInput.fill(validTitle);
     await taskPage.createButton.click();
     await taskPage.verifyModalClosed();
 
     // Verify the task was created with valid title
-    await expect(appPage.page.getByText('Valid Task Title').first()).toBeVisible();
+    await expect(appPage.page.getByText(validTitle).first()).toBeVisible();
   });
 
   test('should handle task form cancellation', async () => {
@@ -176,7 +190,8 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalOpen();
 
     // Fill form partially
-    await taskPage.titleInput.fill('Cancelled Task');
+    const cancelledTitle = generateUniqueTitle('Cancelled Task');
+    await taskPage.titleInput.fill(cancelledTitle);
     await taskPage.descriptionInput.fill('This should not be saved');
 
     // Cancel the form
@@ -184,6 +199,6 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalClosed();
 
     // Verify task was not created
-    await expect(appPage.page.getByText('Cancelled Task')).not.toBeVisible();
+    await expect(appPage.page.getByText(cancelledTitle)).not.toBeVisible();
   });
 });

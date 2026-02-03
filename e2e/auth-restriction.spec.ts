@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 import { AuthPage } from './page-objects/auth.page';
 import { TaskPage } from './page-objects/task.page';
 
+// Helper to generate unique titles
+const generateUniqueTitle = (base: string) => `${base} - ${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
 // Test credentials from environment
 const TEST_EMAIL = process.env.E2E_USER_AUTH_EMAIL!;
 const TEST_PASSWORD = process.env.E2E_USER_AUTH_PASSWORD!;
@@ -28,7 +31,8 @@ test.describe('Authentication Restriction for Task Editing', () => {
         if (await editButton.count() === 0) {
             const addTaskButton = page.getByTestId('add-task-button').first();
             await addTaskButton.click();
-            await taskPage.createTask({ title: 'Test Task for Auth check' });
+            const title = generateUniqueTitle('Test Task for Auth check');
+            await taskPage.createTask({ title });
             await taskPage.verifyModalClosed();
         }
 
@@ -47,13 +51,14 @@ test.describe('Authentication Restriction for Task Editing', () => {
 
     test('should show AuthRequiredModal when an unauthenticated user tries to edit from Task Detail', async ({ page }) => {
         // 1. Create a task (unauthenticated can create)
+        const taskTitle = generateUniqueTitle('Detail Test Task');
         const addTaskButton = page.getByTestId('add-task-button').first();
         await addTaskButton.click();
-        await taskPage.createTask({ title: 'Detail Test Task' });
+        await taskPage.createTask({ title: taskTitle });
         await taskPage.verifyModalClosed();
 
         // 2. Open task detail by clicking the title
-        await page.getByText('Detail Test Task').first().click();
+        await page.getByText(taskTitle).first().click();
 
         // 3. Click Edit in detail modal (using the test ID we just added)
         await page.getByTestId('task-detail-edit-button').click();
@@ -75,9 +80,10 @@ test.describe('Authentication Restriction for Task Editing', () => {
         await page.waitForSelector('[data-testid="add-task-button"]', { state: 'visible', timeout: 10000 });
 
         // 2. Create a task
+        const taskTitle = generateUniqueTitle('Auth Edit Task');
         const addTaskButton = page.getByTestId('add-task-button').first();
         await addTaskButton.click();
-        await taskPage.createTask({ title: 'Auth Edit Task' });
+        await taskPage.createTask({ title: taskTitle });
         await taskPage.verifyModalClosed();
 
         // 3. Click Edit
