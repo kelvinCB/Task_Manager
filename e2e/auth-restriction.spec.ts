@@ -71,6 +71,8 @@ test.describe('Authentication Restriction for Task Editing', () => {
         await authPage.goToLogin();
         await authPage.login(TEST_EMAIL, TEST_PASSWORD);
         await expect(page).toHaveURL('/');
+        // Wait for the app to be fully loaded and stable
+        await page.waitForSelector('[data-testid="add-task-button"]', { state: 'visible', timeout: 10000 });
 
         // 2. Create a task
         const addTaskButton = page.getByTestId('add-task-button').first();

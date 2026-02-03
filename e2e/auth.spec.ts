@@ -37,43 +37,43 @@ test.describe('Authentication E2E Tests', () => {
     test('User can access login from My Account and successfully log in', async ({ page }) => {
       // Access login from Account menu
       await authPage.loginViaAccountMenu();
-      
+
       // Verify visual elements of the page
       await authPage.expectGradientBackground();
       await authPage.expectSocialLoginButtons();
-      
+
       // Perform login with correct credentials
       await authPage.login(TEST_EMAIL, TEST_PASSWORD);
-      
+
       // Verify redirection to dashboard and logged in state
       await expect(page).toHaveURL('/');
       await authPage.expectLoggedIn();
     });
-    
+
     test('Shows error when credentials are incorrect', async () => {
       await authPage.goToLogin();
-      await authPage.login(TEST_EMAIL, 'contraseña-incorrecta');
-      
+      await authPage.login(TEST_EMAIL, 'contraseña-incorrecta', false);
+
       // Verificar mensaje de error
       await authPage.expectLoginError('Invalid login credentials');
     });
 
     test('Form validation - required fields', async ({ page }) => {
       await authPage.goToLogin();
-      
+
       // Try to submit empty form
       await page.click('[data-testid="login-button"]');
-      
+
       // Verify browser validation (required fields)
       await authPage.expectFormValidationError();
     });
 
     test('Email format validation', async () => {
       await authPage.goToLogin();
-      
+
       // Email with invalid format
-      await authPage.login(INVALID_EMAIL, TEST_PASSWORD);
-      
+      await authPage.login(INVALID_EMAIL, TEST_PASSWORD, false);
+
       // Verify browser validation or error message
       await authPage.expectFormValidationError();
     });
@@ -97,12 +97,12 @@ test.describe('Authentication E2E Tests', () => {
       await authPage.login(TEST_EMAIL, TEST_PASSWORD);
       await authPage.expectLoggedIn();
     });
-    
+
     test('User can logout successfully', async ({ page }) => {
       // Perform logout
       await page.waitForSelector('[data-testid="account-menu-button"]', { state: 'visible', timeout: 5000 });
       await authPage.logout();
-      
+
       // Verify logged out state
       await authPage.expectLoggedOut();
     });
@@ -111,24 +111,24 @@ test.describe('Authentication E2E Tests', () => {
   test.describe('Scenario 3: Registration of new users', () => {
     test('User can register successfully', async ({ page }) => {
       await authPage.goToRegister();
-      
+
       // Verify visual elements of the page
       await authPage.expectGradientBackground();
       await authPage.expectSocialRegisterButtons();
-      
+
       // Try registration with multiple emails if needed
       let success = false;
       let attempts = 0;
       const maxAttempts = 5;
-      
+
       while (!success && attempts < maxAttempts) {
         const randomEmail = generateRandomEmail();
         await authPage.register(randomEmail, TEST_PASSWORD);
-        
+
         // Check if we got an error for existing email
         const errorLocator = page.locator('[data-testid="error-message"]');
         const hasError = await errorLocator.isVisible();
-        
+
         if (hasError) {
           const errorText = await errorLocator.textContent();
           if (errorText && (errorText.includes('Email already in use') || errorText.includes('User already registered'))) {
@@ -137,51 +137,51 @@ test.describe('Authentication E2E Tests', () => {
             continue;
           }
         }
-        
+
         // If no error about existing email, we should be successful
         success = true;
-        
+
         // Verify success and redirection
         await authPage.expectRegistrationSuccess();
       }
-      
+
       if (!success) {
         throw new Error(`Failed to register after ${maxAttempts} attempts with different emails`);
       }
     });
-    
+
     test('Form validation - required fields', async () => {
       await authPage.goToRegister();
-      
+
       // Try to submit empty form
       await authPage.page.click('[data-testid="register-button"]');
-      
+
       // Verify browser validation (required fields)
       await authPage.expectFormValidationError();
     });
 
     test('Password validation - minimum 6 characters', async () => {
       await authPage.goToRegister();
-      
+
       // Password too short with a random email
       const randomEmail = generateRandomEmail();
       await authPage.register(randomEmail, INVALID_PASSWORD);
-      
+
       // Verify error message
       await authPage.expectRegistrationError('Password should be at least 6 characters');
     });
-    
+
     test('Error when registering existing email', async ({ page }) => {
       await authPage.goToRegister();
-      
+
       // Use email that already exists - we know this one exists
       await authPage.register(TEST_EMAIL, TEST_PASSWORD);
-      
+
       // Supabase may be configured to not reveal if an email exists (security feature)
       // Check if we got an error message OR if we were redirected (Supabase security behavior)
       const errorLocator = page.locator('[data-testid="error-message"]');
       const hasError = await errorLocator.isVisible().catch(() => false);
-      
+
       if (hasError) {
         // If error is shown, verify it mentions the user already exists or email is not confirmed (common Supabase response)
         const errorMessage = page.locator('[data-testid="error-message"]');
@@ -189,7 +189,7 @@ test.describe('Authentication E2E Tests', () => {
       } else {
         // If no error shown, Supabase is configured for security (no email enumeration)
         // It will show the success modal (same as new registration)
-        
+
         // Use the shared method to handle modal interaction
         await authPage.expectRegistrationSuccess();
       }

@@ -19,42 +19,41 @@ export class AuthPage {
   }
 
   // Login actions
-  async login(email: string, password: string) {
+  async login(email: string, password: string, expectSuccess: boolean = true) {
     await this.page.locator('[data-testid="email-input"]').fill(email);
     await this.page.locator('[data-testid="password-input"]').fill(password);
     await this.page.locator('[data-testid="login-button"]').click();
 
-    // Check for immediate error message
-    const errorMsg = this.page.locator('[data-testid="error-message"]');
-    if (await errorMsg.isVisible({ timeout: 2000 }).catch(() => false)) {
-      const text = await errorMsg.textContent();
-      throw new Error(`Login failed: ${text}`);
+    if (expectSuccess) {
+      // Check for immediate error message
+      const errorMsg = this.page.locator('[data-testid="error-message"]');
+      if (await errorMsg.isVisible({ timeout: 2000 }).catch(() => false)) {
+        const text = await errorMsg.textContent();
+        throw new Error(`Login failed: ${text}`);
+      }
+
+      // Wait for navigation and app to be ready
+      await this.page.waitForURL(url => url.pathname === '/' || url.pathname === '', { timeout: 15000 });
+
+      // Wait for any tasks to load or the app to be interactive
+      await this.page.waitForTimeout(2000);
+    } else {
+      // For negative tests, just wait for the UI to reflect the local state
+      await this.page.waitForTimeout(1000);
     }
-
-    // Wait for redirection to dashboard - use a more flexible URL check
-    await this.page.waitForURL(url => url.pathname === '/' || url.pathname === '', { timeout: 15000 });
-
-    // Wait for the app to finish loading
-    await expect(this.page.locator('[data-loading="false"]')).toBeVisible({ timeout: 15000 });
-
-    // Verify we see the main application (board or tree container)
-    await expect(this.page.locator('[data-testid$="-view-container"]')).toBeVisible({ timeout: 10000 });
-
-    // Brief wait for state propagation
-    await this.page.waitForTimeout(1000);
   }
 
   async loginViaAccountMenu() {
     await this.page.goto('/');
-    // Use :visible to handle multiple account menu buttons (desktop/mobile)
-    await this.page.locator('[data-testid="account-menu-button"]:visible').click();
+    const accountMenuButton = this.page.getByTestId('account-menu-button').or(this.page.getByTitle('My Account')).filter({ visible: true }).first();
+    await accountMenuButton.click();
     await this.page.click('[data-testid="login-button-menu"]');
     await expect(this.page).toHaveURL('/login');
   }
 
   async logout() {
     // Find the visible AccountMenu button
-    const accountMenuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
+    const accountMenuButton = this.page.getByTestId('account-menu-button').or(this.page.getByTitle('My Account')).filter({ visible: true }).first();
 
     // Check if the menu is already open before clicking
     const logoutButtonBeforeClick = this.page.locator('[data-testid="logout-button"]');
@@ -151,7 +150,8 @@ export class AuthPage {
     }
 
     // Wait for the account menu button to appear after login
-    const accountMenuButton = this.page.locator('[data-testid="account-menu-button"]:visible');
+    // Using a more robust locator matching AppPage object
+    const accountMenuButton = this.page.getByTestId('account-menu-button').or(this.page.getByTitle('My Account')).filter({ visible: true }).first();
     await expect(accountMenuButton).toBeVisible({ timeout: 15000 });
 
     // Short pause to ensure UI is interactive

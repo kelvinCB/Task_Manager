@@ -319,21 +319,32 @@ router.get('/api/tasks', authenticateUser, taskController.getTasks);
 ```
 src/tests/
 ├── controllers/
-│   ├── authController.test.js    # Unit tests for auth (10 tests)
-│   └── taskController.test.js    # Unit tests for tasks (22 tests)
+│   ├── authController.test.js    # Unit tests for auth (22 tests)
+│   ├── taskController.test.js    # Unit tests for tasks (22 tests)
+│   ├── profileController.test.js # Unit tests for profile (15 tests)
+│   ├── timeEntryController.test.js # Unit tests for time tracking (10 tests)
+│   ├── featureRequestController.test.js # Unit tests for feedback (4 tests)
+│   └── uploadController.test.js   # Unit tests for uploads (4 tests)
 ├── routes/
-│   ├── auth.test.js              # Integration tests for auth (9 tests)
-│   └── tasks.test.js             # Integration tests for tasks (17 tests)
+│   ├── auth.test.js              # Integration tests for auth (20 tests)
+│   ├── tasks.test.js             # Integration tests for tasks (17 tests)
+│   ├── ai.test.js               # Integration tests for AI functions (15 tests)
+│   ├── ai_image.test.js         # Integration tests for AI images (6 tests)
+│   ├── timeEntries.test.js      # Integration tests for time tracking (5 tests)
+│   └── upload.test.js           # Integration tests for file uploads (5 tests)
 └── setup.js                      # Test configuration and mocks
 ```
 
 ### Test Coverage
-- **High coverage** on controllers and routes
-- **58 tests** total (all passing)
-  - 10 authentication controller tests
-  - 22 task controller tests
-  - 9 authentication route tests
+- **145 tests** total (all passing)
+  - 22 authentication controller tests (Register, Login, Password Reset)
+  - 22 task controller tests (CRUD, Isolation, Validation)
+  - 20 authentication route tests
   - 17 task route tests
+  - 15 profile & user management tests
+  - 15 AI & SSE streaming tests
+  - 15 time tracking & statistics tests
+  - 19 other integration tests (Uploads, Help, etc.)
 
 ### Test Cases Covered
 

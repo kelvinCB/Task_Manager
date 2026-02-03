@@ -49,8 +49,8 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalClosed();
 
     // Verify task appears in the board
-    await expect(appPage.page.getByText(taskData.title)).toBeVisible();
-    await expect(appPage.page.getByText(taskData.description)).toBeVisible();
+    await expect(appPage.page.getByText(taskData.title).first()).toBeVisible();
+    await expect(appPage.page.getByText(taskData.description).first()).toBeVisible();
   });
 
   test('should edit an existing task in both Board and Tree views', async () => {
@@ -72,7 +72,7 @@ test.describe('Task Management', () => {
       description: 'Updated description for board'
     });
     await taskPage.verifyModalClosed();
-    await expect(appPage.page.getByText('Updated Board Task')).toBeVisible();
+    await expect(appPage.page.getByText('Updated Board Task').first()).toBeVisible();
 
     // Create another task for Tree View testing
     await appPage.openAddTaskModal();
@@ -100,7 +100,7 @@ test.describe('Task Management', () => {
       description: 'Updated description for tree'
     });
     await taskPage.verifyModalClosed();
-    await expect(appPage.page.getByText('Updated Tree Task')).toBeVisible();
+    await expect(appPage.page.getByText('Updated Tree Task').first()).toBeVisible();
   });
 
   test('should delete a task in both Board and Tree views', async () => {
@@ -146,7 +146,8 @@ test.describe('Task Management', () => {
     await expect(appPage.page.getByRole('dialog')).toBeVisible();
     await appPage.page.getByTestId('confirm-delete-button').click();
 
-    await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
+    // Verify task is gone
+    await expect(appPage.page.getByText('Task to Delete in Tree').first()).not.toBeVisible();
   });
 
   test('should prevent creating task without title (required field validation)', async () => {
@@ -166,7 +167,7 @@ test.describe('Task Management', () => {
     await taskPage.verifyModalClosed();
 
     // Verify the task was created with valid title
-    await expect(appPage.page.getByText('Valid Task Title')).toBeVisible();
+    await expect(appPage.page.getByText('Valid Task Title').first()).toBeVisible();
   });
 
   test('should handle task form cancellation', async () => {
