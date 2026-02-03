@@ -84,17 +84,19 @@ vi.mock('../../lib/supabaseClient', () => ({
 }));
 
 // Mock AuthContext
-vi.mock('../../contexts/AuthContext', () => {
-  const originalModule = vi.importActual('../../contexts/AuthContext');
+const mockUseAuth = vi.fn(() => ({
+  isAuthenticated: true,
+  logout: vi.fn(),
+  user: null,
+  session: null
+}));
+
+vi.mock('../../contexts/AuthContext', async () => {
+  const actual = (await vi.importActual('../../contexts/AuthContext')) as any;
   return {
-    ...originalModule,
+    ...actual,
     AuthProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="auth-provider">{children}</div>,
-    useAuth: () => ({
-      isAuthenticated: true,
-      logout: vi.fn(),
-      user: null,
-      session: null
-    })
+    useAuth: () => mockUseAuth()
   };
 });
 
@@ -195,7 +197,16 @@ vi.mock('lucide-react', () => ({
 
 // Mock view components
 vi.mock('../../components/TaskBoard', () => ({
-  TaskBoard: () => <div data-testid="task-board">Mock Board View</div>
+  TaskBoard: ({ onEdit }: any) => {
+    return (
+      <div data-testid="task-board">
+        Mock Board View
+        <button data-testid="test-edit-button" onClick={() => onEdit({ id: '1', title: 'Task 1' })}>
+          Edit Task 1
+        </button>
+      </div>
+    );
+  }
 }));
 
 vi.mock('../../components/TaskTree', () => ({
@@ -207,24 +218,26 @@ vi.mock('../../components/TimeStatsView', () => ({
 }));
 
 // Mock useTasks hook
+const mockUseTasks = vi.fn(() => ({
+  tasks: mockTasks,
+  taskTree: mockTaskTree,
+  filteredTaskTree: mockTaskTree,
+  createTask: createTaskMock,
+  updateTask: updateTaskMock,
+  deleteTask: deleteTaskMock,
+  toggleTaskTimer: toggleTaskTimerMock,
+  getElapsedTime: getElapsedTimeMock,
+  exportTasks: exportTasksMock,
+  importTasks: importTasksMock,
+  getTimeStatistics: getTimeStatisticsMock,
+  expandedNodes: new Set(),
+  toggleNodeExpanded: vi.fn(),
+  searchTerm: '',
+  setSearchTerm: vi.fn()
+}));
+
 vi.mock('../../hooks/useTasks', () => ({
-  useTasks: () => ({
-    tasks: mockTasks,
-    taskTree: mockTaskTree,
-    filteredTaskTree: mockTaskTree,
-    createTask: createTaskMock,
-    updateTask: updateTaskMock,
-    deleteTask: deleteTaskMock,
-    toggleTaskTimer: toggleTaskTimerMock,
-    getElapsedTime: getElapsedTimeMock,
-    exportTasks: exportTasksMock,
-    importTasks: importTasksMock,
-    getTimeStatistics: getTimeStatisticsMock,
-    expandedNodes: new Set(),
-    toggleNodeExpanded: vi.fn(),
-    searchTerm: '',
-    setSearchTerm: vi.fn()
-  })
+  useTasks: () => mockUseTasks()
 }));
 
 describe('App Component', () => {
@@ -234,6 +247,33 @@ describe('App Component', () => {
 
     // Clear mocks
     vi.clearAllMocks();
+
+    // Reset auth mock to default (authenticated)
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      logout: vi.fn(),
+      user: null,
+      session: null
+    });
+
+    // Reset useTasks mock
+    mockUseTasks.mockReturnValue({
+      tasks: mockTasks,
+      taskTree: mockTaskTree,
+      filteredTaskTree: mockTaskTree,
+      createTask: createTaskMock,
+      updateTask: updateTaskMock,
+      deleteTask: deleteTaskMock,
+      toggleTaskTimer: toggleTaskTimerMock,
+      getElapsedTime: getElapsedTimeMock,
+      exportTasks: exportTasksMock,
+      importTasks: importTasksMock,
+      getTimeStatistics: getTimeStatisticsMock,
+      expandedNodes: new Set(),
+      toggleNodeExpanded: vi.fn(),
+      searchTerm: '',
+      setSearchTerm: vi.fn()
+    });
   });
 
   it('should render the app with navigation buttons', () => {
@@ -407,5 +447,36 @@ describe('App Component', () => {
 
     // Reset window.innerWidth
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 });
+  });
+
+  it('should show AuthRequiredModal when editing a task while unauthenticated', async () => {
+    // Mock unauthenticated state
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      logout: vi.fn(),
+      user: null,
+      session: null
+    });
+
+    render(
+      <AuthProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AuthProvider>
+    );
+
+    // Ensure Board view is selected
+    const boardToggles = screen.getAllByTestId('board-view-toggle');
+    fireEvent.click(boardToggles[0]);
+
+    // Find and click edit button in our simplified mock
+    const editButton = await screen.findByTestId('test-edit-button');
+    fireEvent.click(editButton);
+
+    // Assert - verify AuthRequiredModal is shown
+    expect(screen.getByTestId('auth-required-modal')).toBeInTheDocument();
+    // In our test environment, we might see the translation key instead of the text
+    expect(screen.getByTestId('auth-modal-title')).toHaveTextContent(/auth\.auth_required_title|autenticación|authentication/i);
   });
 });

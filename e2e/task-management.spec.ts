@@ -2,21 +2,33 @@ import { test, expect } from '@playwright/test';
 import { AppPage } from './page-objects/app.page';
 import { TaskPage } from './page-objects/task.page';
 import { BoardPage } from './page-objects/board.page';
+import { AuthPage } from './page-objects/auth.page';
 
 test.describe('Task Management', () => {
   let appPage: AppPage;
   let taskPage: TaskPage;
   let boardPage: BoardPage;
+  let authPage: AuthPage;
 
   test.beforeEach(async ({ page }) => {
     appPage = new AppPage(page);
     taskPage = new TaskPage(page);
     boardPage = new BoardPage(page);
+    authPage = new AuthPage(page);
+
     await appPage.goto();
 
     // Clear local storage to start fresh
     await page.evaluate(() => localStorage.clear());
     await appPage.page.reload();
+
+    // Login before tests that require editing
+    await authPage.goToLogin();
+    await authPage.login(
+      process.env.E2E_USER_TASK_EMAIL || 'automation-kolium-task@yopmail.com',
+      process.env.E2E_USER_TASK_PASSWORD || 'Automation123'
+    );
+    await expect(page).toHaveURL('/');
   });
 
 
@@ -102,11 +114,11 @@ test.describe('Task Management', () => {
     await appPage.switchToView('board');
     await appPage.verifyCurrentView('board');
     await boardPage.deleteTask('Task to Delete in Board');
-    
+
     // Confirm deletion in modal
     await expect(appPage.page.getByRole('dialog')).toBeVisible();
     await appPage.page.getByTestId('confirm-delete-button').click();
-    
+
     await expect(appPage.page.getByText('Task to Delete in Board')).not.toBeVisible();
 
     // Test deletion in Tree View
@@ -129,11 +141,11 @@ test.describe('Task Management', () => {
     const deleteOption = appPage.page.getByTestId('delete-task-button');
     await expect(deleteOption).toBeVisible();
     await deleteOption.click();
-    
+
     // Confirm deletion in modal
     await expect(appPage.page.getByRole('dialog')).toBeVisible();
     await appPage.page.getByTestId('confirm-delete-button').click();
-    
+
     await expect(appPage.page.getByText('Task to Delete in Tree')).not.toBeVisible();
   });
 

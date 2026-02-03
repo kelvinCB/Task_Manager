@@ -23,7 +23,24 @@ export class AuthPage {
     await this.page.locator('[data-testid="email-input"]').fill(email);
     await this.page.locator('[data-testid="password-input"]').fill(password);
     await this.page.locator('[data-testid="login-button"]').click();
-    // Wait for auth state to propagate
+
+    // Check for immediate error message
+    const errorMsg = this.page.locator('[data-testid="error-message"]');
+    if (await errorMsg.isVisible({ timeout: 2000 }).catch(() => false)) {
+      const text = await errorMsg.textContent();
+      throw new Error(`Login failed: ${text}`);
+    }
+
+    // Wait for redirection to dashboard - use a more flexible URL check
+    await this.page.waitForURL(url => url.pathname === '/' || url.pathname === '', { timeout: 15000 });
+
+    // Wait for the app to finish loading
+    await expect(this.page.locator('[data-loading="false"]')).toBeVisible({ timeout: 15000 });
+
+    // Verify we see the main application (board or tree container)
+    await expect(this.page.locator('[data-testid$="-view-container"]')).toBeVisible({ timeout: 10000 });
+
+    // Brief wait for state propagation
     await this.page.waitForTimeout(1000);
   }
 
