@@ -33,7 +33,9 @@
         "go_to_login": "Ir a Iniciar Sesión",
         "github_error": "Error al iniciar sesión con GitHub",
         "invalid_email": "Formato de correo inválido",
-        "email_not_confirmed": "Correo electrónico no confirmado"
+        "email_not_confirmed": "Correo electrónico no confirmado",
+        "auth_required_title": "Autenticación requerida",
+        "auth_required_message": "Para editar tareas, necesitas iniciar sesión en tu cuenta."
     },
     "stats_view": {
         "title": "Estadísticas de Tiempo",

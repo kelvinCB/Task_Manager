@@ -41,6 +41,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import HelpFAB from './components/features/help/HelpFAB';
 import { Toaster } from 'sonner';
+import { AuthRequiredModal } from './components/features/auth/AuthRequiredModal';
 
 const MainApp = () => {
   const {
@@ -100,6 +101,9 @@ const MainApp = () => {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Auth Required Modal State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   const handleTaskClick = (taskId: string) => {
     setSelectedTaskId(taskId);
     setIsDetailModalOpen(true);
@@ -149,6 +153,10 @@ const MainApp = () => {
   };
 
   const handleEditTask = (task: Task) => {
+    if (!isAuthenticated) {
+      setIsAuthModalOpen(true);
+      return;
+    }
     setEditingTask(task);
     setIsFormOpen(true);
   };
@@ -798,10 +806,15 @@ const MainApp = () => {
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetailModal}
         onEdit={(task) => {
-          handleCloseDetailModal();
           handleEditTask(task);
+          handleCloseDetailModal();
         }}
         getElapsedTime={getElapsedTime}
+      />
+
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
 
       {/* Error Modal */}

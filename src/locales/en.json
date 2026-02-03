@@ -27,6 +27,8 @@
         "invalid_email": "Invalid email format",
         "go_to_login": "Go to Login",
         "email_not_confirmed": "Email not confirmed",
+        "auth_required_title": "Authentication Required",
+        "auth_required_message": "To edit tasks, you need to sign in to your account.",
         "join_us": "Join us to manage your tasks efficiently",
         "login_google": "LOG IN WITH GOOGLE",
         "signup_google": "SIGN UP WITH GOOGLE",
