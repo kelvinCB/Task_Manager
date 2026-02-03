@@ -53,6 +53,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         onEdit(task);
                         onClose();
                       }}
+                      data-testid="task-detail-edit-button"
                       className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors duration-200 ${theme === 'dark'
                         ? 'bg-gray-700 text-indigo-400 hover:bg-gray-600'
                         : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'

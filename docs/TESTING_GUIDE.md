@@ -16,8 +16,8 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ### Estado Actual
 
-✅ **341 pruebas unitarias** (100% pasando)
-✅ **142 pruebas E2E** (100% pasando)
+✅ **354 pruebas unitarias** (100% pasando)
+✅ **153 pruebas E2E** (100% pasando)
 ✅ **145 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
@@ -342,6 +342,7 @@ e2e/
 ├── time-tracking.spec.ts           # Seguimiento de tiempo (4 tests)
 ├── time-stats.spec.ts              # Estadísticas (8 tests)
 ├── username-display.spec.ts         # Display de username (8 tests)
+├── auth-restriction.spec.ts         # Restricción de edición (3 tests) 🆕
 ├── global-setup.ts                 # Configuración global para tests
 ├── global-teardown.ts              # Limpieza global después de tests
 └── page-objects/                   # Objetos de página para E2E
@@ -489,10 +490,14 @@ Para cada nuevo test automatizado que se agregue a la suite E2E, es **OBLIGATORI
 
 ### Resultados E2E actuales
 
-✅ **142/142 tests pasando** (100% de éxito)
-✅ **Todos los tests funcionando** (incluido username-display)⏱️ **~2.6 minutos** con 5 workers🧹 **Tests limpios y optimizados**🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
+✅ **153/153 tests pasando** (100% de éxito)
+✅ **Todos los tests funcionando** (incluido username-display e isolation)
+⏱️ **~2.8 minutos** con 5 workers
+🧹 **Tests limpios y optimizados**
+🌍 **Compatible globalmente** - Funciona en cualquier zona horaria
 ✨ **Username Feature** - Tests completos para display de username
 🔒 **User Isolation** - Tests de seguridad multi-usuario
+🛡️ **Auth Restriction** - Bloqueo de edición para no autenticados
 
 > Nota: En modo autenticado no se muestran tareas por defecto; en modo offline/no autenticado se usan `defaultTasks`/localStorage. Los tests de `useTasks` cubren ambos flujos.
 
@@ -727,4 +732,4 @@ render(
 
 ---
 
-**Última actualización**: Enero 2026 - Suite de testing completamente funcional, robusta y optimizada con **628 tests** (341 Frontend + 145 Backend + 142 E2E).
+**Última actualización**: Febrero 2026 - Suite de testing completamente funcional, robusta y optimizada con **652 tests** (354 Frontend + 145 Backend + 153 E2E).

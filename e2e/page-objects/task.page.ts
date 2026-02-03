@@ -50,6 +50,7 @@ export class TaskPage {
     dueDate?: string;
     status?: string;
   }) {
+    await this.titleInput.waitFor({ state: 'visible' });
     await this.titleInput.fill(data.title);
 
     if (data.description) {
@@ -72,6 +73,7 @@ export class TaskPage {
     status?: string;
   }) {
     await this.fillTaskForm(data);
+    await this.createButton.waitFor({ state: 'visible' });
     await this.createButton.click();
   }
 
@@ -104,6 +106,7 @@ export class TaskPage {
   }
 
   async cancelTask() {
+    await this.cancelButton.waitFor({ state: 'visible' });
     await this.cancelButton.click();
   }
 

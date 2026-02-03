@@ -67,7 +67,7 @@
 - [x] Pre-commit hooks ejecutan tests y build
 - [x] Script de validación de ramas funciona
 - [x] Commitizen funciona para commits interactivos
-- [x] Tests pasan (59/59 tests exitosos)
+- [x] Tests pasan (652/652 tests exitosos)
 - [x] Build exitoso
 
 ### ⚠️ Warnings Conocidos
