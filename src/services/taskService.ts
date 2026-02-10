@@ -1,4 +1,4 @@
-import supabase from '../lib/supabaseClient';
+import supabase, { supabaseUrl } from '../lib/supabaseClient';
 import { Task, TaskStatus } from '../types/Task';
 import { API_BASE_URL } from '../utils/apiConfig';
 
@@ -75,10 +75,16 @@ export class TaskService {
     }
 
     // Fallback: read from localStorage (browser only)
+    // Prefer the project-specific key: `sb-<projectRef>-auth-token`
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
-        const keys = Object.keys(localStorage);
-        const authKey = keys.find((k) => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        const projectRef = supabaseUrl?.match(/^https:\/\/([^.]+)\.supabase\.co/i)?.[1];
+        const preferredKey = projectRef ? `sb-${projectRef}-auth-token` : null;
+
+        const authKey = (preferredKey && localStorage.getItem(preferredKey))
+          ? preferredKey
+          : Object.keys(localStorage).find((k) => k.startsWith('sb-') && k.endsWith('-auth-token'));
+
         if (!authKey) return null;
 
         const raw = localStorage.getItem(authKey);
