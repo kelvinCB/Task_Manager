@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
-import loginIllustrationLight from '../assets/images/login-illustration-light.webp';
-import loginIllustrationDark from '../assets/images/login-illustration-dark.webp';
+import loginIllustrationLight from '../assets/images/login-illustration-light.mp4';
+import loginIllustrationDark from '../assets/images/login-illustration-dark.mp4';
+import loginIllustrationLightPoster from '../assets/images/login-illustration-light-poster.jpg';
+import loginIllustrationDarkPoster from '../assets/images/login-illustration-dark-poster.jpg';
+import { motion } from 'framer-motion';
 
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -124,17 +127,32 @@ const ResetPasswordPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Illustrations - object-cover/left for consistency */}
-        <img 
-          src={loginIllustrationLight} 
-          alt="Task Management Illustration" 
-          className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
-        />
-        <img 
-          src={loginIllustrationDark} 
-          alt="Task Management Illustration" 
-          className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
-        />
+        {/* Illustrations - video backgrounds for performance */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="w-full h-full"
+        >
+          <video
+            src={loginIllustrationLight}
+            poster={loginIllustrationLightPoster}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
+          />
+          <video
+            src={loginIllustrationDark}
+            poster={loginIllustrationDarkPoster}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
+          />
+        </motion.div>
         
         {/* Subtle overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
