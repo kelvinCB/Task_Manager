@@ -58,10 +58,40 @@ export class TaskService {
 
   /**
    * Get the current user's JWT token
+   *
+   * Note: In some browser runtimes (e.g. headless Chromium on a VPS),
+   * we've observed that the UI can appear logged-in, yet `supabase.auth.getSession()`
+   * returns null at the moment a request is made. In that case, we fall back to
+   * reading Supabase's persisted auth token from localStorage.
    */
   private async getAuthToken(): Promise<string | null> {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token || null;
+    // Primary: ask Supabase client
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || null;
+      if (token) return token;
+    } catch {
+      // ignore and fall back
+    }
+
+    // Fallback: read from localStorage (browser only)
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const keys = Object.keys(localStorage);
+        const authKey = keys.find((k) => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        if (!authKey) return null;
+
+        const raw = localStorage.getItem(authKey);
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw);
+        return parsed?.access_token || null;
+      }
+    } catch {
+      // ignore
+    }
+
+    return null;
   }
 
   /**
@@ -78,13 +108,14 @@ export class TaskService {
         return { error: 'Not authenticated. Please log in.' };
       }
 
+      // Normalize headers: spreading a `Headers` instance produces `{}` and can silently drop values.
+      const headers = new Headers(options.headers);
+      if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+      headers.set('Authorization', `Bearer ${token}`);
+
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          ...options.headers,
-        },
+        headers,
       });
 
       const data = (await response.json().catch(() => ({}))) as unknown as T & { error?: string; message?: string };
