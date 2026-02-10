@@ -261,6 +261,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                                   onStart={onStartTimer}
                                   onPause={onPauseTimer}
                                   compact={true}
+                                  disabled={task.status === 'Done'}
                                 />
                               </div>
                             )}

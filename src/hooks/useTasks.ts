@@ -462,10 +462,48 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       return;
     }
 
+    let finalUpdates = { ...updates };
+    let durationToRecord = 0;
+
+    // If the task is being marked as completed or moved back to Open and the timer is active,
+    // we must pause it first. This ensures any status update (form or drag-drop) pauses the timer.
+    if ((updates.status === 'Done' || updates.status === 'Open') && task.timeTracking.isActive) {
+      const now = Date.now();
+      const lastEntryIndex = task.timeTracking.timeEntries.length - 1;
+      const lastEntry = task.timeTracking.timeEntries[lastEntryIndex];
+
+      let duration = 0;
+      let newTimeEntries = [...task.timeTracking.timeEntries];
+
+      if (lastEntry && !lastEntry.endTime) {
+        duration = Math.min(now - lastEntry.startTime, MAX_TIMER_DURATION_MS);
+        newTimeEntries[lastEntryIndex] = {
+          ...lastEntry,
+          endTime: lastEntry.startTime + duration,
+          duration
+        };
+      } else {
+        const effectiveStart = task.timeTracking.lastStarted || now;
+        duration = Math.min(Math.max(0, now - effectiveStart), MAX_TIMER_DURATION_MS);
+        newTimeEntries.push({ startTime: effectiveStart, endTime: effectiveStart + duration, duration } as TimeEntry);
+      }
+
+      durationToRecord = duration;
+      finalUpdates.timeTracking = {
+        ...task.timeTracking,
+        isActive: false,
+        totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
+        timeEntries: newTimeEntries
+      };
+
+      // Clear persisted running state
+      clearActiveTimer(id);
+    }
+
     // If using API, try to update task on backend
     if (useApi) {
       try {
-        const response = await taskService.updateTask(id, updates);
+        const response = await taskService.updateTask(id, finalUpdates);
 
         if (response.error) {
           console.error('Failed to update task on API:', response.error);
@@ -479,10 +517,15 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
                 ...task,
                 ...response.data as any,
                 // Preserve local timeTracking updates if they exist, otherwise keep existing
-                timeTracking: updates.timeTracking || task.timeTracking
+                timeTracking: finalUpdates.timeTracking || task.timeTracking
               }
               : task
           ));
+
+          // Persist session to backend if needed
+          if (durationToRecord > 0) {
+            taskService.recordTimeSummary(id, durationToRecord).catch(() => { });
+          }
           return;
         }
       } catch (error) {
@@ -494,9 +537,9 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
 
     // localStorage fallback
     setTasks(prev => prev.map(task =>
-      task.id === id ? { ...task, ...updates } : task
+      task.id === id ? { ...task, ...finalUpdates } : task
     ));
-  }, [useApi, tasks, t]);
+  }, [useApi, tasks, t, clearActiveTimer]);
 
   const deleteTask = useCallback(async (id: string) => {
     const taskToDelete = tasks.find(t => t.id === id);
@@ -588,56 +631,16 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     }
 
     let updates: Partial<Task> & { total_time_ms?: number } = { status: newStatus };
-    let durationToRecord = 0;
-
-    // If the task is being marked as completed or moved back to Open and the timer is active,
-    // we must pause it first
-    if ((newStatus === 'Done' || newStatus === 'Open') && task.timeTracking.isActive) {
-      const now = Date.now();
-      const lastEntryIndex = task.timeTracking.timeEntries.length - 1;
-      const lastEntry = task.timeTracking.timeEntries[lastEntryIndex];
-
-      let duration = 0;
-      let newTimeEntries = [...task.timeTracking.timeEntries];
-
-      if (lastEntry && !lastEntry.endTime) {
-        duration = Math.min(now - lastEntry.startTime, MAX_TIMER_DURATION_MS);
-        newTimeEntries[lastEntryIndex] = {
-          ...lastEntry,
-          endTime: lastEntry.startTime + duration,
-          duration
-        };
-      } else {
-        const effectiveStart = task.timeTracking.lastStarted || now;
-        duration = Math.min(Math.max(0, now - effectiveStart), MAX_TIMER_DURATION_MS);
-        newTimeEntries.push({ startTime: effectiveStart, endTime: effectiveStart + duration, duration } as TimeEntry);
-      }
-
-      durationToRecord = duration;
-      updates.timeTracking = {
-        ...task.timeTracking,
-        isActive: false,
-        totalTimeSpent: task.timeTracking.totalTimeSpent + duration,
-        timeEntries: newTimeEntries
-      };
-
-      // Clear persisted running state
-      clearActiveTimer(id);
-    }
 
     // If moving to Done, ensure we send the total_time_ms to backend
     if (newStatus === 'Done') {
-      const finalTotal = (updates.timeTracking?.totalTimeSpent) ?? task.timeTracking.totalTimeSpent;
-      updates.total_time_ms = finalTotal;
+      // Note: the auto-pause logic in updateTask will update timeTracking if needed
+      // but for the total_time_ms field we use the current total
+      updates.total_time_ms = task.timeTracking.totalTimeSpent;
     }
 
-    // Perform a single update to avoid race conditions and multiple state renders
+    // Perform a single update. updateTask now handles auto-pausing the timer.
     await updateTask(id, updates);
-
-    // Persist session to backend if needed
-    if (useApi && durationToRecord > 0) {
-      taskService.recordTimeSummary(id, durationToRecord).catch(() => { });
-    }
 
     return { ...task, ...updates } as Task;
   };

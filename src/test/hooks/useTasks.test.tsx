@@ -251,6 +251,34 @@ describe('useTasks Hook', () => {
     // Assert - verify the timer is paused
     expect(result.current.filteredTasks[0].timeTracking.isActive).toBe(false);
   });
+
+  it('should pause timer when task status is updated to Done via updateTask', async () => {
+    const { result } = renderHook(() => useTasks({ useApi: false }));
+    let taskId: string = '';
+    
+    await act(async () => {
+      const task = await result.current.createTask({ title: 'Task to complete via update' });
+      taskId = task!.id;
+    });
+
+    // Start timer
+    await act(async () => {
+      await result.current.startTaskTimer(taskId);
+    });
+
+    // Verify it is active
+    expect(result.current.getTaskById(taskId)?.timeTracking.isActive).toBe(true);
+
+    // Update status to Done via updateTask
+    await act(async () => {
+      await result.current.updateTask(taskId, { status: 'Done' });
+    });
+
+    // Verify it is paused
+    const updatedTask = result.current.getTaskById(taskId);
+    expect(updatedTask?.status).toBe('Done');
+    expect(updatedTask?.timeTracking.isActive).toBe(false);
+  });
   
   // Mock the getTimeStatistics function directly to make the test pass
   it('should get time statistics for a specific period', () => {

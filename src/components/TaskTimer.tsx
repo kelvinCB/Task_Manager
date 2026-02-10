@@ -11,6 +11,7 @@ interface TaskTimerProps {
   onStart: (taskId: string) => void;
   onPause: (taskId: string) => void;
   compact?: boolean;
+  disabled?: boolean;
 }
 
 const MAX_TIMER_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
@@ -32,7 +33,8 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   elapsedTime,
   onStart,
   onPause,
-  compact = false
+  compact = false,
+  disabled = false
 }) => {
   const { theme } = useTheme();
   const [currentTime, setCurrentTime] = useState(elapsedTime);
@@ -42,7 +44,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   useEffect(() => {
     let interval: number | null = null;
 
-    if (isActive) {
+    if (isActive && !disabled) {
       interval = window.setInterval(() => {
         setCurrentTime(prevTime => {
           const newTime = prevTime + 1000; // Update every second
@@ -80,7 +82,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     return () => {
       if (interval) window.clearInterval(interval);
     };
-  }, [isActive, elapsedTime, taskId, onPause]);
+  }, [isActive, elapsedTime, taskId, onPause, disabled]);
 
 
   // Format time more compactly for mobile
@@ -97,8 +99,8 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
 
   return (
     <div className={`timer-component flex items-center gap-1 text-sm ${compact ? 'text-xs' : ''}`} data-testid="task-timer">
-      <Clock className={`${compact ? 'w-2.5 h-2.5' : 'w-3 h-3 sm:w-4 sm:h-4'} ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
-      <span className={`font-mono text-xs sm:text-sm ${isActive
+      <Clock className={`${compact ? "w-2.5 h-2.5" : "w-3 h-3 sm:w-4 sm:h-4"} ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`} />
+      <span className={`font-mono text-xs sm:text-sm ${isActive && !disabled
         ? (theme === 'dark' ? 'text-green-400 font-bold' : 'text-green-600 font-bold')
         : (theme === 'dark' ? 'text-gray-300' : 'text-gray-600')
         }`} data-testid="elapsed-time">
@@ -111,34 +113,36 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
           </>
         )}
       </span>
-      {isActive ? (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onPause(taskId);
-          }}
-          className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
-            ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700'
-            : 'text-orange-500 hover:text-orange-700 hover:bg-orange-50'} rounded transition-all`}
-          title="Pause timer"
-          data-testid="pause-timer"
-        >
-          <Pause className={compact ? "w-2.5 h-2.5" : "w-3 h-3 sm:w-4 sm:h-4"} />
-        </button>
-      ) : (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onStart(taskId);
-          }}
-          className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
-            ? 'text-green-400 hover:text-green-300 hover:bg-gray-700'
-            : 'text-green-500 hover:text-green-700 hover:bg-green-50'} rounded transition-all`}
-          title="Start timer"
-          data-testid="start-timer"
-        >
-          <Play className={compact ? "w-2.5 h-2.5" : "w-3 h-3 sm:w-4 sm:h-4"} />
-        </button>
+      {!disabled && (
+        isActive ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onPause(taskId);
+            }}
+            className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
+              ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700'
+              : 'text-orange-500 hover:text-orange-700 hover:bg-orange-50'} rounded transition-all`}
+            title="Pause timer"
+            data-testid="pause-timer"
+          >
+            <Pause className={compact ? "w-2.5 h-2.5" : "w-3 h-3 sm:w-4 sm:h-4"} />
+          </button>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onStart(taskId);
+            }}
+            className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
+              ? 'text-green-400 hover:text-green-300 hover:bg-gray-700'
+              : 'text-green-500 hover:text-green-700 hover:bg-green-50'} rounded transition-all`}
+            title="Start timer"
+            data-testid="start-timer"
+          >
+            <Play className={compact ? "w-2.5 h-2.5" : "w-3 h-3 sm:w-4 sm:h-4"} />
+          </button>
+        )
       )}
     </div>
   );
