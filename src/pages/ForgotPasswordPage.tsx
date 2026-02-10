@@ -148,17 +148,32 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Illustrations - object-cover to fill space, object-left to pin the rocket/content */}
-        <img
-          src={loginIllustrationLight}
-          alt="Task Management Illustration"
-          className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
-        />
-        <img
-          src={loginIllustrationDark}
-          alt="Task Management Illustration"
-          className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
-        />
+        {/* Illustrations - video backgrounds for performance */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="w-full h-full"
+        >
+          <video
+            src={loginIllustrationLight}
+            poster={loginIllustrationLightPoster}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
+          />
+          <video
+            src={loginIllustrationDark}
+            poster={loginIllustrationDarkPoster}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
+          />
+        </motion.div>
 
         {/* Subtle overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
