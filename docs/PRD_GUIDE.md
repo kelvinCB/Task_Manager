@@ -25,6 +25,14 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 
 ### 🆕 Recent Updates
 
+**Feature TM-061: Review Status Across Task Manager** (🚧 Implemented in code, pending production deploy)
+- New task status: `Review` added to frontend and backend validations
+- Board + Tree + form status selectors updated
+- Drag & drop/status transitions now support `Review`
+- Runtime regression fixed (`TaskItem` Eye icon import) with test coverage
+- Database constraint migrated in Supabase production to include `Review`
+- ⚠️ Current production API still running old validation (`Open`, `In Progress`, `Done`) until backend deploy/restart
+
 **Feature TM-012: Backend Task Management API** (✅ Completed - Ready for Merge)
 - Full CRUD operations for tasks
 - JWT authentication with Supabase integration
@@ -91,7 +99,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Task Deletion** | ✅ Complete | 100% | Delete tasks from Tree View and Board View |
 | **Subtask Dependency** | ✅ Complete | 100% | Tasks with incomplete subtasks cannot be marked as "Done". Users receive explicit UI feedback (alerts and disabled options) in Tree View, Board View (drag & drop), and Task Form. |
 | **Hierarchical Tasks** | ✅ Complete | 100% | Parent-child task relationships |
-| **Task Status Management** | ✅ Complete | 100% | Open, In Progress, Done statuses |
+| **Task Status Management** | 🚧 In Rollout | 90% | Open, In Progress, Review, Done statuses (production backend deploy pending) |
 | **Time Tracking** | ✅ Complete | 100% | Start/pause timers, track time per task |
 | **Time Statistics** | ✅ Complete | 100% | View time stats by period (day/week/month/year) |
 | **Export/Import Tasks** | ✅ Complete | 100% | CSV export/import with time tracking data |
@@ -428,5 +436,5 @@ Every AI agent working on this project must follow these rules:
 
 *This PRD serves as the single source of truth for the Task Manager project. All team members and AI agents should reference this document before starting any work.*
 
-**Last Updated:** February 3rd, 2026 
+**Last Updated:** February 11th, 2026 
 **Next Review:** Quarterly

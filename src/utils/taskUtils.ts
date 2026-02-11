@@ -99,6 +99,7 @@ export const getStatusColor = (status: string): string => {
   switch (status) {
     case 'Open': return 'text-blue-600 bg-blue-50 border-blue-200';
     case 'In Progress': return 'text-amber-600 bg-amber-50 border-amber-200';
+    case 'Review': return 'text-purple-600 bg-purple-50 border-purple-200';
     case 'Done': return 'text-green-600 bg-green-50 border-green-200';
     default: return 'text-gray-600 bg-gray-50 border-gray-200';
   }
@@ -108,6 +109,7 @@ export const getStatusIcon = (status: string): string => {
   switch (status) {
     case 'Open': return 'Circle';
     case 'In Progress': return 'Clock';
+    case 'Review': return 'Eye';
     case 'Done': return 'CheckCircle';
     default: return 'Circle';
   }

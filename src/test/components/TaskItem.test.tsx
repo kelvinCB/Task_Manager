@@ -133,6 +133,33 @@ describe('TaskItem Component', () => {
     expect(screen.getByTestId('delete-task-button')).toBeInTheDocument();
   });
 
+
+  it('should render Review status without crashing', () => {
+    const reviewTask = { ...mockTask, status: 'Review' as TaskStatus };
+
+    render(
+      <ThemeProvider>
+        <TaskItem
+          task={reviewTask}
+          isExpanded={false}
+          onToggleExpand={mockOnToggleExpand}
+          onStatusChange={mockOnStatusChange}
+          onEdit={mockOnEdit}
+          onDelete={mockOnDelete}
+          onAddChild={mockOnAddChild}
+          hasChildren={false}
+          canComplete={true}
+          onStartTimer={mockOnStartTimer}
+          onPauseTimer={mockOnPauseTimer}
+          getElapsedTime={mockGetElapsedTime}
+          allTasks={[reviewTask]}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Review')).toBeInTheDocument();
+  });
+
   it('should call onStatusChange when changing task status', () => {
     // Act
     render(

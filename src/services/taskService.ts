@@ -32,8 +32,8 @@ interface BackendTask {
   user_id: string;
   title: string;
   description: string;
-  // Backend status enum now matches frontend: 'Open' | 'In Progress' | 'Done'
-  status: 'Open' | 'In Progress' | 'Done';
+  // Backend status enum now matches frontend: 'Open' | 'In Progress' | 'Review' | 'Done'
+  status: 'Open' | 'In Progress' | 'Review' | 'Done';
   parent_id: number | null;
   created_at: string;
   updated_at?: string;

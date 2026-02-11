@@ -132,7 +132,7 @@ describe('Task Controller', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Validation error',
-        message: 'Invalid status. Must be one of: Open, In Progress, Done'
+        message: 'Invalid status. Must be one of: Open, In Progress, Review, Done'
       });
     });
 

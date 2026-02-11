@@ -340,6 +340,19 @@ export const ComponentName: React.FC<ComponentNameProps> = ({
 
 ---
 
+
+### Task Status Model (Open / In Progress / Review / Done)
+
+- The frontend supports four workflow statuses: `Open`, `In Progress`, `Review`, `Done`.
+- `Review` must be present consistently in:
+  - board columns (`TaskBoard`)
+  - status selectors (`TaskForm`, inline updates)
+  - stats aggregation (`TaskStats`)
+  - filtering logic (`useTasks`)
+- Keep status labels aligned with backend validation to avoid 400 errors during create/update.
+
+> Deployment note: if DB schema already allows `Review` but API still rejects it, production backend is running older code and must be redeployed/restarted.
+
 ## State Management
 
 ### Current State Architecture
@@ -1083,6 +1096,8 @@ export const useCreateTask = () => {
 ## Testing Guidelines
 
 ### Component Testing
+
+- Add regression tests when introducing new icon/status UI mappings (example: `TaskItem` Eye icon import for `Review` badge coverage in `src/test/components/TaskItem.test.tsx`).
 
 #### Testing Best Practices
 - **Test user behavior** rather than implementation details

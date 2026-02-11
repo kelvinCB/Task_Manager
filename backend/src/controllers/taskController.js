@@ -18,11 +18,11 @@ const createTask = async (req, res) => {
     }
 
     // Validate status if provided
-    const validStatuses = ['Open', 'In Progress', 'Done'];
+    const validStatuses = ['Open', 'In Progress', 'Review', 'Done'];
     if (status && !validStatuses.includes(status)) {
       return res.status(400).json({
         error: 'Validation error',
-        message: 'Invalid status. Must be one of: Open, In Progress, Done'
+        message: 'Invalid status. Must be one of: Open, In Progress, Review, Done'
       });
     }
 
@@ -96,7 +96,7 @@ const getTasks = async (req, res) => {
 
     // Filter by status if provided
     if (status) {
-      const validStatuses = ['Open', 'In Progress', 'Done'];
+      const validStatuses = ['Open', 'In Progress', 'Review', 'Done'];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({
           error: 'Validation error',
@@ -235,11 +235,11 @@ const updateTask = async (req, res) => {
 
     // Validate status if provided
     if (status) {
-      const validStatuses = ['Open', 'In Progress', 'Done'];
+      const validStatuses = ['Open', 'In Progress', 'Review', 'Done'];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({
           error: 'Validation error',
-          message: 'Invalid status. Must be one of: Open, In Progress, Done'
+          message: 'Invalid status. Must be one of: Open, In Progress, Review, Done'
         });
       }
     }

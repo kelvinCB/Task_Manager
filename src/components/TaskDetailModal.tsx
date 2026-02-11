@@ -80,6 +80,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   <span className={`px-2.5 py-0.5 text-sm font-medium border rounded-full ${getStatusColor(task.status)}`}>
                     {task.status === 'Open' && t('tasks.status_open')}
                     {task.status === 'In Progress' && t('tasks.status_in_progress')}
+                    {task.status === 'Review' && t('tasks.status_review')}
                     {task.status === 'Done' && t('tasks.status_done')}
                   </span>
 
