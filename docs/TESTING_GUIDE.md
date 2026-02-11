@@ -34,6 +34,18 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 
 ## Pruebas Unitarias
 
+### Estado de rollout: status `Review` (Feb 2026)
+
+- ✅ **Frontend**: soporte para `Review` implementado en Board/Tree/Form/filtros.
+- ✅ **Backend (código)**: validación actualizada para aceptar `Review`.
+- ✅ **DB Producción (Supabase)**: constraint `tasks_status_check` actualizado a `('Open','In Progress','Review','Done')`.
+- ⚠️ **Producción actual**: API aún devuelve `400 Invalid status. Must be one of: Open, In Progress, Done` hasta desplegar/reiniciar backend con el código nuevo.
+
+#### Regresión cubierta
+- Se agregó test para evitar crash en runtime por icono faltante (`Eye`) en `TaskItem`:
+  - `src/test/components/TaskItem.test.tsx`
+
+
 ### Estructura de archivos
 
 ```
@@ -732,4 +744,4 @@ render(
 
 ---
 
-**Última actualización**: Febrero 2026 - Suite de testing completamente funcional, robusta y optimizada con **652 tests** (354 Frontend + 145 Backend + 153 E2E).
+**Última actualización**: Febrero 2026 - Suite de testing completamente funcional, robusta y optimizada con **652 tests** (354 Frontend + 145 Backend + 153 E2E). Incluye cobertura de regresión para soporte de status `Review` en UI.

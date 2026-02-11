@@ -250,6 +250,21 @@ router.get('/api/tasks', authenticateUser, taskController.getTasks);
 ### Configuration
 - **supabaseClient.js** - Centralized Supabase client configuration with environment validation
 
+
+### Status Enum Synchronization (`Review`)
+
+When adding or updating task statuses, keep **all three layers** synchronized:
+1. Backend controller validation (allowed status list)
+2. Database constraint (`tasks_status_check`)
+3. Frontend status options
+
+If only the DB is migrated and backend runtime is not redeployed, the API can still reject valid DB statuses with `400 Validation error`.
+
+**Operational checklist after status changes:**
+- Merge backend code
+- Deploy/restart production backend
+- Run smoke test: `POST /api/tasks` with `status: "Review"`
+
 ## Standards
 
 ### Code Quality
