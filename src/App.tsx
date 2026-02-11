@@ -593,6 +593,7 @@ const MainApp = () => {
                           <option value="" className="text-center">{t('tasks.all_status')}</option>
                           <option value="Open" className="text-center">{t('tasks.status_open')}</option>
                           <option value="In Progress" className="text-center">{t('tasks.status_in_progress')}</option>
+                          <option value="Review" className="text-center">{t('tasks.status_review')}</option>
                           <option value="Done" className="text-center">{t('tasks.status_done')}</option>
                         </select>
                       </div>
@@ -657,6 +658,7 @@ const MainApp = () => {
                       <option value="">{t('tasks.all_status')}</option>
                       <option value="Open">{t('tasks.status_open')}</option>
                       <option value="In Progress">{t('tasks.status_in_progress')}</option>
+                      <option value="Review">{t('tasks.status_review')}</option>
                       <option value="Done">{t('tasks.status_done')}</option>
                     </select>
                   </div>

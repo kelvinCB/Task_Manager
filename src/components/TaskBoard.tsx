@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { Task, TaskStatus } from '../types/Task';
 import { getStatusColor, formatDate, isTaskOverdue, canCompleteTask, getTaskAncestry, getTaskDepth } from '../utils/taskUtils';
-import { Plus, Calendar, Circle, Clock, CheckCircle, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Calendar, Circle, Clock, CheckCircle, Eye, Edit2, Trash2 } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { SpotlightCard } from './ui/SpotlightCard';
@@ -45,6 +45,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const statusColumns: { status: TaskStatus; title: string; description: string }[] = [
     { status: 'Open', title: t('tasks.status_open'), description: t('tasks.status_open_desc') || 'Tasks ready to be started' },
     { status: 'In Progress', title: t('tasks.status_in_progress'), description: t('tasks.status_in_progress_desc') || 'Tasks currently being worked on' },
+    { status: 'Review', title: t('tasks.status_review'), description: t('tasks.status_review_desc') || 'Tasks pending review before completion' },
     { status: 'Done', title: t('tasks.status_done'), description: t('tasks.status_done_desc') || 'Completed tasks' }
   ];
 
@@ -151,13 +152,14 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
   return (
     <div className={`h-full overflow-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 p-6">
         {statusColumns.map(column => {
           const columnTasks = getTasksByStatus(column.status);
           const getIconComponent = (status: TaskStatus) => {
             switch (status) {
               case 'Open': return Circle;
               case 'In Progress': return Clock;
+              case 'Review': return Eye;
               case 'Done': return CheckCircle;
               default: return Circle;
             }

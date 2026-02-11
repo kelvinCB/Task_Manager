@@ -27,7 +27,7 @@ export interface TimeEntry {
   backendId?: number;    // Optional: ID of the time_entries row in backend
 }
 
-export type TaskStatus = 'Open' | 'In Progress' | 'Done';
+export type TaskStatus = 'Open' | 'In Progress' | 'Review' | 'Done';
 
 export interface TaskNode extends Task {
   children: TaskNode[];

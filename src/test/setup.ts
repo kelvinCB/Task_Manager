@@ -34,6 +34,7 @@ vi.mock('react-i18next', () => ({
         'tasks.status_open': 'Open',
         'tasks.status_in_progress': 'In Progress',
         'tasks.status_done': 'Done',
+        'tasks.status_review': 'Review',
         'tasks.status_open_desc': 'Tasks tailored for you',
         'tasks.status_in_progress_desc': 'Tasks currently being worked on',
         'tasks.status_done_desc': 'Completed tasks',

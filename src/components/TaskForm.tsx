@@ -687,6 +687,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   >
                     <option value="Open">{t('tasks.status_open')}</option>
                     <option value="In Progress">{t('tasks.status_in_progress')}</option>
+                    <option value="Review">{t('tasks.status_review')}</option>
                     <option value="Done" disabled={canComplete === false} title={canComplete === false ? t('tasks.has_subtasks') : undefined}>
                       {t('tasks.status_done')}
                     </option>

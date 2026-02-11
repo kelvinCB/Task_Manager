@@ -53,6 +53,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     switch (status) {
       case 'Open': return Circle;
       case 'In Progress': return Clock;
+      case 'Review': return Eye;
       case 'Done': return CheckCircle;
       default: return Circle;
     }
@@ -247,9 +248,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                     flex-shrink-0 mt-0.5
                     ${task.status === 'Done'
                         ? 'text-emerald-500'
-                        : task.status === 'In Progress'
-                          ? 'text-amber-500 animate-pulse-slow'
-                          : theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                        : task.status === 'Review'
+                          ? 'text-purple-500'
+                          : task.status === 'In Progress'
+                            ? 'text-amber-500 animate-pulse-slow'
+                            : theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
                       }
                   `}
                   />
@@ -387,6 +390,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             >
               <option value="Open">{t('tasks.status_open')}</option>
               <option value="In Progress">{t('tasks.status_in_progress')}</option>
+              <option value="Review">{t('tasks.status_review')}</option>
               <option value="Done" disabled={!canComplete} title={!canComplete ? t('tasks.has_subtasks') : undefined}>
                 {t('tasks.status_done')}
               </option>
