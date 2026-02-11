@@ -53,7 +53,7 @@ Stores the tasks for each user. Each task is linked to a user and supports hiera
 | `user_id`         | `uuid`        | Not Null, Foreign Key to `auth.users(id)`, On Delete Cascade |
 | `title`           | `text`        | Not Null                                           |
 | `description`     | `text`        | Nullable                                           |
-| `status`          | `text`        | Not Null, Default `'Open'`, CHECK (status IN ('Open', 'In Progress', 'Done')) |
+| `status`          | `text`        | Not Null, Default `'Open'`, CHECK (status IN ('Open', 'In Progress', 'Review', 'Done')) |
 | `parent_id`       | `bigint`      | Nullable, Foreign Key to `public.tasks(id)`, On Delete SET NULL |
 | `due_date`        | `date`        | Nullable                                           |
 | `estimation`      | `integer`     | Nullable, Default `1`, CHECK (estimation IN (1, 2, 3, 5, 8, 13)) |
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
     user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     title text NOT NULL,
     description text,
-    status text NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Done')),
+    status text NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Review', 'Done')),
     parent_id bigint REFERENCES public.tasks(id) ON DELETE SET NULL,
     due_date date,
     estimation integer DEFAULT 1 CHECK (estimation IN (1, 2, 3, 5, 8, 13)),
@@ -288,6 +288,21 @@ CREATE TABLE IF NOT EXISTS public.feature_requests (
 ALTER TABLE public.feature_requests ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow anyone to insert feature requests" ON public.feature_requests FOR INSERT WITH CHECK ((auth.uid() = user_id) OR (auth.uid() IS NULL AND user_id IS NULL));
 CREATE POLICY "Users can view own feature requests" ON public.feature_requests FOR SELECT USING (auth.uid() = user_id);
+```
+
+
+
+### Migration: add new `Review` status to existing DB
+
+If your database was created before introducing `Review`, run this migration so API create/update does not reject the new status:
+
+```sql
+-- Replace constraint name if your DB uses a different one
+ALTER TABLE public.tasks DROP CONSTRAINT IF EXISTS tasks_status_check;
+
+ALTER TABLE public.tasks
+ADD CONSTRAINT tasks_status_check
+CHECK (status IN ('Open', 'In Progress', 'Review', 'Done'));
 ```
 
 ### Automatic updated_at trigger
