@@ -4,28 +4,31 @@ export class BoardPage {
   readonly page: Page;
   readonly openColumn: Locator;
   readonly inProgressColumn: Locator;
+  readonly reviewColumn: Locator;
   readonly doneColumn: Locator;
   readonly taskCards: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    // Column headers
-    this.openColumn = page.getByText('Open');
-    this.inProgressColumn = page.getByText('In Progress');
-    this.doneColumn = page.getByText('Done');
-    // Task cards
+    // Column headers (strict, heading-only)
+    this.openColumn = page.getByRole('heading', { name: 'Open', exact: true });
+    this.inProgressColumn = page.getByRole('heading', { name: 'In Progress', exact: true });
+    this.reviewColumn = page.getByRole('heading', { name: 'Review', exact: true });
+    this.doneColumn = page.getByRole('heading', { name: 'Done', exact: true });
     this.taskCards = page.locator('[data-testid="board-task-item"]');
   }
 
-  // Get column by exact status text
-  getColumn(status: 'Open' | 'In Progress' | 'Done') {
-    // The drop zone is the dashed border div inside the status column
-    return this.page.locator('.flex.flex-col.h-full').filter({ has: this.page.getByText(status, { exact: true }) }).locator('div.flex-1.rounded-lg.border-2.border-dashed');
+  getColumn(status: 'Open' | 'In Progress' | 'Review' | 'Done') {
+    return this.page
+      .locator('.flex.flex-col.h-full')
+      .filter({ has: this.page.getByRole('heading', { name: status, exact: true }) })
+      .locator('div.flex-1.rounded-lg.border-2.border-dashed');
   }
 
   async verifyColumnsVisible() {
     await expect(this.openColumn).toBeVisible();
     await expect(this.inProgressColumn).toBeVisible();
+    await expect(this.reviewColumn).toBeVisible();
     await expect(this.doneColumn).toBeVisible();
   }
 
@@ -33,7 +36,7 @@ export class BoardPage {
     return this.page.locator(`[data-testid="board-task-item"][data-task-title="${taskTitle}"]`);
   }
 
-  async verifyTaskInColumn(taskTitle: string, columnTitle: string) {
+  async verifyTaskInColumn(taskTitle: string, columnTitle: 'Open' | 'In Progress' | 'Review' | 'Done') {
     const column = this.getColumn(columnTitle);
     const taskCard = column.locator(`[data-testid="board-task-item"][data-task-title="${taskTitle}"]`);
     await expect(taskCard).toBeVisible();
@@ -41,14 +44,11 @@ export class BoardPage {
 
   async openTaskMenu(taskTitle: string) {
     const taskCard = this.getTaskCard(taskTitle);
-    // Hover over the task card to make the edit/delete buttons visible
     await taskCard.hover();
-    // Look for the edit button (Edit2 icon) or three dots menu
     const editButton = taskCard.getByTitle('Edit task');
     if (await editButton.isVisible()) {
       await editButton.click();
     } else {
-      // Fallback to three dots menu if available
       const menuButton = taskCard.locator('button').filter({ hasText: '' }).last();
       await menuButton.click();
     }
@@ -56,30 +56,24 @@ export class BoardPage {
 
   async editTask(taskTitle: string) {
     const taskCard = this.getTaskCard(taskTitle);
-    // Hover over the task card to make the edit/delete buttons visible
     await taskCard.hover();
-    // Click the edit button directly
     const editButton = taskCard.getByTestId('edit-task-button');
     await editButton.click();
   }
 
   async deleteTask(taskTitle: string) {
     const taskCard = this.getTaskCard(taskTitle);
-    // Hover over the task card to make the edit/delete buttons visible
     await taskCard.hover();
-    // Click the delete button directly
     const deleteButton = taskCard.getByTestId('delete-task-button');
     await deleteButton.click();
   }
 
   async verifyTaskExists(taskTitle: string) {
-    const taskCard = this.getTaskCard(taskTitle);
-    await expect(taskCard).toBeVisible();
+    await expect(this.getTaskCard(taskTitle)).toBeVisible();
   }
 
   async verifyTaskNotExists(taskTitle: string) {
-    const taskCard = this.getTaskCard(taskTitle);
-    await expect(taskCard).not.toBeVisible();
+    await expect(this.getTaskCard(taskTitle)).not.toBeVisible();
   }
 
   async verifyEmptyState() {
@@ -113,8 +107,6 @@ export class BoardPage {
 
   async isTimerActive(taskTitle: string): Promise<boolean> {
     const taskCard = this.getTaskCard(taskTitle);
-    // The timer is active if the TaskTimer component has the 'active' state 
-    // or if we see the 'Pause' button instead of 'Start'
     const pauseButton = taskCard.locator('[data-testid="pause-timer"]');
     return await pauseButton.isVisible();
   }

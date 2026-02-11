@@ -17,7 +17,7 @@ Esta guía documenta el enfoque de testing para la aplicación Task Manager, inc
 ### Estado Actual
 
 ✅ **354 pruebas unitarias** (100% pasando)
-✅ **153 pruebas E2E** (100% pasando)
+✅ **156 pruebas E2E** (100% pasando)
 ✅ **145 pruebas de backend** (100% pasando)
 ✅ **Cobertura completa** de funcionalidades críticas
 ✅ **Compatible globalmente** (todas las zonas horarias)
@@ -502,7 +502,7 @@ Para cada nuevo test automatizado que se agregue a la suite E2E, es **OBLIGATORI
 
 ### Resultados E2E actuales
 
-✅ **153/153 tests pasando** (100% de éxito)
+✅ **156/156 tests pasando** (100% de éxito)
 ✅ **Todos los tests funcionando** (incluido username-display e isolation)
 ⏱️ **~2.8 minutos** con 5 workers
 🧹 **Tests limpios y optimizados**
@@ -744,4 +744,4 @@ render(
 
 ---
 
-**Última actualización**: Febrero 2026 - Suite de testing completamente funcional, robusta y optimizada con **652 tests** (354 Frontend + 145 Backend + 153 E2E). Incluye cobertura de regresión para soporte de status `Review` en UI.
+**Última actualización**: Febrero 2026 - Suite de testing completamente funcional, robusta y optimizada con **655 tests** (354 Frontend + 145 Backend + 156 E2E). Incluye cobertura de regresión para soporte de status `Review` en UI y flujo E2E dedicado.
