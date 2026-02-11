@@ -114,6 +114,21 @@ describe('TaskDetailModal', () => {
     expect(mockOnEdit).toHaveBeenCalledWith(mockTask);
   });
 
+  it('should call onClose when Escape key is pressed', () => {
+    renderWithTheme(
+      <TaskDetailModal
+        task={mockTask}
+        allTasks={[]}
+        isOpen={true}
+        onClose={mockOnClose}
+        onEdit={mockOnEdit}
+      />
+    );
+
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
   it('should render correct subtask count', () => {
     const subtasks: Task[] = [
       { ...mockTask, id: '2', parentId: mockTask.id, title: 'Subtask 1' },

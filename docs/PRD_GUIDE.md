@@ -25,6 +25,12 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 
 ### 🆕 Recent Updates
 
+**Feature TM-065: UX - Close Detail View with Escape** (✅ Completed)
+- Implemented global `Escape` key listener in `TaskDetailModal` for instant closure
+- Enhanced navigation to ensure return to Board or Tree view upon closing
+- Added unit test coverage for keyboard interaction
+- Verified cleanup of event listeners on component unmount
+
 **Feature TM-061: Review Status Across Task Manager** (🚧 Implemented in code, pending production deploy)
 - New task status: `Review` added to frontend and backend validations
 - Board + Tree + form status selectors updated
