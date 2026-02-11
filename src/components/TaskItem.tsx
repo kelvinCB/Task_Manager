@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus } from '../types/Task';
 import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon, getTaskAncestry, getTaskDepth } from '../utils/taskUtils';
-import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, CheckCircle, Play, Pause, CornerDownRight, Plus } from 'lucide-react';
+import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, Eye, CheckCircle, Play, Pause, CornerDownRight, Plus } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
