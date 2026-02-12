@@ -21,13 +21,20 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
 
   const fetchComments = async () => {
     setIsLoading(true);
+    setComments([]);
     try {
       const response = await taskService.getComments(taskId);
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
+
       if (response.data) {
         setComments(response.data);
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
+      toast.error(t('common.error', 'Something went wrong'));
     } finally {
       setIsLoading(false);
     }

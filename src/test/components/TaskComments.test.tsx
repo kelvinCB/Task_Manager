@@ -75,6 +75,30 @@ describe('TaskComments', () => {
     });
   });
 
+  it('should clear stale comments and surface error when fetch fails', async () => {
+    vi.mocked(taskService.getComments)
+      .mockResolvedValueOnce({ data: mockComments })
+      .mockResolvedValueOnce({ error: 'Not authenticated. Please log in.' });
+
+    const { rerender } = renderWithTheme(<TaskComments taskId="1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('First comment')).toBeInTheDocument();
+    });
+
+    rerender(
+      <ThemeProvider>
+        <TaskComments taskId="2" />
+      </ThemeProvider>
+    );
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Not authenticated. Please log in.');
+      expect(screen.queryByText('First comment')).not.toBeInTheDocument();
+      expect(screen.getByText('No comments yet.')).toBeInTheDocument();
+    });
+  });
+
   it('should add a new comment', async () => {
     vi.mocked(taskService.getComments).mockResolvedValue({ data: [] });
     const newComment = {
