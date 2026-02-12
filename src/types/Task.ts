@@ -61,3 +61,13 @@ export interface TaskTimeStats {
   startDate: number;  // timestamp
   endDate: number;    // timestamp
 }
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  userId: string;
+  authorName: string;
+  authorAvatar?: string;
+  content: string;
+  createdAt: Date;
+}

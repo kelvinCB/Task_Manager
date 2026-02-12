@@ -113,7 +113,10 @@
         "add_subtask": "Add Subtask",
         "cannot_complete_subtasks": "Cannot complete a task that has incomplete subtasks",
         "subtask_of": "Subtask of",
-        "parents": "Parents"
+        "parents": "Parents",
+        "comments": "Comments",
+        "no_comments": "No comments yet.",
+        "add_comment_placeholder": "Add a comment..."
     },
     "nav": {
         "dashboard": "Dashboard",

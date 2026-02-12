@@ -105,6 +105,10 @@ vi.mock('react-i18next', () => ({
         'pricing.use_crypto': 'Use crypto',
         'pricing.custom_amount': 'Custom',
         'pricing.price_amount': '${{amount}}',
+        'tasks.comments': 'Comments',
+        'tasks.no_comments': 'No comments yet.',
+        'tasks.add_comment_placeholder': 'Add a comment...',
+        'common.loading': 'Loading...',
         // Add more mapping as needed by tests
       };
       return translations[key] || key;

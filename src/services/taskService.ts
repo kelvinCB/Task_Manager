@@ -1,5 +1,5 @@
 import supabase, { supabaseUrl } from '../lib/supabaseClient';
-import { Task, TaskStatus } from '../types/Task';
+import { Task, TaskStatus, TaskComment } from '../types/Task';
 import { API_BASE_URL } from '../utils/apiConfig';
 
 export interface UploadResult {
@@ -42,6 +42,16 @@ interface BackendTask {
   active_start_time?: string | null; // ISO string if a timer is currently running
   estimation?: number | null;
   responsible?: string | null;
+}
+
+interface BackendComment {
+  id: string;
+  task_id: number;
+  user_id: string;
+  author_name: string;
+  author_avatar: string | null;
+  content: string;
+  created_at: string;
 }
 
 // No mapping needed; backend and frontend share the same status values
@@ -388,6 +398,60 @@ export class TaskService {
     });
     if (response.error) return { error: response.error };
     return { data: { id: (response.data as any).entry.id } } as any;
+  }
+
+  /**
+   * Convert backend comment to frontend TaskComment format
+   */
+  private convertBackendCommentToFrontend(bc: BackendComment): TaskComment {
+    return {
+      id: bc.id,
+      taskId: String(bc.task_id),
+      userId: bc.user_id,
+      authorName: bc.author_name,
+      authorAvatar: bc.author_avatar || undefined,
+      content: bc.content,
+      createdAt: new Date(bc.created_at),
+    };
+  }
+
+  /**
+   * Get all comments for a specific task
+   */
+  async getComments(taskId: string): Promise<ApiResponse<TaskComment[]>> {
+    const response = await this.makeRequest<{ comments: BackendComment[] }>(`/api/tasks/${taskId}/comments`);
+
+    if (response.error) {
+      return { error: response.error };
+    }
+
+    if (response.data?.comments) {
+      const comments = response.data.comments.map((bc) => this.convertBackendCommentToFrontend(bc));
+      return { data: comments };
+    }
+
+    return { error: 'Invalid response from server' };
+  }
+
+  /**
+   * Add a new comment to a task
+   */
+  async addComment(taskId: string, content: string): Promise<ApiResponse<TaskComment>> {
+    const response = await this.makeRequest<{ comment: BackendComment }>(`/api/tasks/${taskId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+
+    if (response.error) {
+      return { error: response.error };
+    }
+
+    if (response.data?.comment) {
+      const newComment = this.convertBackendCommentToFrontend(response.data.comment);
+      return { data: newComment };
+    }
+
+    return { error: 'Failed to add comment' };
   }
 
   /**

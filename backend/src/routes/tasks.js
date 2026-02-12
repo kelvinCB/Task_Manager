@@ -6,7 +6,9 @@ const {
   getTasks,
   getTaskById,
   updateTask,
-  deleteTask
+  deleteTask,
+  getComments,
+  addComment
 } = require('../controllers/taskController');
 
 // Apply authentication middleware to all task routes
@@ -150,5 +152,58 @@ router.put('/:id', updateTask);
  *         description: Task deleted
  */
 router.delete('/:id', deleteTask);
+
+/**
+ * @swagger
+ * /tasks/{id}/comments:
+ *   get:
+ *     summary: Get all comments for a task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     responses:
+ *       200:
+ *         description: List of comments
+ */
+router.get('/:id/comments', getComments);
+
+/**
+ * @swagger
+ * /tasks/{id}/comments:
+ *   post:
+ *     summary: Add a comment to a task
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Task ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - content
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Comment created
+ */
+router.post('/:id/comments', addComment);
 
 module.exports = router;

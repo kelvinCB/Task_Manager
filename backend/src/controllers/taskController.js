@@ -377,10 +377,108 @@ const deleteTask = async (req, res) => {
   }
 };
 
+/**
+ * Get all comments for a specific task
+ */
+const getComments = async (req, res) => {
+  try {
+    const { id: task_id } = req.params;
+    const user_id = req.user.id;
+
+    const db = req.supabase || supabaseClient.supabase;
+
+    // Verify task belongs to user
+    const { data: task, error: taskErr } = await db
+      .from('tasks')
+      .select('id')
+      .eq('id', task_id)
+      .eq('user_id', user_id)
+      .single();
+
+    if (taskErr || !task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const { data: comments, error } = await db
+      .from('task_comments')
+      .select('*')
+      .eq('task_id', task_id)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    res.status(200).json({ comments });
+  } catch (error) {
+    console.error('Get comments error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * Add a new comment to a task
+ */
+const addComment = async (req, res) => {
+  try {
+    const { id: task_id } = req.params;
+    const { content } = req.body;
+    const user_id = req.user.id;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+
+    const db = req.supabase || supabaseClient.supabase;
+
+    // Verify task belongs to user
+    const { data: task, error: taskErr } = await db
+      .from('tasks')
+      .select('id')
+      .eq('id', task_id)
+      .eq('user_id', user_id)
+      .single();
+
+    if (taskErr || !task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Get user profile for author info
+    const { data: profile } = await db
+      .from('profiles')
+      .select('username, display_name, avatar_url')
+      .eq('id', user_id)
+      .single();
+
+    const author_name = profile?.display_name || profile?.username || req.user.email;
+    const author_avatar = profile?.avatar_url || null;
+
+    const { data: comment, error } = await db
+      .from('task_comments')
+      .insert([{
+        task_id,
+        user_id,
+        author_name,
+        author_avatar,
+        content: content.trim()
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.status(201).json({ comment });
+  } catch (error) {
+    console.error('Add comment error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 module.exports = {
   createTask,
   getTasks,
   getTaskById,
   updateTask,
-  deleteTask
+  deleteTask,
+  getComments,
+  addComment
 };
