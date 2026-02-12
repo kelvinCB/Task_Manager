@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaskComment } from '../types/Task';
 import { taskService } from '../services/taskService';
@@ -18,12 +18,17 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const requestSeqRef = useRef(0);
 
   const fetchComments = async () => {
+    const requestId = ++requestSeqRef.current;
+
     setIsLoading(true);
     setComments([]);
     try {
       const response = await taskService.getComments(taskId);
+      if (requestId !== requestSeqRef.current) return;
+
       if (response.error) {
         toast.error(response.error);
         return;
@@ -33,15 +38,22 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
         setComments(response.data);
       }
     } catch (error) {
+      if (requestId !== requestSeqRef.current) return;
       console.error('Error fetching comments:', error);
       toast.error(t('common.error', 'Something went wrong'));
     } finally {
-      setIsLoading(false);
+      if (requestId === requestSeqRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     fetchComments();
+
+    return () => {
+      requestSeqRef.current += 1;
+    };
   }, [taskId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
