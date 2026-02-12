@@ -85,19 +85,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          PROMPT="$(cat <<EOF
-Este es un Code Review hecho por Kimi k2.5
-PR #${PR_NUMBER} | base: ${BASE_REF} | head: ${HEAD_REF}
-
-Revisa este diff con enfoque en: correctness, regresiones, seguridad y UX edge-cases.
-Responde en markdown breve con:
-- Findings (P1/P2/P3) con archivo y recomendación, o
-- Approved si no hay issues.
-
-DIFF:
-${DIFF_EOF}
-EOF
-)"
+          PROMPT_HEADER="Este es un Code Review hecho por Kimi k2.5\nPR #${PR_NUMBER} | base: ${BASE_REF} | head: ${HEAD_REF}\n\nRevisa este diff con enfoque en: correctness, regresiones, seguridad y UX edge-cases.\nResponde en markdown breve con:\n- Findings (P1/P2/P3) con archivo y recomendación, o\n- Approved si no hay issues.\n\nDIFF:\n"
+          PROMPT="${PROMPT_HEADER}${DIFF_EOF}"
 
           PAYLOAD="$(jq -nc --arg content "$PROMPT" '{model:"kimi-k2.5",temperature:1,messages:[{role:"user",content:$content}]}')"
 
