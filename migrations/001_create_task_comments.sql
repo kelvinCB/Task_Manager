@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS public.task_comments (
   created_at timestamp with time zone DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
+CREATE INDEX IF NOT EXISTS idx_task_comments_task_id
+  ON public.task_comments(task_id);
+
 -- Enable Row Level Security
 ALTER TABLE public.task_comments ENABLE ROW LEVEL SECURITY;
 

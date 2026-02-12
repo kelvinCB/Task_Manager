@@ -384,6 +384,10 @@ const getComments = async (req, res) => {
   try {
     const { id: task_id } = req.params;
     const user_id = req.user.id;
+    const rawLimit = Number.parseInt(String(req.query.limit ?? '50'), 10);
+    const rawOffset = Number.parseInt(String(req.query.offset ?? '0'), 10);
+    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 200) : 50;
+    const offset = Number.isFinite(rawOffset) ? Math.max(rawOffset, 0) : 0;
 
     const db = req.supabase || supabaseClient.supabase;
 
@@ -401,9 +405,10 @@ const getComments = async (req, res) => {
 
     const { data: comments, error } = await db
       .from('task_comments')
-      .select('*')
+      .select('id, task_id, user_id, author_name, author_avatar, content, created_at')
       .eq('task_id', task_id)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .range(offset, offset + limit - 1);
 
     if (error) throw error;
 
@@ -413,6 +418,10 @@ const getComments = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+const MAX_COMMENT_LENGTH = 2000;
+const COMMENT_COOLDOWN_MS = 1500;
+const lastCommentAtByUser = new Map();
 
 /**
  * Add a new comment to a task
@@ -430,6 +439,16 @@ const addComment = async (req, res) => {
     const trimmed = content.trim();
     if (!trimmed) {
       return res.status(400).json({ error: 'Content is required' });
+    }
+
+    if (trimmed.length > MAX_COMMENT_LENGTH) {
+      return res.status(400).json({ error: `Content exceeds max length (${MAX_COMMENT_LENGTH})` });
+    }
+
+    const now = Date.now();
+    const lastAt = lastCommentAtByUser.get(user_id) || 0;
+    if (now - lastAt < COMMENT_COOLDOWN_MS) {
+      return res.status(429).json({ error: 'Too many comments. Please wait a moment.' });
     }
 
     const db = req.supabase || supabaseClient.supabase;
@@ -451,7 +470,7 @@ const addComment = async (req, res) => {
       .from('profiles')
       .select('username, display_name, avatar_url')
       .eq('id', user_id)
-      .single();
+      .maybeSingle();
 
     const author_name = profile?.display_name || profile?.username || req.user.email;
     const author_avatar = profile?.avatar_url || null;
@@ -469,6 +488,8 @@ const addComment = async (req, res) => {
       .single();
 
     if (error) throw error;
+
+    lastCommentAtByUser.set(user_id, now);
 
     res.status(201).json({ comment });
   } catch (error) {

@@ -19,6 +19,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const requestSeqRef = useRef(0);
+  const MAX_COMMENT_LENGTH = 2000;
 
   const fetchComments = async () => {
     const requestId = ++requestSeqRef.current;
@@ -58,11 +59,12 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || isSubmitting) return;
+    const trimmed = newComment.trim();
+    if (!trimmed || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const response = await taskService.addComment(taskId, newComment);
+      const response = await taskService.addComment(taskId, trimmed);
       if (response.error) {
         toast.error(response.error);
         return;
@@ -143,6 +145,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
           onChange={(e) => setNewComment(e.target.value)}
           placeholder={t('tasks.add_comment_placeholder', 'Add a comment...')}
           rows={2}
+          maxLength={MAX_COMMENT_LENGTH}
           data-testid="comment-input"
           className={`w-full p-3 pr-12 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
             theme === 'dark'
@@ -162,6 +165,9 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
         >
           <Send size={18} />
         </button>
+        <div className={`mt-1 text-[11px] text-right ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+          {newComment.length}/{MAX_COMMENT_LENGTH}
+        </div>
       </form>
     </div>
   );

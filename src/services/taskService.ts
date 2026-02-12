@@ -418,8 +418,9 @@ export class TaskService {
   /**
    * Get all comments for a specific task
    */
-  async getComments(taskId: string): Promise<ApiResponse<TaskComment[]>> {
-    const response = await this.makeRequest<{ comments: BackendComment[] }>(`/api/tasks/${taskId}/comments`);
+  async getComments(taskId: string, limit = 50, offset = 0): Promise<ApiResponse<TaskComment[]>> {
+    const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    const response = await this.makeRequest<{ comments: BackendComment[] }>(`/api/tasks/${taskId}/comments?${qs.toString()}`);
 
     if (response.error) {
       return { error: response.error };
