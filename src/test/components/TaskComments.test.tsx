@@ -3,11 +3,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TaskComments } from '../../components/TaskComments';
 import { ThemeProvider } from '../../contexts/ThemeContext';
 import { taskService } from '../../services/taskService';
+import { toast } from 'sonner';
 
 vi.mock('../../services/taskService', () => ({
   taskService: {
     getComments: vi.fn(),
     addComment: vi.fn(),
+  },
+}));
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: vi.fn(),
   },
 }));
 
@@ -96,6 +103,28 @@ describe('TaskComments', () => {
     await waitFor(() => {
       expect(taskService.addComment).toHaveBeenCalledWith('1', 'New test comment');
       expect(screen.getByText('New test comment')).toBeInTheDocument();
+    });
+  });
+
+  it('should surface error when comment submission fails', async () => {
+    vi.mocked(taskService.getComments).mockResolvedValue({ data: [] });
+    vi.mocked(taskService.addComment).mockResolvedValue({ error: 'Not authenticated. Please log in.' });
+
+    renderWithTheme(<TaskComments taskId="1" />);
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Add a comment...')).toBeInTheDocument();
+    });
+
+    const textarea = screen.getByPlaceholderText('Add a comment...');
+    fireEvent.change(textarea, { target: { value: 'Comment that should fail' } });
+
+    const submitButton = screen.getByRole('button');
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(taskService.addComment).toHaveBeenCalledWith('1', 'Comment that should fail');
+      expect(toast.error).toHaveBeenCalledWith('Not authenticated. Please log in.');
     });
   });
 });

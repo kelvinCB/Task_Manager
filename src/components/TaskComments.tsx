@@ -4,6 +4,7 @@ import { TaskComment } from '../types/Task';
 import { taskService } from '../services/taskService';
 import { useTheme } from '../contexts/ThemeContext';
 import { MessageSquare, Send, User } from 'lucide-react';
+import { toast } from 'sonner';
 import { formatDate } from '../utils/taskUtils';
 
 interface TaskCommentsProps {
@@ -43,12 +44,18 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
     setIsSubmitting(true);
     try {
       const response = await taskService.addComment(taskId, newComment);
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
+
       if (response.data) {
         setComments((prev) => [...prev, response.data!]);
         setNewComment('');
       }
     } catch (error) {
       console.error('Error adding comment:', error);
+      toast.error(t('common.error', 'Something went wrong'));
     } finally {
       setIsSubmitting(false);
     }
