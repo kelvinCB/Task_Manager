@@ -30,7 +30,8 @@ CREATE POLICY "Users can create comments on their own tasks"
   ON public.task_comments
   FOR INSERT
   WITH CHECK (
-    EXISTS (
+    auth.uid() = user_id
+    AND EXISTS (
       SELECT 1 FROM public.tasks
       WHERE public.tasks.id = public.task_comments.task_id
       AND public.tasks.user_id = auth.uid()

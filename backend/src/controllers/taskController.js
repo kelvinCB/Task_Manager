@@ -423,7 +423,12 @@ const addComment = async (req, res) => {
     const { content } = req.body;
     const user_id = req.user.id;
 
-    if (!content || !content.trim()) {
+    if (typeof content !== 'string') {
+      return res.status(400).json({ error: 'Content must be a string' });
+    }
+
+    const trimmed = content.trim();
+    if (!trimmed) {
       return res.status(400).json({ error: 'Content is required' });
     }
 
@@ -458,7 +463,7 @@ const addComment = async (req, res) => {
         user_id,
         author_name,
         author_avatar,
-        content: content.trim()
+        content: trimmed
       }])
       .select()
       .single();
