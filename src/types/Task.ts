@@ -70,4 +70,5 @@ export interface TaskComment {
   authorAvatar?: string;
   content: string;
   createdAt: Date;
+  updatedAt?: Date;
 }

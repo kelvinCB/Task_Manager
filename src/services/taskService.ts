@@ -52,6 +52,7 @@ interface BackendComment {
   author_avatar: string | null;
   content: string;
   created_at: string;
+  updated_at?: string | null;
 }
 
 // No mapping needed; backend and frontend share the same status values
@@ -137,6 +138,14 @@ export class TaskService {
       const data = (await response.json().catch(() => ({}))) as unknown as T & { error?: string; message?: string };
 
       if (!response.ok) {
+        if (response.status === 429) {
+          const retryAfter = (data as any)?.retry_after_seconds || response.headers.get('Retry-After');
+          const waitText = retryAfter ? ` Please wait ${retryAfter}s before posting another comment.` : ' Please wait before posting another comment.';
+          return {
+            error: (data as any)?.error || `Too many requests.${waitText}`,
+          };
+        }
+
         return {
           error: data && (data as any).error || (data as any).message || `Request failed with status ${response.status}`,
         };
@@ -412,6 +421,7 @@ export class TaskService {
       authorAvatar: bc.author_avatar || undefined,
       content: bc.content,
       createdAt: new Date(bc.created_at),
+      updatedAt: bc.updated_at ? new Date(bc.updated_at) : undefined,
     };
   }
 
@@ -453,6 +463,28 @@ export class TaskService {
     }
 
     return { error: 'Failed to add comment' };
+  }
+
+  async updateComment(taskId: string, commentId: string, content: string): Promise<ApiResponse<TaskComment>> {
+    const response = await this.makeRequest<{ comment: BackendComment }>(`/api/tasks/${taskId}/comments/${commentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ content }),
+    });
+
+    if (response.error) return { error: response.error };
+    if (response.data?.comment) {
+      return { data: this.convertBackendCommentToFrontend(response.data.comment) };
+    }
+
+    return { error: 'Failed to update comment' };
+  }
+
+  async deleteComment(taskId: string, commentId: string): Promise<ApiResponse<{ message: string }>> {
+    const response = await this.makeRequest<{ message: string }>(`/api/tasks/${taskId}/comments/${commentId}`, {
+      method: 'DELETE',
+    });
+
+    return response;
   }
 
   /**
