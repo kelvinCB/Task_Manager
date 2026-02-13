@@ -116,7 +116,8 @@
         "parents": "Parents",
         "comments": "Comments",
         "no_comments": "No comments yet.",
-        "add_comment_placeholder": "Add a comment..."
+        "add_comment_placeholder": "Add a comment...",
+        "comment_cooldown_wait": "Please wait {{seconds}}s before posting another comment."
     },
     "nav": {
         "dashboard": "Dashboard",

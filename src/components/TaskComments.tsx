@@ -19,6 +19,8 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
@@ -65,6 +67,27 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
     };
   }, [taskId]);
 
+  useEffect(() => {
+    if (!cooldownUntil) {
+      setCooldownSeconds(0);
+      return;
+    }
+
+    const tick = () => {
+      const remainingMs = cooldownUntil - Date.now();
+      if (remainingMs <= 0) {
+        setCooldownUntil(null);
+        setCooldownSeconds(0);
+        return;
+      }
+      setCooldownSeconds(Math.ceil(remainingMs / 1000));
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 250);
+    return () => window.clearInterval(timer);
+  }, [cooldownUntil]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newComment.trim();
@@ -74,6 +97,11 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
     try {
       const response = await taskService.addComment(taskId, trimmed);
       if (response.error) {
+        const retryMatch = response.error.match(/wait\s+(\d+)s/i);
+        if (retryMatch) {
+          const seconds = Math.max(1, Number(retryMatch[1]));
+          setCooldownUntil(Date.now() + seconds * 1000);
+        }
         toast.error(response.error);
         return;
       }
@@ -234,9 +262,9 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
           type="submit"
           aria-label={t('tasks.send_comment', 'Send comment')}
           data-testid="add-comment-button"
-          disabled={!newComment.trim() || isSubmitting}
+          disabled={!newComment.trim() || isSubmitting || cooldownSeconds > 0}
           className={`absolute right-2 bottom-2 p-2 rounded-lg transition-colors ${
-            !newComment.trim() || isSubmitting
+            !newComment.trim() || isSubmitting || cooldownSeconds > 0
               ? 'text-gray-400'
               : 'text-indigo-500 hover:bg-indigo-50'
           }`}
@@ -246,6 +274,11 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
         <div className={`mt-1 text-[11px] text-right ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
           {newComment.length}/{MAX_COMMENT_LENGTH}
         </div>
+        {cooldownSeconds > 0 && (
+          <div className={`text-[11px] mt-1 ${theme === 'dark' ? 'text-amber-400' : 'text-amber-600'}`}>
+            {t('tasks.comment_cooldown_wait', 'Please wait {{seconds}}s before posting another comment.', { seconds: cooldownSeconds })}
+          </div>
+        )}
       </form>
     </div>
   );

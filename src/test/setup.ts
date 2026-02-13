@@ -108,6 +108,7 @@ vi.mock('react-i18next', () => ({
         'tasks.comments': 'Comments',
         'tasks.no_comments': 'No comments yet.',
         'tasks.add_comment_placeholder': 'Add a comment...',
+        'tasks.comment_cooldown_wait': 'Please wait {{seconds}}s before posting another comment.',
         'common.loading': 'Loading...',
         // Add more mapping as needed by tests
       };
