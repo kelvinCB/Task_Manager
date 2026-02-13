@@ -232,10 +232,10 @@ Manages task CRUD operations with:
   - `updateTask`: Update task fields (validates ownership)
   - `deleteTask`: Remove task (validates ownership)
 - **Comment Operations**:
-  - `getComments`: Paginated task comments (`limit`/`offset`)
-  - `addComment`: Sanitized create + backend cooldown (returns 429 + `Retry-After`)
+  - `getComments`: Paginated task comments (`limit`/`offset`) with safe-range guard
+  - `addComment`: Sanitized create + backend cooldown (returns 429 + `Retry-After` + `retry_after_seconds`)
   - `updateComment`: Edit own comment
-  - `deleteComment`: Delete own comment
+  - `deleteComment`: Delete own comment with explicit `404` (not found) vs `500` (DB error)
 - **Security**: Prevents cross-user data access
 - **Validation**: Status enum, UUID format, circular reference prevention
 
