@@ -41,7 +41,7 @@ test.describe('Task Comments', () => {
     
     // Search for the task to ensure it's visible
     await appPage.searchTasks(taskTitle);
-    const taskCard = page.getByText(taskTitle).first();
+    const taskCard = page.getByTestId('board-task-item').filter({ hasText: taskTitle }).first();
     await expect(taskCard).toBeVisible({ timeout: 10000 });
 
     // Open task detail
@@ -77,7 +77,12 @@ test.describe('Task Comments', () => {
     await page.locator('button[aria-label="Close modal"]').click();
     await appPage.clearSearch();
     await appPage.searchTasks(taskTitle);
-    await page.getByText(taskTitle).first().click();
-    await expect(page.getByText(commentContent)).toBeVisible({ timeout: 10000 });
+
+    const reopenedTaskCard = page.getByTestId('board-task-item').filter({ hasText: taskTitle }).first();
+    await expect(reopenedTaskCard).toBeVisible({ timeout: 10000 });
+    await reopenedTaskCard.click();
+
+    await expect(commentsHeader).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(commentContent)).toBeVisible({ timeout: 15000 });
   });
 });
