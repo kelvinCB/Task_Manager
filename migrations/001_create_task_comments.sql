@@ -48,6 +48,16 @@ CREATE POLICY "Users can create comments on their own tasks"
     )
   );
 
+CREATE POLICY "Users can update their own comments"
+  ON public.task_comments
+  FOR UPDATE
+  USING (
+    auth.uid() = user_id
+  )
+  WITH CHECK (
+    auth.uid() = user_id
+  );
+
 CREATE POLICY "Users can delete their own comments"
   ON public.task_comments
   FOR DELETE

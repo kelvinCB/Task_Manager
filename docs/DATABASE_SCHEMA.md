@@ -165,7 +165,7 @@ CREATE POLICY "Users can delete own tasks"
 
 ### `task_comments` Table Policies
 
-Users can view and create comments **only on their own tasks**. Users can delete their own comments.
+Users can view and create comments **only on their own tasks**. Users can update/delete their own comments.
 
 ```sql
 -- Enable RLS
@@ -194,6 +194,13 @@ CREATE POLICY "Users can create comments on their own tasks"
       AND public.tasks.user_id = auth.uid()
     )
   );
+
+-- Update: user can update their own comments
+CREATE POLICY "Users can update their own comments"
+  ON public.task_comments
+  FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 
 -- Delete: user can delete their own comments
 CREATE POLICY "Users can delete their own comments"
