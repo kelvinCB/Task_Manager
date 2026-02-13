@@ -427,10 +427,16 @@ const MAX_COMMENT_LENGTH = 2000;
 const COMMENT_COOLDOWN_MS = 1500;
 
 const sanitizeCommentContent = (value = '') => {
-  return value
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const escaped = String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/`/g, '&#96;')
+    .replace(/\u0000/g, '');
+
+  return escaped.replace(/\s+/g, ' ').trim();
 };
 
 /**
@@ -573,7 +579,12 @@ const deleteComment = async (req, res) => {
       .select('id')
       .maybeSingle();
 
-    if (error || !deleted) {
+    if (error) {
+      console.error('Delete comment DB error:', error);
+      return res.status(500).json({ error: 'Failed to delete comment' });
+    }
+
+    if (!deleted) {
       return res.status(404).json({ error: 'Comment not found or not allowed' });
     }
 
