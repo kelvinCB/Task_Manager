@@ -389,6 +389,10 @@ const getComments = async (req, res) => {
     const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 200) : 50;
     const offset = Number.isFinite(rawOffset) ? Math.max(rawOffset, 0) : 0;
 
+    if (!Number.isSafeInteger(offset + limit - 1)) {
+      return res.status(400).json({ error: 'Invalid pagination range' });
+    }
+
     const db = req.supabase || supabaseClient.supabase;
 
     // Verify task belongs to user
@@ -405,7 +409,7 @@ const getComments = async (req, res) => {
 
     const { data: comments, error } = await db
       .from('task_comments')
-      .select('id, task_id, user_id, author_name, author_avatar, content, created_at')
+      .select('id, task_id, user_id, author_name, author_avatar, content, created_at, updated_at')
       .eq('task_id', task_id)
       .order('created_at', { ascending: true })
       .range(offset, offset + limit - 1);
@@ -421,7 +425,13 @@ const getComments = async (req, res) => {
 
 const MAX_COMMENT_LENGTH = 2000;
 const COMMENT_COOLDOWN_MS = 1500;
-const lastCommentAtByUser = new Map();
+
+const sanitizeCommentContent = (value = '') => {
+  return value
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
 
 /**
  * Add a new comment to a task
@@ -436,19 +446,13 @@ const addComment = async (req, res) => {
       return res.status(400).json({ error: 'Content must be a string' });
     }
 
-    const trimmed = content.trim();
-    if (!trimmed) {
+    const sanitized = sanitizeCommentContent(content);
+    if (!sanitized) {
       return res.status(400).json({ error: 'Content is required' });
     }
 
-    if (trimmed.length > MAX_COMMENT_LENGTH) {
+    if (sanitized.length > MAX_COMMENT_LENGTH) {
       return res.status(400).json({ error: `Content exceeds max length (${MAX_COMMENT_LENGTH})` });
-    }
-
-    const now = Date.now();
-    const lastAt = lastCommentAtByUser.get(user_id) || 0;
-    if (now - lastAt < COMMENT_COOLDOWN_MS) {
-      return res.status(429).json({ error: 'Too many comments. Please wait a moment.' });
     }
 
     const db = req.supabase || supabaseClient.supabase;
@@ -465,6 +469,26 @@ const addComment = async (req, res) => {
       return res.status(404).json({ error: 'Task not found' });
     }
 
+    // DB-backed cooldown (multi-instance safe)
+    const cooldownSince = new Date(Date.now() - COMMENT_COOLDOWN_MS).toISOString();
+    const { data: latestOwnComment } = await db
+      .from('task_comments')
+      .select('created_at')
+      .eq('user_id', user_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (latestOwnComment?.created_at && latestOwnComment.created_at > cooldownSince) {
+      const elapsedMs = Date.now() - new Date(latestOwnComment.created_at).getTime();
+      const retryAfterSeconds = Math.max(1, Math.ceil((COMMENT_COOLDOWN_MS - elapsedMs) / 1000));
+      res.set('Retry-After', String(retryAfterSeconds));
+      return res.status(429).json({
+        error: `Please wait ${retryAfterSeconds}s before posting another comment.`,
+        retry_after_seconds: retryAfterSeconds,
+      });
+    }
+
     // Get user profile for author info
     const { data: profile } = await db
       .from('profiles')
@@ -472,7 +496,7 @@ const addComment = async (req, res) => {
       .eq('id', user_id)
       .maybeSingle();
 
-    const author_name = profile?.display_name || profile?.username || req.user.email;
+    const author_name = profile?.display_name || profile?.username || 'User';
     const author_avatar = profile?.avatar_url || null;
 
     const { data: comment, error } = await db
@@ -482,14 +506,12 @@ const addComment = async (req, res) => {
         user_id,
         author_name,
         author_avatar,
-        content: trimmed
+        content: sanitized
       }])
-      .select()
+      .select('id, task_id, user_id, author_name, author_avatar, content, created_at, updated_at')
       .single();
 
     if (error) throw error;
-
-    lastCommentAtByUser.set(user_id, now);
 
     res.status(201).json({ comment });
   } catch (error) {
@@ -498,6 +520,69 @@ const addComment = async (req, res) => {
   }
 };
 
+const updateComment = async (req, res) => {
+  try {
+    const { id: task_id, commentId } = req.params;
+    const { content } = req.body;
+    const user_id = req.user.id;
+
+    if (typeof content !== 'string') {
+      return res.status(400).json({ error: 'Content must be a string' });
+    }
+
+    const sanitized = sanitizeCommentContent(content);
+    if (!sanitized) return res.status(400).json({ error: 'Content is required' });
+    if (sanitized.length > MAX_COMMENT_LENGTH) {
+      return res.status(400).json({ error: `Content exceeds max length (${MAX_COMMENT_LENGTH})` });
+    }
+
+    const db = req.supabase || supabaseClient.supabase;
+
+    const { data: updated, error } = await db
+      .from('task_comments')
+      .update({ content: sanitized, updated_at: new Date().toISOString() })
+      .eq('id', commentId)
+      .eq('task_id', task_id)
+      .eq('user_id', user_id)
+      .select('id, task_id, user_id, author_name, author_avatar, content, created_at, updated_at')
+      .single();
+
+    if (error || !updated) {
+      return res.status(404).json({ error: 'Comment not found or not allowed' });
+    }
+
+    res.status(200).json({ comment: updated });
+  } catch (error) {
+    console.error('Update comment error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const deleteComment = async (req, res) => {
+  try {
+    const { id: task_id, commentId } = req.params;
+    const user_id = req.user.id;
+    const db = req.supabase || supabaseClient.supabase;
+
+    const { data: deleted, error } = await db
+      .from('task_comments')
+      .delete()
+      .eq('id', commentId)
+      .eq('task_id', task_id)
+      .eq('user_id', user_id)
+      .select('id')
+      .maybeSingle();
+
+    if (error || !deleted) {
+      return res.status(404).json({ error: 'Comment not found or not allowed' });
+    }
+
+    res.status(200).json({ message: 'Comment deleted' });
+  } catch (error) {
+    console.error('Delete comment error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 module.exports = {
   createTask,
@@ -506,5 +591,7 @@ module.exports = {
   updateTask,
   deleteTask,
   getComments,
-  addComment
+  addComment,
+  updateComment,
+  deleteComment
 };

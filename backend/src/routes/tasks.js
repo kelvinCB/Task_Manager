@@ -8,7 +8,9 @@ const {
   updateTask,
   deleteTask,
   getComments,
-  addComment
+  addComment,
+  updateComment,
+  deleteComment
 } = require('../controllers/taskController');
 
 // Apply authentication middleware to all task routes
@@ -205,5 +207,7 @@ router.get('/:id/comments', getComments);
  *         description: Comment created
  */
 router.post('/:id/comments', addComment);
+router.patch('/:id/comments/:commentId', updateComment);
+router.delete('/:id/comments/:commentId', deleteComment);
 
 module.exports = router;
