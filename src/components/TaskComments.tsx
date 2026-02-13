@@ -6,6 +6,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { MessageSquare, Send, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDate } from '../utils/taskUtils';
+import supabase from '../lib/supabaseClient';
 
 interface TaskCommentsProps {
   taskId: string;
@@ -18,6 +19,9 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState('');
   const requestSeqRef = useRef(0);
   const MAX_COMMENT_LENGTH = 2000;
 
@@ -52,6 +56,10 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
   useEffect(() => {
     fetchComments();
 
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id || null);
+    });
+
     return () => {
       requestSeqRef.current += 1;
     };
@@ -80,6 +88,45 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const beginEdit = (comment: TaskComment) => {
+    setEditingId(comment.id);
+    setEditingContent(comment.content);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingContent('');
+  };
+
+  const saveEdit = async () => {
+    if (!editingId) return;
+    const trimmed = editingContent.trim();
+    if (!trimmed) return;
+
+    const response = await taskService.updateComment(taskId, editingId, trimmed);
+    if (response.error) {
+      toast.error(response.error);
+      return;
+    }
+
+    if (response.data) {
+      setComments((prev) => prev.map((c) => (c.id === editingId ? response.data! : c)));
+      cancelEdit();
+    }
+  };
+
+  const removeComment = async (commentId: string) => {
+    if (!window.confirm(t('tasks.confirm_delete_comment', 'Delete this comment?'))) return;
+
+    const response = await taskService.deleteComment(taskId, commentId);
+    if (response.error) {
+      toast.error(response.error);
+      return;
+    }
+
+    setComments((prev) => prev.filter((c) => c.id !== commentId));
   };
 
   return (
@@ -124,15 +171,45 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
                     {comment.authorName}
                   </span>
                 </div>
-                <span className="text-[10px] text-gray-400">
-                  {formatDate(comment.createdAt)}
-                </span>
+                <div className="text-right">
+                  <span className="text-[10px] text-gray-400 block">
+                    {formatDate(comment.updatedAt || comment.createdAt)}
+                  </span>
+                  {comment.userId === currentUserId && (
+                    <div className="flex gap-2 justify-end mt-1">
+                      <button type="button" className="text-[10px] text-indigo-500" onClick={() => beginEdit(comment)}>
+                        {t('common.edit', 'Edit')}
+                      </button>
+                      <button type="button" className="text-[10px] text-red-500" onClick={() => removeComment(comment.id)}>
+                        {t('common.delete', 'Delete')}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-              <p className={`text-sm whitespace-pre-wrap ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-              }`}>
-                {comment.content}
-              </p>
+              {editingId === comment.id ? (
+                <div className="space-y-2">
+                  <textarea
+                    value={editingContent}
+                    onChange={(e) => setEditingContent(e.target.value)}
+                    rows={2}
+                    maxLength={MAX_COMMENT_LENGTH}
+                    className={`w-full p-2 text-sm rounded border ${
+                      theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900'
+                    }`}
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <button type="button" className="text-xs text-gray-500" onClick={cancelEdit}>{t('common.cancel', 'Cancel')}</button>
+                    <button type="button" className="text-xs text-indigo-500" onClick={saveEdit}>{t('common.save', 'Save')}</button>
+                  </div>
+                </div>
+              ) : (
+                <p className={`text-sm whitespace-pre-wrap ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                }`}>
+                  {comment.content}
+                </p>
+              )}
             </div>
           ))
         )}
@@ -155,6 +232,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
         />
         <button
           type="submit"
+          aria-label={t('tasks.send_comment', 'Send comment')}
           data-testid="add-comment-button"
           disabled={!newComment.trim() || isSubmitting}
           className={`absolute right-2 bottom-2 p-2 rounded-lg transition-colors ${
