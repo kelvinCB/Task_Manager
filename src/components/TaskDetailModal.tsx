@@ -8,6 +8,8 @@ import { formatDate, getStatusColor, formatTime } from '../utils/taskUtils';
 import { X, Calendar, Clock, Edit2, AlertCircle, CheckCircle, Calculator, User } from 'lucide-react';
 import { extractAttachments } from '../utils/attachmentUtils';
 import { AttachmentList } from './AttachmentList';
+import { TaskComments } from './TaskComments';
+
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -181,6 +183,11 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   })()}
                 </div>
               </div>
+
+              <hr className={`${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`} />
+
+              {/* Comments Section */}
+              <TaskComments taskId={task.id} />
 
               {/* Stats / Metadata */}
               <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'

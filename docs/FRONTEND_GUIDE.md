@@ -66,6 +66,7 @@ src/
 │   ├── TaskForm.tsx     # Task creation/editing form
 │   ├── TaskItem.tsx     # Individual task component
 │   ├── TaskTimer.tsx    # Time tracking component
+│   ├── TaskComments.tsx # Task comments (create/edit/delete + cooldown UX)
 │   ├── TaskStats.tsx    # Statistics component
 │   ├── TimeStatsView.tsx # Time analytics view
 │   ├── ProgressIcon.tsx # Custom progress icon
@@ -954,6 +955,12 @@ const useApiCall = <T>(apiFunction: () => Promise<T>) => {
   return { data, loading, error, execute };
 };
 ```
+
+### Task Comments Error/Cooldown Handling
+
+- `TaskComments` keeps previously loaded comments when a fetch error occurs (avoids flicker/context loss on transient errors).
+- Cooldown UX is driven by structured backend metadata (`retry_after_seconds` / `Retry-After`) instead of parsing localized text.
+- While cooldown is active, the submit button is disabled and a countdown message is shown.
 
 ### User-Friendly Error Messages
 

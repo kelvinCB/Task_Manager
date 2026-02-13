@@ -79,6 +79,7 @@ src/test/
   - ResetPasswordPage (7 tests)
 - **PasswordInput**: Componente de contraseña con toggle de visibilidad (8 tests)
 - **TaskForm**: Creación, edición, validación, IA, campos de Estimación y Responsable (22 tests)
+- **TaskComments**: carga, estado vacío, submit, manejo de error, y prevención de stale state/race conditions (5 tests)
 - **TaskTimer**: Cronometraje, notificaciones (6 tests)
 - **useTasks**: Lógica de tareas y tiempo (10 tests)
 - **openaiService**: Integración IA (16 tests)

@@ -20,8 +20,18 @@ export class AuthPage {
 
   // Login actions
   async login(email: string, password: string, expectSuccess: boolean = true) {
-    await this.page.locator('[data-testid="email-input"]').fill(email);
-    await this.page.locator('[data-testid="password-input"]').fill(password);
+    const emailInput = this.page.locator('[data-testid="email-input"]');
+    const passwordInput = this.page.locator('[data-testid="password-input"]');
+    
+    // Use fill instead of type for reliability with browser autofill
+    await emailInput.click();
+    await emailInput.fill(email);
+    await expect(emailInput).toHaveValue(email);
+    
+    await passwordInput.click();
+    await passwordInput.fill(password);
+    await expect(passwordInput).toHaveValue(password);
+    
     await this.page.locator('[data-testid="login-button"]').click();
 
     if (expectSuccess) {

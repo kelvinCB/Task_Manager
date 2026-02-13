@@ -25,6 +25,13 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 
 ### 🆕 Recent Updates
 
+**Feature TM-066: Task Comments End-to-End** (✅ Completed)
+- Backend endpoints for comments: list/create/update/delete
+- RLS policies now include `SELECT`, `INSERT`, `UPDATE`, `DELETE`
+- DB-backed cooldown with `429` + `Retry-After` header
+- Frontend cooldown UX: disabled send button + countdown message
+- Added pagination support (`limit`/`offset`) and improved error handling
+
 **Feature TM-065: UX - Close Detail View with Escape** (✅ Completed)
 - Implemented global `Escape` key listener in `TaskDetailModal` for instant closure
 - Enhanced navigation to ensure return to Board or Tree view upon closing
@@ -142,12 +149,12 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Password Reset** | ✅ Complete | 100% | Forgot password functionality |
 | **Account Settings** | ❌ Pending | 0% | User preferences and settings |
 
-### 📱 Enhanced UI Features (Not Started - 25%)
+### 📱 Enhanced UI Features (In Progress - 40%)
 
 | Feature | Status | Completion | Description |
 |---------|--------|------------|-------------|
 | **Task Detail View** | ✅ Complete | 100% | Detailed task view modal |
-| **Task Comments** | ❌ Pending | 0% | Add comments to tasks |
+| **Task Comments** | ✅ Complete | 100% | Create/edit/delete comments, backend cooldown (429), Retry-After UX countdown, and RLS-backed ownership controls |
 | **Task Attachments** | ✅ Complete | 100% | Attach files to tasks |
 | **Task Labels/Tags** | ❌ Pending | 0% | Categorize tasks with labels |
 | **Task Priority** | ❌ Pending | 0% | Set task priorities |

@@ -62,6 +62,20 @@ Stores the tasks for each user. Each task is linked to a user and supports hiera
 | `created_at`      | `timestamptz` | Not Null, Default `now()`                          |
 | `updated_at`      | `timestamptz` | Not Null, Default `now()`                          |
 
+### `public.task_comments`
+
+Stores comments on tasks. Each comment belongs to a task and is authored by a user.
+
+| Column          | Type          | Constraints |
+|-----------------|---------------|------------|
+| `id`            | `uuid`        | Primary Key, Default `gen_random_uuid()` |
+| `task_id`       | `bigint`      | Not Null, Foreign Key to `public.tasks(id)`, On Delete CASCADE |
+| `user_id`       | `uuid`        | Not Null, Foreign Key to `auth.users(id)` |
+| `author_name`   | `text`        | Not Null |
+| `author_avatar` | `text`        | Nullable |
+| `content`       | `text`        | Not Null |
+| `created_at`    | `timestamptz` | Not Null, Default `now()` |
+
 ### `public.feature_requests`
 
 Stores user feedback, bug reports, and feature requests.
@@ -148,6 +162,52 @@ CREATE POLICY "Users can delete own tasks"
 ```
 
 **Note:** Backend API implements additional user isolation at the application level through JWT validation.
+
+### `task_comments` Table Policies
+
+Users can view and create comments **only on their own tasks**. Users can update/delete their own comments.
+
+```sql
+-- Enable RLS
+ALTER TABLE public.task_comments ENABLE ROW LEVEL SECURITY;
+
+-- Select: user can see comments where the parent task belongs to them
+CREATE POLICY "Users can view comments on their own tasks"
+  ON public.task_comments
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.tasks
+      WHERE public.tasks.id = public.task_comments.task_id
+      AND public.tasks.user_id = auth.uid()
+    )
+  );
+
+-- Insert: user can add comments where the parent task belongs to them
+CREATE POLICY "Users can create comments on their own tasks"
+  ON public.task_comments
+  FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.tasks
+      WHERE public.tasks.id = public.task_comments.task_id
+      AND public.tasks.user_id = auth.uid()
+    )
+  );
+
+-- Update: user can update their own comments
+CREATE POLICY "Users can update their own comments"
+  ON public.task_comments
+  FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- Delete: user can delete their own comments
+CREATE POLICY "Users can delete their own comments"
+  ON public.task_comments
+  FOR DELETE
+  USING (auth.uid() = user_id);
+```
 
 ### `time_entries` Table Policies
 

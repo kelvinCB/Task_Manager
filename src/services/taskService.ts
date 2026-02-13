@@ -1,5 +1,5 @@
 import supabase, { supabaseUrl } from '../lib/supabaseClient';
-import { Task, TaskStatus } from '../types/Task';
+import { Task, TaskStatus, TaskComment } from '../types/Task';
 import { API_BASE_URL } from '../utils/apiConfig';
 
 export interface UploadResult {
@@ -21,6 +21,7 @@ interface ApiResponse<T> {
   data?: T;
   error?: string;
   message?: string;
+  retryAfterSeconds?: number;
 }
 
 /**
@@ -42,6 +43,17 @@ interface BackendTask {
   active_start_time?: string | null; // ISO string if a timer is currently running
   estimation?: number | null;
   responsible?: string | null;
+}
+
+interface BackendComment {
+  id: string;
+  task_id: number;
+  user_id: string;
+  author_name: string;
+  author_avatar: string | null;
+  content: string;
+  created_at: string;
+  updated_at?: string | null;
 }
 
 // No mapping needed; backend and frontend share the same status values
@@ -127,6 +139,16 @@ export class TaskService {
       const data = (await response.json().catch(() => ({}))) as unknown as T & { error?: string; message?: string };
 
       if (!response.ok) {
+        if (response.status === 429) {
+          const retryAfterRaw = (data as any)?.retry_after_seconds || response.headers.get('Retry-After');
+          const retryAfter = retryAfterRaw ? Number(retryAfterRaw) : undefined;
+          const waitText = retryAfter ? ` Please wait ${retryAfter}s before posting another comment.` : ' Please wait before posting another comment.';
+          return {
+            error: (data as any)?.error || `Too many requests.${waitText}`,
+            retryAfterSeconds: Number.isFinite(retryAfter) ? retryAfter : undefined,
+          };
+        }
+
         return {
           error: data && (data as any).error || (data as any).message || `Request failed with status ${response.status}`,
         };
@@ -388,6 +410,84 @@ export class TaskService {
     });
     if (response.error) return { error: response.error };
     return { data: { id: (response.data as any).entry.id } } as any;
+  }
+
+  /**
+   * Convert backend comment to frontend TaskComment format
+   */
+  private convertBackendCommentToFrontend(bc: BackendComment): TaskComment {
+    return {
+      id: bc.id,
+      taskId: String(bc.task_id),
+      userId: bc.user_id,
+      authorName: bc.author_name,
+      authorAvatar: bc.author_avatar || undefined,
+      content: bc.content,
+      createdAt: new Date(bc.created_at),
+      updatedAt: bc.updated_at ? new Date(bc.updated_at) : undefined,
+    };
+  }
+
+  /**
+   * Get all comments for a specific task
+   */
+  async getComments(taskId: string, limit = 50, offset = 0): Promise<ApiResponse<TaskComment[]>> {
+    const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    const response = await this.makeRequest<{ comments: BackendComment[] }>(`/api/tasks/${taskId}/comments?${qs.toString()}`);
+
+    if (response.error) {
+      return { error: response.error };
+    }
+
+    if (response.data?.comments) {
+      const comments = response.data.comments.map((bc) => this.convertBackendCommentToFrontend(bc));
+      return { data: comments };
+    }
+
+    return { error: 'Invalid response from server' };
+  }
+
+  /**
+   * Add a new comment to a task
+   */
+  async addComment(taskId: string, content: string): Promise<ApiResponse<TaskComment>> {
+    const response = await this.makeRequest<{ comment: BackendComment }>(`/api/tasks/${taskId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+
+    if (response.error) {
+      return { error: response.error };
+    }
+
+    if (response.data?.comment) {
+      const newComment = this.convertBackendCommentToFrontend(response.data.comment);
+      return { data: newComment };
+    }
+
+    return { error: 'Failed to add comment' };
+  }
+
+  async updateComment(taskId: string, commentId: string, content: string): Promise<ApiResponse<TaskComment>> {
+    const response = await this.makeRequest<{ comment: BackendComment }>(`/api/tasks/${taskId}/comments/${commentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ content }),
+    });
+
+    if (response.error) return { error: response.error };
+    if (response.data?.comment) {
+      return { data: this.convertBackendCommentToFrontend(response.data.comment) };
+    }
+
+    return { error: 'Failed to update comment' };
+  }
+
+  async deleteComment(taskId: string, commentId: string): Promise<ApiResponse<{ message: string }>> {
+    const response = await this.makeRequest<{ message: string }>(`/api/tasks/${taskId}/comments/${commentId}`, {
+      method: 'DELETE',
+    });
+
+    return response;
   }
 
   /**
