@@ -165,9 +165,8 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <MessageSquare size={18} className="text-indigo-500" />
-        <h3 className={`text-sm font-semibold uppercase tracking-wider ${
-          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-        }`}>
+        <h3 className={`text-sm font-semibold uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`}>
           {t('tasks.comments', 'Comments')}
         </h3>
       </div>
@@ -182,24 +181,21 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
           comments.map((comment) => (
             <div
               key={comment.id}
-              className={`p-3 rounded-lg border ${
-                theme === 'dark' ? 'bg-gray-700/30 border-gray-600' : 'bg-gray-50 border-gray-100'
-              }`}
+              className={`p-3 rounded-lg border ${theme === 'dark' ? 'bg-gray-700/30 border-gray-600' : 'bg-gray-50 border-gray-100'
+                }`}
             >
               <div className="flex items-start justify-between gap-2 mb-1">
                 <div className="flex items-center gap-2">
-                  <div className={`p-1 rounded-full ${
-                    theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'
-                  }`}>
+                  <div className={`p-1 rounded-full ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'
+                    }`}>
                     {comment.authorAvatar ? (
                       <img src={comment.authorAvatar} alt={comment.authorName} className="w-5 h-5 rounded-full" />
                     ) : (
                       <User size={12} className="text-gray-500" />
                     )}
                   </div>
-                  <span className={`text-xs font-bold ${
-                    theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-                  }`}>
+                  <span className={`text-xs font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                    }`}>
                     {comment.authorName}
                   </span>
                 </div>
@@ -226,9 +222,8 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
                     onChange={(e) => setEditingContent(e.target.value)}
                     rows={2}
                     maxLength={MAX_COMMENT_LENGTH}
-                    className={`w-full p-2 text-sm rounded border ${
-                      theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900'
-                    }`}
+                    className={`w-full p-2 text-sm rounded border ${theme === 'dark' ? 'bg-gray-900 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900'
+                      }`}
                   />
                   <div className="flex gap-2 justify-end">
                     <button type="button" className="text-xs text-gray-500 disabled:opacity-50" onClick={cancelEdit} disabled={isSavingEdit}>{t('common.cancel', 'Cancel')}</button>
@@ -236,9 +231,8 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
                   </div>
                 </div>
               ) : (
-                <p className={`text-sm whitespace-pre-wrap ${
-                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                }`}>
+                <p className={`text-sm whitespace-pre-wrap ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>
                   {comment.content}
                 </p>
               )}
@@ -256,22 +250,20 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
           rows={2}
           maxLength={MAX_COMMENT_LENGTH}
           data-testid="comment-input"
-          className={`w-full p-3 pr-12 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
-            theme === 'dark'
+          className={`w-full p-3 pr-12 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${theme === 'dark'
               ? 'bg-gray-900 border-gray-700 text-gray-100'
               : 'bg-white border-gray-200 text-gray-900'
-          }`}
+            }`}
         />
         <button
           type="submit"
           aria-label={t('tasks.send_comment', 'Send comment')}
           data-testid="add-comment-button"
           disabled={!newComment.trim() || isSubmitting || cooldownSeconds > 0}
-          className={`absolute right-2 bottom-2 p-2 rounded-lg transition-colors ${
-            !newComment.trim() || isSubmitting || cooldownSeconds > 0
+          className={`absolute right-2 bottom-2 z-10 p-2 rounded-lg transition-colors ${!newComment.trim() || isSubmitting || cooldownSeconds > 0
               ? 'text-gray-400'
               : 'text-indigo-500 hover:bg-indigo-50'
-          }`}
+            }`}
         >
           <Send size={18} />
         </button>

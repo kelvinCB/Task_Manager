@@ -134,6 +134,7 @@ export class TaskService {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         headers,
+        cache: 'no-store',
       });
 
       const data = (await response.json().catch(() => ({}))) as unknown as T & { error?: string; message?: string };
@@ -432,7 +433,7 @@ export class TaskService {
    * Get all comments for a specific task
    */
   async getComments(taskId: string, limit = 50, offset = 0): Promise<ApiResponse<TaskComment[]>> {
-    const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    const qs = new URLSearchParams({ limit: String(limit), offset: String(offset), t: String(Date.now()) });
     const response = await this.makeRequest<{ comments: BackendComment[] }>(`/api/tasks/${taskId}/comments?${qs.toString()}`);
 
     if (response.error) {
