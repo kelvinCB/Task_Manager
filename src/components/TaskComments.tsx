@@ -24,6 +24,7 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
   const requestSeqRef = useRef(0);
   const MAX_COMMENT_LENGTH = 2000;
 
@@ -127,19 +128,24 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
   };
 
   const saveEdit = async () => {
-    if (!editingId) return;
+    if (!editingId || isSavingEdit) return;
     const trimmed = editingContent.trim();
     if (!trimmed) return;
 
-    const response = await taskService.updateComment(taskId, editingId, trimmed);
-    if (response.error) {
-      toast.error(response.error);
-      return;
-    }
+    setIsSavingEdit(true);
+    try {
+      const response = await taskService.updateComment(taskId, editingId, trimmed);
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
 
-    if (response.data) {
-      setComments((prev) => prev.map((c) => (c.id === editingId ? response.data! : c)));
-      cancelEdit();
+      if (response.data) {
+        setComments((prev) => prev.map((c) => (c.id === editingId ? response.data! : c)));
+        cancelEdit();
+      }
+    } finally {
+      setIsSavingEdit(false);
     }
   };
 
@@ -225,8 +231,8 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
                     }`}
                   />
                   <div className="flex gap-2 justify-end">
-                    <button type="button" className="text-xs text-gray-500" onClick={cancelEdit}>{t('common.cancel', 'Cancel')}</button>
-                    <button type="button" className="text-xs text-indigo-500" onClick={saveEdit}>{t('common.save', 'Save')}</button>
+                    <button type="button" className="text-xs text-gray-500 disabled:opacity-50" onClick={cancelEdit} disabled={isSavingEdit}>{t('common.cancel', 'Cancel')}</button>
+                    <button type="button" className="text-xs text-indigo-500 disabled:opacity-50" onClick={saveEdit} disabled={isSavingEdit}>{isSavingEdit ? t('common.loading', 'Loading...') : t('common.save', 'Save')}</button>
                   </div>
                 </div>
               ) : (
