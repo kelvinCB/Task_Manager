@@ -75,7 +75,7 @@ describe('TaskComments', () => {
     });
   });
 
-  it('should clear stale comments and surface error when fetch fails', async () => {
+  it('should keep previous comments and surface error when fetch fails', async () => {
     vi.mocked(taskService.getComments)
       .mockResolvedValueOnce({ data: mockComments })
       .mockResolvedValueOnce({ error: 'Not authenticated. Please log in.' });
@@ -94,8 +94,7 @@ describe('TaskComments', () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Not authenticated. Please log in.');
-      expect(screen.queryByText('First comment')).not.toBeInTheDocument();
-      expect(screen.getByText('No comments yet.')).toBeInTheDocument();
+      expect(screen.getByText('First comment')).toBeInTheDocument();
     });
   });
 

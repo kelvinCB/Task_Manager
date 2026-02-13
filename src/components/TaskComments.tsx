@@ -31,7 +31,6 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
     const requestId = ++requestSeqRef.current;
 
     setIsLoading(true);
-    setComments([]);
     try {
       const response = await taskService.getComments(taskId);
       if (requestId !== requestSeqRef.current) return;
@@ -97,9 +96,8 @@ export const TaskComments: React.FC<TaskCommentsProps> = ({ taskId }) => {
     try {
       const response = await taskService.addComment(taskId, trimmed);
       if (response.error) {
-        const retryMatch = response.error.match(/wait\s+(\d+)s/i);
-        if (retryMatch) {
-          const seconds = Math.max(1, Number(retryMatch[1]));
+        if (response.retryAfterSeconds) {
+          const seconds = Math.max(1, Number(response.retryAfterSeconds));
           setCooldownUntil(Date.now() + seconds * 1000);
         }
         toast.error(response.error);

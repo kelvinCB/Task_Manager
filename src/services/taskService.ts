@@ -21,6 +21,7 @@ interface ApiResponse<T> {
   data?: T;
   error?: string;
   message?: string;
+  retryAfterSeconds?: number;
 }
 
 /**
@@ -139,10 +140,12 @@ export class TaskService {
 
       if (!response.ok) {
         if (response.status === 429) {
-          const retryAfter = (data as any)?.retry_after_seconds || response.headers.get('Retry-After');
+          const retryAfterRaw = (data as any)?.retry_after_seconds || response.headers.get('Retry-After');
+          const retryAfter = retryAfterRaw ? Number(retryAfterRaw) : undefined;
           const waitText = retryAfter ? ` Please wait ${retryAfter}s before posting another comment.` : ' Please wait before posting another comment.';
           return {
             error: (data as any)?.error || `Too many requests.${waitText}`,
+            retryAfterSeconds: Number.isFinite(retryAfter) ? retryAfter : undefined,
           };
         }
 
