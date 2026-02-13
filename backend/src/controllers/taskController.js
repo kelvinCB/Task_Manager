@@ -409,7 +409,7 @@ const getComments = async (req, res) => {
 
     const { data: comments, error } = await db
       .from('task_comments')
-      .select('id, task_id, user_id, author_name, author_avatar, content, created_at, updated_at')
+      .select('id, task_id, user_id, author_name, author_avatar, content, created_at')
       .eq('task_id', task_id)
       .order('created_at', { ascending: true })
       .range(offset, offset + limit - 1);
@@ -514,7 +514,7 @@ const addComment = async (req, res) => {
         author_avatar,
         content: sanitized
       }])
-      .select('id, task_id, user_id, author_name, author_avatar, content, created_at, updated_at')
+      .select('id, task_id, user_id, author_name, author_avatar, content, created_at')
       .single();
 
     if (error) throw error;
@@ -546,11 +546,11 @@ const updateComment = async (req, res) => {
 
     const { data: updated, error } = await db
       .from('task_comments')
-      .update({ content: sanitized, updated_at: new Date().toISOString() })
+      .update({ content: sanitized })
       .eq('id', commentId)
       .eq('task_id', task_id)
       .eq('user_id', user_id)
-      .select('id, task_id, user_id, author_name, author_avatar, content, created_at, updated_at')
+      .select('id, task_id, user_id, author_name, author_avatar, content, created_at')
       .single();
 
     if (error || !updated) {
