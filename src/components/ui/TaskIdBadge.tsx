@@ -13,8 +13,8 @@ export const TaskIdBadge: React.FC<TaskIdBadgeProps> = ({ id, className = '', si
   if (id === undefined || id === null) return null;
 
   const sizeClasses = {
-    xs: 'text-[10px]',
-    sm: 'text-[11px]',
+    xs: 'text-xs scale-90 origin-left',
+    sm: 'text-xs',
     md: 'text-sm',
     lg: 'text-lg',
   };
@@ -22,7 +22,10 @@ export const TaskIdBadge: React.FC<TaskIdBadgeProps> = ({ id, className = '', si
   const opacityClass = theme === 'dark' ? 'text-gray-400 opacity-70' : 'text-gray-500 opacity-80';
 
   return (
-    <span className={`font-mono mr-2 ${sizeClasses[size]} ${opacityClass} truncate max-w-[120px] ${className}`}>
+    <span 
+      className={`font-mono mr-2 ${sizeClasses[size]} ${opacityClass} truncate max-w-[140px] ${className}`}
+      title={String(id)}
+    >
       #{id}
     </span>
   );
