@@ -19,17 +19,23 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
   idSize = 'xs'
 }) => {
   const { theme } = useTheme();
-  const isLong = task.title.length > maxLength;
+  const title = task.title ?? '';
+  const isLong = title.length > maxLength;
   
-  const titleContent = isLong ? task.title.substring(0, maxLength) : task.title;
+  const titleContent = isLong ? title.substring(0, maxLength) : title;
 
   return (
     <div className={`flex items-baseline min-w-0 ${className}`}>
-      <TaskIdBadge id={task.id} size={idSize} />
-      <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} ${!isLong ? 'truncate' : ''}`}>
+      {task.id && <TaskIdBadge id={task.id} size={idSize} />}
+      <h3 
+        className={`font-medium ${!isLong ? 'truncate' : ''}`}
+        style={{ color: 'inherit' }}
+      >
         {titleContent}
         {isLong && (
           <button
+            type="button"
+            aria-label="Ver título completo o editar tarea"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(task);
