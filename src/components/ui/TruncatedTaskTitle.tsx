@@ -6,7 +6,7 @@ import { TaskIdBadge } from './TaskIdBadge';
 interface TruncatedTaskTitleProps {
   task: Task;
   maxLength: number;
-  onEdit: (task: Task) => void;
+  onEdit?: (task: Task) => void;
   className?: string;
   titleClassName?: string;
   idSize?: 'xs' | 'sm' | 'md' | 'lg';
@@ -34,7 +34,7 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
     ? 'text-indigo-400 hover:text-indigo-300' 
     : 'text-indigo-600 hover:text-indigo-800';
 
-  const hasColorClass = /\btext-(?:gray|red|blue|indigo|green|yellow|white|black|transparent|current|inherit|slate|zinc|neutral|stone|orange|amber|lime|emerald|teal|cyan|sky|violet|purple|fuchsia|pink|rose)(?:-\d+)?\b/.test(titleClassName) || 
+  const hasColorClass = /\b(?:[a-z0-9]+:)?text-(?:gray|red|blue|indigo|green|yellow|white|black|transparent|current|inherit|slate|zinc|neutral|stone|orange|amber|lime|emerald|teal|cyan|sky|violet|purple|fuchsia|pink|rose)(?:-\d+)?\b/.test(titleClassName) || 
                        titleClassName.includes('text-[') || 
                        ['text-current', 'text-transparent', 'text-inherit'].some(c => titleClassName.includes(c));
   const colorClasses = hasColorClass 
