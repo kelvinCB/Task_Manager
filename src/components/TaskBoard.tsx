@@ -190,9 +190,11 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                             )}
                             <TruncatedTaskTitle 
                               task={task} 
-                              maxLength={40} 
+                              maxLength={60} 
                               onEdit={onEdit} 
+                              as="h4"
                               className="mb-1"
+                              titleClassName="font-bold"
                             />
                             {renderDescription(task)}
                           </div>

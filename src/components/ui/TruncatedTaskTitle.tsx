@@ -8,7 +8,9 @@ interface TruncatedTaskTitleProps {
   maxLength: number;
   onEdit: (task: Task) => void;
   className?: string;
+  titleClassName?: string;
   idSize?: 'xs' | 'sm' | 'md' | 'lg';
+  as?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'span';
 }
 
 export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
@@ -16,36 +18,44 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
   maxLength,
   onEdit,
   className = '',
-  idSize = 'xs'
+  titleClassName = '',
+  idSize = 'xs',
+  as: Component = 'h3'
 }) => {
   const { theme } = useTheme();
   const title = task.title ?? '';
-  const isLong = title.length > maxLength;
+  const safeMaxLength = Math.max(1, maxLength);
+  const isLong = title.length > safeMaxLength;
   
-  const titleContent = isLong ? title.substring(0, maxLength) : title;
+  const titleContent = isLong ? title.substring(0, safeMaxLength) : title;
+
+  const buttonThemeClasses = theme === 'dark' 
+    ? 'text-indigo-400 hover:text-indigo-300' 
+    : 'text-indigo-600 hover:text-indigo-800';
 
   return (
     <div className={`flex items-baseline min-w-0 ${className}`}>
       {task.id && <TaskIdBadge id={task.id} size={idSize} />}
-      <h3 
-        className={`font-medium ${!isLong ? 'truncate' : ''}`}
+      <Component 
+        className={`font-medium ${!isLong ? 'truncate' : ''} ${titleClassName}`}
         style={{ color: 'inherit' }}
+        title={isLong ? title : undefined}
       >
         {titleContent}
         {isLong && (
           <button
             type="button"
-            aria-label="Ver título completo o editar tarea"
+            aria-label={`Ver título completo: ${title}`}
             onClick={(e) => {
               e.stopPropagation();
               onEdit(task);
             }}
-            className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
+            className={`${buttonThemeClasses} font-medium ml-1 transition-colors duration-200`}
           >
             ...
           </button>
         )}
-      </h3>
+      </Component>
     </div>
   );
 };

@@ -67,6 +67,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <div className="flex items-start justify-between gap-4">
                   <h2 className="text-2xl font-bold leading-tight break-words pr-8">
                     <TaskIdBadge id={task.id} size="lg" />
+                    {' '}
                     {task.title}
                   </h2>
                   <div className="flex items-center gap-2 flex-shrink-0">
