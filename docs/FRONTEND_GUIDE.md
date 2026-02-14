@@ -55,6 +55,15 @@ This guide provides comprehensive documentation for frontend development in the 
 
 ---
 
+## Task IDs (Visible in UI)
+
+To improve human↔automation coordination, each task now displays its unique ID with a `#` prefix across the UI:
+- Board View task cards
+- Tree View task rows
+- Task Detail Modal header
+
+---
+
 ## Project Structure
 
 ### Current Directory Structure
