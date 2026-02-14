@@ -28,7 +28,9 @@ describe('TaskIdBadge', () => {
         <TaskIdBadge id="1" size="xs" />
       </ThemeProvider>
     );
-    expect(xsContainer.querySelector('.text-\\[10px\\]')).toBeDefined();
+    // xs uses tailwind text-xs plus scale-90 for subtle badge sizing
+    expect(xsContainer.querySelector('.text-xs')).toBeDefined();
+    expect(xsContainer.querySelector('.scale-90')).toBeDefined();
 
     const { container: lgContainer } = render(
       <ThemeProvider>

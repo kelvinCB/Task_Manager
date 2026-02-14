@@ -28,7 +28,7 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
   const isLong = title.length > safeMaxLength;
   
   const titleContent = isLong ? Array.from(title).slice(0, safeMaxLength).join('') : title;
-  const safeAriaLabel = `Editar tarea: ${Array.from(title).slice(0, 100).join('')}${title.length > 100 ? '...' : ''}`;
+  const safeAriaLabel = `Edit task: ${Array.from(title).slice(0, 100).join('')}${title.length > 100 ? '...' : ''}`;
 
   const buttonThemeClasses = theme === 'dark' 
     ? 'text-indigo-400 hover:text-indigo-300' 
