@@ -28,7 +28,7 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
   const isLong = title.length > safeMaxLength;
   
   const titleContent = isLong ? Array.from(title).slice(0, safeMaxLength).join('') : title;
-  const safeAriaLabel = `Ver título completo: ${Array.from(title).slice(0, 100).join('')}${title.length > 100 ? '...' : ''}`;
+  const safeAriaLabel = `Editar tarea: ${Array.from(title).slice(0, 100).join('')}${title.length > 100 ? '...' : ''}`;
 
   const buttonThemeClasses = theme === 'dark' 
     ? 'text-indigo-400 hover:text-indigo-300' 
@@ -39,7 +39,7 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
                        ['text-current', 'text-transparent', 'text-inherit'].some(c => titleClassName.includes(c));
   const colorClasses = hasColorClass 
     ? '' 
-    : (theme === 'dark' ? 'text-gray-100' : 'text-gray-800');
+    : (theme === 'dark' ? 'text-gray-100' : 'text-gray-900');
 
   return (
     <div className={`flex items-center min-w-0 ${className}`}>
@@ -56,7 +56,7 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
           aria-label={safeAriaLabel}
           onClick={(e) => {
             e.stopPropagation();
-            onEdit(task);
+            if (onEdit) onEdit(task);
           }}
           className={`${buttonThemeClasses} font-medium ml-1 hover:underline focus:outline-none transition-colors duration-200 flex-shrink-0 cursor-pointer`}
         >
