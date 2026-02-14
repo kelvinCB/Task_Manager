@@ -6,6 +6,7 @@ import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Cloc
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
+import { TruncatedTaskTitle } from './ui/TruncatedTaskTitle';
 
 interface TaskItemProps {
   task: Task;
@@ -114,38 +115,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
   const handleCancelDelete = () => {
     setDeleteModalOpen(false);
-  };
-
-  const renderTitle = () => {
-    const maxLength = 60;
-    const isLong = task.title.length > maxLength;
-    const taskNumber = task.id.toString();
-
-    const titleContent = (
-      <>
-        <span className={`text-[11px] font-mono mr-2 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-          #{taskNumber}
-        </span>
-        {isLong ? task.title.substring(0, maxLength) : task.title}
-      </>
-    );
-
-    return (
-      <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} ${!isLong ? 'truncate' : ''}`}>
-        {titleContent}
-        {isLong && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(task);
-            }}
-            className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
-          >
-            ...
-          </button>
-        )}
-      </h3>
-    );
   };
 
   const renderDescription = () => {
@@ -259,15 +228,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                       }
                   `}
                   />
-                  <h3
-                    className={`
-                    text-base sm:text-lg font-bold truncate leading-tight cursor-pointer
-                    ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}
-                    ${task.status === 'Done' ? 'line-through text-gray-500 decoration-gray-400' : ''}
-                  `}
-                  >
-                    {task.title}
-                  </h3>
+                  <TruncatedTaskTitle 
+                    task={task} 
+                    maxLength={60} 
+                    onEdit={onEdit} 
+                    idSize="sm"
+                    className={`text-base sm:text-lg font-bold leading-tight cursor-pointer ${task.status === 'Done' ? 'line-through decoration-gray-400' : ''}`}
+                  />
                 </div>
               </div>
             </div>

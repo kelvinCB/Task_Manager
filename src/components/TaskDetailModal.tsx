@@ -9,6 +9,7 @@ import { X, Calendar, Clock, Edit2, AlertCircle, CheckCircle, Calculator, User }
 import { extractAttachments } from '../utils/attachmentUtils';
 import { AttachmentList } from './AttachmentList';
 import { TaskComments } from './TaskComments';
+import { TaskIdBadge } from './ui/TaskIdBadge';
 
 
 interface TaskDetailModalProps {
@@ -65,9 +66,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-4">
                   <h2 className="text-2xl font-bold leading-tight break-words pr-8">
-                    <span className={`text-lg font-mono mr-2 opacity-40 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                      #{task.id}
-                    </span>
+                    <TaskIdBadge id={task.id} size="lg" />
                     {task.title}
                   </h2>
                   <div className="flex items-center gap-2 flex-shrink-0">

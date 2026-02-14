@@ -7,6 +7,7 @@ import { Plus, Calendar, Circle, Clock, CheckCircle, Eye, Edit2, Trash2 } from '
 import { TaskTimer } from './TaskTimer';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { SpotlightCard } from './ui/SpotlightCard';
+import { TruncatedTaskTitle } from './ui/TruncatedTaskTitle';
 
 interface TaskBoardProps {
   tasks: Task[];
@@ -94,35 +95,6 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const handleCancelDelete = () => {
     setDeleteModalOpen(false);
     setTaskToDelete(null);
-  };
-
-  const renderTitle = (task: Task) => {
-    const maxLength = 40;
-    const isLong = task.title.length > maxLength;
-    const taskNumber = task.id.toString();
-
-    const titleContent = (
-      <>
-        <span className={`text-[10px] font-mono mr-1.5 opacity-60 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-          #{taskNumber}
-        </span>
-        {isLong ? task.title.substring(0, maxLength) : task.title}
-      </>
-    );
-
-    return (
-      <h4 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} ${!isLong ? 'truncate' : ''} mb-1`}>
-        {titleContent}
-        {isLong && (
-          <button
-            onClick={() => onEdit(task)}
-            className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
-          >
-            ...
-          </button>
-        )}
-      </h4>
-    );
   };
 
   const renderDescription = (task: Task) => {
@@ -216,7 +188,12 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                                 </span>
                               </div>
                             )}
-                            {renderTitle(task)}
+                            <TruncatedTaskTitle 
+                              task={task} 
+                              maxLength={40} 
+                              onEdit={onEdit} 
+                              className="mb-1"
+                            />
                             {renderDescription(task)}
                           </div>
 
