@@ -27,17 +27,19 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
   const safeMaxLength = Math.max(1, maxLength);
   const isLong = title.length > safeMaxLength;
   
-  const titleContent = isLong ? title.substring(0, safeMaxLength) : title;
+  const titleContent = isLong ? Array.from(title).slice(0, safeMaxLength).join('') : title;
   const safeAriaLabel = `Ver título completo: ${Array.from(title).slice(0, 100).join('')}${title.length > 100 ? '...' : ''}`;
 
   const buttonThemeClasses = theme === 'dark' 
     ? 'text-indigo-400 hover:text-indigo-300' 
     : 'text-indigo-600 hover:text-indigo-800';
 
-  const hasColorClass = /\btext-(?:gray|red|blue|indigo|green|yellow|white|black|transparent|current|inherit|slate|zinc|neutral|stone|orange|amber|lime|emerald|teal|cyan|sky|violet|purple|fuchsia|pink|rose)-\d+\b/.test(titleClassName) || titleClassName.includes('text-white') || titleClassName.includes('text-black');
+  const hasColorClass = /\btext-(?:gray|red|blue|indigo|green|yellow|white|black|transparent|current|inherit|slate|zinc|neutral|stone|orange|amber|lime|emerald|teal|cyan|sky|violet|purple|fuchsia|pink|rose)(?:-\d+)?\b/.test(titleClassName) || 
+                       titleClassName.includes('text-[') || 
+                       ['text-current', 'text-transparent', 'text-inherit'].some(c => titleClassName.includes(c));
   const colorClasses = hasColorClass 
     ? '' 
-    : (theme === 'dark' ? 'text-gray-100' : 'text-gray-900');
+    : (theme === 'dark' ? 'text-gray-100' : 'text-gray-800');
 
   return (
     <div className={`flex items-center min-w-0 ${className}`}>
