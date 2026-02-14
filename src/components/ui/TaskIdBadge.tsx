@@ -22,7 +22,7 @@ export const TaskIdBadge: React.FC<TaskIdBadgeProps> = ({ id, className = '', si
   const opacityClass = theme === 'dark' ? 'text-gray-400 opacity-70' : 'text-gray-500 opacity-80';
 
   return (
-    <span className={`font-mono mr-2 ${sizeClasses[size]} ${opacityClass} ${className}`}>
+    <span className={`font-mono mr-2 ${sizeClasses[size]} ${opacityClass} truncate max-w-[120px] ${className}`}>
       #{id}
     </span>
   );

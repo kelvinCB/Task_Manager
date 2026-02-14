@@ -194,7 +194,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                               onEdit={onEdit} 
                               as="h4"
                               className="mb-1"
-                              titleClassName="font-bold"
+                              titleClassName={`font-bold ${task.status === 'Done' ? 'text-gray-500 line-through' : ''}`}
                             />
                             {renderDescription(task)}
                           </div>

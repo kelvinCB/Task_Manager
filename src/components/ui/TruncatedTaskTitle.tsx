@@ -33,18 +33,19 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
     ? 'text-indigo-400 hover:text-indigo-300' 
     : 'text-indigo-600 hover:text-indigo-800';
 
-  const colorClasses = titleClassName.includes('text-') 
+  const hasColorClass = /\btext-(?:[a-z]+(?:-[0-9]{2,3})?|black|white|transparent|current|inherit)\b/.test(titleClassName);
+  const colorClasses = hasColorClass 
     ? '' 
     : (theme === 'dark' ? 'text-gray-100' : 'text-gray-900');
 
   return (
-    <div className={`flex items-baseline min-w-0 ${className}`}>
+    <div className={`flex items-center min-w-0 ${className}`}>
       {task.id != null && <TaskIdBadge id={task.id} size={idSize} />}
       <Component 
-        className={`font-medium ${!isLong ? 'truncate' : ''} ${colorClasses} ${titleClassName}`}
+        className={`font-medium flex items-center ${!isLong ? 'truncate' : ''} ${colorClasses} ${titleClassName}`}
         title={isLong ? title : undefined}
       >
-        {titleContent}
+        <span className={!isLong ? 'truncate' : ''}>{titleContent}</span>
         {isLong && (
           <button
             type="button"
@@ -53,7 +54,7 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
               e.stopPropagation();
               onEdit(task);
             }}
-            className={`${buttonThemeClasses} font-medium ml-1 transition-colors duration-200`}
+            className={`${buttonThemeClasses} font-medium ml-1 transition-colors duration-200 flex-shrink-0`}
           >
             ...
           </button>

@@ -234,7 +234,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                     onEdit={onEdit} 
                     idSize="sm"
                     as="h3"
-                    titleClassName={`text-base sm:text-lg font-bold leading-tight cursor-pointer ${task.status === 'Done' ? 'line-through decoration-gray-400' : ''}`}
+                    titleClassName={`text-base sm:text-lg font-bold leading-tight cursor-pointer ${task.status === 'Done' ? 'text-gray-500 line-through decoration-gray-400' : ''}`}
                   />
                 </div>
               </div>
