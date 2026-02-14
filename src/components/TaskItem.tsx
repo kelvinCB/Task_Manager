@@ -119,12 +119,21 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const renderTitle = () => {
     const maxLength = 60;
     const isLong = task.title.length > maxLength;
+    const taskNumber = task.id.toString();
 
-    if (isLong) {
-      const truncated = task.title.substring(0, maxLength);
-      return (
-        <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-          {truncated}
+    const titleContent = (
+      <>
+        <span className={`text-[11px] font-mono mr-2 opacity-50 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+          #{taskNumber}
+        </span>
+        {isLong ? task.title.substring(0, maxLength) : task.title}
+      </>
+    );
+
+    return (
+      <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} ${!isLong ? 'truncate' : ''}`}>
+        {titleContent}
+        {isLong && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -134,13 +143,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           >
             ...
           </button>
-        </h3>
-      );
-    }
-
-    return (
-      <h3 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} truncate`}>
-        {task.title}
+        )}
       </h3>
     );
   };

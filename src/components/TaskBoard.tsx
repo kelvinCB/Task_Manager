@@ -99,25 +99,28 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   const renderTitle = (task: Task) => {
     const maxLength = 40;
     const isLong = task.title.length > maxLength;
+    const taskNumber = task.id.toString();
 
-    if (isLong) {
-      const truncated = task.title.substring(0, maxLength);
-      return (
-        <h4 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} mb-1`}>
-          {truncated}
+    const titleContent = (
+      <>
+        <span className={`text-[10px] font-mono mr-1.5 opacity-60 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+          #{taskNumber}
+        </span>
+        {isLong ? task.title.substring(0, maxLength) : task.title}
+      </>
+    );
+
+    return (
+      <h4 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} ${!isLong ? 'truncate' : ''} mb-1`}>
+        {titleContent}
+        {isLong && (
           <button
             onClick={() => onEdit(task)}
             className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
           >
             ...
           </button>
-        </h4>
-      );
-    }
-
-    return (
-      <h4 className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-gray-900'} truncate mb-1`}>
-        {task.title}
+        )}
       </h4>
     );
   };

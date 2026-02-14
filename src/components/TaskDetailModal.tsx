@@ -64,7 +64,12 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               {/* Header */}
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-4">
-                  <h2 className="text-2xl font-bold leading-tight break-words pr-8">{task.title}</h2>
+                  <h2 className="text-2xl font-bold leading-tight break-words pr-8">
+                    <span className={`text-lg font-mono mr-2 opacity-40 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      #{task.id}
+                    </span>
+                    {task.title}
+                  </h2>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => {
