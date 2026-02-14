@@ -33,19 +33,22 @@ export const TruncatedTaskTitle: React.FC<TruncatedTaskTitleProps> = ({
     ? 'text-indigo-400 hover:text-indigo-300' 
     : 'text-indigo-600 hover:text-indigo-800';
 
+  const colorClasses = titleClassName.includes('text-') 
+    ? '' 
+    : (theme === 'dark' ? 'text-gray-100' : 'text-gray-900');
+
   return (
     <div className={`flex items-baseline min-w-0 ${className}`}>
-      {task.id && <TaskIdBadge id={task.id} size={idSize} />}
+      {task.id != null && <TaskIdBadge id={task.id} size={idSize} />}
       <Component 
-        className={`font-medium ${!isLong ? 'truncate' : ''} ${titleClassName}`}
-        style={{ color: 'inherit' }}
+        className={`font-medium ${!isLong ? 'truncate' : ''} ${colorClasses} ${titleClassName}`}
         title={isLong ? title : undefined}
       >
         {titleContent}
         {isLong && (
           <button
             type="button"
-            aria-label={`Ver título completo: ${title}`}
+            aria-label={`Ver título completo: ${title.substring(0, 100)}${title.length > 100 ? '...' : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               onEdit(task);
