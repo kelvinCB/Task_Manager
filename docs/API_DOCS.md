@@ -14,6 +14,8 @@
 
 This document describes the REST API endpoints for the Task Manager application.
 
+.
+
 ## Base URL
 
 - Development: `http://localhost:3001/api`
