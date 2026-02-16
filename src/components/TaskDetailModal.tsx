@@ -66,10 +66,10 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0 pr-8">
-                    {task.id != null && (
-                      <TaskIdBadge id={task.id} size="lg" className="mb-2" />
-                    )}
                     <h2 className="text-2xl font-bold leading-tight break-words">
+                      {task.id != null && (
+                        <TaskIdBadge id={task.id} size="lg" className="mr-2" />
+                      )}
                       {task.title}
                     </h2>
                   </div>
