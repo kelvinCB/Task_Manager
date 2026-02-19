@@ -10,6 +10,7 @@
         "logout": "Sign Out",
         "email": "Email",
         "password": "Password",
+        "confirm_password": "Confirm Password",
         "forgot_password": "Don't remember your password?",
         "no_account": "Don't have an account?",
         "have_account": "Already have an account?",

@@ -46,10 +46,27 @@ describe('AuthForm', () => {
   it('renders correctly for signup', () => {
     renderAuthForm({ isSignUp: true, buttonText: "Register" });
     expect(screen.getByText('SIGN UP WITH GOOGLE')).toBeDefined();
+    expect(screen.getByTestId('confirm-password-input')).toBeInTheDocument();
   });
 
   it('renders correctly for login', () => {
     renderAuthForm({ isSignUp: false });
     expect(screen.getByText('LOG IN WITH GOOGLE')).toBeDefined();
+  });
+
+  it('stacks confirm password below password for signup', () => {
+    renderAuthForm({ isSignUp: true, buttonText: "Register" });
+    const passwordInput = screen.getByTestId('password-input');
+    const confirmInput = screen.getByTestId('confirm-password-input');
+    const follows = passwordInput.compareDocumentPosition(confirmInput) & Node.DOCUMENT_POSITION_FOLLOWING;
+    expect(follows).toBeTruthy();
+  });
+
+  it('styles the submit button to match inputs', () => {
+    renderAuthForm();
+    const submitButton = screen.getByTestId('login-button');
+    expect(submitButton).toHaveClass('w-full');
+    expect(submitButton).toHaveClass('rounded-md');
+    expect(submitButton).toHaveClass('py-2.5');
   });
 });

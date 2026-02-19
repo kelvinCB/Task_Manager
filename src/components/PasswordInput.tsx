@@ -10,6 +10,7 @@ interface PasswordInputProps {
   required?: boolean;
   autoComplete?: string;
   'data-testid'?: string;
+  toggleTestId?: string;
   className?: string;
 }
 
@@ -22,6 +23,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   required = false,
   autoComplete = 'current-password',
   'data-testid': testId = 'password-input',
+  toggleTestId = 'toggle-password-visibility',
   className = ''
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -58,7 +60,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
         <button
           type="button"
           onClick={togglePasswordVisibility}
-          data-testid="toggle-password-visibility"
+          data-testid={toggleTestId}
           title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
           className="text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700 transition-colors duration-200"
         >

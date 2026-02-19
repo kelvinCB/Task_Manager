@@ -71,6 +71,7 @@ describe('RegisterPage', () => {
     
     // Check title
     expect(screen.getByText('Create your account')).toBeInTheDocument();
+    expect(screen.queryByText('VPS Dashboard access (front-end only)')).not.toBeInTheDocument();
     
     // Check logo (either mobile or desktop version should exist)
     const desktopLogo = screen.queryByTestId('app-logo-desktop');
@@ -90,6 +91,7 @@ describe('RegisterPage', () => {
     // Check form inputs
     expect(screen.getByTestId('email-input')).toBeInTheDocument();
     expect(screen.getByTestId('password-input')).toBeInTheDocument();
+    expect(screen.getByTestId('confirm-password-input')).toBeInTheDocument();
     
     // Check registration button
     expect(screen.getByRole('button', { name: 'Create Account' })).toBeInTheDocument();

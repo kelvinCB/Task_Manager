@@ -12,6 +12,7 @@ vi.mock('react-i18next', () => ({
         'auth.logout': 'Sign Out',
         'auth.email': 'Email',
         'auth.password': 'Password',
+        'auth.confirm_password': 'Confirm Password',
         'app.title': 'Kolium',
         'tasks.new_task': 'New Task',
         'common.save': 'Save',

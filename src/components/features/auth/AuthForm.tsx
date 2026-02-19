@@ -15,6 +15,7 @@ interface AuthFormProps {
 export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoading, isSignUp = false, onGoogleLogin, onGithubLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -102,10 +103,26 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t('auth.password')}
             required
-            autoComplete="current-password"
+            autoComplete={isSignUp ? 'new-password' : 'current-password'}
             data-testid="password-input"
           />
         </div>
+
+        {isSignUp && (
+          <div>
+            <PasswordInput
+              id="confirmPassword"
+              name="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder={t('auth.confirm_password')}
+              required
+              autoComplete="new-password"
+              data-testid="confirm-password-input"
+              toggleTestId="toggle-confirm-password-visibility"
+            />
+          </div>
+        )}
 
         {/* Forgot password link - solo mostrar en login */}
         {!isSignUp && (
@@ -121,7 +138,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSubmit, buttonText, isLoad
             type="submit"
             disabled={isLoading}
             data-testid={isSignUp ? "register-button" : "login-button"}
-            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50"
           >
             {isLoading ? t('common.loading') : buttonText}
           </button>

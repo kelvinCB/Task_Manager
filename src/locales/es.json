@@ -10,6 +10,7 @@
         "logout": "Cerrar Sesión",
         "email": "Correo Electrónico",
         "password": "Contraseña",
+        "confirm_password": "Confirmar contraseña",
         "forgot_password": "¿Olvidaste tu contraseña?",
         "no_account": "¿No tienes una cuenta?",
         "have_account": "¿Ya tienes una cuenta?",
