@@ -166,6 +166,46 @@ describe('Task Controller', () => {
       });
     });
 
+    it('should treat whitespace estimation as null', async () => {
+      req.body = {
+        title: 'Task with whitespace estimation',
+        estimation: '   '
+      };
+
+      const mockTask = {
+        id: 1,
+        title: 'Task with whitespace estimation',
+        estimation: null,
+        user_id: 'user-123'
+      };
+
+      const mockSingle = jest.fn().mockResolvedValue({ data: mockTask, error: null });
+      const mockSelect = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockInsert = jest.fn().mockReturnValue({ select: mockSelect });
+
+      supabase.from.mockReturnValue({ insert: mockInsert });
+
+      await createTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(mockInsert).toHaveBeenCalledWith([expect.objectContaining({ estimation: null })]);
+    });
+
+    it('should return 400 if estimation has plus sign', async () => {
+      req.body = {
+        title: 'Test Task',
+        estimation: '+5'
+      };
+
+      await createTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Validation error',
+        message: 'Invalid estimation. Must be one of: 1, 2, 3, 5, 8, 13'
+      });
+    });
+
     it('should return 404 if parent task does not exist', async () => {
       req.body = {
         title: 'Test Task',

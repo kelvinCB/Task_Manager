@@ -17,7 +17,10 @@ const parseEstimationOrNull = (value) => {
     parsed = value;
   } else if (typeof value === 'string') {
     const trimmed = value.trim();
-    if (!/^[-+]?\d+$/.test(trimmed)) {
+    if (trimmed === '') {
+      return { value: null, error: null };
+    }
+    if (!/^\d+$/.test(trimmed)) {
       return { value: null, error: `Invalid estimation. Must be one of: ${VALID_ESTIMATIONS.join(', ')}` };
     }
     parsed = Number(trimmed);
@@ -32,19 +35,19 @@ const parseEstimationOrNull = (value) => {
   return { value: parsed, error: null };
 };
 
-const handleTaskDbError = (res, error, actionMessage) => {
+const handleTaskDbError = (res, error, operation) => {
   // Common Postgres/Supabase validation errors that should not bubble as 500
   if (error?.code === '23514' || error?.code === '22P02') {
     return res.status(400).json({
       error: 'Validation error',
-      message: error.message || actionMessage
+      message: error.message || 'Validation failed'
     });
   }
 
-  console.error(actionMessage, error);
+  console.error(`${operation} task error`, error);
   return res.status(500).json({
     error: 'Internal server error',
-    message: actionMessage.includes('Create') ? 'Failed to create task' : 'Failed to update task'
+    message: operation === 'create' ? 'Failed to create task' : 'Failed to update task'
   });
 };
 
@@ -124,7 +127,7 @@ const createTask = async (req, res) => {
 
     res.status(201).json({ task: data });
   } catch (error) {
-    return handleTaskDbError(res, error, 'Create task error');
+    return handleTaskDbError(res, error, 'create');
   }
 };
 
@@ -370,7 +373,7 @@ const updateTask = async (req, res) => {
 
     res.status(200).json({ task: data });
   } catch (error) {
-    return handleTaskDbError(res, error, 'Update task error');
+    return handleTaskDbError(res, error, 'update');
   }
 };
 
