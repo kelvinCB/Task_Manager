@@ -4,17 +4,37 @@ const VALID_STATUSES = ['Open', 'In Progress', 'Review', 'Done'];
 const VALID_ESTIMATIONS = [1, 2, 3, 5, 8, 13];
 
 const parseEstimationOrNull = (value) => {
-  if (value === undefined || value === null || value === '') return null;
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed) || !VALID_ESTIMATIONS.includes(parsed)) {
-    return { error: `Invalid estimation. Must be one of: ${VALID_ESTIMATIONS.join(', ')}` };
+  if (value === undefined || value === null || value === '') {
+    return { value: null, error: null };
   }
-  return { value: parsed };
+
+  if (typeof value === 'boolean') {
+    return { value: null, error: `Invalid estimation. Must be one of: ${VALID_ESTIMATIONS.join(', ')}` };
+  }
+
+  let parsed;
+  if (typeof value === 'number') {
+    parsed = value;
+  } else if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!/^[-+]?\d+$/.test(trimmed)) {
+      return { value: null, error: `Invalid estimation. Must be one of: ${VALID_ESTIMATIONS.join(', ')}` };
+    }
+    parsed = Number(trimmed);
+  } else {
+    return { value: null, error: `Invalid estimation. Must be one of: ${VALID_ESTIMATIONS.join(', ')}` };
+  }
+
+  if (!Number.isInteger(parsed) || !VALID_ESTIMATIONS.includes(parsed)) {
+    return { value: null, error: `Invalid estimation. Must be one of: ${VALID_ESTIMATIONS.join(', ')}` };
+  }
+
+  return { value: parsed, error: null };
 };
 
 const handleTaskDbError = (res, error, actionMessage) => {
   // Common Postgres/Supabase validation errors that should not bubble as 500
-  if (error?.code === '23514' || error?.code === '22P02' || error?.code === '23502') {
+  if (error?.code === '23514' || error?.code === '22P02') {
     return res.status(400).json({
       error: 'Validation error',
       message: error.message || actionMessage

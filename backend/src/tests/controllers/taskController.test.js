@@ -151,6 +151,21 @@ describe('Task Controller', () => {
       });
     });
 
+    it('should return 400 if estimation is boolean (no coercion)', async () => {
+      req.body = {
+        title: 'Test Task',
+        estimation: true
+      };
+
+      await createTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Validation error',
+        message: 'Invalid estimation. Must be one of: 1, 2, 3, 5, 8, 13'
+      });
+    });
+
     it('should return 404 if parent task does not exist', async () => {
       req.body = {
         title: 'Test Task',
@@ -193,6 +208,26 @@ describe('Task Controller', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'Validation error',
         message: 'new row violates check constraint'
+      });
+    });
+
+    it('should keep not-null violations as 500 on create', async () => {
+      req.body = { title: 'Test Task', estimation: 5 };
+
+      const mockInsert = jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data: null, error: { code: '23502', message: 'null value in column' } })
+        })
+      });
+
+      supabase.from.mockReturnValue({ insert: mockInsert });
+
+      await createTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Internal server error',
+        message: 'Failed to create task'
       });
     });
 
