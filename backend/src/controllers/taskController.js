@@ -1,5 +1,33 @@
 const supabaseClient = require('../config/supabaseClient');
 
+const VALID_STATUSES = ['Open', 'In Progress', 'Review', 'Done'];
+const VALID_ESTIMATIONS = [1, 2, 3, 5, 8, 13];
+
+const parseEstimationOrNull = (value) => {
+  if (value === undefined || value === null || value === '') return null;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || !VALID_ESTIMATIONS.includes(parsed)) {
+    return { error: `Invalid estimation. Must be one of: ${VALID_ESTIMATIONS.join(', ')}` };
+  }
+  return { value: parsed };
+};
+
+const handleTaskDbError = (res, error, actionMessage) => {
+  // Common Postgres/Supabase validation errors that should not bubble as 500
+  if (error?.code === '23514' || error?.code === '22P02' || error?.code === '23502') {
+    return res.status(400).json({
+      error: 'Validation error',
+      message: error.message || actionMessage
+    });
+  }
+
+  console.error(actionMessage, error);
+  return res.status(500).json({
+    error: 'Internal server error',
+    message: actionMessage.includes('Create') ? 'Failed to create task' : 'Failed to update task'
+  });
+};
+
 /**
  * Create a new task
  * Automatically assigns the authenticated user's ID to the task
@@ -18,8 +46,7 @@ const createTask = async (req, res) => {
     }
 
     // Validate status if provided
-    const validStatuses = ['Open', 'In Progress', 'Review', 'Done'];
-    if (status && !validStatuses.includes(status)) {
+    if (status && !VALID_STATUSES.includes(status)) {
       return res.status(400).json({
         error: 'Validation error',
         message: 'Invalid status. Must be one of: Open, In Progress, Review, Done'
@@ -43,6 +70,14 @@ const createTask = async (req, res) => {
       }
     }
 
+    const parsedEstimation = parseEstimationOrNull(estimation);
+    if (parsedEstimation?.error) {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: parsedEstimation.error
+      });
+    }
+
     // Choose RLS-aware client if available
     const db = req.supabase || supabaseClient.supabase;
 
@@ -57,7 +92,7 @@ const createTask = async (req, res) => {
         parent_id: parent_id || null,
         user_id,
         total_time_ms: total_time_ms ?? 0,
-        estimation: estimation || null,
+        estimation: parsedEstimation?.value ?? null,
         responsible: responsible || null
       }])
       .select()
@@ -69,11 +104,7 @@ const createTask = async (req, res) => {
 
     res.status(201).json({ task: data });
   } catch (error) {
-    console.error('Create task error:', error);
-    res.status(500).json({
-      error: 'Internal server error',
-      message: 'Failed to create task'
-    });
+    return handleTaskDbError(res, error, 'Create task error');
   }
 };
 
@@ -235,8 +266,7 @@ const updateTask = async (req, res) => {
 
     // Validate status if provided
     if (status) {
-      const validStatuses = ['Open', 'In Progress', 'Review', 'Done'];
-      if (!validStatuses.includes(status)) {
+      if (!VALID_STATUSES.includes(status)) {
         return res.status(400).json({
           error: 'Validation error',
           message: 'Invalid status. Must be one of: Open, In Progress, Review, Done'
@@ -270,6 +300,14 @@ const updateTask = async (req, res) => {
       }
     }
 
+    const parsedEstimation = parseEstimationOrNull(estimation);
+    if (parsedEstimation?.error) {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: parsedEstimation.error
+      });
+    }
+
     // Build update object with only provided fields
     const updates = {};
     if (title !== undefined) updates.title = title.trim();
@@ -278,7 +316,7 @@ const updateTask = async (req, res) => {
     if (due_date !== undefined) updates.due_date = due_date;
     if (parent_id !== undefined) updates.parent_id = parent_id;
     if (total_time_ms !== undefined) updates.total_time_ms = total_time_ms;
-    if (estimation !== undefined) updates.estimation = estimation;
+    if (estimation !== undefined) updates.estimation = parsedEstimation?.value ?? null;
     if (responsible !== undefined) updates.responsible = responsible;
 
     // Validate that at least one field is being updated
@@ -312,11 +350,7 @@ const updateTask = async (req, res) => {
 
     res.status(200).json({ task: data });
   } catch (error) {
-    console.error('Update task error:', error);
-    res.status(500).json({
-      error: 'Internal server error',
-      message: 'Failed to update task'
-    });
+    return handleTaskDbError(res, error, 'Update task error');
   }
 };
 

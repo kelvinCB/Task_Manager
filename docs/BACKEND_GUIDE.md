@@ -224,7 +224,7 @@ Handles authentication logic with:
 #### taskController.js
 Manages task CRUD operations with:
 - **User Isolation**: All operations automatically scoped to authenticated user
-- **Input Validation**: Title required, status validation, parent task verification, estimation & responsible sanitization
+- **Input Validation**: Title required, status validation, parent task verification, estimation validation (`1,2,3,5,8,13`) and responsible sanitization. DB check/constraint errors are mapped to `400` when applicable.
 - **CRUD Operations**:
   - `createTask`: Create new task with user ownership
   - `getTasks`: Retrieve user's tasks with optional status filter

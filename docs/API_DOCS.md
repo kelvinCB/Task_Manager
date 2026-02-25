@@ -218,7 +218,7 @@ Create a new task.
 ```
 
 **Error Responses:**
-- `400`: Missing title, invalid status, parent task not found
+- `400`: Missing title, invalid status, invalid estimation (must be one of `1,2,3,5,8,13`), parent task not found
 - `401`: Not authenticated
 - `500`: Internal server error
 
@@ -281,7 +281,7 @@ Update an existing task.
 ```
 
 **Error Responses:**
-- `400`: No fields to update, invalid status, task cannot be its own parent, invalid task ID
+- `400`: No fields to update, invalid status, invalid estimation (must be one of `1,2,3,5,8,13`), task cannot be its own parent, invalid task ID
 - `401`: Not authenticated
 - `404`: Task not found or doesn't belong to user
 - `500`: Internal server error

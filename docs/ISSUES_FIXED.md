@@ -4,6 +4,40 @@ This file documents issues that have been identified and resolved in the TaskMan
 
 ---
 
+## Intermittent 500 on `POST /api/tasks` due to invalid estimation values — Fixed on 2026-02-25
+
+### Symptoms
+
+- Creating tasks via API sometimes returned `500 Failed to create task`.
+- Same user/session could create some tasks successfully, while others failed.
+- Failures were more frequent when using estimations outside the Fibonacci set (e.g. `4`, `6`, `7`).
+
+### Root Cause
+
+- Backend did not pre-validate `estimation` and relied on DB CHECK constraints.
+- Constraint violations bubbled up as generic `500` responses instead of clear `400 Validation error`.
+
+### Fixes Applied
+
+- `backend/src/controllers/taskController.js`
+  - Added explicit estimation validation for create/update (`1,2,3,5,8,13`).
+  - Added DB error mapping for common validation/constraint errors (`23514`, `22P02`, `23502`) to `400`.
+- `backend/src/tests/controllers/taskController.test.js`
+  - Added tests for invalid estimation on create/update.
+  - Added test for DB CHECK violation mapped to `400` on create.
+- `docs/API_DOCS.md` and `docs/BACKEND_GUIDE.md`
+  - Updated documentation to reflect estimation validation and error behavior.
+
+### Verification
+
+- Backend controller tests pass (`taskController.test.js`): validation and error-mapping scenarios covered.
+- Invalid estimation now returns `400 Validation error` instead of generic `500`.
+
+### Prevention
+
+- Validate business constraints at API boundary, not only at DB layer.
+- Map known DB constraint errors to explicit 4xx responses.
+
 ## Tasks not saved in production (Supabase) + data isolation broken — Fixed on 2025-10-24
 
 ### Symptoms

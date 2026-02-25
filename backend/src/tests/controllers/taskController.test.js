@@ -136,6 +136,21 @@ describe('Task Controller', () => {
       });
     });
 
+    it('should return 400 if estimation is invalid', async () => {
+      req.body = {
+        title: 'Test Task',
+        estimation: 4
+      };
+
+      await createTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Validation error',
+        message: 'Invalid estimation. Must be one of: 1, 2, 3, 5, 8, 13'
+      });
+    });
+
     it('should return 404 if parent task does not exist', async () => {
       req.body = {
         title: 'Test Task',
@@ -158,6 +173,26 @@ describe('Task Controller', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'Not found',
         message: 'Parent task not found or does not belong to you'
+      });
+    });
+
+    it('should map check violations to 400 on create', async () => {
+      req.body = { title: 'Test Task', estimation: 5 };
+
+      const mockInsert = jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data: null, error: { code: '23514', message: 'new row violates check constraint' } })
+        })
+      });
+
+      supabase.from.mockReturnValue({ insert: mockInsert });
+
+      await createTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Validation error',
+        message: 'new row violates check constraint'
       });
     });
 
@@ -425,6 +460,27 @@ describe('Task Controller', () => {
         estimation: 8,
         responsible: 'Alice'
       }));
+    });
+
+    it('should return 400 if estimation is invalid on update', async () => {
+      req.params.id = '1';
+      req.body = { estimation: 4 };
+
+      const existingTask = { id: 1, title: 'Task', user_id: 'user-123' };
+      const mockSingle = jest.fn().mockResolvedValue({ data: existingTask, error: null });
+      const mockEqUser = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockEq = jest.fn().mockReturnValue({ eq: mockEqUser });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+
+      supabase.from.mockReturnValue({ select: mockSelect });
+
+      await updateTask(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Validation error',
+        message: 'Invalid estimation. Must be one of: 1, 2, 3, 5, 8, 13'
+      });
     });
 
     it('should return 400 if no fields to update', async () => {
