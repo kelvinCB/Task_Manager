@@ -7,7 +7,7 @@ import loginIllustrationLight from '../assets/images/login-illustration-light.mp
 import loginIllustrationDark from '../assets/images/login-illustration-dark.mp4';
 import loginIllustrationLightPoster from '../assets/images/login-illustration-light-poster.jpg';
 import loginIllustrationDarkPoster from '../assets/images/login-illustration-dark-poster.jpg';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const ForgotPasswordPage: React.FC = () => {
   const { t } = useTranslation();
@@ -40,7 +40,7 @@ const ForgotPasswordPage: React.FC = () => {
 
   if (isEmailSent) {
     return (
-      <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+            <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
         {/* Left side - Decorative Image (Desktop only) - 50% width */}
         <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
           {/* Logo context in the image side - Top Left over image */}
@@ -53,7 +53,7 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
 
           {/* Illustrations - video backgrounds for performance */}
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
@@ -77,7 +77,7 @@ const ForgotPasswordPage: React.FC = () => {
               playsInline
               className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
             />
-          </motion.div>
+          </m.div>
 
           {/* Subtle overlay */}
           <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
@@ -136,7 +136,7 @@ const ForgotPasswordPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+        <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
       {/* Left side - Decorative Image (Desktop only) - 50% width */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
         {/* Logo context in the image side - Top Left over image */}
@@ -149,7 +149,7 @@ const ForgotPasswordPage: React.FC = () => {
         </div>
 
         {/* Illustrations - video backgrounds for performance */}
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
@@ -173,7 +173,7 @@ const ForgotPasswordPage: React.FC = () => {
             playsInline
             className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
           />
-        </motion.div>
+        </m.div>
 
         {/* Subtle overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
@@ -257,3 +257,4 @@ const ForgotPasswordPage: React.FC = () => {
 };
 
 export default ForgotPasswordPage;
+

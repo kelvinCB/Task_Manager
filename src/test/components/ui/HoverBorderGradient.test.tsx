@@ -5,7 +5,9 @@ import React from 'react';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
-  motion: {
+  LazyMotion: ({ children }: any) => <>{children}</>,
+  domAnimation: { type: 'domAnimation' },
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,

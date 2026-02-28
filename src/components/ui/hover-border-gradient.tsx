@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { cn } from "../../lib/utils";
 
 type Direction = "TOP" | "LEFT" | "BOTTOM" | "RIGHT";
@@ -59,7 +59,7 @@ export function HoverBorderGradient({
   }, [hovered, duration, clockwise]);
 
   return (
-    <Tag
+        <Tag
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={cn(
@@ -76,7 +76,7 @@ export function HoverBorderGradient({
       >
         {children}
       </div>
-      <motion.div
+      <m.div
         className={cn(
           "flex-none inset-0 overflow-hidden absolute z-0 rounded-[inherit]"
         )}
@@ -98,3 +98,5 @@ export function HoverBorderGradient({
     </Tag>
   );
 }
+
+

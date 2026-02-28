@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Check } from "lucide-react"
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import confetti from "canvas-confetti"
 import NumberFlow from "@number-flow/react"
 import { Button } from "../ui/button"
@@ -133,7 +133,7 @@ export function Pricing({
   }
 
   return (
-    <div className="py-10 sm:py-16">
+        <div className="py-10 sm:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -160,7 +160,7 @@ export function Pricing({
 
         <div className="mx-auto mt-8 grid max-w-lg grid-cols-1 gap-y-6 sm:mt-12 sm:gap-y-0 lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8">
           {plans.map((plan, planIdx) => (
-            <motion.div
+            <m.div
               key={plan.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -229,10 +229,12 @@ export function Pricing({
                       ? t('pricing.start_free_trial', 'Start Free Trial')
                       : t('pricing.get_started', 'Get Started')))}
               </Button>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
     </div>
   )
 }
+
+
