@@ -35,18 +35,12 @@
 
 @media (prefers-reduced-motion: reduce) {
 
-  *,
+  *:not(.motion-safe):not(.motion-safe *),
   ::before,
   ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .motion-safe,
-  .motion-safe * {
-    animation-duration: revert !important;
-    transition-duration: revert !important;
   }
 }
