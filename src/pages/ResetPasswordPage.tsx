@@ -51,16 +51,6 @@ const LeftSideImage: React.FC = () => (
   </div>
 );
 
-const MobileLogo = () => (
-  <div className="flex justify-center mb-8 lg:hidden">
-    <div data-testid="app-logo-mobile" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
-      {'Kolium'.split('').map((letter, index) => (
-        <span key={index}>{letter}</span>
-      ))}
-    </div>
-  </div>
-);
-
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -169,6 +159,15 @@ const ResetPasswordPage: React.FC = () => {
     }
   };
 
+  const MobileLogo = () => (
+    <div className="flex justify-center mb-8 lg:hidden">
+      <div data-testid="app-logo-mobile" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
+        {'Kolium'.split('').map((letter, index) => (
+          <span key={index}>{letter}</span>
+        ))}
+      </div>
+    </div>
+  );
 
   // Show loading screen while validating session
   if (isValidatingSession) {
