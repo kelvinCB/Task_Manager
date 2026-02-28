@@ -8,6 +8,49 @@ import loginIllustrationLightPoster from '../assets/images/login-illustration-li
 import loginIllustrationDarkPoster from '../assets/images/login-illustration-dark-poster.jpg';
 import { motion } from 'framer-motion';
 
+const LeftSideImage: React.FC = () => (
+  <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
+      {/* Logo context in the image side - Top Left over image */}
+      <div className="absolute top-10 left-12 z-20">
+        <div data-testid="app-logo-desktop" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
+          {'Kolium'.split('').map((letter, index) => (
+            <span key={index} className="drop-shadow-md">{letter}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Illustrations - video backgrounds for performance */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="w-full h-full"
+      >
+        <video
+          src={loginIllustrationLight}
+          poster={loginIllustrationLightPoster}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
+        />
+        <video
+          src={loginIllustrationDark}
+          poster={loginIllustrationDarkPoster}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
+        />
+      </motion.div>
+      
+      {/* Subtle overlay */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
+  </div>
+);
+
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -115,49 +158,6 @@ const ResetPasswordPage: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  const LeftSideImage = () => (
-    <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
-        {/* Logo context in the image side - Top Left over image */}
-        <div className="absolute top-10 left-12 z-20">
-          <div data-testid="app-logo-desktop" className="font-bold text-indigo-600 dark:text-indigo-400 text-3xl mobile-logo-animation light dark:dark">
-            {'Kolium'.split('').map((letter, index) => (
-              <span key={index} className="drop-shadow-md">{letter}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* Illustrations - video backgrounds for performance */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="w-full h-full"
-        >
-          <video
-            src={loginIllustrationLight}
-            poster={loginIllustrationLightPoster}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="dark:hidden w-full h-full object-cover object-left opacity-90 transition-all duration-500"
-          />
-          <video
-            src={loginIllustrationDark}
-            poster={loginIllustrationDarkPoster}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="hidden dark:block w-full h-full object-cover object-left opacity-80 transition-all duration-500"
-          />
-        </motion.div>
-        
-        {/* Subtle overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/20 to-transparent pointer-events-none"></div>
-    </div>
-  );
 
   const MobileLogo = () => (
     <div className="flex justify-center mb-8 lg:hidden">
