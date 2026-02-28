@@ -113,7 +113,11 @@
         "add_subtask": "Añadir Subtarea",
         "cannot_complete_subtasks": "No se puede completar una tarea que tiene subtareas incompletas",
         "subtask_of": "Subtarea de",
-        "parents": "Padres"
+        "parents": "Padres",
+        "comments": "Comentarios",
+        "no_comments": "Aún no hay comentarios.",
+        "add_comment_placeholder": "Añadir un comentario...",
+        "comment_cooldown_wait": "Espera {{seconds}}s antes de enviar otro comentario."
     },
     "nav": {
         "dashboard": "Tablero",

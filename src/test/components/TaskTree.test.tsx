@@ -121,10 +121,10 @@ describe('TaskTree Component', () => {
     );
 
     // Assert - verificar que se muestran las tareas
-    expect(screen.getByRole('heading', { name: 'Parent Task' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Child Task 1' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Child Task 2' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Grandchild Task' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Parent Task/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Child Task 1/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Child Task 2/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Grandchild Task/ })).toBeInTheDocument();
   });
 
   it('should apply correct indentation for nested tasks', () => {

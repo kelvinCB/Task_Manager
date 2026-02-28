@@ -107,6 +107,10 @@ backend/
 | GET | `/api/tasks/:id` | Get specific task by ID |
 | PUT | `/api/tasks/:id` | Update an existing task |
 | DELETE | `/api/tasks/:id` | Delete a task |
+| GET | `/api/tasks/:id/comments` | Get comments for a task (supports `limit` + `offset`) |
+| POST | `/api/tasks/:id/comments` | Create comment (cooldown/429 supported) |
+| PATCH | `/api/tasks/:id/comments/:commentId` | Edit own comment |
+| DELETE | `/api/tasks/:id/comments/:commentId` | Delete own comment |
 | **Time Entries** | | |
 | POST | `/api/time-entries/start` | Start task timer |
 | POST | `/api/time-entries/stop` | Stop task timer |
@@ -220,13 +224,18 @@ Handles authentication logic with:
 #### taskController.js
 Manages task CRUD operations with:
 - **User Isolation**: All operations automatically scoped to authenticated user
-- **Input Validation**: Title required, status validation, parent task verification, estimation & responsible sanitization
+- **Input Validation**: Title required, status validation, parent task verification, estimation validation (`1,2,3,5,8,13`) and responsible sanitization. DB check/constraint errors are mapped to `400` when applicable.
 - **CRUD Operations**:
   - `createTask`: Create new task with user ownership
   - `getTasks`: Retrieve user's tasks with optional status filter
   - `getTaskById`: Get single task (validates ownership)
   - `updateTask`: Update task fields (validates ownership)
   - `deleteTask`: Remove task (validates ownership)
+- **Comment Operations**:
+  - `getComments`: Paginated task comments (`limit`/`offset`) with safe-range guard
+  - `addComment`: Sanitized create + backend cooldown (returns 429 + `Retry-After` + `retry_after_seconds`)
+  - `updateComment`: Edit own comment
+  - `deleteComment`: Delete own comment with explicit `404` (not found) vs `500` (DB error)
 - **Security**: Prevents cross-user data access
 - **Validation**: Status enum, UUID format, circular reference prevention
 

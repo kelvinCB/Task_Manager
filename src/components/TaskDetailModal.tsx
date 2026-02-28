@@ -8,6 +8,9 @@ import { formatDate, getStatusColor, formatTime } from '../utils/taskUtils';
 import { X, Calendar, Clock, Edit2, AlertCircle, CheckCircle, Calculator, User } from 'lucide-react';
 import { extractAttachments } from '../utils/attachmentUtils';
 import { AttachmentList } from './AttachmentList';
+import { TaskComments } from './TaskComments';
+import { TaskIdBadge } from './ui/TaskIdBadge';
+
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -62,7 +65,14 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               {/* Header */}
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-4">
-                  <h2 className="text-2xl font-bold leading-tight break-words pr-8">{task.title}</h2>
+                  <div className="flex-1 min-w-0 pr-8">
+                    <h2 className="text-2xl font-bold leading-tight break-words">
+                      {task.id != null && (
+                        <TaskIdBadge id={task.id} size="lg" className="mr-2" />
+                      )}
+                      {task.title}
+                    </h2>
+                  </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => {
@@ -181,6 +191,11 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   })()}
                 </div>
               </div>
+
+              <hr className={`${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`} />
+
+              {/* Comments Section */}
+              <TaskComments taskId={task.id} />
 
               {/* Stats / Metadata */}
               <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'

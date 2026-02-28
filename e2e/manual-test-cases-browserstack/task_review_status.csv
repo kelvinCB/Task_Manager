@@ -1,0 +1,12 @@
+Title,Steps,Expected Result,Description,Priority,Type,Tags,Automation Status
+"Review Status - Create task in Review","Step 1: Login and open Task Manager","User is authenticated and dashboard is visible","Validate new Review status end-to-end","High","Functional","Review, E2E, Board","Automated"
+"Review Status - Create task in Review","Step 2: Click Create and enter title/description","Task form accepts data without validation errors","","","","",""
+"Review Status - Create task in Review","Step 3: Select status 'Review' and submit","Task is created successfully","","","","",""
+"Review Status - Create task in Review","Step 4: Open Board View","Review column is visible and contains the created task","","","","",""
+"Review Status - DnD transitions","Step 1: Create a task with status 'In Progress'","Task appears in In Progress column","Validate transition flow including Review","High","Functional","Review, DragDrop, Board","Automated"
+"Review Status - DnD transitions","Step 2: Drag task to 'Review'","Task moves to Review column","","","","",""
+"Review Status - DnD transitions","Step 3: Drag task from 'Review' to 'Done'","Task moves to Done column","","","","",""
+"Review Status - Filter + view stability","Step 1: Create one task in Review and one task in Open","Both tasks are created","Validate filter + Board/Tree stability","High","Functional","Review, Filter, Tree","Automated"
+"Review Status - Filter + view stability","Step 2: Apply global status filter = Review","Only Review task is shown","","","","",""
+"Review Status - Filter + view stability","Step 3: Switch Board -> Tree","Tree view renders correctly (no blank/corruption) and Review task remains visible","","","","",""
+"Review Status - Filter + view stability","Step 4: Switch Tree -> Board","Board view renders correctly and Review task remains visible","","","","",""

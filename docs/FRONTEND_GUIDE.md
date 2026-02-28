@@ -55,6 +55,15 @@ This guide provides comprehensive documentation for frontend development in the 
 
 ---
 
+## Task IDs (Visible in UI)
+
+To improve human↔automation coordination, each task now displays its unique ID with a `#` prefix across the UI:
+- Board View task cards
+- Tree View task rows
+- Task Detail Modal header
+
+---
+
 ## Project Structure
 
 ### Current Directory Structure
@@ -66,6 +75,7 @@ src/
 │   ├── TaskForm.tsx     # Task creation/editing form
 │   ├── TaskItem.tsx     # Individual task component
 │   ├── TaskTimer.tsx    # Time tracking component
+│   ├── TaskComments.tsx # Task comments (create/edit/delete + cooldown UX)
 │   ├── TaskStats.tsx    # Statistics component
 │   ├── TimeStatsView.tsx # Time analytics view
 │   ├── ProgressIcon.tsx # Custom progress icon
@@ -954,6 +964,12 @@ const useApiCall = <T>(apiFunction: () => Promise<T>) => {
   return { data, loading, error, execute };
 };
 ```
+
+### Task Comments Error/Cooldown Handling
+
+- `TaskComments` keeps previously loaded comments when a fetch error occurs (avoids flicker/context loss on transient errors).
+- Cooldown UX is driven by structured backend metadata (`retry_after_seconds` / `Retry-After`) instead of parsing localized text.
+- While cooldown is active, the submit button is disabled and a countdown message is shown.
 
 ### User-Friendly Error Messages
 
