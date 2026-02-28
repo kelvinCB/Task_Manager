@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { LazyMotion, domAnimation, m } from "framer-motion";
 import { cn } from "../../lib/utils";
 
 type Direction = "TOP" | "LEFT" | "BOTTOM" | "RIGHT";
@@ -59,6 +59,7 @@ export function HoverBorderGradient({
   }, [hovered, duration, clockwise]);
 
   return (
+    <LazyMotion features={domAnimation}>
     <Tag
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -76,7 +77,7 @@ export function HoverBorderGradient({
       >
         {children}
       </div>
-      <motion.div
+      <m.div
         className={cn(
           "flex-none inset-0 overflow-hidden absolute z-0 rounded-[inherit]"
         )}
@@ -96,5 +97,7 @@ export function HoverBorderGradient({
       />
       <div className="bg-black absolute z-1 flex-none inset-[2px] rounded-[inherit]" />
     </Tag>
+    </LazyMotion>
   );
 }
+
