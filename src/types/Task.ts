@@ -39,20 +39,6 @@ export interface TaskFilter {
   searchTerm?: string;
 }
 
-export interface ImportedTaskRow {
-  id?: string;
-  title: string;
-  description?: string;
-  status: string;
-  createdAt: string;
-  dueDate?: string;
-  parentId?: string;
-  childIds?: string;
-  // Time tracking fields
-  totalTimeSpent?: string;
-  timeEntries?: string;
-}
-
 export interface TaskTimeStats {
   id: string;
   title: string;
