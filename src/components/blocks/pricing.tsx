@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Check } from "lucide-react"
-import { LazyMotion, domAnimation, m } from "framer-motion"
+import { m } from "framer-motion"
 import confetti from "canvas-confetti"
 import NumberFlow from "@number-flow/react"
 import { Button } from "../ui/button"
@@ -133,8 +133,7 @@ export function Pricing({
   }
 
   return (
-    <LazyMotion features={domAnimation}>
-    <div className="py-10 sm:py-16">
+        <div className="py-10 sm:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -235,7 +234,7 @@ export function Pricing({
         </div>
       </div>
     </div>
-    </LazyMotion>
   )
 }
+
 

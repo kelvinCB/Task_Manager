@@ -8,7 +8,7 @@ import loginIllustrationLight from '../assets/images/login-illustration-light.mp
 import loginIllustrationDark from '../assets/images/login-illustration-dark.mp4';
 import loginIllustrationLightPoster from '../assets/images/login-illustration-light-poster.jpg';
 import loginIllustrationDarkPoster from '../assets/images/login-illustration-dark-poster.jpg';
-import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -87,8 +87,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <LazyMotion features={domAnimation}>
-    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden relative">
+        <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden relative">
       <div className="absolute top-4 right-4 z-50">
         <LanguageToggle />
       </div>
@@ -176,9 +175,9 @@ const LoginPage: React.FC = () => {
         </div>
       </div>
     </div>
-    </LazyMotion>
   );
 };
 
 export default LoginPage;
+
 

@@ -7,7 +7,7 @@ import loginIllustrationLight from '../assets/images/login-illustration-light.mp
 import loginIllustrationDark from '../assets/images/login-illustration-dark.mp4';
 import loginIllustrationLightPoster from '../assets/images/login-illustration-light-poster.jpg';
 import loginIllustrationDarkPoster from '../assets/images/login-illustration-dark-poster.jpg';
-import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const ForgotPasswordPage: React.FC = () => {
   const { t } = useTranslation();
@@ -40,8 +40,7 @@ const ForgotPasswordPage: React.FC = () => {
 
   if (isEmailSent) {
     return (
-      <LazyMotion features={domAnimation}>
-      <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+            <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
         {/* Left side - Decorative Image (Desktop only) - 50% width */}
         <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
           {/* Logo context in the image side - Top Left over image */}
@@ -133,13 +132,11 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
         </div>
       </div>
-      </LazyMotion>
     );
   }
 
   return (
-    <LazyMotion features={domAnimation}>
-    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
+        <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-100 dark:from-gray-900 dark:via-indigo-900 dark:to-blue-900 overflow-hidden">
       {/* Left side - Decorative Image (Desktop only) - 50% width */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-600 dark:bg-indigo-900 overflow-hidden">
         {/* Logo context in the image side - Top Left over image */}
@@ -256,8 +253,8 @@ const ForgotPasswordPage: React.FC = () => {
         </div>
       </div>
     </div>
-    </LazyMotion>
   );
 };
 
 export default ForgotPasswordPage;
+

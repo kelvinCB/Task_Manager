@@ -9,7 +9,7 @@ vi.mock('canvas-confetti', () => ({
 
 vi.mock('framer-motion', () => ({
   LazyMotion: ({ children }: any) => <>{children}</>,
-  domAnimation: {},
+  domAnimation: { type: 'domAnimation' },
   m: {
     div: ({ children, className, onClick }: any) => (
       <div className={className} onClick={onClick}>

@@ -5,16 +5,18 @@ import './index.css';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserProfileProvider } from './contexts/UserProfileContext';
-import { MotionConfig } from 'framer-motion';
+import { LazyMotion, MotionConfig, domAnimation } from 'framer-motion';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
       <UserProfileProvider>
         <ThemeProvider>
-          <MotionConfig reducedMotion='user'>
-            <App />
-          </MotionConfig>
+          <LazyMotion features={domAnimation}>
+            <MotionConfig reducedMotion='user'>
+              <App />
+            </MotionConfig>
+          </LazyMotion>
         </ThemeProvider>
       </UserProfileProvider>
     </AuthProvider>
