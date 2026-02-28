@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
+const {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+} = require('../controllers/authController');
 
 /**
  * @swagger
@@ -35,7 +40,7 @@ const authController = require('../controllers/authController');
  *       400:
  *         description: Validation error
  */
-router.post('/register', authController.register);
+router.post('/register', register);
 
 /**
  * @swagger
@@ -63,7 +68,7 @@ router.post('/register', authController.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', authController.login);
+router.post('/login', login);
 
 /**
  * @swagger
@@ -86,7 +91,7 @@ router.post('/login', authController.login);
  *       200:
  *         description: Password reset email sent
  */
-router.post('/forgot-password', authController.forgotPassword);
+router.post('/forgot-password', forgotPassword);
 
 /**
  * @swagger
@@ -112,6 +117,6 @@ router.post('/forgot-password', authController.forgotPassword);
  *       200:
  *         description: Password reset successful
  */
-router.post('/reset-password', authController.resetPassword);
+router.post('/reset-password', resetPassword);
 
 module.exports = router;
