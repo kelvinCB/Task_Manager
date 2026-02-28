@@ -46,7 +46,7 @@
 
   .motion-safe,
   .motion-safe * {
-    animation-duration: inherit !important;
-    transition-duration: inherit !important;
+    animation-duration: revert !important;
+    transition-duration: revert !important;
   }
 }
