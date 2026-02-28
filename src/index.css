@@ -3,9 +3,19 @@
 @tailwind utilities;
 
 @keyframes thinking-dots {
-  0%, 20% { opacity: 0.2; }
-  50% { opacity: 1; }
-  100% { opacity: 0.2; }
+
+  0%,
+  20% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
 }
 
 .dot-1 {
@@ -21,4 +31,16 @@
 .dot-3 {
   animation: thinking-dots 1.5s infinite;
   animation-delay: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *:not(.motion-safe):not(.motion-safe *),
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
