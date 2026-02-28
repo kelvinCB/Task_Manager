@@ -61,7 +61,7 @@ interface BackendComment {
 /**
  * Service for managing tasks through the backend API
  */
-export class TaskService {
+class TaskService {
   private baseUrl: string;
 
   constructor() {
