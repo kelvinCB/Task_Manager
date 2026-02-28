@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 import supabase from '../lib/supabaseClient';
 import { API_BASE_URL } from '../utils/apiConfig';
 
-export interface UserProfile {
+interface UserProfile {
     id: string;
     username: string;
     display_name: string | null;
