@@ -160,9 +160,9 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                           <div className={`markdown-preview ${theme === 'dark' ? 'prose-invert' : ''}`}>
                             <ReactMarkdown
                               components={{
-                                h1: ({ node: _node, ...props }) => <h1 className="text-xl font-bold mb-2 mt-4" {...props} />,
-                                h2: ({ node: _node, ...props }) => <h2 className="text-lg font-bold mb-2 mt-4" {...props} />,
-                                h3: ({ node: _node, ...props }) => <h3 className="text-md font-bold mb-1 mt-3" {...props} />,
+                                h1: ({ node: _node, children, ...props }) => <h1 className="text-xl font-bold mb-2 mt-4" {...props}>{children}</h1>,
+                                h2: ({ node: _node, children, ...props }) => <h2 className="text-lg font-bold mb-2 mt-4" {...props}>{children}</h2>,
+                                h3: ({ node: _node, children, ...props }) => <h3 className="text-md font-bold mb-1 mt-3" {...props}>{children}</h3>,
                                 ul: ({ node: _node, ...props }) => <ul className="list-disc pl-5 mb-2" {...props} />,
                                 ol: ({ node: _node, ...props }) => <ol className="list-decimal pl-5 mb-2" {...props} />,
                                 li: ({ node: _node, ...props }) => <li className="mb-1" {...props} />,
