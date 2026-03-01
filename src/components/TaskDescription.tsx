@@ -38,7 +38,7 @@ export const TaskDescription: React.FC<TaskDescriptionProps> = ({ task, onEdit, 
     const truncated = text.substring(0, cutIndex) + '...';
     
     return (
-      <div role="paragraph" className={baseClasses}>
+      <div className={`${baseClasses} ${clampClass}`}>
         <span>{truncated}</span>
         <button
           type="button"
