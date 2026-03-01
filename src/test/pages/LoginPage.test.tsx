@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Link } from 'react-router-dom';
 import React from 'react';
 // Mocks simples de componentes
 const ThemeProvider = ({ children }: { children: React.ReactNode }) => <div data-testid="theme-provider">{children}</div>;
@@ -19,10 +19,10 @@ const LoginPage = () => (
     <button data-testid="login-button">Log in</button>
     <button data-testid="google-login">LOG IN WITH GOOGLE</button>
     <button data-testid="github-login">LOG IN WITH GITHUB</button>
-    <a href="#" data-testid="forgot-password">Don't remember your password?</a>
+    <button data-testid="forgot-password">Don't remember your password?</button>
     <div>
       <span>Don't have an account?</span>
-      <a href="/register" data-testid="signup-link">Sign up →</a>
+      <Link to="/register" data-testid="signup-link">Sign up →</Link>
     </div>
   </div>
 );

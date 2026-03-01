@@ -462,7 +462,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       return;
     }
 
-    let finalUpdates = { ...updates };
+    const finalUpdates = { ...updates };
     let durationToRecord = 0;
 
     // If the task is being marked as completed or moved back to Open and the timer is active,
@@ -473,7 +473,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       const lastEntry = task.timeTracking.timeEntries[lastEntryIndex];
 
       let duration = 0;
-      let newTimeEntries = [...task.timeTracking.timeEntries];
+      const newTimeEntries = [...task.timeTracking.timeEntries];
 
       if (lastEntry && !lastEntry.endTime) {
         duration = Math.min(now - lastEntry.startTime, MAX_TIMER_DURATION_MS);
@@ -630,7 +630,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
       return null;
     }
 
-    let updates: Partial<Task> & { total_time_ms?: number } = { status: newStatus };
+    const updates: Partial<Task> & { total_time_ms?: number } = { status: newStatus };
 
     // If moving to Done, ensure we send the total_time_ms to backend
     if (newStatus === 'Done') {
@@ -701,7 +701,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     if (!task) return;
 
     const now = Date.now();
-    let updates: Partial<Task> = {};
+    const updates: Partial<Task> = {};
 
     // If task is not in progress, change its status
     if (task.status !== 'In Progress') {
@@ -739,7 +739,7 @@ export const useTasks = (options: { useDefaultTasks?: boolean; useApi?: boolean 
     const lastEntry = task.timeTracking.timeEntries[lastEntryIndex];
 
     let duration = 0;
-    let newTimeEntries = [...task.timeTracking.timeEntries];
+    const newTimeEntries = [...task.timeTracking.timeEntries];
 
     if (lastEntry && !lastEntry.endTime) {
       duration = Math.min(now - lastEntry.startTime, MAX_TIMER_DURATION_MS);
