@@ -2,7 +2,7 @@ import { API_BASE_URL } from '../utils/apiConfig';
 
 const API_URL = `${API_BASE_URL}/api`;
 
-export interface FeatureRequestInput {
+interface FeatureRequestInput {
     description: string;
     type: 'bug' | 'help' | 'feature';
     priority: 'Low' | 'Medium' | 'High';
