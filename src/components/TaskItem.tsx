@@ -211,11 +211,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </div>
 
             {/* Description Snippet */}
-            <TaskDescription 
-              task={task} 
-              onEdit={onEdit} 
-              className="mt-1 text-[11px] sm:text-xs ml-6" 
-            />
+            {task.description && (
+              <TaskDescription 
+                task={task} 
+                onEdit={onEdit} 
+                className="mt-1 text-[11px] sm:text-xs ml-6" 
+                lines={1}
+              />
+            )}
           </div>
         </div>
 
