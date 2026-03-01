@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HelpCircle, Bug, Rocket, X, Send, ChevronRight, Search } from 'lucide-react';
+import { HelpCircle, Bug, Rocket, X, Send, Search } from 'lucide-react';
 import { helpService } from '../../../services/helpService';
 import { toast } from 'sonner';
 import { track } from '@vercel/analytics';

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Task, TaskStatus } from '../types/Task';
-import { formatDate, isTaskOverdue, getStatusColor, getStatusIcon, getTaskAncestry, getTaskDepth } from '../utils/taskUtils';
-import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, User, Circle, Clock, Eye, CheckCircle, Play, Pause, CornerDownRight, Plus } from 'lucide-react';
+import { formatDate, isTaskOverdue, getStatusColor, getTaskAncestry, getTaskDepth } from '../utils/taskUtils';
+import { ChevronRight, ChevronDown, MoreHorizontal, Calendar, Circle, Clock, Eye, CheckCircle, CornerDownRight, Plus } from 'lucide-react';
 import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
@@ -115,37 +115,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
   const handleCancelDelete = () => {
     setDeleteModalOpen(false);
-  };
-
-  const renderDescription = () => {
-    if (!task.description) return null;
-
-    const maxLength = 80;
-    const isLong = task.description.length > maxLength;
-
-    if (isLong) {
-      const truncated = task.description.substring(0, maxLength);
-      return (
-        <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-          {truncated}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(task);
-            }}
-            className={`${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-800'} font-medium ml-1 transition-colors duration-200`}
-          >
-            {t('tasks.see_more')}
-          </button>
-        </p>
-      );
-    }
-
-    return (
-      <p className={`mt-1 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
-        {task.description}
-      </p>
-    );
   };
 
   return (

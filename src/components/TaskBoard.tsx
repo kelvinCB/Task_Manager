@@ -8,6 +8,7 @@ import { TaskTimer } from './TaskTimer';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { SpotlightCard } from './ui/SpotlightCard';
 import { TruncatedTaskTitle } from './ui/TruncatedTaskTitle';
+import { TaskDescription } from './TaskDescription';
 
 interface TaskBoardProps {
   tasks: Task[];
@@ -97,34 +98,6 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     setTaskToDelete(null);
   };
 
-  const renderDescription = (task: Task) => {
-    if (!task.description) return null;
-
-    const maxLength = 80;
-    const isLong = task.description.length > maxLength;
-
-    if (isLong) {
-      const truncated = task.description.substring(0, maxLength);
-      return (
-        <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2 mb-2`}>
-          {truncated}
-          <button
-            onClick={() => onEdit(task)}
-            className="text-indigo-600 hover:text-indigo-800 font-medium ml-1 transition-colors duration-200"
-          >
-            {t('tasks.see_more')}
-          </button>
-        </p>
-      );
-    }
-
-    return (
-      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2 mb-2`}>
-        {task.description}
-      </p>
-    );
-  };
-
   return (
     <div className={`h-full overflow-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 p-6">
@@ -196,7 +169,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
                               className="mb-1"
                               titleClassName={`font-medium ${task.status === 'Done' ? 'text-gray-500 line-through' : ''}`}
                             />
-                            {renderDescription(task)}
+                            <TaskDescription task={task} onEdit={onEdit} className="text-sm mb-2" />
                           </div>
 
                           {/* Desktop and Mobile layout - Consistent Badges */}
