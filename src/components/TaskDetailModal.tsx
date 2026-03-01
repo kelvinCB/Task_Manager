@@ -160,14 +160,14 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                           <div className={`markdown-preview ${theme === 'dark' ? 'prose-invert' : ''}`}>
                             <ReactMarkdown
                               components={{
-                                h1: ({ node, ...props }) => <h1 className="text-xl font-bold mb-2 mt-4" {...props} />,
-                                h2: ({ node, ...props }) => <h2 className="text-lg font-bold mb-2 mt-4" {...props} />,
-                                h3: ({ node, ...props }) => <h3 className="text-md font-bold mb-1 mt-3" {...props} />,
-                                ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-2" {...props} />,
-                                ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-2" {...props} />,
-                                li: ({ node, ...props }) => <li className="mb-1" {...props} />,
-                                p: ({ node, ...props }) => <p className="mb-2 whitespace-pre-wrap" {...props} />,
-                                code: ({ node, ...props }) => <code className={`px-1 py-0.5 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`} {...props} />,
+                                h1: ({ node: _node, ...props }) => <h1 className="text-xl font-bold mb-2 mt-4" {...props} />,
+                                h2: ({ node: _node, ...props }) => <h2 className="text-lg font-bold mb-2 mt-4" {...props} />,
+                                h3: ({ node: _node, ...props }) => <h3 className="text-md font-bold mb-1 mt-3" {...props} />,
+                                ul: ({ node: _node, ...props }) => <ul className="list-disc pl-5 mb-2" {...props} />,
+                                ol: ({ node: _node, ...props }) => <ol className="list-decimal pl-5 mb-2" {...props} />,
+                                li: ({ node: _node, ...props }) => <li className="mb-1" {...props} />,
+                                p: ({ node: _node, ...props }) => <p className="mb-2 whitespace-pre-wrap" {...props} />,
+                                code: ({ node: _node, ...props }) => <code className={`px-1 py-0.5 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`} {...props} />,
                               }}
                             >
                               {text}
