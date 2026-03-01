@@ -7,6 +7,7 @@ import { TaskTimer } from './TaskTimer';
 import { useTheme } from '../contexts/ThemeContext';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { TruncatedTaskTitle } from './ui/TruncatedTaskTitle';
+import { TaskDescription } from './TaskDescription';
 
 interface TaskItemProps {
   task: Task;
@@ -211,12 +212,12 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
             {/* Description Snippet */}
             {task.description && (
-              <p className={`
-              text-[11px] sm:text-xs line-clamp-1 ml-6
-              ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}
-            `}>
-                {task.description}
-              </p>
+              <TaskDescription 
+                task={task} 
+                onEdit={onEdit} 
+                className="mt-1 text-[11px] sm:text-xs ml-6" 
+                lines={1}
+              />
             )}
           </div>
         </div>
