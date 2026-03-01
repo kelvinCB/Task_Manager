@@ -17,11 +17,16 @@ export const TaskDescription: React.FC<TaskDescriptionProps> = ({ task, onEdit, 
 
   const maxLength = 80;
   const isLong = task.description.length > maxLength;
+  const baseClasses = `${className} ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`;
 
   if (isLong) {
-    const truncated = task.description.substring(0, maxLength);
+    const descriptionPrefix = task.description.substring(0, maxLength);
+    const lastSpaceIndex = descriptionPrefix.lastIndexOf(' ');
+    const cutIndex = lastSpaceIndex > 0 ? lastSpaceIndex : maxLength;
+    const truncated = task.description.substring(0, cutIndex) + '...';
+    
     return (
-      <p className={`${className} ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+      <p className={baseClasses}>
         {truncated}
         <button
           onClick={(e) => {
@@ -37,7 +42,7 @@ export const TaskDescription: React.FC<TaskDescriptionProps> = ({ task, onEdit, 
   }
 
   return (
-    <p className={`${className} ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} line-clamp-2`}>
+    <p className={baseClasses}>
       {task.description}
     </p>
   );
