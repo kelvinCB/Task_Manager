@@ -28,8 +28,7 @@ vi.mock('../../pages/ResetPasswordPage', () => {
   const React = require('react');
   const { useState } = React;
   
-  return {
-    default: () => {
+  const MockResetPasswordPage = () => {
       const [password, setPassword] = useState('');
       const [confirmPassword, setConfirmPassword] = useState('');
       const [isLoading, setIsLoading] = useState(false);
@@ -262,7 +261,10 @@ vi.mock('../../pages/ResetPasswordPage', () => {
           ])
         )
       ]);
-    }
+  };
+
+  return {
+    default: MockResetPasswordPage,
   };
 });
 
