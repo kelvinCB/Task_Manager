@@ -7,8 +7,14 @@ interface TaskDescriptionProps {
   task: Task;
   onEdit: (task: Task) => void;
   className?: string; // Container classes
-  lines?: number;
+  lines?: 1 | 2 | 3;
 }
+
+const lineClampClasses = {
+  1: 'line-clamp-1',
+  2: 'line-clamp-2',
+  3: 'line-clamp-3',
+};
 
 export const TaskDescription: React.FC<TaskDescriptionProps> = ({ task, onEdit, className = '', lines = 2 }) => {
   const { theme } = useTheme();
@@ -21,19 +27,21 @@ export const TaskDescription: React.FC<TaskDescriptionProps> = ({ task, onEdit, 
   const isLong = text.length > maxLength;
   
   const textColorClass = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
-  const clampClass = `line-clamp-${lines}`;
+  const clampClass = lineClampClasses[lines];
   const baseClasses = `${className} ${textColorClass}`;
 
   if (isLong) {
-    const descriptionPrefix = text.substring(0, maxLength);
+    const displayMax = maxLength - 3;
+    const descriptionPrefix = text.substring(0, displayMax);
     const lastSpaceIndex = descriptionPrefix.lastIndexOf(' ');
-    const cutIndex = lastSpaceIndex > 0 ? lastSpaceIndex : maxLength;
+    const cutIndex = lastSpaceIndex > 0 ? lastSpaceIndex : displayMax;
     const truncated = text.substring(0, cutIndex) + '...';
     
     return (
-      <div className={baseClasses}>
+      <div role="paragraph" className={baseClasses}>
         <span>{truncated}</span>
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             onEdit(task);
@@ -47,8 +55,8 @@ export const TaskDescription: React.FC<TaskDescriptionProps> = ({ task, onEdit, 
   }
 
   return (
-    <div className={`${baseClasses} ${clampClass}`}>
+    <p className={`${baseClasses} ${clampClass}`}>
       {text}
-    </div>
+    </p>
   );
 };
