@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Clock } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -50,15 +50,15 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     elapsedTimeRef.current = elapsedTime;
   }, [elapsedTime]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     onPauseRef.current = onPause;
   }, [onPause]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     onStartRef.current = onStart;
   }, [onStart]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     taskIdRef.current = taskId;
   }, [taskId]);
 
@@ -164,7 +164,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onPauseRef.current(taskIdRef.current);
+              onPause(taskId);
             }}
             className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
               ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700'
@@ -178,7 +178,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onStartRef.current(taskIdRef.current);
+              onStart(taskId);
             }}
             className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
               ? 'text-green-400 hover:text-green-300 hover:bg-gray-700'
