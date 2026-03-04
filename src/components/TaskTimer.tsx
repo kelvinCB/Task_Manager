@@ -38,10 +38,11 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   disabled = false
 }) => {
   const { theme } = useTheme();
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(() => elapsedTime);
   const currentTimeRef = useRef(0);
   const elapsedTimeRef = useRef(elapsedTime);
   const onPauseRef = useRef(onPause);
+  const taskIdRef = useRef(taskId);
   const lastNotificationTimeRef = useRef(0);
 
   useEffect(() => {
@@ -51,6 +52,10 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   useEffect(() => {
     onPauseRef.current = onPause;
   }, [onPause]);
+
+  useEffect(() => {
+    taskIdRef.current = taskId;
+  }, [taskId]);
 
   // Keep display synchronized with external elapsed time updates.
   useEffect(() => {
@@ -65,9 +70,9 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   useEffect(() => {
     if (!isActive || disabled) return;
 
-    // New active session: allow notification schedule to restart naturally.
+    // New active session: initialize notification throttle baseline.
     if (lastNotificationTimeRef.current === 0) {
-      lastNotificationTimeRef.current = Date.now() - 10 * 60 * 1000;
+      lastNotificationTimeRef.current = Date.now();
     }
 
     const interval = window.setInterval(() => {
@@ -80,7 +85,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
           const cappedTime = elapsedTimeRef.current + MAX_TIMER_DURATION_MS;
           currentTimeRef.current = cappedTime;
           window.clearInterval(interval);
-          onPauseRef.current(taskId);
+          onPauseRef.current(taskIdRef.current);
           return cappedTime;
         }
 
