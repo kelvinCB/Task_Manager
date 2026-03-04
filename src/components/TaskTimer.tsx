@@ -42,6 +42,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   const currentTimeRef = useRef(0);
   const elapsedTimeRef = useRef(elapsedTime);
   const onPauseRef = useRef(onPause);
+  const onStartRef = useRef(onStart);
   const taskIdRef = useRef(taskId);
   const lastNotificationTimeRef = useRef(0);
 
@@ -52,6 +53,10 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   useEffect(() => {
     onPauseRef.current = onPause;
   }, [onPause]);
+
+  useEffect(() => {
+    onStartRef.current = onStart;
+  }, [onStart]);
 
   useEffect(() => {
     taskIdRef.current = taskId;
@@ -110,7 +115,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     return () => {
       window.clearInterval(interval);
     };
-  }, [isActive, disabled, taskId]);
+  }, [isActive, disabled]);
 
   // When inactive, keep latest authoritative elapsed time to avoid display jumps.
   useEffect(() => {
@@ -122,8 +127,6 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
       return next;
     });
 
-    // Reset notification base for next active session.
-    lastNotificationTimeRef.current = 0;
   }, [isActive, disabled]);
 
   // Format time more compactly for mobile
@@ -159,7 +162,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onPause(taskId);
+              onPauseRef.current(taskIdRef.current);
             }}
             className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
               ? 'text-orange-400 hover:text-orange-300 hover:bg-gray-700'
@@ -173,7 +176,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onStart(taskId);
+              onStartRef.current(taskIdRef.current);
             }}
             className={`${compact ? 'p-0.5' : 'p-0.5 sm:p-1'} ${theme === 'dark'
               ? 'text-green-400 hover:text-green-300 hover:bg-gray-700'
