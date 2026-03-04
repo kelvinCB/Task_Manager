@@ -123,6 +123,10 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
         }
     };
 
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        await handleSave();
+    };
 
     const profileImage = profile?.avatar_url || "";
 
@@ -189,7 +193,7 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
 
                     {/* Form Fields */}
                     <div className="max-h-[50vh] overflow-y-auto px-6 py-6 space-y-4">
-                        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <form id="my-profile-form" className="space-y-4" onSubmit={handleFormSubmit}>
                             <div className="space-y-1.5">
                                 <Label htmlFor="displayName" className={theme === 'dark' ? 'text-gray-200' : ''}>Full Name</Label>
                                 <Input
@@ -313,8 +317,8 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
                             <Button variant="outline" onClick={onClose} className={theme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white' : 'border-gray-200 hover:bg-gray-100'}>Cancel</Button>
                         </DialogClose>
                         <Button
-                            type="button"
-                            onClick={handleSave}
+                            type="submit"
+                            form="my-profile-form"
                             className="bg-indigo-600 hover:bg-indigo-700 text-white border-0"
                         >
                             Save Changes
