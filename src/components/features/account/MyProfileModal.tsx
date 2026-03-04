@@ -189,7 +189,7 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
 
                     {/* Form Fields */}
                     <div className="max-h-[50vh] overflow-y-auto px-6 py-6 space-y-4">
-                        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <div className="space-y-4">
                             <div className="space-y-1.5">
                                 <Label htmlFor="displayName" className={theme === 'dark' ? 'text-gray-200' : ''}>Full Name</Label>
                                 <Input
@@ -305,7 +305,7 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
                                     maxLength={maxLength}
                                 />
                             </div>
-                        </form>
+                        </div>
                     </div>
 
                     <DialogFooter className={`border-t px-6 py-4 rounded-b-2xl ${theme === 'dark' ? 'border-gray-800 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}>

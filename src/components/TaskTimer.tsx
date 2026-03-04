@@ -37,50 +37,68 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   disabled = false
 }) => {
   const { theme } = useTheme();
-  const [currentTime, setCurrentTime] = useState(elapsedTime);
+  const [tickMs, setTickMs] = useState(0);
   const lastNotificationTimeRef = useRef(0);
+  const sessionStartTickRef = useRef<number | null>(null);
 
-  // Update elapsed time if timer is active
+  // Track active session start without state resets derived from props.
   useEffect(() => {
-    let interval: number | null = null;
-
-    if (isActive && !disabled) {
-      interval = window.setInterval(() => {
-        setCurrentTime(prevTime => {
-          const newTime = prevTime + 1000; // Update every second
-
-          // Check if we reached the 8-hour limit for this session
-          const sessionDuration = newTime - elapsedTime;
-          if (sessionDuration >= MAX_TIMER_DURATION_MS) {
-            if (interval) window.clearInterval(interval);
-            onPause(taskId);
-            return elapsedTime + MAX_TIMER_DURATION_MS;
-          }
-
-          // Check if we should play a sound (every 10 minutes)
-          const tenMinutesInMs = 10 * 60 * 1000;
-          const previousMinutes = Math.floor(prevTime / tenMinutesInMs);
-          const currentMinutes = Math.floor(newTime / tenMinutesInMs);
-
-          if (currentMinutes > previousMinutes) {
-            // Only play if at least 9 minutes have passed since last notification
-            // This prevents multiple notifications if there are several active timers
-            const now = Date.now();
-            if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
-              playNotificationSound();
-              lastNotificationTimeRef.current = now;
-            }
-          }
-
-          return newTime;
-        });
-      }, 1000);
-    } else {
-      setCurrentTime(elapsedTime); // Sync with external time when paused
+    if (isActive && !disabled && sessionStartTickRef.current === null) {
+      sessionStartTickRef.current = tickMs;
     }
 
+    if (!isActive || disabled) {
+      sessionStartTickRef.current = null;
+    }
+  }, [isActive, disabled, tickMs]);
+
+  const rawSessionElapsed =
+    isActive && !disabled && sessionStartTickRef.current !== null
+      ? tickMs - sessionStartTickRef.current
+      : 0;
+
+  const activeSessionElapsed = Math.min(rawSessionElapsed, MAX_TIMER_DURATION_MS);
+  const currentTime = elapsedTime + activeSessionElapsed;
+
+  // Update displayed time while active.
+  useEffect(() => {
+    if (!isActive || disabled) return;
+
+    const interval = window.setInterval(() => {
+      setTickMs(prevTick => {
+        const nextTick = prevTick + 1000;
+        const startTick = sessionStartTickRef.current ?? prevTick;
+        const previousSessionDuration = prevTick - startTick;
+        const nextSessionDuration = nextTick - startTick;
+
+        // Check if we reached the 8-hour limit for this session
+        if (nextSessionDuration >= MAX_TIMER_DURATION_MS) {
+          window.clearInterval(interval);
+          onPause(taskId);
+          return startTick + MAX_TIMER_DURATION_MS;
+        }
+
+        // Check if we should play a sound (every 10 minutes)
+        const tenMinutesInMs = 10 * 60 * 1000;
+        const previousMinutes = Math.floor((elapsedTime + Math.max(0, previousSessionDuration)) / tenMinutesInMs);
+        const currentMinutes = Math.floor((elapsedTime + nextSessionDuration) / tenMinutesInMs);
+
+        if (currentMinutes > previousMinutes) {
+          // Only play if at least 9 minutes have passed since last notification
+          // This prevents multiple notifications if there are several active timers
+          const now = Date.now();
+          if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
+            playNotificationSound();
+            lastNotificationTimeRef.current = now;
+          }
+        }
+
+        return nextTick;
+      });
+    }, 1000);
+
     return () => {
-      if (interval) window.clearInterval(interval);
+      window.clearInterval(interval);
     };
   }, [isActive, elapsedTime, taskId, onPause, disabled]);
 
