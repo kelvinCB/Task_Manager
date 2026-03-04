@@ -27,6 +27,7 @@ const formatTime = (ms: number): string => {
     seconds.toString().padStart(2, '0'),
   ].join(':');
 };
+
 export const TaskTimer: React.FC<TaskTimerProps> = ({
   taskId,
   isActive,
@@ -37,71 +38,73 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   disabled = false
 }) => {
   const { theme } = useTheme();
-  const [tickMs, setTickMs] = useState(0);
+  const [displayTime, setDisplayTime] = useState(0);
+  const displayTimeRef = useRef(0);
   const lastNotificationTimeRef = useRef(0);
-  const sessionStartTickRef = useRef<number | null>(null);
+  const elapsedTimeRef = useRef(elapsedTime);
+  const activeStartAtRef = useRef<number | null>(null);
+  const activeBaseElapsedRef = useRef(0);
 
-  // Track active session start without state resets derived from props.
   useEffect(() => {
-    if (isActive && !disabled && sessionStartTickRef.current === null) {
-      sessionStartTickRef.current = tickMs;
-    }
+    elapsedTimeRef.current = elapsedTime;
+  }, [elapsedTime]);
 
+  useEffect(() => {
     if (!isActive || disabled) {
-      sessionStartTickRef.current = null;
+      activeStartAtRef.current = null;
+      // Keep latest visual time to avoid pause flicker if parent updates asynchronously.
+      setDisplayTime(prev => {
+        const next = Math.max(prev, elapsedTime);
+        displayTimeRef.current = next;
+        return next;
+      });
+      return;
     }
-  }, [isActive, disabled, tickMs]);
 
-  const rawSessionElapsed =
-    isActive && !disabled && sessionStartTickRef.current !== null
-      ? tickMs - sessionStartTickRef.current
-      : 0;
-
-  const activeSessionElapsed = Math.min(rawSessionElapsed, MAX_TIMER_DURATION_MS);
-  const currentTime = elapsedTime + activeSessionElapsed;
-
-  // Update displayed time while active.
-  useEffect(() => {
-    if (!isActive || disabled) return;
+    activeStartAtRef.current = Date.now();
+    activeBaseElapsedRef.current = elapsedTimeRef.current;
+    displayTimeRef.current = activeBaseElapsedRef.current;
+    setDisplayTime(activeBaseElapsedRef.current);
 
     const interval = window.setInterval(() => {
-      setTickMs(prevTick => {
-        const nextTick = prevTick + 1000;
-        const startTick = sessionStartTickRef.current ?? prevTick;
-        const previousSessionDuration = prevTick - startTick;
-        const nextSessionDuration = nextTick - startTick;
+      const startedAt = activeStartAtRef.current;
+      if (!startedAt) return;
 
-        // Check if we reached the 8-hour limit for this session
-        if (nextSessionDuration >= MAX_TIMER_DURATION_MS) {
-          window.clearInterval(interval);
-          onPause(taskId);
-          return startTick + MAX_TIMER_DURATION_MS;
+      const sessionDuration = Date.now() - startedAt;
+      const cappedSessionDuration = Math.min(sessionDuration, MAX_TIMER_DURATION_MS);
+      const nextDisplayTime = activeBaseElapsedRef.current + cappedSessionDuration;
+
+      // Check if we should play a sound (every 10 minutes)
+      const tenMinutesInMs = 10 * 60 * 1000;
+      const previousMinutes = Math.floor(displayTimeRef.current / tenMinutesInMs);
+      const currentMinutes = Math.floor(nextDisplayTime / tenMinutesInMs);
+
+      if (currentMinutes > previousMinutes) {
+        const now = Date.now();
+        if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
+          playNotificationSound();
+          lastNotificationTimeRef.current = now;
         }
+      }
 
-        // Check if we should play a sound (every 10 minutes)
-        const tenMinutesInMs = 10 * 60 * 1000;
-        const previousMinutes = Math.floor((elapsedTime + Math.max(0, previousSessionDuration)) / tenMinutesInMs);
-        const currentMinutes = Math.floor((elapsedTime + nextSessionDuration) / tenMinutesInMs);
+      displayTimeRef.current = nextDisplayTime;
+      setDisplayTime(nextDisplayTime);
 
-        if (currentMinutes > previousMinutes) {
-          // Only play if at least 9 minutes have passed since last notification
-          // This prevents multiple notifications if there are several active timers
-          const now = Date.now();
-          if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
-            playNotificationSound();
-            lastNotificationTimeRef.current = now;
-          }
-        }
-
-        return nextTick;
-      });
+      // Check if we reached the 8-hour limit for this session
+      if (sessionDuration >= MAX_TIMER_DURATION_MS) {
+        window.clearInterval(interval);
+        onPause(taskId);
+      }
     }, 1000);
 
     return () => {
       window.clearInterval(interval);
     };
-  }, [isActive, elapsedTime, taskId, onPause, disabled]);
+  }, [isActive, taskId, onPause, disabled, elapsedTime]);
 
+  const currentTime = isActive && !disabled
+    ? displayTime
+    : Math.max(displayTime, elapsedTime);
 
   // Format time more compactly for mobile
   const formatTimeCompact = (ms: number): string => {
