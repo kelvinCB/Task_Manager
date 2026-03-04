@@ -57,6 +57,10 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     taskIdRef.current = taskId;
   }, [taskId]);
 
+  // Intentionally keep taskId out of the interval effect deps.
+  // We read taskId from taskIdRef.current inside the interval callback
+  // to avoid restarting the timer when taskId changes without unmounting.
+
   // Keep display synchronized with external elapsed time updates.
   useEffect(() => {
     setCurrentTime(prev => {
