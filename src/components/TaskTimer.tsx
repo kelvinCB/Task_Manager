@@ -42,7 +42,6 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   const currentTimeRef = useRef(0);
   const elapsedTimeRef = useRef(elapsedTime);
   const onPauseRef = useRef(onPause);
-  const onStartRef = useRef(onStart);
   const taskIdRef = useRef(taskId);
   const lastNotificationTimeRef = useRef(0);
 
@@ -53,10 +52,6 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   useEffect(() => {
     onPauseRef.current = onPause;
   }, [onPause]);
-
-  useEffect(() => {
-    onStartRef.current = onStart;
-  }, [onStart]);
 
   useEffect(() => {
     taskIdRef.current = taskId;
