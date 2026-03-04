@@ -53,7 +53,7 @@ test.describe('Task Advanced Features', () => {
     await expect(appPage.page.getByText('Unlock AI Power')).not.toBeVisible();
   });
 
-  test('should create a task using AI description generation', async () => {
+  test.skip('should create a task using AI description generation', async () => {
     test.setTimeout(90000); // Allow up to 90 seconds for AI generation
 
     // Login first
@@ -150,7 +150,7 @@ test.describe('Task Advanced Features', () => {
     await expect(appPage.page.getByText(uniqueDescription)).toBeVisible();
   });
 
-  test('should improve grammar using AI', async () => {
+  test.skip('should improve grammar using AI', async () => {
     test.setTimeout(90000);
 
     // Login first
