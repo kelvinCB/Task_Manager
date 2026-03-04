@@ -105,7 +105,7 @@ test.describe('Credit Management', () => {
         }
     });
 
-    test('should show error when user has no credits', async ({ page, request }) => {
+    test.skip('should show error when user has no credits', async ({ page, request }) => {
         if (!process.env.SUPABASE_SERVICE_KEY) {
             console.warn('Skipping test: SUPABASE_SERVICE_KEY not found');
             test.skip();

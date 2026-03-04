@@ -185,44 +185,10 @@ const deleteAvatar = async (req, res) => {
     }
 };
 
-const updateProfile = async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const { username, display_name, about, linkedin } = req.body;
-        const token = req.headers.authorization?.split(' ')[1];
-        const userClient = token ? createClientWithToken(token) : supabase;
 
-        // Build update object with only provided fields
-        const updates = {
-            updated_at: new Date().toISOString()
-        };
-        if (username !== undefined) updates.username = username;
-        if (display_name !== undefined) updates.display_name = display_name;
-        if (about !== undefined) updates.about = about;
-        if (linkedin !== undefined) updates.linkedin = linkedin;
-
-        const { data: profile, error } = await userClient
-            .from('profiles')
-            .update(updates)
-            .eq('id', userId)
-            .select()
-            .single();
-
-        if (error) {
-            console.error('Error updating profile:', error);
-            return res.status(500).json({ error: 'Failed to update profile', details: error.message });
-        }
-
-        res.status(200).json(profile);
-    } catch (err) {
-        console.error('Update Profile Error:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
 
 module.exports = {
     uploadAvatar,
     deleteAvatar,
-    getProfile,
-    updateProfile
+    getProfile
 };

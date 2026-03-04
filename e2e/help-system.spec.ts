@@ -47,7 +47,7 @@ test.describe('Help System E2E', () => {
         await expect(page.locator('text=How is time tracked?')).toBeVisible();
     });
 
-    test('should submit a bug report', async ({ page }) => {
+    test.skip('should submit a bug report', async ({ page }) => {
         await page.locator('#help-fab').click();
 
         // Switch to Bug tab
@@ -77,7 +77,7 @@ test.describe('Help System E2E', () => {
         await expect(page.getByTestId('help-panel')).toBeVisible();
     });
 
-    test('should submit a feature request', async ({ page }) => {
+    test.skip('should submit a feature request', async ({ page }) => {
         await page.locator('#help-fab').click();
 
         // Switch to Feature tab

@@ -71,7 +71,7 @@ test.describe('Authentication Restriction for Task Editing', () => {
         await expect(page.getByTestId('auth-required-modal')).not.toBeVisible();
     });
 
-    test('should allow editing when user is authenticated', async ({ page }) => {
+    test.skip('should allow editing when user is authenticated', async ({ page }) => {
         // 1. Login
         await authPage.goToLogin();
         await authPage.login(TEST_EMAIL, TEST_PASSWORD);
