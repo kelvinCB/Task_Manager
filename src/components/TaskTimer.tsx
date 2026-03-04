@@ -54,17 +54,19 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
       activeStartAtRef.current = null;
       // Keep latest visual time to avoid pause flicker if parent updates asynchronously.
       setDisplayTime(prev => {
-        const next = Math.max(prev, elapsedTime);
+        const next = Math.max(prev, elapsedTimeRef.current);
         displayTimeRef.current = next;
         return next;
       });
       return;
     }
 
-    activeStartAtRef.current = Date.now();
-    activeBaseElapsedRef.current = elapsedTimeRef.current;
-    displayTimeRef.current = activeBaseElapsedRef.current;
-    setDisplayTime(activeBaseElapsedRef.current);
+    if (activeStartAtRef.current === null) {
+      activeStartAtRef.current = Date.now();
+      activeBaseElapsedRef.current = elapsedTimeRef.current;
+      displayTimeRef.current = activeBaseElapsedRef.current;
+      setDisplayTime(activeBaseElapsedRef.current);
+    }
 
     const interval = window.setInterval(() => {
       const startedAt = activeStartAtRef.current;
@@ -87,20 +89,26 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
         }
       }
 
-      displayTimeRef.current = nextDisplayTime;
-      setDisplayTime(nextDisplayTime);
-
       // Check if we reached the 8-hour limit for this session
       if (sessionDuration >= MAX_TIMER_DURATION_MS) {
+        const cappedTime = activeBaseElapsedRef.current + MAX_TIMER_DURATION_MS;
+        displayTimeRef.current = cappedTime;
+        setDisplayTime(cappedTime);
+        activeStartAtRef.current = null;
         window.clearInterval(interval);
         onPause(taskId);
+        return;
       }
+
+      displayTimeRef.current = nextDisplayTime;
+      setDisplayTime(nextDisplayTime);
     }, 1000);
 
     return () => {
+      activeStartAtRef.current = null;
       window.clearInterval(interval);
     };
-  }, [isActive, taskId, onPause, disabled, elapsedTime]);
+  }, [isActive, taskId, onPause, disabled]);
 
   const currentTime = isActive && !disabled
     ? displayTime
