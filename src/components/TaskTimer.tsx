@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Play, Pause, Clock } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -50,15 +50,15 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     elapsedTimeRef.current = elapsedTime;
   }, [elapsedTime]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     onPauseRef.current = onPause;
   }, [onPause]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     onStartRef.current = onStart;
   }, [onStart]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     taskIdRef.current = taskId;
   }, [taskId]);
 
@@ -127,6 +127,8 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
       return next;
     });
 
+    // Reset throttle baseline between active sessions.
+    lastNotificationTimeRef.current = 0;
   }, [isActive, disabled]);
 
   // Format time more compactly for mobile
