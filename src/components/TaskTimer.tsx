@@ -38,81 +38,88 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
   disabled = false
 }) => {
   const { theme } = useTheme();
-  const [displayTime, setDisplayTime] = useState(0);
-  const displayTimeRef = useRef(0);
-  const lastNotificationTimeRef = useRef(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const currentTimeRef = useRef(0);
   const elapsedTimeRef = useRef(elapsedTime);
-  const activeStartAtRef = useRef<number | null>(null);
-  const activeBaseElapsedRef = useRef(0);
+  const onPauseRef = useRef(onPause);
+  const lastNotificationTimeRef = useRef(0);
 
   useEffect(() => {
     elapsedTimeRef.current = elapsedTime;
   }, [elapsedTime]);
 
   useEffect(() => {
-    if (!isActive || disabled) {
-      activeStartAtRef.current = null;
-      // Keep latest visual time to avoid pause flicker if parent updates asynchronously.
-      setDisplayTime(prev => {
-        const next = Math.max(prev, elapsedTimeRef.current);
-        displayTimeRef.current = next;
-        return next;
-      });
-      return;
-    }
+    onPauseRef.current = onPause;
+  }, [onPause]);
 
-    if (activeStartAtRef.current === null) {
-      activeStartAtRef.current = Date.now();
-      activeBaseElapsedRef.current = elapsedTimeRef.current;
-      displayTimeRef.current = activeBaseElapsedRef.current;
-      setDisplayTime(activeBaseElapsedRef.current);
+  // Keep display synchronized with external elapsed time updates.
+  useEffect(() => {
+    setCurrentTime(prev => {
+      const next = Math.max(prev, elapsedTime);
+      currentTimeRef.current = next;
+      return next;
+    });
+  }, [elapsedTime]);
+
+  // Tick only while active.
+  useEffect(() => {
+    if (!isActive || disabled) return;
+
+    // New active session: allow notification schedule to restart naturally.
+    if (lastNotificationTimeRef.current === 0) {
+      lastNotificationTimeRef.current = Date.now() - 10 * 60 * 1000;
     }
 
     const interval = window.setInterval(() => {
-      const startedAt = activeStartAtRef.current;
-      if (!startedAt) return;
+      setCurrentTime(prevTime => {
+        const nextTime = prevTime + 1000;
+        const sessionDuration = Math.max(0, nextTime - elapsedTimeRef.current);
 
-      const sessionDuration = Date.now() - startedAt;
-      const cappedSessionDuration = Math.min(sessionDuration, MAX_TIMER_DURATION_MS);
-      const nextDisplayTime = activeBaseElapsedRef.current + cappedSessionDuration;
-
-      // Check if we should play a sound (every 10 minutes)
-      const tenMinutesInMs = 10 * 60 * 1000;
-      const previousMinutes = Math.floor(displayTimeRef.current / tenMinutesInMs);
-      const currentMinutes = Math.floor(nextDisplayTime / tenMinutesInMs);
-
-      if (currentMinutes > previousMinutes) {
-        const now = Date.now();
-        if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
-          playNotificationSound();
-          lastNotificationTimeRef.current = now;
+        // Check if we reached the 8-hour limit for this session
+        if (sessionDuration >= MAX_TIMER_DURATION_MS) {
+          const cappedTime = elapsedTimeRef.current + MAX_TIMER_DURATION_MS;
+          currentTimeRef.current = cappedTime;
+          window.clearInterval(interval);
+          onPauseRef.current(taskId);
+          return cappedTime;
         }
-      }
 
-      // Check if we reached the 8-hour limit for this session
-      if (sessionDuration >= MAX_TIMER_DURATION_MS) {
-        const cappedTime = activeBaseElapsedRef.current + MAX_TIMER_DURATION_MS;
-        displayTimeRef.current = cappedTime;
-        setDisplayTime(cappedTime);
-        activeStartAtRef.current = null;
-        window.clearInterval(interval);
-        onPause(taskId);
-        return;
-      }
+        // Check if we should play a sound (every 10 minutes)
+        const tenMinutesInMs = 10 * 60 * 1000;
+        const previousMinutes = Math.floor(prevTime / tenMinutesInMs);
+        const currentMinutes = Math.floor(nextTime / tenMinutesInMs);
 
-      displayTimeRef.current = nextDisplayTime;
-      setDisplayTime(nextDisplayTime);
+        if (currentMinutes > previousMinutes) {
+          const now = Date.now();
+          if (now - lastNotificationTimeRef.current > 9 * 60 * 1000) {
+            playNotificationSound();
+            lastNotificationTimeRef.current = now;
+          }
+        }
+
+        currentTimeRef.current = nextTime;
+        return nextTime;
+      });
     }, 1000);
 
     return () => {
-      activeStartAtRef.current = null;
       window.clearInterval(interval);
     };
-  }, [isActive, taskId, onPause, disabled]);
+  }, [isActive, disabled, taskId]);
 
-  const currentTime = isActive && !disabled
-    ? displayTime
-    : Math.max(displayTime, elapsedTime);
+  // When inactive, keep latest authoritative elapsed time to avoid display jumps.
+  useEffect(() => {
+    if (isActive && !disabled) return;
+
+    setCurrentTime(prev => {
+      const next = Math.max(prev, elapsedTimeRef.current);
+      currentTimeRef.current = next;
+      return next;
+    });
+
+    // Reset notification base for next active session.
+    lastNotificationTimeRef.current = 0;
+  }, [isActive, disabled]);
 
   // Format time more compactly for mobile
   const formatTimeCompact = (ms: number): string => {
