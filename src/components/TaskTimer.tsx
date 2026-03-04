@@ -57,6 +57,10 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     taskIdRef.current = taskId;
   }, [taskId]);
 
+  // Intentionally keep taskId out of the interval effect deps.
+  // We read taskId from taskIdRef.current inside the interval callback
+  // to avoid restarting the timer when taskId changes without unmounting.
+
   // Keep display synchronized with external elapsed time updates.
   useEffect(() => {
     setCurrentTime(prev => {
@@ -110,7 +114,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
     return () => {
       window.clearInterval(interval);
     };
-  }, [isActive, disabled, taskId]);
+  }, [isActive, disabled]);
 
   // When inactive, keep latest authoritative elapsed time to avoid display jumps.
   useEffect(() => {
@@ -122,7 +126,7 @@ export const TaskTimer: React.FC<TaskTimerProps> = ({
       return next;
     });
 
-    // Reset notification base for next active session.
+    // Reset throttle baseline between active sessions.
     lastNotificationTimeRef.current = 0;
   }, [isActive, disabled]);
 
