@@ -53,7 +53,7 @@ app.get('/', (req, res) => {
     res.send('Task Manager Backend is running!');
 });
 
-app.get('/health', (req, res) => {
+const healthCheck = (req, res) => {
     const configured = isSupabaseConfigured;
     res.status(configured ? 200 : 503).json({
         status: configured ? 'healthy' : 'degraded',
@@ -62,6 +62,10 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development'
     });
-});
+};
+
+// Both paths are supported because Vercel rewrites /api/* requests to this app
+// while local Express usage commonly calls /health directly.
+app.get(['/health', '/api/health'], healthCheck);
 
 module.exports = app;
