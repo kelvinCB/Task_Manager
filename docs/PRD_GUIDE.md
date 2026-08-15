@@ -147,7 +147,7 @@ Create an intuitive, powerful task management tool that combines hierarchical or
 | **Google OAuth** | ✅ Complete | 100% | Login with Google (Client-side implementation) |
 | **GitHub OAuth** | ✅ Complete | 100% | Login with GitHub (Client-side implementation) |
 | **Password Reset** | ✅ Complete | 100% | Forgot password functionality |
-| **Account Settings** | ❌ Pending | 0% | User preferences and settings |
+| **Account Settings** | ✅ Complete | 100% | Profile and Settings tabs, inactivity timeout, and personal access tokens for MCP clients |
 
 ### 📱 Enhanced UI Features (In Progress - 40%)
 

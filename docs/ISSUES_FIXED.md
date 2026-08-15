@@ -4,6 +4,35 @@ This file documents issues that have been identified and resolved in the TaskMan
 
 ---
 
+## Production `/api/tasks` 500 caused by missing Vercel runtime dependencies — Fixed on 2026-08-15
+
+### Symptoms
+
+- `GET https://kolium.com/api/tasks` returned `500 Internal Server Error`.
+- Vercel runtime logs showed `Cannot find module 'express'` from `backend/src/app.js`.
+
+### Root Cause
+
+The latest production `main` commit removed Express and the other backend runtime packages from the root `package.json`. Vercel installs the root package for this fullstack project, while the `/api` function imports the backend from `backend/`.
+
+### Fixes Applied
+
+- Restored the backend runtime dependencies (`express`, `cors`, `multer`, and Swagger packages) in the root `package.json` and lockfile used by Vercel.
+- Avoided loading `dotenv` in Vercel, where environment variables are already injected.
+- Made Supabase configuration fail closed with a controlled `503` health/API response instead of crashing the function during module initialization.
+
+### Deployment Requirements
+
+After the branch is merged, redeploy Vercel and verify `/api/health` before retrying `/api/tasks`. Configure `SUPABASE_URL` plus a browser-safe `SUPABASE_KEY`/`VITE_SUPABASE_KEY` in the Vercel Production environment.
+
+## Browser sessions remaining active indefinitely — Fixed on 2026-08-15
+
+The frontend now records the last user activity and locally signs out inactive sessions after eight hours by default. The timeout can be changed with `VITE_AUTH_INACTIVITY_TIMEOUT_MS`. Expired sessions are redirected to `/login`.
+
+## MCP personal access tokens and Account Settings — Implemented on 2026-08-15
+
+My Account now includes a Settings tab for creating, viewing, copying once, and revoking personal access tokens. Tokens are stored as SHA-256 hashes and can be sent as `Authorization: Bearer kolium_pat_...` to authenticated API routes. Apply `migrations/002_create_personal_access_tokens.sql` and configure the server-only `SUPABASE_SECRET_KEY` before enabling this feature in production.
+
 ## Intermittent 500 on `POST /api/tasks` due to invalid estimation values — Fixed on 2026-02-25
 
 ### Symptoms

@@ -9,6 +9,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const express = require('express');
 const cors = require('cors');
+const { isSupabaseConfigured, isServiceRoleConfigured } = require('./config/supabaseClient');
 
 const app = express();
 
@@ -35,6 +36,7 @@ const profileRoutes = require('./routes/profile');
 const aiRoutes = require('./routes/ai');
 const featureRequestRoutes = require('./routes/featureRequests');
 const adminRoutes = require('./routes/admin');
+const personalAccessTokenRoutes = require('./routes/personalAccessTokens');
 
 app.use('/api/auth', authRoutes);
 
@@ -45,17 +47,25 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/feature-requests', featureRequestRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/personal-access-tokens', personalAccessTokenRoutes);
 
 app.get('/', (req, res) => {
     res.send('Task Manager Backend is running!');
 });
 
-app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'healthy',
+const healthCheck = (req, res) => {
+    const configured = isSupabaseConfigured;
+    res.status(configured ? 200 : 503).json({
+        status: configured ? 'healthy' : 'degraded',
+        supabase: configured ? 'configured' : 'missing_environment',
+        personal_access_tokens: isServiceRoleConfigured ? 'configured' : 'missing_secret_key',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development'
     });
-});
+};
+
+// Both paths are supported because Vercel rewrites /api/* requests to this app
+// while local Express usage commonly calls /health directly.
+app.get(['/health', '/api/health'], healthCheck);
 
 module.exports = app;

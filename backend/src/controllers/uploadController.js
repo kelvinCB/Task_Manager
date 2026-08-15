@@ -28,7 +28,7 @@ const uploadFile = async (req, res) => {
     
     // We assume 'req.headers.authorization' contains the Bearer token.
     const token = req.headers.authorization?.split(' ')[1];
-    const userClient = token ? createClientWithToken(token) : supabase;
+    const userClient = req.supabase || (token ? createClientWithToken(token) : supabase);
 
     console.log(`Uploading file ${filePath} for user ${userId} size ${file.size}`);
 

@@ -45,6 +45,14 @@ Set the following **REQUIRED** environment variables in Vercel. You can use the 
 VITE_SUPABASE_URL=your-supabase-project-url
 VITE_SUPABASE_KEY=your-supabase-anon-key
 
+# Server-side API configuration (keep these out of VITE_ variables)
+SUPABASE_URL=your-supabase-project-url
+SUPABASE_KEY=your-supabase-publishable-or-anon-key
+SUPABASE_SECRET_KEY=your-supabase-secret-key
+
+# Optional; defaults to 8 hours
+VITE_AUTH_INACTIVITY_TIMEOUT_MS=28800000
+
 # AI Features
 VITE_OPENAI_API_KEY=your-openai-api-key
 VITE_OPENAI_MODEL=gpt-5-nano-2025-08-07
@@ -59,6 +67,8 @@ VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 - **Output Directory**: `dist`
 - **Install Command**: `npm install`
 
+The root package must retain the backend runtime dependencies because Vercel packages `/api/index.js` from the root installation. If the runtime reports `Cannot find module 'express'`, confirm the dependency is present in the root lockfile and trigger a fresh deployment without using the old build cache.
+
 ### 4. Deploy
 - Vercel will automatically deploy both frontend and serverless functions on every push to main.
 
@@ -69,6 +79,10 @@ The backend is no longer a separate service. It resides in `backend/` but is dep
 - `vercel.json`: Handles routing rewrites to direct `/api/*` traffic to the backend.
 
 No separate backend deployment (Heroku/Railway/Render) is required.
+
+### Personal Access Token database setup
+
+Before enabling MCP access in Production, apply [`migrations/002_create_personal_access_tokens.sql`](../migrations/002_create_personal_access_tokens.sql) to the production Supabase project. Then set the server-only `SUPABASE_SECRET_KEY` Vercel variable. Never place this key in a `VITE_` variable.
 
 
 ### Initial Setup

@@ -59,5 +59,17 @@ describe('Auth Middleware', () => {
       });
       expect(next).not.toHaveBeenCalled();
     });
+
+    it('should return 503 for personal access tokens when the server secret is missing', async () => {
+      req.headers.authorization = 'Bearer kolium_pat_test-token';
+
+      await authenticateUser(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(503);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        code: 'SUPABASE_NOT_CONFIGURED'
+      }));
+      expect(next).not.toHaveBeenCalled();
+    });
   });
 });

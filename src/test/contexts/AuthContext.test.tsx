@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, renderHook, act, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuth } from '../../contexts/AuthContext';
 import supabase from '../../lib/supabaseClient';
+import { AUTH_ACTIVITY_STORAGE_KEY, DEFAULT_AUTH_INACTIVITY_TIMEOUT_MS } from '../../utils/authSession';
 
 // Mock Supabase
 vi.mock('../../lib/supabaseClient', () => ({
@@ -176,6 +177,33 @@ describe('AuthContext', () => {
       unmount();
 
       expect(unsubscribeMock).toHaveBeenCalled();
+    });
+
+    it('signs out and marks the session expired after inactivity', async () => {
+      window.localStorage.setItem(AUTH_ACTIVITY_STORAGE_KEY, JSON.stringify({
+        userId: 'user-123',
+        timestamp: Date.now() - DEFAULT_AUTH_INACTIVITY_TIMEOUT_MS - 1
+      }));
+
+      vi.mocked(supabase.auth.getSession).mockResolvedValue({
+        data: { session: mockSession as any },
+        error: null,
+      });
+
+      vi.mocked(supabase.auth.onAuthStateChange).mockReturnValue({
+        data: { subscription: { unsubscribe: vi.fn() } },
+      } as any);
+
+      const { result } = renderHook(() => useAuth(), {
+        wrapper: AuthProvider,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isAuthenticated).toBe(false);
+        expect(result.current.isSessionExpired).toBe(true);
+      });
+
+      expect(supabase.auth.signOut).toHaveBeenCalledWith({ scope: 'local' });
     });
   });
 

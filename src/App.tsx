@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { useTasks } from './hooks/useTasks';
 import { TaskTree } from './components/TaskTree';
 import { TaskBoard } from './components/TaskBoard';
@@ -68,7 +68,14 @@ const MainApp = () => {
 
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isSessionExpired } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isSessionExpired) {
+      navigate('/login', { replace: true });
+    }
+  }, [isSessionExpired, navigate]);
 
   useEffect(() => {
     document.title = t('app.title');

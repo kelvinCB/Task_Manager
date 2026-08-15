@@ -89,6 +89,24 @@ Stores user feedback, bug reports, and feature requests.
 | `priority`    | `text`        | Not Null, Default 'Medium', CHECK (priority IN ('Low', 'Medium', 'High')) |
 | `created_at`  | `timestamptz` | Not Null, Default `now()`                          |
 
+### `public.personal_access_tokens`
+
+Stores hashed personal access tokens for MCP and automation clients. The plaintext token is never persisted.
+
+| Column | Type | Constraints |
+|---|---|---|
+| `id` | `uuid` | Primary key, default `gen_random_uuid()` |
+| `user_id` | `uuid` | Not null, foreign key to `auth.users(id)` with cascade delete |
+| `name` | `text` | Not null, 1–100 characters |
+| `token_prefix` | `text` | Not null, display-only prefix |
+| `token_hash` | `text` | Not null, unique SHA-256 digest |
+| `created_at` | `timestamptz` | Not null, default `now()` |
+| `last_used_at` | `timestamptz` | Nullable |
+| `expires_at` | `timestamptz` | Nullable |
+| `revoked_at` | `timestamptz` | Nullable |
+
+RLS allows authenticated users to list only their own token metadata. Token creation and revocation are performed by the backend with the server-only Supabase secret key after validating the user's session.
+
 ### Indexes
 
 For optimal query performance:
