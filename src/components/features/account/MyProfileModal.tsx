@@ -23,6 +23,7 @@ import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/Avatar';
 import ImageCropModal from './ImageCropModal';
+import { AccountSettingsPanel } from './AccountSettingsPanel';
 import { useCharacterLimit } from '../../../hooks/use-character-limit';
 
 interface MyProfileModalProps {
@@ -59,6 +60,7 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
     const [isUploading, setIsUploading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'profile' | 'settings'>('profile');
 
     // Initialize form when profile loads
     useEffect(() => {
@@ -98,10 +100,10 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
             setIsCropModalOpen(false);
             setSelectedImage(null);
             toast.success(t('account.upload_success'));
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Failed to upload avatar:', err);
             toast.error(t('common.error'), {
-                description: err.message || t('account.upload_error'),
+                description: err instanceof Error ? err.message : t('account.upload_error'),
             });
         } finally {
             setIsUploading(false);
@@ -117,7 +119,7 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
             });
             toast.success('Profile updated successfully');
             onClose();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error updating profile', error);
             toast.error('Failed to update profile');
         }
@@ -139,6 +141,31 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
                         <DialogDescription>Edit your profile information and settings</DialogDescription>
                     </DialogHeader>
 
+                    <div className={`flex gap-1 border-b px-6 pt-4 ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`} role="tablist" aria-label={t('account.my_account')}>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === 'profile'}
+                            data-testid="profile-tab"
+                            onClick={() => setActiveTab('profile')}
+                            className={`border-b-2 px-3 py-2 text-sm font-medium ${activeTab === 'profile' ? 'border-indigo-500 text-indigo-500' : 'border-transparent text-muted-foreground'}`}
+                        >
+                            {t('account.my_profile')}
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === 'settings'}
+                            data-testid="settings-tab"
+                            onClick={() => setActiveTab('settings')}
+                            className={`border-b-2 px-3 py-2 text-sm font-medium ${activeTab === 'settings' ? 'border-indigo-500 text-indigo-500' : 'border-transparent text-muted-foreground'}`}
+                        >
+                            {t('account.settings')}
+                        </button>
+                    </div>
+
+                    {activeTab === 'profile' ? (
+                    <div>
                     {/* Gradient Banner */}
                     <div
                         className="px-6 py-4 h-36"
@@ -312,17 +339,22 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
                         </form>
                     </div>
 
+                    </div>
+                    ) : <AccountSettingsPanel theme={theme} />}
+
                     <DialogFooter className={`border-t px-6 py-4 rounded-b-2xl ${theme === 'dark' ? 'border-gray-800 bg-gray-900' : 'border-gray-100 bg-gray-50'}`}>
                         <DialogClose asChild>
                             <Button variant="outline" onClick={onClose} className={theme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white' : 'border-gray-200 hover:bg-gray-100'}>Cancel</Button>
                         </DialogClose>
-                        <Button
-                            type="submit"
-                            form="my-profile-form"
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white border-0"
-                        >
-                            Save Changes
-                        </Button>
+                        {activeTab === 'profile' && (
+                            <Button
+                                type="submit"
+                                form="my-profile-form"
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white border-0"
+                            >
+                                Save Changes
+                            </Button>
+                        )}
                     </DialogFooter>
                 </DialogContent>
 

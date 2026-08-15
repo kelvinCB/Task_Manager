@@ -43,6 +43,9 @@ In Vercel, the backend runs as a Serverless Function.
 # Backend Critical
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_KEY=...       # Anon Key
+SUPABASE_URL=...             # Server-side URL (preferred)
+SUPABASE_KEY=...             # Publishable/anon key for RLS-aware requests
+SUPABASE_SECRET_KEY=...      # Server-only key for personal access token lookup
 VITE_OPENAI_API_KEY=...
 VITE_OPENAI_MODEL=...
 ```
@@ -120,6 +123,10 @@ backend/
 | GET | `/api/profile` | Get user profile (includes credits) |
 | POST | `/api/profile/avatar` | Upload profile avatar |
 | DELETE | `/api/profile/avatar` | Delete profile avatar |
+| **Personal Access Tokens** | | |
+| GET | `/api/personal-access-tokens` | List the authenticated user's tokens (never returns token secrets) |
+| POST | `/api/personal-access-tokens` | Create a token; the raw secret is returned once |
+| POST | `/api/personal-access-tokens/:id/revoke` | Revoke one of the authenticated user's tokens |
 | **Upload** | | |
 | POST | `/api/upload` | Upload generic file (Docs, Images, Media) |
 | GET | `/api/upload/test` | Upload test endpoint |
@@ -148,6 +155,16 @@ backend/
 > 4. Keep the table organized by modules (Auth, Tasks, etc.).
 >
 > This table is the source of truth for manual testing and frontend development. Keep it updated!
+
+### Personal Access Tokens (MCP)
+
+The Settings tab creates tokens with the `kolium_pat_` prefix. Only a SHA-256 hash is persisted in Supabase; the raw token is returned once at creation time. MCP clients authenticate with:
+
+```http
+Authorization: Bearer kolium_pat_<secret>
+```
+
+PATs are scoped to the owning user by the backend and the existing task/profile/time-entry controllers. They can be revoked from Settings, and optional expiration is supported for up to 10 years.
 
 #### Request/Response Format
 **Register:**

@@ -14,7 +14,7 @@ router.post('/chat', authenticateUser, async (req, res) => {
 
   const userId = req.user.id;
   const token = req.headers.authorization?.split(' ')[1];
-  const userClient = token ? createClientWithToken(token) : supabase;
+  const userClient = req.supabase || (token ? createClientWithToken(token) : supabase);
 
   try {
     // 1. Check Credits
@@ -100,7 +100,7 @@ router.post('/generate-image', authenticateUser, async (req, res) => {
 
   const userId = req.user.id;
   const token = req.headers.authorization?.split(' ')[1];
-  const userClient = token ? createClientWithToken(token) : supabase;
+  const userClient = req.supabase || (token ? createClientWithToken(token) : supabase);
   const COST_PER_IMAGE = 3;
 
   try {

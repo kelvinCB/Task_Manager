@@ -30,6 +30,25 @@ Authorization: Bearer <supabase-jwt-token>
 
 The JWT token is obtained through Supabase authentication and contains the user's ID in the `sub` claim.
 
+### Personal access tokens
+
+Users can create a personal access token from **My Account → Settings** for MCP clients and other automation. Send it using the same header format:
+
+```http
+Authorization: Bearer kolium_pat_<secret>
+```
+
+The raw secret is shown only once. The API stores only a SHA-256 hash, supports optional expiration, records last use, and allows the owner to revoke the token. Configure the server-only `SUPABASE_SECRET_KEY` and apply `migrations/002_create_personal_access_tokens.sql` before using these endpoints.
+
+#### GET /personal-access-tokens
+Returns the authenticated user's token metadata without secrets.
+
+#### POST /personal-access-tokens
+Creates a token. The request body accepts `name` and optional `expires_in_days` (`null` means no expiration).
+
+#### POST /personal-access-tokens/:id/revoke
+Revokes an active token owned by the authenticated user.
+
 ## Endpoints
 
 ### Authentication
