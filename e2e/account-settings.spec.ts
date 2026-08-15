@@ -61,7 +61,7 @@ test.describe('Account settings personal access tokens', () => {
     await authPage.login(email!, password!);
     await authPage.expectLoggedIn();
 
-    await page.getByTestId('account-menu-button').click();
+    await page.locator('[data-testid="account-menu-button"]:visible').first().click();
     await page.getByTestId('my-profile-menu-item').click();
     await page.getByTestId('settings-tab').click();
     await expect(page.getByTestId('account-settings-panel')).toBeVisible();
