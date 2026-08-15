@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const dotenv = require('dotenv');
 
 const mode = process.env.NODE_ENV || 'development';
 
@@ -9,6 +8,7 @@ const mode = process.env.NODE_ENV || 'development';
 if (process.env.VERCEL) {
   console.log('[env] Running on Vercel. Skipping .env file loading.');
 } else {
+  const dotenv = require('dotenv');
   // Determine if we're running from root or backend directory
   const isInBackend = process.cwd().endsWith('backend');
   const baseDir = isInBackend ? process.cwd() : path.resolve(process.cwd(), 'backend');
