@@ -22,6 +22,16 @@ describe('TaskIdBadge', () => {
     expect(container.firstChild).toBeNull();
   });
 
+  it('does not render temporary non-numeric ids', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <TaskIdBadge id="ms7xgti5lgqk5g1vn5" />
+      </ThemeProvider>
+    );
+
+    expect(container.firstChild).toBeNull();
+  });
+
   it('applies correct size classes', () => {
     const { container: xsContainer } = render(
       <ThemeProvider>
