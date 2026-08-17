@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import { AuthPage } from './page-objects/auth.page';
 
 test.describe('Account settings personal access tokens', () => {
+  test.use({ viewport: { width: 1280, height: 600 } });
+
   test('creates and revokes a token from the Settings tab', async ({ page }) => {
     const email = process.env.E2E_USER_PROFILE_EMAIL;
     const password = process.env.E2E_USER_PROFILE_PASSWORD;
@@ -63,7 +65,11 @@ test.describe('Account settings personal access tokens', () => {
 
     await page.locator('[data-testid="account-menu-button"]:visible').first().click();
     await page.getByTestId('my-profile-menu-item').click();
-    await page.getByTestId('settings-tab').click();
+    const settingsTab = page.getByTestId('settings-tab');
+    await expect(settingsTab).toBeVisible();
+    await expect(settingsTab).toBeInViewport();
+    await settingsTab.click();
+    await expect(settingsTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByTestId('account-settings-panel')).toBeVisible();
 
     await page.getByLabel('Token name').fill('Playwright MCP');
