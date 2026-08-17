@@ -135,13 +135,13 @@ export const MyProfileModal: React.FC<MyProfileModalProps> = ({
     return (
         <>
             <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-                <DialogContent data-testid="my-profile-modal" className={`sm:max-w-xl p-0 overflow-hidden rounded-2xl border ${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white'}`}>
+                <DialogContent data-testid="my-profile-modal" className={`sm:max-w-xl max-h-[calc(100vh-2rem)] overflow-y-auto overflow-x-hidden !top-4 !translate-y-0 md:!top-[50%] md:!translate-y-[-50%] p-0 rounded-2xl border ${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white'}`}>
                     <DialogHeader className="sr-only">
                         <DialogTitle>My Profile</DialogTitle>
                         <DialogDescription>Edit your profile information and settings</DialogDescription>
                     </DialogHeader>
 
-                    <div className={`flex gap-1 border-b px-6 pt-4 ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`} role="tablist" aria-label={t('account.my_account')}>
+                    <div className={`sticky top-0 z-20 flex gap-1 border-b px-6 pt-4 ${theme === 'dark' ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`} role="tablist" aria-label={t('account.my_account')}>
                         <button
                             type="button"
                             role="tab"
