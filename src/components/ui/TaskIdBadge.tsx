@@ -18,6 +18,9 @@ export const TaskIdBadge: React.FC<TaskIdBadgeProps> = ({
 
   if (id === undefined || id === null) return null;
 
+  const normalizedId = String(id).trim();
+  if (!/^\d+$/.test(normalizedId)) return null;
+
   const sizeClasses = {
     xs: 'text-xs scale-90 origin-left',
     sm: 'text-xs',
@@ -29,10 +32,11 @@ export const TaskIdBadge: React.FC<TaskIdBadgeProps> = ({
 
   return (
     <span 
+      data-testid="task-id-badge"
       className={`font-mono mr-2 ${sizeClasses[size]} ${opacityClass} truncate ${maxWidth} ${className}`}
-      title={String(id)}
+      title={normalizedId}
     >
-      #{id}
+      #{normalizedId}
     </span>
   );
 };
